@@ -416,21 +416,15 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
       const ladder = document.querySelector<HTMLElement>('.ladder')
       if (ladder) {
         const cols = gsap.utils.toArray<HTMLElement>('.ladder .col')
-        const risers = gsap.utils.toArray<HTMLElement>('.ladder .riser')
-        const cards = gsap.utils.toArray<HTMLElement>('.ladder .card')
         let played = false
-        const revealAll = () => { gsap.set(cols, { clearProps: 'all' }); gsap.set(risers, { clearProps: 'all' }); gsap.set(cards, { clearProps: 'all' }) }
-        // estado inicial (la escalera está bien bajo el fold → sin flash)
-        gsap.set(cols, { opacity: 0, y: 28 })
-        gsap.set(risers, { scaleY: 0, transformOrigin: 'bottom center' })
-        gsap.set(cards, { scale: 0.97 })
+        const revealAll = () => { gsap.set(cols, { clearProps: 'all' }) }
+        // estado inicial (la escalera está bien bajo el fold → sin flash).
+        // NO se anima el pedestal-líquido: queda estático/lleno siempre (nunca colapsa).
+        gsap.set(cols, { opacity: 0, y: 26 })
         const play = () => {
           if (played) return
           played = true
-          const tl = gsap.timeline()
-          tl.to(cols, { opacity: 1, y: 0, duration: 0.5, stagger: 0.14, ease: 'power3.out' })
-            .to(cards, { scale: 1, duration: 0.5, stagger: 0.14, ease: 'back.out(1.2)' }, 0.02)
-            .to(risers, { scaleY: 1, duration: 0.7, stagger: 0.14, ease: 'power2.inOut' }, 0.12)
+          gsap.to(cols, { opacity: 1, y: 0, duration: 0.55, stagger: 0.13, ease: 'power3.out' })
           document.querySelectorAll<HTMLElement>('.ladder [data-rung-score]').forEach((el, i) => {
             const t = parseFloat(el.dataset.rungScore || '0')
             const o = { v: 0 }
