@@ -46,8 +46,8 @@ const liquid = (measured: boolean, sevBorder: string) =>
           {r.caption && <p class="q" style={`color:${axis.gray[600]}`}>{r.caption}</p>}
           {measured && <span class="sev" style={`background:${s.bg};color:${s.fg}`}>{s.label}</span>}
         </div>
-        <div class={`riser${measured ? ' measured' : ''}`} style={`--i:${i};background:${liquid(measured, s.border)}`}>
-          {measured && <span class="surface" style={`background:${s.border}`}></span>}
+        <div class={`riser${measured ? ' measured' : ''}`} style={`--i:${i};--liquid:${s.border};background:${liquid(measured, s.border)}`}>
+          {measured && <span class="surface" style={`--surface:${s.border}`}></span>}
         </div>
       </div>
     )
@@ -79,10 +79,57 @@ const liquid = (measured: boolean, sevBorder: string) =>
   .label { margin-top: 0.12rem; font-weight: 600; font-size: 0.92rem; line-height: 1.2; }
   .q { margin-top: 0.2rem; font-size: 0.76rem; line-height: 1.3; }
   .sev { align-self: flex-start; margin-top: 0.55rem; border-radius: 999px; padding: 0.12rem 0.5rem; font-size: 0.6875rem; font-weight: 600; }
-  .riser { position: relative; height: calc(10px + var(--i, 0) * 18px); overflow: hidden; }
-  .surface { position: absolute; inset: 0 0 auto 0; height: 2px; opacity: 0.85; }
+  .riser {
+    position: relative; height: calc(10px + var(--i, 0) * 18px); overflow: hidden; isolation: isolate;
+    --slosh-x: 0px; --slosh-tilt: 0deg; --current-y: 0px; --current-scale: 1;
+  }
+  .riser.measured {
+    box-shadow:
+      inset 0 8px 14px rgba(255,255,255,0.26),
+      inset 0 -12px 18px rgba(0,0,0,0.1);
+  }
+  .riser.measured::before {
+    content: ''; position: absolute; z-index: 1; inset: -24px -38px -14px;
+    background:
+      radial-gradient(58px 24px at 18% 58%, rgba(255,255,255,0.34), transparent 72%),
+      radial-gradient(64px 28px at 72% 38%, rgba(255,255,255,0.24), transparent 72%),
+      radial-gradient(92px 34px at 48% 106%, rgba(255,255,255,0.22), transparent 76%),
+      linear-gradient(90deg, rgba(255,255,255,0.12), transparent 34%, rgba(255,255,255,0.18) 58%, transparent);
+    opacity: 0.74;
+    filter: blur(0.5px);
+    transform: translate3d(var(--slosh-x), var(--current-y), 0) rotate(var(--slosh-tilt)) scaleX(var(--current-scale));
+    transform-origin: 50% 50%;
+    will-change: transform;
+    pointer-events: none;
+  }
+  .surface {
+    position: absolute; z-index: 3; inset: -7px -18% auto; height: 17px; opacity: 0.98;
+    background:
+      radial-gradient(72% 92% at 50% 88%, rgba(255,255,255,0.56), transparent 68%),
+      linear-gradient(90deg, transparent 0%, var(--surface) 14%, var(--surface) 86%, transparent 100%);
+    border-radius: 999px;
+    box-shadow: 0 5px 14px rgba(0,0,0,0.11);
+    transform-origin: 50% 50%;
+    will-change: transform;
+    pointer-events: none;
+  }
+  .surface::before {
+    content: ''; position: absolute; inset: 7px 13% auto; height: 3px; border-radius: 999px;
+    background: rgba(255,255,255,0.5);
+    filter: blur(0.2px);
+    opacity: 0.78;
+    pointer-events: none;
+  }
+  .surface::after {
+    content: ''; position: absolute; inset: 0 8% auto; height: 11px; border-radius: 999px;
+    background:
+      radial-gradient(24px 8px at 22% 70%, rgba(255,255,255,0.6), transparent 78%),
+      radial-gradient(32px 10px at 78% 42%, rgba(255,255,255,0.42), transparent 78%);
+    opacity: 0.62;
+    pointer-events: none;
+  }
   .riser.measured::after {
-    content: ''; position: absolute; inset: 0;
+    content: ''; position: absolute; z-index: 2; inset: 0;
     background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%);
     transform: translateX(-120%); animation: mladder-sheen 4.5s ease-in-out infinite;
   }
@@ -91,7 +138,10 @@ const liquid = (measured: boolean, sevBorder: string) =>
     .mladder { grid-template-columns: 1fr; gap: 0.55rem; align-items: stretch; }
     .riser { height: 10px !important; }
   }
-  @media (prefers-reduced-motion: reduce) { .riser.measured::after { animation: none; opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .riser.measured::before, .surface { will-change: auto; }
+    .riser.measured::after { animation: none; opacity: 0; }
+  }
 </style>
 
 <script>
@@ -104,6 +154,46 @@ const liquid = (measured: boolean, sevBorder: string) =>
     const cols = Array.from(ladder.querySelectorAll<HTMLElement>('.col'))
     if (!cols.length) return
     if (reduce) return
+    cols.forEach((col) => {
+      const riser = col.querySelector<HTMLElement>('.riser.measured')
+      const surface = col.querySelector<HTMLElement>('.surface')
+      if (!riser) return
+      col.addEventListener('pointerenter', () => {
+        gsap.killTweensOf([riser, surface])
+        const tl = gsap.timeline({ defaults: { overwrite: 'auto' } })
+        tl.to(riser, { '--slosh-x': '22px', '--slosh-tilt': '-4deg', '--current-y': '-2px', '--current-scale': 1.08, duration: 0.22, ease: 'sine.out' })
+          .to(riser, { '--slosh-x': '-14px', '--slosh-tilt': '2.6deg', '--current-y': '1px', '--current-scale': 1.03, duration: 0.34, ease: 'sine.inOut' })
+          .to(riser, { '--slosh-x': '6px', '--slosh-tilt': '-1deg', '--current-y': '0px', '--current-scale': 1.01, duration: 0.28, ease: 'sine.inOut' })
+          .to(riser, { '--slosh-x': '0px', '--slosh-tilt': '0deg', '--current-y': '0px', '--current-scale': 1, duration: 0.72, ease: 'elastic.out(1,0.48)' })
+        if (surface) {
+          tl.to(surface, { xPercent: 12, y: -2, rotation: -4.5, scaleX: 1.06, duration: 0.22, ease: 'sine.out' }, 0)
+            .to(surface, { xPercent: -8, y: 1, rotation: 3, scaleX: 1.03, duration: 0.34, ease: 'sine.inOut' }, 0.22)
+            .to(surface, { xPercent: 4, y: 0, rotation: -1.3, scaleX: 1.01, duration: 0.28, ease: 'sine.inOut' }, 0.56)
+            .to(surface, { xPercent: 0, y: 0, rotation: 0, scaleX: 1, duration: 0.72, ease: 'elastic.out(1,0.48)' }, 0.84)
+        }
+      })
+      col.addEventListener('pointermove', (event) => {
+        const e = event as PointerEvent
+        const rect = col.getBoundingClientRect()
+        const ratio = Math.max(-0.5, Math.min(0.5, (e.clientX - rect.left) / rect.width - 0.5))
+        gsap.to(riser, {
+          '--slosh-x': `${ratio * -34}px`,
+          '--slosh-tilt': `${ratio * 8}deg`,
+          '--current-y': `${Math.abs(ratio) * -3}px`,
+          '--current-scale': 1 + Math.abs(ratio) * 0.1,
+          duration: 0.22,
+          ease: 'sine.out',
+          overwrite: 'auto',
+        })
+        if (surface) {
+          gsap.to(surface, { xPercent: ratio * -18, y: Math.abs(ratio) * -2, rotation: ratio * 8, scaleX: 1 + Math.abs(ratio) * 0.08, duration: 0.22, ease: 'sine.out', overwrite: 'auto' })
+        }
+      })
+      col.addEventListener('pointerleave', () => {
+        gsap.to(riser, { '--slosh-x': '0px', '--slosh-tilt': '0deg', '--current-y': '0px', '--current-scale': 1, duration: 0.9, ease: 'elastic.out(1,0.5)', overwrite: 'auto' })
+        if (surface) gsap.to(surface, { xPercent: 0, y: 0, rotation: 0, scaleX: 1, duration: 0.9, ease: 'elastic.out(1,0.5)', overwrite: 'auto' })
+      })
+    })
     let played = false
     gsap.set(cols, { opacity: 0, y: 26 })
     const play = () => {
@@ -115,6 +205,20 @@ const liquid = (measured: boolean, sevBorder: string) =>
         const o = { v: 0 }
         gsap.to(o, { v: t, duration: 0.8, delay: 0.2 + i * 0.13, ease: 'power2.out', onUpdate: () => { el.textContent = String(Math.round(o.v)) } })
       })
+      const risers = Array.from(ladder.querySelectorAll<HTMLElement>('.riser.measured'))
+      const surfaces = risers
+        .map((r) => r.querySelector<HTMLElement>('.surface'))
+        .filter((el): el is HTMLElement => Boolean(el))
+      gsap.fromTo(
+        risers,
+        { '--slosh-x': '-30px', '--slosh-tilt': '-5deg', '--current-y': '-3px', '--current-scale': 1.1 },
+        { '--slosh-x': '0px', '--slosh-tilt': '0deg', '--current-y': '0px', '--current-scale': 1, duration: 1.2, delay: 0.22, stagger: 0.12, ease: 'elastic.out(1,0.46)' },
+      )
+      gsap.fromTo(
+        surfaces,
+        { xPercent: -16, y: -2, rotation: -4, scaleX: 1.08 },
+        { xPercent: 0, y: 0, rotation: 0, scaleX: 1, duration: 1.2, delay: 0.22, stagger: 0.12, ease: 'elastic.out(1,0.46)' },
+      )
     }
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting) { play(); io.disconnect() } })
