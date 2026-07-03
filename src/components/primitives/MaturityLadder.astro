@@ -1,0 +1,125 @@
+---
+/**
+ * MaturityLadder — PRIMITIVA CANÓNICA del hub (la "escalera").
+ *
+ * Escalera de peldaños de madurez que se suben en orden. Presentación pura + self-contained
+ * (estilos + motion propios). Contrato en `@lib/primitives/ladder` (`LadderRung`).
+ *
+ * Cada peldaño es UNA pieza (card + líquido como base, sin costura):
+ *  - altura del pedestal-líquido = posición en la escalera (ordinal)
+ *  - color del líquido + chip = severidad ('critico'|'atencion'|'optimo'|'sin_dato')
+ *  - score = número; null = "En cobertura" (pedestal con hatch)
+ *  - isNext = marcador "Empieza aquí" + anillo de acento
+ *
+ * Uso:  <MaturityLadder rungs={rungs} />   (rungs ordenados 01→N con isNext resuelto)
+ */
+import { axis, severityMeta } from '@lib/report-tokens'
+import type { MaturityLadderProps } from '@lib/primitives/ladder'
+
+const { rungs, animate = true, nextLabel = 'Empieza aquí', coverageLabel = 'En cobertura' } =
+  Astro.props as MaturityLadderProps
+
+const liquid = (measured: boolean, sevBorder: string) =>
+  measured
+    ? `linear-gradient(180deg, ${sevBorder}cc 0%, ${sevBorder}30 100%)`
+    : `repeating-linear-gradient(135deg, ${axis.gray[100]} 0 10px, ${axis.gray[50]} 10px 20px)`
+---
+
+<div class="mladder" data-animate={animate ? '' : undefined} style={`--n:${rungs.length}`}>
+  {rungs.map((r, i) => {
+    const measured = r.score !== null
+    const s = severityMeta(measured ? r.severity : 'sin_dato')
+    return (
+      <div class={`col${r.isNext ? ' is-next' : ''}`}>
+        <div class="card">
+          {r.isNext && <p class="next" style={`color:${axis.accent[700]}`}>{nextLabel}</p>}
+          <div class="card-top">
+            <span class="ord" style={`color:${axis.gray[200]}`}>{r.ordinal}</span>
+            {measured ? (
+              <span class="score" data-rung-score={Math.round(r.score as number)} style={`color:${axis.gray[900]}`}>{Math.round(r.score as number)}</span>
+            ) : (
+              <span class="cover" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>{coverageLabel}</span>
+            )}
+          </div>
+          {r.eyebrow && <p class="bex" style={`color:${axis.accent[500]}`}>{r.eyebrow}</p>}
+          <p class="label" style={`color:${axis.gray[900]}`}>{r.label}</p>
+          {r.caption && <p class="q" style={`color:${axis.gray[600]}`}>{r.caption}</p>}
+          {measured && <span class="sev" style={`background:${s.bg};color:${s.fg}`}>{s.label}</span>}
+        </div>
+        <div class={`riser${measured ? ' measured' : ''}`} style={`--i:${i};background:${liquid(measured, s.border)}`}>
+          {measured && <span class="surface" style={`background:${s.border}`}></span>}
+        </div>
+      </div>
+    )
+  })}
+</div>
+
+<style>
+  .mladder { margin-top: 1.75rem; display: grid; grid-template-columns: repeat(var(--n), 1fr); align-items: end; gap: 0.75rem; }
+  .col {
+    display: flex; flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.07); border-radius: 16px; overflow: hidden; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    transition: box-shadow 0.18s cubic-bezier(0.2,0,0,1), transform 0.18s cubic-bezier(0.2,0,0,1);
+  }
+  @media (hover: hover) { .col:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -14px rgba(2,60,112,0.3); } }
+  .col.is-next {
+    border-color: transparent;
+    box-shadow: 0 0 0 2px #0375db, 0 10px 26px -12px rgba(3,117,219,0.42);
+    background: linear-gradient(180deg, rgba(3,117,219,0.06), #fff 42%);
+  }
+  .card { display: flex; flex-direction: column; gap: 0.12rem; padding: 1rem 1.05rem 1.15rem; }
+  .next { display: inline-flex; align-items: center; gap: 0.28rem; font-size: 0.6875rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.35rem; }
+  .next::before { content: '↑'; font-size: 0.72rem; }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem; }
+  .ord { font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .score { font-size: 1.9rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
+  .cover { font-size: 0.6875rem; font-weight: 500; border-radius: 999px; padding: 0.2rem 0.5rem; white-space: nowrap; }
+  .bex { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+  .label { margin-top: 0.12rem; font-weight: 600; font-size: 0.92rem; line-height: 1.2; }
+  .q { margin-top: 0.2rem; font-size: 0.76rem; line-height: 1.3; }
+  .sev { align-self: flex-start; margin-top: 0.55rem; border-radius: 999px; padding: 0.12rem 0.5rem; font-size: 0.6875rem; font-weight: 600; }
+  .riser { position: relative; height: calc(10px + var(--i, 0) * 18px); overflow: hidden; }
+  .surface { position: absolute; inset: 0 0 auto 0; height: 2px; opacity: 0.85; }
+  .riser.measured::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%);
+    transform: translateX(-120%); animation: mladder-sheen 4.5s ease-in-out infinite;
+  }
+  @keyframes mladder-sheen { 0%, 60%, 100% { transform: translateX(-120%); } 80% { transform: translateX(120%); } }
+  @media (max-width: 720px) {
+    .mladder { grid-template-columns: 1fr; gap: 0.55rem; align-items: stretch; }
+    .riser { height: 10px !important; }
+  }
+  @media (prefers-reduced-motion: reduce) { .riser.measured::after { animation: none; opacity: 0; } }
+</style>
+
+<script>
+  // Motion self-contained de la primitiva: los peldaños suben en secuencia + count-up.
+  // El pedestal-líquido NO se anima (estático/lleno siempre → nunca colapsa). Robusto:
+  // fail-safe global + reduced-motion + bien bajo el fold. Soporta múltiples instancias.
+  import gsap from 'gsap'
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  document.querySelectorAll<HTMLElement>('.mladder[data-animate]').forEach((ladder) => {
+    const cols = Array.from(ladder.querySelectorAll<HTMLElement>('.col'))
+    if (!cols.length) return
+    if (reduce) return
+    let played = false
+    gsap.set(cols, { opacity: 0, y: 26 })
+    const play = () => {
+      if (played) return
+      played = true
+      gsap.to(cols, { opacity: 1, y: 0, duration: 0.55, stagger: 0.13, ease: 'power3.out' })
+      ladder.querySelectorAll<HTMLElement>('[data-rung-score]').forEach((el, i) => {
+        const t = parseFloat(el.dataset.rungScore || '0')
+        const o = { v: 0 }
+        gsap.to(o, { v: t, duration: 0.8, delay: 0.2 + i * 0.13, ease: 'power2.out', onUpdate: () => { el.textContent = String(Math.round(o.v)) } })
+      })
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { play(); io.disconnect() } })
+    }, { threshold: 0.15 })
+    io.observe(ladder)
+    window.setTimeout(() => { if (!played) gsap.set(cols, { clearProps: 'all' }) }, 3500)
+  })
+</script>

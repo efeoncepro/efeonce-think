@@ -5,10 +5,11 @@ export const prerender = false
 import BaseLayout from '@layouts/BaseLayout.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import EngineMark from '@/components/EngineMark.astro'
-import LevelLadder from '@/components/LevelLadder.astro'
+import MaturityLadder from '@/components/primitives/MaturityLadder.astro'
 import CompetitiveBenchmark from '@/components/CompetitiveBenchmark.astro'
 import { fetchPublicReport } from '@lib/report'
-import { axis, severityMeta } from '@lib/report-tokens'
+import { axis, severityMeta, LEVEL_COPY } from '@lib/report-tokens'
+import type { LadderRung } from '@lib/primitives/ladder'
 
 const { token } = Astro.params
 const result = token ? await fetchPublicReport(token) : ({ status: 'not_found' } as const)
@@ -42,6 +43,26 @@ const levels = (model?.levels as Level[]) ?? []
 const dimensions = (model?.dimensions as Dimension[]) ?? []
 const primaryGap = model?.primaryGap as { title?: string; severity?: Sev } | undefined
 const recommendations = (model?.recommendations as Rec[]) ?? []
+
+// Adapter: modelo del grader (Level[] + LEVEL_COPY) → contrato de la primitiva MaturityLadder.
+// Ordena 01→N y marca el primer peldaño no-óptimo como "tu próximo nivel".
+const orderedLevels = [...levels].sort(
+  (a, b) => Number(LEVEL_COPY[a.id]?.ordinal ?? '99') - Number(LEVEL_COPY[b.id]?.ordinal ?? '99'),
+)
+const nextLevelIdx = orderedLevels.findIndex((l) => l.severity !== 'optimo')
+const ladderRungs: LadderRung[] = orderedLevels.map((lvl, i) => {
+  const copy = LEVEL_COPY[lvl.id] ?? { ordinal: '', label: lvl.id, labelEn: '', tier: '', result: '', desc: '', question: '' }
+  const measured = lvl.status === 'measured' && lvl.score !== null
+  return {
+    ordinal: copy.ordinal,
+    eyebrow: copy.labelEn,
+    label: copy.label,
+    caption: copy.question,
+    score: measured ? (lvl.score as number) : null,
+    severity: lvl.severity,
+    isNext: i === nextLevelIdx,
+  }
+})
 const engines = (model?.engineSnapshot as Engine[]) ?? []
 const disclaimer = (model?.disclaimer as string) ?? ''
 
@@ -217,7 +238,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               <p class="mt-2 max-w-2xl lead" style={`color:${axis.gray[600]}`}>
                 Existir para la IA es subir cinco peldaños — los <strong style={`color:${axis.gray[900]}`}>5 Be</strong> del AEO: <strong style={`color:${axis.gray[900]}`}>Be Found</strong>, <strong style={`color:${axis.gray[900]}`}>Readable</strong>, <strong style={`color:${axis.gray[900]}`}>Correct</strong>, <strong style={`color:${axis.gray[900]}`}>Actionable</strong> e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong>. Cada peldaño se apoya en el anterior — el primero que aún no logras es tu próximo nivel.
               </p>
-              <LevelLadder levels={levels} />
+              <MaturityLadder rungs={ladderRungs} />
             </section>
           )}
 
@@ -410,32 +431,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         gsap.from(el, { width: 0, duration: 1, ease: 'power2.out', delay: 0.2 })
       })
 
-      // ── LA ESCALERA se anima: peldaños suben en secuencia + pedestales crecen + count-up ──
-      const ladder = document.querySelector<HTMLElement>('.ladder')
-      if (ladder) {
-        const cols = gsap.utils.toArray<HTMLElement>('.ladder .col')
-        let played = false
-        const revealAll = () => { gsap.set(cols, { clearProps: 'all' }) }
-        // estado inicial (la escalera está bien bajo el fold → sin flash).
-        // NO se anima el pedestal-líquido: queda estático/lleno siempre (nunca colapsa).
-        gsap.set(cols, { opacity: 0, y: 26 })
-        const play = () => {
-          if (played) return
-          played = true
-          gsap.to(cols, { opacity: 1, y: 0, duration: 0.55, stagger: 0.13, ease: 'power3.out' })
-          document.querySelectorAll<HTMLElement>('.ladder [data-rung-score]').forEach((el, i) => {
-            const t = parseFloat(el.dataset.rungScore || '0')
-            const o = { v: 0 }
-            gsap.to(o, { v: t, duration: 0.8, delay: 0.2 + i * 0.14, ease: 'power2.out', onUpdate: () => { el.textContent = String(Math.round(o.v)) } })
-          })
-        }
-        const io = new IntersectionObserver((entries) => {
-          entries.forEach((e) => { if (e.isIntersecting) { play(); io.disconnect() } })
-        }, { threshold: 0.15 })
-        io.observe(ladder)
-        // fail-safe: si nunca dispara, mostrar todo a los 3.5s (página de conversión: nunca en blanco)
-        window.setTimeout(() => { if (!played) revealAll() }, 3500)
-      }
+      // (La escalera anima su propia entrada — motion self-contained en la primitiva MaturityLadder.)
 
       // ── reveal on-scroll sutil de cada sección (robusto: fail-safe global) ──
       const sections = gsap.utils.toArray<HTMLElement>('main section')
