@@ -52,8 +52,8 @@ export interface LevelCopy {
 export const LEVEL_COPY: Record<string, LevelCopy> = {
   found: {
     ordinal: '01', label: 'Que te encuentre', labelEn: 'Be Found', tier: 'Base', result: 'Visible',
-    desc: 'Estás indexado y visible para los motores de IA. Si no te encuentran, nada más importa.',
-    question: '¿Existes para la IA?',
+    desc: 'Estás indexado y visible para los motores de respuesta. Si no te encuentran, nada más importa.',
+    question: '¿Te encuentran?',
   },
   readable: {
     ordinal: '02', label: 'Que te entienda', labelEn: 'Be Readable', tier: 'Base', result: 'Legible',
@@ -62,17 +62,17 @@ export const LEVEL_COPY: Record<string, LevelCopy> = {
   },
   correct: {
     ordinal: '03', label: 'Que te describa bien', labelEn: 'Be Correct', tier: 'Alto riesgo', result: 'Preciso',
-    desc: 'Lo que la IA dice de ti es verdad: sin features inventadas, precios viejos ni confusión con tu competencia.',
+    desc: 'Lo que los motores responden sobre ti es verdad: sin features inventadas, precios viejos ni confusión con tu competencia.',
     question: '¿Lo que dice de ti es verdad?',
   },
   actionable: {
     ordinal: '04', label: 'Que pueda actuar', labelEn: 'Be Actionable', tier: 'Sistema', result: 'Accionable',
-    desc: 'Un agente de IA puede comparar, reservar o comprar en tu sitio sin fricción.',
+    desc: 'Un agente puede comparar, reservar o comprar en tu sitio sin fricción.',
     question: '¿Te pueden usar, no solo citar?',
   },
   intrinsic: {
     ordinal: '05', label: 'Que te prefiera', labelEn: 'Be Intrinsic', tier: 'La meta', result: 'Preferido',
-    desc: 'Eres la recomendación por defecto: parte de cómo la IA entiende tu categoría.',
+    desc: 'Eres la recomendación por defecto: parte de cómo los motores de respuesta entienden tu categoría.',
     question: '¿Eres el default?',
   },
 }
@@ -81,12 +81,12 @@ export const AXIS_LABEL: Record<string, { title: string; tag: string; helper: st
   perception: {
     title: 'Eje de percepción',
     tag: 'Percepción · ¿te mencionan?',
-    helper: 'Cómo los motores te encuentran, entienden, representan y recomiendan.',
+    helper: 'Cómo los motores de respuesta te encuentran, entienden, representan y recomiendan.',
   },
   agentic: {
     title: 'Eje de operabilidad',
     tag: 'Operabilidad · ¿te pueden usar?',
-    helper: 'Qué tan listo está tu sitio para que un agente pueda actuar, no solo citarte.',
+    helper: 'Qué tan listo está tu sitio para que un agente pueda actuar, no solo citarte en una respuesta.',
   },
 }
 

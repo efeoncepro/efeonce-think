@@ -111,7 +111,7 @@ const criticalDimensions = dimensions
 const unmeasuredDimensions = dimensions.filter((d) => d.score === null)
 const partialReason =
   gate?.status === 'partial'
-    ? 'Score basado en motores que respondieron; operabilidad sigue en cobertura.'
+    ? 'Score basado en motores de respuesta que respondieron; operabilidad sigue en cobertura.'
     : null
 
 // Gauge glow (dirección B)
@@ -121,8 +121,8 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
 ---
 
 <BaseLayout
-  title={`Informe de visibilidad en IA${header?.organizationName ? ` — ${header.organizationName}` : ''}`}
-  description={`Diagnóstico de la visibilidad de ${header?.organizationName ?? 'tu marca'} en los motores de IA — qué tan visible, entendible y recomendable eres para ChatGPT, Gemini, Perplexity y más.`}
+  title={`Informe de visibilidad en respuestas de IA${header?.organizationName ? ` — ${header.organizationName}` : ''}`}
+  description={`Diagnóstico de la visibilidad de ${header?.organizationName ?? 'tu marca'} en motores de respuesta — qué tanto apareces, cómo te representan y si te citan ChatGPT, Gemini, Perplexity y más.`}
   noindex
 >
   {
@@ -137,7 +137,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             <div class="flex items-center justify-between gap-4">
               <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:34px;width:auto" />
               <span class="rounded-full px-3.5 py-1.5 text-xs font-medium" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.88)">
-                Informe de visibilidad en IA
+                Informe de visibilidad en respuestas de IA
               </span>
             </div>
 
@@ -239,8 +239,8 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {engines.length > 0 && (
             <section class="py-16" data-capture="report-engine-visibility">
               <p class="eyebrow" style={`color:${axis.accent[500]}`}>01 · Cobertura capturada</p>
-              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Qué motores mencionan a {organizationName}</h2>
-              <p class="section-lead" style={`color:${axis.gray[600]}`}>Separamos menciones reales, ausencia de mención y motores sin respuesta. Así el diagnóstico no confunde una consulta sin resultado con una medición que aún está en cobertura.</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Qué motores de respuesta mencionan a {organizationName}</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Separamos menciones reales, ausencia de mención y motores que no respondieron. Así el diagnóstico no confunde una consulta sin resultado con una medición que aún está en cobertura.</p>
               <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
                 <div class="hidden grid-cols-[1.35fr_0.85fr_1.2fr] border-b px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] sm:grid" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
                   <span>Motor</span>
@@ -299,9 +299,9 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {levels.length > 0 && (
             <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
               <p class="eyebrow" style={`color:${axis.accent[500]}`}>03 · Marco de madurez</p>
-              <h2 class="section-title" style={`color:${axis.gray[900]}`}>La escalera de visibilidad en IA</h2>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>La escalera de visibilidad en motores de respuesta</h2>
               <p class="section-lead max-w-3xl" style={`color:${axis.gray[600]}`}>
-                El diagnóstico se ordena en cinco niveles acumulativos: <strong style={`color:${axis.gray[900]}`}>Be Found</strong>, <strong style={`color:${axis.gray[900]}`}>Readable</strong>, <strong style={`color:${axis.gray[900]}`}>Correct</strong>, <strong style={`color:${axis.gray[900]}`}>Actionable</strong> e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong>. El primer peldaño pendiente marca dónde destrabar avance antes de intentar optimizar niveles superiores.
+                El diagnóstico organiza menciones, citas y representación en cinco niveles acumulativos: <strong style={`color:${axis.gray[900]}`}>Be Found</strong>, <strong style={`color:${axis.gray[900]}`}>Readable</strong>, <strong style={`color:${axis.gray[900]}`}>Correct</strong>, <strong style={`color:${axis.gray[900]}`}>Actionable</strong> e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong>. El primer peldaño pendiente marca dónde destrabar avance antes de optimizar niveles superiores.
               </p>
               {coverageLevelCount > 0 && (
                 <p class="mt-3 max-w-2xl rounded-2xl border bg-white p-4 text-sm leading-relaxed" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
@@ -421,7 +421,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                 Convierte este diagnóstico en avance medible
               </h2>
               <p class="mt-2 max-w-xl text-sm leading-relaxed text-pretty" style="color:rgba(255,255,255,0.72)">
-                Transforma la brecha priorizada en un plan de mejoras, medición y contenido para que la IA te encuentre, te entienda y te recomiende con más consistencia.
+                Transforma la brecha priorizada en un plan de mejoras, medición y contenido para que los motores de respuesta te encuentren, te entiendan y te citen con más consistencia.
               </p>
             </div>
             <a
