@@ -372,16 +372,16 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                   )}
                 </div>
               )}
-              <div class="mt-5 grid gap-5 lg:grid-cols-[1fr_1.25fr] lg:items-start">
+              <div class="report-panel mt-5 grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[0.95fr_1.35fr]" style={`border-color:${axis.gray[100]}`}>
                 {hasRadar && (
-                  <figure class="report-panel rounded-2xl border p-4" style={`border-color:${axis.gray[100]}`}>
-                    <div id="dims-radar" data-dims={JSON.stringify(radarDims)} style="width:100%;height:300px"></div>
-                    <figcaption class="mt-2 text-xs leading-relaxed" style={`color:${axis.gray[600]}`}>
+                  <figure class="flex min-h-[360px] flex-col justify-center border-b p-5 lg:min-h-full lg:border-b-0 lg:border-r lg:p-6" style={`border-color:${axis.gray[100]};background:${axis.gray[50]}66`}>
+                    <div id="dims-radar" data-dims={JSON.stringify(radarDims)} style="width:100%;height:320px"></div>
+                    <figcaption class="mx-auto mt-3 max-w-sm text-center text-xs leading-relaxed lg:text-left" style={`color:${axis.gray[600]}`}>
                       Radar de dimensiones medidas; las dimensiones sin dato no se grafican como cero.
                     </figcaption>
                   </figure>
                 )}
-                <div class="report-panel overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+                <div class="overflow-hidden">
                   <div class="hidden grid-cols-[1.35fr_0.45fr_0.72fr_1.5fr] gap-4 border-b px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] lg:grid" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
                     <span>Dimensión</span>
                     <span class="text-right">Score</span>
