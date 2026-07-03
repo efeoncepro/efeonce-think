@@ -63,6 +63,7 @@ const ladderRungs: LadderRung[] = orderedLevels.map((lvl, i) => {
     isNext: i === nextLevelIdx,
   }
 })
+const coverageLevelCount = orderedLevels.filter((lvl) => lvl.status !== 'measured' || lvl.score === null).length
 const engines = (model?.engineSnapshot as Engine[]) ?? []
 const disclaimer = (model?.disclaimer as string) ?? ''
 
@@ -94,8 +95,23 @@ const RADAR_SHORT: Record<string, string> = {
 const radarDims = dimensions.filter((d) => d.score !== null).map((d) => ({ name: RADAR_SHORT[d.label] ?? d.label, score: Math.round(d.score as number) }))
 const hasRadar = radarDims.length >= 3
 
-
 const sev = severityMeta(overallSeverity)
+
+const findDimension = (label: string) => dimensions.find((d) => d.label === label)
+const entityClarity = findDimension('Entity Clarity')
+const categoryOwnership = findDimension('Category Ownership')
+const citationQuality = findDimension('Citation Quality')
+const strongDimensions = dimensions
+  .filter((d) => d.score !== null && d.severity === 'optimo')
+  .map((d) => ({ ...d, score: Math.round(d.score as number) }))
+const criticalDimensions = dimensions
+  .filter((d) => d.score !== null && d.severity === 'critico')
+  .map((d) => ({ ...d, score: Math.round(d.score as number) }))
+const unmeasuredDimensions = dimensions.filter((d) => d.score === null)
+const partialReason =
+  gate?.status === 'partial'
+    ? 'Score basado en motores que respondieron; operabilidad sigue en cobertura.'
+    : null
 
 // Gauge glow (dirección B)
 const R = 90
@@ -113,11 +129,16 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
       <article>
         {/* ══ HERO NAVY ══ */}
         <header
-          class="relative overflow-hidden px-6 pt-8 pb-20"
+          class="relative overflow-hidden px-6 pt-6 pb-14 sm:pt-8 sm:pb-20"
           style={`background:linear-gradient(160deg,${axis.accent[800]} 0%,${axis.accent[900]} 62%,#001a33 100%)`}
         >
-          <div class="mx-auto max-w-4xl">
-            <div class="flex items-center justify-between">
+          <div
+            aria-hidden="true"
+            class="pointer-events-none absolute inset-0"
+            style="background:linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(180deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:72px 72px;mask-image:linear-gradient(180deg,rgba(0,0,0,0.42),transparent 72%)"
+          ></div>
+          <div class="relative mx-auto max-w-4xl">
+            <div class="flex items-center justify-between gap-4">
               <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:34px;width:auto" />
               <span class="rounded-full px-3.5 py-1.5 text-xs font-medium" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.88)">
                 Informe de visibilidad en IA
@@ -125,28 +146,52 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             </div>
 
             {gate?.status === 'partial' && (
-              <div class="mt-8 flex items-start gap-2.5 rounded-xl px-4 py-3 text-sm" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.82)">
+              <div class="mt-8 grid gap-2 rounded-xl px-4 py-3 text-sm sm:grid-cols-[auto_1fr_auto]" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.82)">
                 <span aria-hidden="true">⚠️</span>
                 <p><span class="font-semibold text-white">Informe parcial.</span> Algunos motores no respondieron — te mostramos solo lo que sí pudimos medir.</p>
+                <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold" style="background:rgba(255,255,255,0.11);color:rgba(255,255,255,0.86)">
+                  Operabilidad en cobertura
+                </span>
               </div>
             )}
 
-            <div class="mt-10 flex flex-col items-center gap-8 pb-2 sm:mt-12 sm:flex-row sm:items-center sm:justify-center sm:gap-16">
-              <div class="relative shrink-0" role="img" aria-label={`Visibilidad ${overallScore ?? 'sin dato'} de 100, ${sev.label}`}>
-                <svg viewBox="0 0 220 128" style="width:260px;height:150px">
+            <div class="mt-8 grid items-center gap-7 pb-2 sm:mt-12 sm:grid-cols-[0.9fr_1.1fr] sm:gap-14">
+              <div class="relative mx-auto flex w-full max-w-[300px] items-center justify-center rounded-[28px] px-4 py-5 sm:max-w-none" role="img" aria-label={`Visibilidad ${overallScore ?? 'sin dato'} de 100, ${sev.label}`} style="background:linear-gradient(180deg,rgba(255,255,255,0.075),rgba(255,255,255,0.025));box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08)">
+                <svg viewBox="0 0 220 128" class="mx-auto" style="width:min(236px,66vw);height:auto">
                   <path d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="13" stroke-linecap="round" />
                   <path id="gauge-arc" data-dash={dash} data-circ={CIRC} d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke={sev.border} stroke-width="13" stroke-linecap="round" stroke-dasharray={`${dash} ${CIRC}`} style={`filter:drop-shadow(0 0 10px ${sev.border}aa)`} />
                 </svg>
-                <div class="absolute inset-0 flex flex-col items-center justify-end pb-2">
-                  <span class="text-6xl font-semibold tabular-nums text-white" data-countup={overallScore ?? ''}>{overallScore ?? '—'}</span>
+                <div class="absolute inset-0 flex flex-col items-center justify-end pb-7">
+                  <span class="text-5xl font-semibold tabular-nums text-white sm:text-6xl" data-countup={overallScore ?? ''}>{overallScore ?? '—'}</span>
                   <span class="text-xs" style="color:rgba(255,255,255,0.6)">de 100 · líderes &gt;85</span>
                 </div>
               </div>
-              <div class="max-w-sm text-center sm:text-left">
+              <div class="text-center sm:text-left">
                 <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold" style={`background:${sev.border};color:white`}>{sev.label}</span>
                 <h1 class="mt-4 text-[2rem] font-semibold tracking-tight text-balance text-white sm:text-[2.4rem]" style="line-height:1.1">{headline?.frame}</h1>
                 <p class="mt-3 text-lg font-medium" style="color:rgba(255,255,255,0.9)">{header?.organizationName}</p>
                 <p class="text-sm" style="color:rgba(255,255,255,0.55)">{[header?.periodLabel, header?.reportDate].filter(Boolean).join(' · ')}</p>
+                <div class="mt-5 rounded-2xl border p-4 text-left" style="border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.06)">
+                  <p class="text-xs font-semibold uppercase tracking-[0.12em]" style="color:rgba(255,255,255,0.58)">Indicadores del modelo</p>
+                  {primaryGap?.title && <p class="mt-2 text-sm leading-relaxed" style="color:rgba(255,255,255,0.86)">Brecha principal: <span class="font-semibold text-white">{primaryGap.title}</span></p>}
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    {typeof entityClarity?.score === 'number' && (
+                      <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.success[100]};color:${axis.success[700]}`}>
+                        Claridad {Math.round(entityClarity.score)}/100
+                      </span>
+                    )}
+                    {typeof categoryOwnership?.score === 'number' && (
+                      <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.error[100]};color:${axis.error[700]}`}>
+                        Categoría {Math.round(categoryOwnership.score)}/100
+                      </span>
+                    )}
+                    {typeof citationQuality?.score === 'number' && (
+                      <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.error[100]};color:${axis.error[700]}`}>
+                        Citas {Math.round(citationQuality.score)}/100
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -156,7 +201,10 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         <div class="relative z-10 mx-auto -mt-9 max-w-4xl px-6">
           <div class="grid overflow-hidden rounded-2xl bg-white shadow-xl ring-1 sm:grid-cols-2" style="--tw-ring-color:rgba(0,0,0,0.06)">
             <div class="p-5 sm:p-6">
-              <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Percepción · ¿te mencionan?</p>
+              <div class="flex items-center justify-between gap-3">
+                <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Percepción medida · ¿te mencionan?</p>
+                <span class="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold" style={`background:${axis.accent[500]}16;color:${axis.accent[700]}`}>Medido</span>
+              </div>
               <div class="mt-1.5 flex items-baseline gap-1">
                 <span class="text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`} data-countup={perceptionScore ?? ''}>{perceptionScore ?? '—'}</span>
                 <span class="text-base" style={`color:${axis.gray[400]}`}>/100</span>
@@ -166,7 +214,10 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               </div>
             </div>
             <div class="border-t p-5 sm:border-t-0 sm:border-l sm:p-6" style={`border-color:${axis.gray[100]}`}>
-              <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Operabilidad · ¿te pueden usar?</p>
+              <div class="flex items-center justify-between gap-3">
+                <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Operabilidad · ¿te pueden usar?</p>
+                <span class="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>{agenticScore !== null ? 'Medido' : 'Cobertura'}</span>
+              </div>
               {agenticScore !== null ? (
                 <>
                   <div class="mt-1.5 flex items-baseline gap-1">
@@ -185,6 +236,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               )}
             </div>
           </div>
+          {partialReason && <p class="mt-3 text-center text-xs" style={`color:${axis.gray[600]}`}>{partialReason}</p>}
         </div>
 
         <main class="mx-auto max-w-4xl px-6">
@@ -193,21 +245,26 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             <section class="py-16">
               <p class="eyebrow" style={`color:${axis.accent[500]}`}>01 · La evidencia</p>
               <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Visibilidad por motor</h2>
-              <p class="mt-2 lead" style={`color:${axis.gray[600]}`}>Menciones de tu marca detectadas en cada motor de respuesta consultado.</p>
-              <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <p class="mt-2 lead" style={`color:${axis.gray[600]}`}>Menciones detectadas en los motores principales. Cuando un motor no respondió, lo marcamos distinto a una consulta con cero menciones.</p>
+              <div class="mt-4 flex flex-wrap gap-2 text-xs" aria-label="Leyenda de estados de motor">
+                <span class="rounded-full px-2.5 py-1 font-semibold" style={`background:${axis.success[100]};color:${axis.success[700]}`}>Mención detectada</span>
+                <span class="rounded-full px-2.5 py-1 font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>Sin mención</span>
+                <span class="rounded-full px-2.5 py-1 font-semibold" style={`background:${axis.gray[50]};color:${axis.gray[600]}`}>Sin datos</span>
+              </div>
+              <ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" role="list">
                 {allEngines.map((e) => {
                   const label = ENGINE_LABEL[e.provider] ?? e.provider
                   const stateText = e.present === null ? 'Sin datos' : e.present > 0 ? `${e.present} mención${e.present === 1 ? '' : 'es'}` : 'Sin mención'
                   const stateColor = e.present === null ? axis.gray[400] : e.present > 0 ? axis.success[700] : axis.gray[400]
                   return (
-                    <div class="lift flex items-center gap-3 rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]};opacity:${e.present === null ? '0.7' : '1'}`}>
+                    <li class="report-card flex items-center gap-3 rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]};opacity:${e.present === null ? '0.7' : '1'}`}>
                       <EngineMark provider={e.provider} label={label} />
                       <span class="flex-1 font-medium" style={`color:${axis.gray[900]}`}>{label}</span>
                       <span class="text-sm font-medium tabular-nums" style={`color:${stateColor}`}>{stateText}</span>
-                    </div>
+                    </li>
                   )
                 })}
-              </div>
+              </ul>
             </section>
           )}
 
@@ -238,13 +295,18 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               <p class="mt-2 max-w-2xl lead" style={`color:${axis.gray[600]}`}>
                 Existir para la IA es subir cinco peldaños — los <strong style={`color:${axis.gray[900]}`}>5 Be</strong> del AEO: <strong style={`color:${axis.gray[900]}`}>Be Found</strong>, <strong style={`color:${axis.gray[900]}`}>Readable</strong>, <strong style={`color:${axis.gray[900]}`}>Correct</strong>, <strong style={`color:${axis.gray[900]}`}>Actionable</strong> e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong>. Cada peldaño se apoya en el anterior — el primero que aún no logras es tu próximo nivel.
               </p>
+              {coverageLevelCount > 0 && (
+                <p class="mt-3 max-w-2xl rounded-2xl border bg-white p-4 text-sm leading-relaxed" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
+                  Lectura parcial: {coverageLevelCount} peldaño{coverageLevelCount === 1 ? '' : 's'} en cobertura. Esos peldaños no se tratan como cero ni entran como evidencia medida.
+                </p>
+              )}
               <MaturityLadder rungs={ladderRungs} />
             </section>
           )}
 
           {/* ══ BRECHA + MOVIMIENTO ══ */}
           {primaryGap?.title && (
-            <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
+            <section class="deferred-report-section border-t py-16" style={`border-color:${axis.gray[100]}`}>
               <p class="eyebrow" style={`color:${axis.accent[500]}`}>04 · Qué hacer</p>
               <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Tu brecha principal</h2>
               <div class="mt-4 flex items-start gap-4 rounded-2xl p-6 sm:gap-5" style={`background:${severityMeta(primaryGap.severity ?? 'critico').bg};border:1px solid ${severityMeta(primaryGap.severity ?? 'critico').border}44`}>
@@ -260,7 +322,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                   <h3 class="eyebrow-sub" style={`color:${axis.gray[600]}`}>El movimiento recomendado</h3>
                   <ol class="mt-4 flex flex-col gap-3">
                     {recommendations.slice(0, 4).map((rec, i) => (
-                      <li class="lift flex gap-4 rounded-2xl border bg-white p-5" style={`border-color:${axis.gray[100]}`}>
+                      <li class="report-card flex gap-4 rounded-2xl border bg-white p-5" style={`border-color:${axis.gray[100]}`}>
                         <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white" style={`background:${axis.accent[500]}`}>{i + 1}</span>
                         <div>
                           <p class="font-semibold" style={`color:${axis.gray[900]}`}>{rec.title}</p>
@@ -276,21 +338,46 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
 
           {/* ══ POR QUÉ OCURRE ══ */}
           {dimensions.length > 0 && (
-            <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
+            <section class="deferred-report-section border-t py-16" style={`border-color:${axis.gray[100]}`}>
               <p class="eyebrow" style={`color:${axis.accent[500]}`}>05 · El detalle</p>
               <h2 id="s-detalle" class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Por qué ocurre</h2>
               <p class="mt-2 lead" style={`color:${axis.gray[600]}`}>Las dimensiones técnicas detrás del puntaje. No fabricamos un número cuando no hay evidencia suficiente.</p>
+              {(strongDimensions.length > 0 || criticalDimensions.length > 0 || unmeasuredDimensions.length > 0) && (
+                <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                  {strongDimensions.length > 0 && (
+                    <div class="rounded-2xl border bg-white p-4" style={`border-color:${axis.success[100]}`}>
+                      <p class="text-xs font-semibold uppercase tracking-[0.12em]" style={`color:${axis.success[700]}`}>Fortalezas</p>
+                      <p class="mt-2 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{strongDimensions.map((d) => `${d.label} ${d.score}`).join(' · ')}</p>
+                    </div>
+                  )}
+                  {criticalDimensions.length > 0 && (
+                    <div class="rounded-2xl border bg-white p-4" style={`border-color:${axis.error[100]}`}>
+                      <p class="text-xs font-semibold uppercase tracking-[0.12em]" style={`color:${axis.error[700]}`}>Brechas críticas</p>
+                      <p class="mt-2 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{criticalDimensions.map((d) => `${d.label} ${d.score}`).join(' · ')}</p>
+                    </div>
+                  )}
+                  {unmeasuredDimensions.length > 0 && (
+                    <div class="rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]}`}>
+                      <p class="text-xs font-semibold uppercase tracking-[0.12em]" style={`color:${axis.gray[600]}`}>Sin evidencia suficiente</p>
+                      <p class="mt-2 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{unmeasuredDimensions.map((d) => d.label).join(' · ')}</p>
+                    </div>
+                  )}
+                </div>
+              )}
               <div class="mt-5 grid gap-5 lg:grid-cols-[1fr_1.25fr] lg:items-start">
                 {hasRadar && (
-                  <div class="rounded-2xl border p-4" style={`border-color:${axis.gray[100]}`}>
+                  <figure class="rounded-2xl border p-4" style={`border-color:${axis.gray[100]}`}>
                     <div id="dims-radar" data-dims={JSON.stringify(radarDims)} style="width:100%;height:300px"></div>
-                  </div>
+                    <figcaption class="mt-2 text-xs leading-relaxed" style={`color:${axis.gray[600]}`}>
+                      Radar de dimensiones medidas; las dimensiones sin dato no se grafican como cero.
+                    </figcaption>
+                  </figure>
                 )}
                 <div class="grid gap-2 sm:grid-cols-2">
                 {dimensions.map((dim) => {
                   const s = severityMeta(dim.severity)
                   return (
-                    <div class="lift rounded-2xl border bg-white p-4 sm:p-5" style={`border-color:${axis.gray[100]};border-left:3px solid ${dim.score === null ? axis.gray[200] : s.border}`}>
+                    <div class="report-card rounded-2xl border bg-white p-4 sm:p-5" style={`border-color:${axis.gray[100]};border-left:3px solid ${dim.score === null ? axis.gray[200] : s.border}`}>
                       <div class="flex items-start justify-between gap-3">
                         <p class="font-semibold leading-tight" style={`color:${axis.gray[900]};font-size:0.95rem`}>{dim.label}</p>
                         <span class="shrink-0 text-2xl font-semibold tabular-nums leading-none" style={`color:${dim.score === null ? axis.gray[400] : axis.gray[900]}`}>{dim.score === null ? '—' : Math.round(dim.score)}</span>

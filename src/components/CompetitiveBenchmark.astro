@@ -19,14 +19,26 @@ const rows = [
   ...competitors.map((c) => ({ name: c.name, mentions: c.mentions, isBrand: false })),
 ].sort((a, b) => b.mentions - a.mentions)
 const max = Math.max(1, ...rows.map((r) => r.mentions))
+const totalMentions = rows.reduce((sum, r) => sum + r.mentions, 0)
+const brandShare = totalMentions > 0 ? Math.round((brandMentions / totalMentions) * 100) : null
 const topCompetitor = competitors.slice().sort((a, b) => b.mentions - a.mentions)[0]
 const multiple = topCompetitor && brandMentions > 0 ? (topCompetitor.mentions / brandMentions).toFixed(1) : null
 ---
 
 <div class="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
   {/* Share of Voice */}
-  <div class="lift rounded-2xl border bg-white p-6" style={`border-color:${axis.gray[100]}`}>
-    <p class="text-sm font-semibold" style={`color:${axis.gray[900]}`}>Share of Voice · tu marca vs competencia</p>
+  <div class="report-card rounded-2xl border bg-white p-6" style={`border-color:${axis.gray[100]}`}>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <p class="text-sm font-semibold" style={`color:${axis.gray[900]}`}>Share of Voice · tu marca vs competencia</p>
+        {brandShare !== null && <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>{brandName} concentra {brandShare}% de las menciones detectadas en este set competitivo.</p>}
+      </div>
+      {topCompetitor && multiple && (
+        <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.warning[100]};color:${axis.warning[700]}`}>
+          Líder detectado {multiple}×
+        </span>
+      )}
+    </div>
     {topCompetitor && multiple && (
       <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>
         <span class="font-semibold" style={`color:${axis.gray[900]}`}>{topCompetitor.name}</span> tiene {multiple}× tus menciones en las respuestas de IA.
@@ -48,8 +60,13 @@ const multiple = topCompetitor && brandMentions > 0 ? (topCompetitor.mentions / 
   </div>
 
   {/* Citas propias */}
-  <div class="lift rounded-2xl border bg-white p-6" style={`border-color:${axis.gray[100]}`}>
-    <p class="text-sm font-semibold" style={`color:${axis.gray[900]}`}>Cuánto te citan</p>
+  <div class="report-card rounded-2xl border bg-white p-6" style={`border-color:${axis.gray[100]}`}>
+    <div class="flex items-start justify-between gap-4">
+      <p class="text-sm font-semibold" style={`color:${axis.gray[900]}`}>Cuánto te citan</p>
+      {ownDomainShare !== null && (
+        <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>Citas propias</span>
+      )}
+    </div>
     <p class="mt-4 text-4xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>
       {ownDomainShare === null ? '—' : `${ownDomainShare}%`}
     </p>

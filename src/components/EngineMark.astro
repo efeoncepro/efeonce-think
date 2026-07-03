@@ -20,7 +20,7 @@ const logo = ENGINE_LOGO[provider]
 ---
 
 {logo ? (
-  <img src={logo} alt={label} style={`height:${size}px;width:${size}px;object-fit:contain`} />
+  <img src={logo} alt="" aria-hidden="true" style={`height:${size}px;width:${size}px;object-fit:contain`} />
 ) : (
   <span
     class="inline-flex items-center justify-center rounded-full text-xs font-bold"

@@ -34,6 +34,28 @@ html {
   line-height: 1.55;
 }
 
+/* Cards informativas: layout modular sin insinuar interactividad. */
+.report-card {
+  container-type: inline-size;
+}
+
+@container (max-width: 280px) {
+  .report-card {
+    overflow-wrap: anywhere;
+  }
+}
+
+/*
+ * Modern Web Guidance: deferir solo bloques pesados bajo el fold.
+ * El hero y la evidencia inicial quedan fuera para no afectar LCP.
+ */
+@supports (content-visibility: auto) {
+  .deferred-report-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto none auto 620px;
+  }
+}
+
 /* ── Focus visible (WCAG 2.2 · teclado) — ring de acento; blanco sobre navy ── */
 a:focus-visible,
 button:focus-visible,
@@ -92,5 +114,12 @@ button:focus-visible,
   .lift:hover,
   .press:hover {
     transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .report-card,
+  .deferred-report-section figure {
+    border-color: #6d6777 !important;
   }
 }
