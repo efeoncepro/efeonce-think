@@ -82,7 +82,11 @@ const CIRC = Math.PI * R
 const dash = overallScore ? (overallScore / 100) * CIRC : 0
 ---
 
-<BaseLayout title={`Informe de visibilidad en IA${header?.organizationName ? ` — ${header.organizationName}` : ''}`} noindex>
+<BaseLayout
+  title={`Informe de visibilidad en IA${header?.organizationName ? ` — ${header.organizationName}` : ''}`}
+  description={`Diagnóstico de la visibilidad de ${header?.organizationName ?? 'tu marca'} en los motores de IA — qué tan visible, entendible y recomendable eres para ChatGPT, Gemini, Perplexity y más.`}
+  noindex
+>
   {
     ok && model && (
       <article>
