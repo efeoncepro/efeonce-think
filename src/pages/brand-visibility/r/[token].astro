@@ -413,17 +413,20 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         </main>
 
         {/* ══ CTA DE CONVERSIÓN (navy, bookend del hero) ══ */}
-        <section class="mt-6 px-6 py-16" style={`background:linear-gradient(160deg,${axis.accent[800]} 0%,${axis.accent[900]} 100%)`}>
-          <div class="mx-auto max-w-2xl text-center">
-            <h2 class="text-2xl font-semibold text-balance text-white sm:text-3xl">
-              Convierte este diagnóstico en avance medible
-            </h2>
-            <p class="mx-auto mt-3 max-w-lg text-pretty" style="color:rgba(255,255,255,0.75)">
-              Podemos convertir la brecha priorizada en un plan de mejoras, medición y contenido para que la IA te encuentre, te entienda y te recomiende con más consistencia.
-            </p>
+        <section class="mt-6 px-6 py-10 sm:py-11" style={`background:linear-gradient(160deg,${axis.accent[800]} 0%,${axis.accent[900]} 100%);border-top:1px solid rgba(255,255,255,0.08)`}>
+          <div class="mx-auto flex max-w-7xl flex-col gap-6 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+            <div class="max-w-2xl">
+              <p class="eyebrow-sub" style="color:rgba(255,255,255,0.58)">Siguiente paso</p>
+              <h2 class="mt-2 text-2xl font-semibold text-balance text-white sm:text-[1.85rem]" style="line-height:1.2">
+                Convierte este diagnóstico en avance medible
+              </h2>
+              <p class="mt-2 max-w-xl text-sm leading-relaxed text-pretty" style="color:rgba(255,255,255,0.72)">
+                Transforma la brecha priorizada en un plan de mejoras, medición y contenido para que la IA te encuentre, te entienda y te recomiende con más consistencia.
+              </p>
+            </div>
             <a
               href="https://efeoncepro.com"
-              class="press mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold"
+              class="press inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold sm:shrink-0"
               style={`color:${axis.accent[800]}`}
             >
               Revisar el plan de visibilidad
@@ -433,15 +436,15 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         </section>
 
         {/* ══ FOOTER MARCA ══ */}
-        <footer class="px-6 py-10" style="background:#1a1b1e">
-          <div class="mx-auto flex max-w-4xl flex-col items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-left">
+        <footer class="px-6 py-7" style="background:#1a1b1e;border-top:1px solid rgba(255,255,255,0.05)">
+          <div class="mx-auto flex max-w-7xl flex-col items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-left">
             <div class="flex flex-col items-center gap-2 sm:items-start">
-              <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:32px;width:auto" />
-              <EfeonceSlogan color="rgba(255,255,255,0.7)" size="0.66rem" />
+              <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:28px;width:auto" />
+              <EfeonceSlogan color="rgba(255,255,255,0.64)" size="0.62rem" />
             </div>
-            <div class="text-xs" style="color:rgba(255,255,255,0.5)">
+            <div class="text-xs leading-relaxed" style="color:rgba(255,255,255,0.46)">
               <p>Efeonce Group SpA · efeoncepro.com</p>
-              <p class="mt-1 max-w-xs">{disclaimer || 'Diagnóstico agregado y público. No garantiza posiciones ni resultados.'}</p>
+              <p class="mt-1 max-w-md">{disclaimer || 'Diagnóstico agregado y público. No garantiza posiciones ni resultados.'}</p>
             </div>
           </div>
         </footer>
