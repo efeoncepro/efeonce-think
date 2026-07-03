@@ -102,7 +102,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             {gate?.status === 'partial' && (
               <div class="mt-8 flex items-start gap-2.5 rounded-xl px-4 py-3 text-sm" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.82)">
                 <span aria-hidden="true">⚠️</span>
-                <p><span class="font-semibold text-white">Informe parcial.</span> {gate.reason}</p>
+                <p><span class="font-semibold text-white">Informe parcial.</span> Algunos motores no respondieron — te mostramos solo lo que sí pudimos medir.</p>
               </div>
             )}
 
@@ -227,7 +227,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                 <div>
                   <span class="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold" style={`color:${severityMeta(primaryGap.severity ?? 'critico').fg}`}>Prioridad · {severityMeta(primaryGap.severity ?? 'critico').label}</span>
                   <p class="mt-2 text-xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>{primaryGap.title}</p>
-                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>El peldaño que más te frena hoy. Empieza por acá.</p>
+                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Es lo que más te frena hoy — y por donde más rápido subes.</p>
                 </div>
               </div>
               {recommendations.length > 0 && (
@@ -290,7 +290,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               Esta brecha se cierra. Nosotros te ayudamos a cerrarla.
             </h2>
             <p class="mx-auto mt-3 max-w-lg text-pretty" style="color:rgba(255,255,255,0.75)">
-              En Efeonce hacemos que las marcas sean visibles, entendibles y recomendables para la IA. Conversemos sobre tu caso.
+              En Efeonce te subimos la escalera nivel a nivel, mes a mes — hasta que la IA te encuentre, te entienda y te recomiende. Conversemos sobre tu caso.
             </p>
             <a
               href="https://efeoncepro.com"
