@@ -1,0 +1,30 @@
+---
+// Isotipo de motor de IA (marca real, nunca emoji). Fallback = monograma neutro.
+import { axis } from '@lib/report-tokens'
+
+const ENGINE_LOGO: Record<string, string> = {
+  gemini: '/logos/engines/gemini.svg',
+  chatgpt: '/logos/engines/chatgpt.svg',
+  openai: '/logos/engines/chatgpt.svg',
+  perplexity: '/logos/engines/perplexity.svg',
+  claude: '/logos/engines/claude.svg',
+  anthropic: '/logos/engines/claude.svg',
+  google_ai_overview: '/logos/engines/google.svg',
+  google_ai_mode: '/logos/engines/google.svg',
+  google: '/logos/engines/google.svg',
+}
+
+interface Props { provider: string; label: string; size?: number }
+const { provider, label, size = 24 } = Astro.props
+const logo = ENGINE_LOGO[provider]
+---
+
+{logo ? (
+  <img src={logo} alt={label} style={`height:${size}px;width:${size}px;object-fit:contain`} />
+) : (
+  <span
+    class="inline-flex items-center justify-center rounded-full text-xs font-bold"
+    style={`height:${size}px;width:${size}px;background:${axis.gray[100]};color:${axis.gray[600]}`}
+    aria-hidden="true"
+  >{label.charAt(0).toUpperCase()}</span>
+)}

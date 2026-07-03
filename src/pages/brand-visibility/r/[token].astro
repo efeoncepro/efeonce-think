@@ -4,8 +4,11 @@ export const prerender = false
 
 import BaseLayout from '@layouts/BaseLayout.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
+import EngineMark from '@/components/EngineMark.astro'
+import LevelLadder from '@/components/LevelLadder.astro'
+import CompetitiveBenchmark from '@/components/CompetitiveBenchmark.astro'
 import { fetchPublicReport } from '@lib/report'
-import { axis, severityMeta, LEVEL_COPY, AXIS_LABEL } from '@lib/report-tokens'
+import { axis, severityMeta } from '@lib/report-tokens'
 
 const { token } = Astro.params
 const result = token ? await fetchPublicReport(token) : ({ status: 'not_found' } as const)
@@ -20,15 +23,9 @@ interface Dimension { label: string; score: number | null; severity: Sev; explai
 interface Rec { title: string; action?: string; severity: Sev }
 interface Engine { provider: string; present: number }
 
-const ENGINE_LOGO: Record<string, string> = {
-  gemini: '/logos/engines/gemini.svg',
-  chatgpt: '/logos/engines/chatgpt.svg',
-  openai: '/logos/engines/chatgpt.svg',
-  perplexity: '/logos/engines/perplexity.svg',
-}
 const ENGINE_LABEL: Record<string, string> = {
   gemini: 'Gemini', google_ai_overview: 'Google AI Overview', google_ai_mode: 'Google AI Mode',
-  chatgpt: 'ChatGPT', openai: 'ChatGPT', perplexity: 'Perplexity', copilot: 'Copilot',
+  chatgpt: 'ChatGPT', openai: 'ChatGPT', perplexity: 'Perplexity', copilot: 'Copilot', claude: 'Claude',
 }
 
 const ok = result.status === 'ok'
@@ -48,8 +45,10 @@ const recommendations = (model?.recommendations as Rec[]) ?? []
 const engines = (model?.engineSnapshot as Engine[]) ?? []
 const disclaimer = (model?.disclaimer as string) ?? ''
 
-const perceptionLevels = levels.filter((l) => l.axis === 'perception')
-const agenticLevels = levels.filter((l) => l.axis === 'agentic')
+const sov = model?.competitiveSov as { competitors?: { name: string; mentions: number }[]; brandMentions?: number } | undefined
+const citation = model?.citationInsight as { ownDomainShare?: number | null; findingsWithCitations?: number; findingsCitingOwnDomain?: number } | undefined
+const hasBenchmark = !!(sov && (sov.competitors?.length || citation?.findingsWithCitations))
+
 const sev = severityMeta(overallSeverity)
 
 // Gauge glow (dirección B)
@@ -118,18 +117,19 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         </div>
 
         <main class="mx-auto max-w-4xl px-6">
-          {/* ══ EVIDENCIA POR MOTOR ══ */}
+          {/* ══ 01 · EVIDENCIA POR MOTOR ══ */}
           {engines.length > 0 && (
             <section class="py-14">
-              <h2 class="text-xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Visibilidad por motor</h2>
+              <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>01 · La evidencia</p>
+              <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Visibilidad por motor</h2>
               <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Menciones de tu marca detectadas en cada motor de respuesta consultado.</p>
-              <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {engines.map((e) => (
                   <div class="flex items-center gap-3 rounded-2xl border p-4" style={`border-color:${axis.gray[100]}`}>
-                    {ENGINE_LOGO[e.provider] ? <img src={ENGINE_LOGO[e.provider]} alt={ENGINE_LABEL[e.provider] ?? e.provider} style="height:24px;width:24px;object-fit:contain" /> : <span class="text-xl">🔍</span>}
+                    <EngineMark provider={e.provider} label={ENGINE_LABEL[e.provider] ?? e.provider} />
                     <span class="flex-1 font-medium" style={`color:${axis.gray[900]}`}>{ENGINE_LABEL[e.provider] ?? e.provider}</span>
                     <span class="text-sm font-medium tabular-nums" style={`color:${e.present > 0 ? axis.success[700] : axis.gray[400]}`}>
-                      {e.present > 0 ? `${e.present} mención${e.present === 1 ? '' : 'es'}` : 'Sin presencia'}
+                      {e.present > 0 ? `${e.present} mención${e.present === 1 ? '' : 'es'}` : 'Sin mención'}
                     </span>
                   </div>
                 ))}
@@ -137,51 +137,42 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             </section>
           )}
 
-          {/* ══ FRAMEWORK DE NIVELES ══ */}
-          <section class="border-t py-14" style={`border-color:${axis.gray[100]}`}>
-            <h2 class="text-xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Niveles para existir en un internet de agentes</h2>
-            <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Se lee en dos ejes: percepción de marca y operabilidad agéntica. El score principal no mezcla ambos.</p>
-            {[{ key: 'perception', items: perceptionLevels }, { key: 'agentic', items: agenticLevels }].map((group) =>
-              group.items.length > 0 ? (
-                <div class="mt-7">
-                  <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>{AXIS_LABEL[group.key]?.tag}</p>
-                  <div class="mt-4 grid gap-4 sm:grid-cols-2">
-                    {group.items.map((lvl) => {
-                      const copy = LEVEL_COPY[lvl.id] ?? { ordinal: '', label: lvl.id, question: '' }
-                      const measured = lvl.status === 'measured' && lvl.score !== null
-                      const s = severityMeta(measured ? lvl.severity : 'sin_dato')
-                      return (
-                        <div class="relative overflow-hidden rounded-2xl border p-5" style={`border-color:${axis.gray[100]};border-left:3px solid ${measured ? s.border : axis.gray[200]}`}>
-                          <div class="flex items-start justify-between gap-3">
-                            <div>
-                              <span class="text-3xl font-bold tabular-nums" style={`color:${axis.gray[200]}`}>{copy.ordinal}</span>
-                              <p class="mt-1 font-semibold" style={`color:${axis.gray[900]}`}>{copy.label}</p>
-                              <p class="mt-0.5 text-sm" style={`color:${axis.gray[600]}`}>{copy.question}</p>
-                            </div>
-                            <div class="shrink-0 text-right">
-                              {measured ? (
-                                <span class="text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{Math.round(lvl.score as number)}</span>
-                              ) : (
-                                <span class="rounded-full px-2.5 py-1 text-xs font-medium" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>En cobertura</span>
-                              )}
-                            </div>
-                          </div>
-                          {measured && (
-                            <span class="mt-3 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold" style={`background:${s.bg};color:${s.fg}`}>{s.label}</span>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              ) : null,
-            )}
-          </section>
+          {/* ══ 02 · BENCHMARK DE COMPETENCIA ══ */}
+          {hasBenchmark && (
+            <section class="border-t py-14" style={`border-color:${axis.gray[100]}`}>
+              <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>02 · Dónde estás parado</p>
+              <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Tú frente a tu competencia</h2>
+              <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Qué parte del espacio de respuesta de la IA ocupas — y cuánto te citan como fuente.</p>
+              <div class="mt-5">
+                <CompetitiveBenchmark
+                  brandName={header?.organizationName ?? 'Tu marca'}
+                  brandMentions={sov?.brandMentions ?? 0}
+                  competitors={sov?.competitors ?? []}
+                  ownDomainShare={citation?.ownDomainShare ?? null}
+                  findingsWithCitations={citation?.findingsWithCitations ?? 0}
+                  findingsCitingOwnDomain={citation?.findingsCitingOwnDomain ?? 0}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* ══ 03 · LA ESCALERA (narrativa central) ══ */}
+          {levels.length > 0 && (
+            <section class="border-t py-14" style={`border-color:${axis.gray[100]}`}>
+              <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>03 · El framework</p>
+              <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>La escalera de visibilidad en IA</h2>
+              <p class="mt-1.5 max-w-2xl text-sm" style={`color:${axis.gray[600]}`}>
+                Existir para la IA es subir cinco peldaños: que te <strong style={`color:${axis.gray[900]}`}>encuentre</strong>, te <strong style={`color:${axis.gray[900]}`}>entienda</strong>, te <strong style={`color:${axis.gray[900]}`}>represente bien</strong>, pueda <strong style={`color:${axis.gray[900]}`}>actuar</strong> y finalmente te <strong style={`color:${axis.gray[900]}`}>prefiera</strong>. Cada peldaño se apoya en el anterior — no sirve competir arriba si la base falla.
+              </p>
+              <LevelLadder levels={levels} />
+            </section>
+          )}
 
           {/* ══ BRECHA + MOVIMIENTO ══ */}
           {primaryGap?.title && (
             <section class="border-t py-14" style={`border-color:${axis.gray[100]}`}>
-              <h2 class="text-xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Tu brecha principal</h2>
+              <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>04 · Qué hacer</p>
+              <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Tu brecha principal</h2>
               <div class="mt-4 rounded-2xl p-6" style={`background:${severityMeta(primaryGap.severity ?? 'critico').bg};border:1px solid ${severityMeta(primaryGap.severity ?? 'critico').border}44`}>
                 <span class="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold" style={`color:${severityMeta(primaryGap.severity ?? 'critico').fg}`}>{severityMeta(primaryGap.severity ?? 'critico').label}</span>
                 <p class="mt-2.5 text-xl font-semibold" style={`color:${axis.gray[900]}`}>{primaryGap.title}</p>
@@ -208,9 +199,10 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ POR QUÉ OCURRE ══ */}
           {dimensions.length > 0 && (
             <section class="border-t py-14" style={`border-color:${axis.gray[100]}`}>
-              <h2 class="text-xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Por qué ocurre</h2>
+              <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>05 · El detalle</p>
+              <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Por qué ocurre</h2>
               <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Las dimensiones técnicas detrás del puntaje. No fabricamos un número cuando no hay evidencia suficiente.</p>
-              <div class="mt-5 flex flex-col gap-2">
+              <div class="mt-5 grid gap-2 sm:grid-cols-2">
                 {dimensions.map((dim) => {
                   const s = severityMeta(dim.severity)
                   return (

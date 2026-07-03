@@ -1,0 +1,62 @@
+---
+// Benchmark competitivo (Share of Voice): cuánto ocupa tu marca vs competidores en las
+// respuestas de IA. Bar chart horizontal (dataviz: comparar categorías) + insight de citas.
+import { axis } from '@lib/report-tokens'
+
+interface Competitor { name: string; mentions: number }
+interface Props {
+  brandName: string
+  brandMentions: number
+  competitors: Competitor[]
+  ownDomainShare: number | null
+  findingsWithCitations: number
+  findingsCitingOwnDomain: number
+}
+const { brandName, brandMentions, competitors, ownDomainShare, findingsWithCitations, findingsCitingOwnDomain } = Astro.props
+
+const rows = [
+  { name: brandName, mentions: brandMentions, isBrand: true },
+  ...competitors.map((c) => ({ name: c.name, mentions: c.mentions, isBrand: false })),
+].sort((a, b) => b.mentions - a.mentions)
+const max = Math.max(1, ...rows.map((r) => r.mentions))
+const topCompetitor = competitors.slice().sort((a, b) => b.mentions - a.mentions)[0]
+const multiple = topCompetitor && brandMentions > 0 ? (topCompetitor.mentions / brandMentions).toFixed(1) : null
+---
+
+<div class="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+  {/* Share of Voice */}
+  <div class="rounded-2xl border p-6" style={`border-color:${axis.gray[100]}`}>
+    <p class="text-sm font-semibold" style={`color:${axis.gray[900]}`}>Share of Voice · tu marca vs competencia</p>
+    {topCompetitor && multiple && (
+      <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>
+        <span class="font-semibold" style={`color:${axis.gray[900]}`}>{topCompetitor.name}</span> tiene {multiple}× tus menciones en las respuestas de IA.
+      </p>
+    )}
+    <div class="mt-5 flex flex-col gap-3.5">
+      {rows.map((r) => (
+        <div>
+          <div class="flex items-baseline justify-between">
+            <span class="text-sm font-medium" style={`color:${r.isBrand ? axis.accent[700] : axis.gray[900]}`}>{r.name}{r.isBrand && ' · tú'}</span>
+            <span class="text-sm font-semibold tabular-nums" style={`color:${axis.gray[600]}`}>{r.mentions}</span>
+          </div>
+          <div class="mt-1.5 h-2.5 w-full overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
+            <div class="h-full rounded-full" style={`width:${Math.max(4, (r.mentions / max) * 100)}%;background:${r.isBrand ? axis.accent[500] : axis.gray[400]}`}></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Citas propias */}
+  <div class="rounded-2xl border p-6" style={`border-color:${axis.gray[100]}`}>
+    <p class="text-sm font-semibold" style={`color:${axis.gray[900]}`}>Cuánto te citan</p>
+    <p class="mt-4 text-4xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>
+      {ownDomainShare === null ? '—' : `${ownDomainShare}%`}
+    </p>
+    <p class="text-sm" style={`color:${axis.gray[600]}`}>de las citas apuntan a tu dominio</p>
+    <p class="mt-4 border-t pt-4 text-sm" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
+      De <span class="font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{findingsWithCitations}</span> respuestas con fuentes,
+      solo <span class="font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{findingsCitingOwnDomain}</span> te citan a ti.
+    </p>
+  </div>
+</div>
