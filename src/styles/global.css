@@ -33,6 +33,24 @@ html {
   font-size: 0.9375rem;
   line-height: 1.55;
 }
+.section-title {
+  margin-top: 0.35rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+.section-lead {
+  max-width: 76ch;
+  margin-top: 0.7rem;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+@media (min-width: 640px) {
+  .section-title {
+    font-size: 2rem;
+  }
+}
 
 /* Cards informativas: layout modular sin insinuar interactividad. */
 .report-card {

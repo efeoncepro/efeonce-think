@@ -32,6 +32,7 @@ const ENGINE_LABEL: Record<string, string> = {
 const ok = result.status === 'ok'
 const model = ok ? (result.model as Record<string, any>) : null
 const header = ok ? result.header : null
+const organizationName = header?.organizationName ?? 'tu marca'
 
 const headline = model?.headline as { frame?: string } | undefined
 const gate = model?.gate as { status?: string; reason?: string; nextAction?: string } | undefined
@@ -163,7 +164,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               </div>
               <div class="text-center sm:text-left">
                 <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold" style={`background:${sev.border};color:white`}>{sev.label}</span>
-                <h1 class="mt-4 text-[2rem] font-semibold tracking-tight text-balance text-white sm:text-[2.4rem]" style="line-height:1.1">{headline?.frame}</h1>
+                <h1 class="mt-4 text-[2rem] font-semibold text-balance text-white sm:text-[2.4rem]" style="line-height:1.1">{headline?.frame}</h1>
                 <p class="mt-3 text-lg font-medium" style="color:rgba(255,255,255,0.9)">{header?.organizationName}</p>
                 <p class="text-sm" style="color:rgba(255,255,255,0.55)">{[header?.periodLabel, header?.reportDate].filter(Boolean).join(' · ')}</p>
                 <div class="mt-5 text-left">
@@ -237,9 +238,9 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ 01 · EVIDENCIA POR MOTOR ══ */}
           {engines.length > 0 && (
             <section class="py-16" data-capture="report-engine-visibility">
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>01 · La evidencia</p>
-              <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Visibilidad por motor</h2>
-              <p class="mt-2 lead" style={`color:${axis.gray[600]}`}>Menciones detectadas en los motores principales. Cuando un motor no respondió, lo marcamos distinto a una consulta con cero menciones.</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>01 · Cobertura capturada</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Qué motores mencionan a {organizationName}</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Separamos menciones reales, ausencia de mención y motores sin respuesta. Así el diagnóstico no confunde una consulta sin resultado con una medición que aún está en cobertura.</p>
               <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
                 <div class="hidden grid-cols-[1.35fr_0.85fr_1.2fr] border-b px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] sm:grid" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
                   <span>Motor</span>
@@ -278,12 +279,12 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ 02 · BENCHMARK DE COMPETENCIA ══ */}
           {hasBenchmark && (
             <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>02 · Dónde estás parado</p>
-              <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Tú frente a tu competencia</h2>
-              <p class="mt-2 lead" style={`color:${axis.gray[600]}`}>Qué parte del espacio de respuesta de la IA ocupas — y cuánto te citan como fuente.</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>02 · Posición competitiva</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Share of voice frente al líder detectado</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Contrasta las menciones de {organizationName} con las entidades competidoras y separa dos señales distintas: aparecer en la respuesta y ser citado como fuente.</p>
               <div class="mt-5">
                 <CompetitiveBenchmark
-                  brandName={header?.organizationName ?? 'Tu marca'}
+                  brandName={organizationName}
                   brandMentions={sov?.brandMentions ?? 0}
                   competitors={sov?.competitors ?? []}
                   ownDomainShare={citation?.ownDomainShare ?? null}
@@ -297,10 +298,10 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ 03 · LA ESCALERA (narrativa central) ══ */}
           {levels.length > 0 && (
             <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>03 · El framework</p>
-              <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>La escalera de visibilidad en IA</h2>
-              <p class="mt-2 max-w-2xl lead" style={`color:${axis.gray[600]}`}>
-                Existir para la IA es subir cinco peldaños — los <strong style={`color:${axis.gray[900]}`}>5 Be</strong> del AEO: <strong style={`color:${axis.gray[900]}`}>Be Found</strong>, <strong style={`color:${axis.gray[900]}`}>Readable</strong>, <strong style={`color:${axis.gray[900]}`}>Correct</strong>, <strong style={`color:${axis.gray[900]}`}>Actionable</strong> e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong>. Cada peldaño se apoya en el anterior — el primero que aún no logras es tu próximo nivel.
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>03 · Marco de madurez</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>La escalera de visibilidad en IA</h2>
+              <p class="section-lead max-w-3xl" style={`color:${axis.gray[600]}`}>
+                El diagnóstico se ordena en cinco niveles acumulativos: <strong style={`color:${axis.gray[900]}`}>Be Found</strong>, <strong style={`color:${axis.gray[900]}`}>Readable</strong>, <strong style={`color:${axis.gray[900]}`}>Correct</strong>, <strong style={`color:${axis.gray[900]}`}>Actionable</strong> e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong>. El primer peldaño pendiente marca dónde destrabar avance antes de intentar optimizar niveles superiores.
               </p>
               {coverageLevelCount > 0 && (
                 <p class="mt-3 max-w-2xl rounded-2xl border bg-white p-4 text-sm leading-relaxed" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
@@ -314,18 +315,19 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ BRECHA + MOVIMIENTO ══ */}
           {primaryGap?.title && (
             <section class="deferred-report-section border-t py-16" data-capture="report-recommendations" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>04 · Qué hacer</p>
-              <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Tu brecha principal</h2>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>04 · Prioridad operativa</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>La brecha que más limita el avance</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>El siguiente paso se ordena desde la brecha principal del modelo: primero corregir el bloqueo de base, después expandir cobertura y autoridad.</p>
               <div class="report-panel mt-4 overflow-hidden rounded-2xl border bg-white" style={`border-color:${severityMeta(primaryGap.severity ?? 'critico').border}66`}>
                 <div class="p-5 sm:p-6" style={`border-left:4px solid ${severityMeta(primaryGap.severity ?? 'critico').border};background:${severityMeta(primaryGap.severity ?? 'critico').bg}`}>
                   <span class="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold" style={`color:${severityMeta(primaryGap.severity ?? 'critico').fg}`}>Prioridad · {severityMeta(primaryGap.severity ?? 'critico').label}</span>
-                  <p class="mt-2 text-xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>{primaryGap.title}</p>
-                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Es lo que más te frena hoy — y por donde más rápido subes.</p>
+                  <p class="mt-2 text-xl font-semibold" style={`color:${axis.gray[900]}`}>{primaryGap.title}</p>
+                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Es el foco de mayor impacto dentro de este diagnóstico.</p>
                 </div>
               </div>
               {recommendations.length > 0 && (
                 <div class="mt-7">
-                  <h3 class="eyebrow-sub" style={`color:${axis.gray[600]}`}>El movimiento recomendado</h3>
+                  <h3 class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Secuencia recomendada</h3>
                   <ol class="report-panel mt-4 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
                     {recommendations.slice(0, 4).map((rec, i) => (
                       <li class="data-row grid grid-cols-[2.3rem_1fr] gap-4 border-b p-5 last:border-b-0" style={`border-color:${axis.gray[100]}`}>
@@ -345,9 +347,9 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ POR QUÉ OCURRE ══ */}
           {dimensions.length > 0 && (
             <section class="deferred-report-section border-t py-16" data-capture="report-dimension-detail" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>05 · El detalle</p>
-              <h2 id="s-detalle" class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Por qué ocurre</h2>
-              <p class="mt-2 lead" style={`color:${axis.gray[600]}`}>Las dimensiones técnicas detrás del puntaje. No fabricamos un número cuando no hay evidencia suficiente.</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>05 · Diagnóstico técnico</p>
+              <h2 id="s-detalle" class="section-title" style={`color:${axis.gray[900]}`}>Qué explica el puntaje</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Resumen de fortalezas, brechas críticas y dimensiones sin evidencia suficiente. Los campos sin dato se mantienen fuera del cálculo visual.</p>
               {(strongDimensions.length > 0 || criticalDimensions.length > 0 || unmeasuredDimensions.length > 0) && (
                 <div class="report-panel mt-5 overflow-hidden rounded-2xl border bg-white sm:grid sm:grid-cols-3" style={`border-color:${axis.gray[100]}`}>
                   {strongDimensions.length > 0 && (
@@ -413,18 +415,18 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         {/* ══ CTA DE CONVERSIÓN (navy, bookend del hero) ══ */}
         <section class="mt-6 px-6 py-16" style={`background:linear-gradient(160deg,${axis.accent[800]} 0%,${axis.accent[900]} 100%)`}>
           <div class="mx-auto max-w-2xl text-center">
-            <h2 class="text-2xl font-semibold tracking-tight text-balance text-white sm:text-3xl">
-              Esta brecha se cierra. Nosotros te ayudamos a cerrarla.
+            <h2 class="text-2xl font-semibold text-balance text-white sm:text-3xl">
+              Convierte este diagnóstico en avance medible
             </h2>
             <p class="mx-auto mt-3 max-w-lg text-pretty" style="color:rgba(255,255,255,0.75)">
-              En Efeonce te subimos la escalera nivel a nivel, mes a mes — hasta que la IA te encuentre, te entienda y te recomiende. Conversemos sobre tu caso.
+              Podemos convertir la brecha priorizada en un plan de mejoras, medición y contenido para que la IA te encuentre, te entienda y te recomiende con más consistencia.
             </p>
             <a
               href="https://efeoncepro.com"
               class="press mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold"
               style={`color:${axis.accent[800]}`}
             >
-              Conversemos sobre tu visibilidad
+              Revisar el plan de visibilidad
               <span aria-hidden="true">→</span>
             </a>
           </div>
