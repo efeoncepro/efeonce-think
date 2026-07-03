@@ -22,7 +22,24 @@ type Sev = string
 interface Level { id: string; axis: string; score: number | null; severity: Sev; status: string }
 interface Dimension { label: string; score: number | null; severity: Sev; explainer?: string }
 interface Rec { title: string; action?: string; severity: Sev }
-interface Engine { provider: string; present: number }
+interface Engine { provider: string; present: number | null; resolved: number | null }
+interface SourceDomain { domain: string; count: number; engines?: string[]; classification?: string }
+interface CitationSourceBreakdown { domains?: SourceDomain[]; totalCitations?: number; uniqueDomains?: number; reason?: string | null }
+interface CategorySummary {
+  status?: string
+  categories?: { nodeId: string; level: string; label?: { es?: string; en?: string } | string; count: number }[]
+  totalSignals?: number
+  unmappedCount?: number
+  ambiguousCount?: number
+}
+interface ReadinessAxis {
+  axis: string
+  overallScore: number | null
+  severity: Sev
+  coverage?: { probed: number; measured: number }
+  dimensions?: { key: string; label: string; score: number | null; severity: Sev; status: string }[]
+}
+interface Readiness { scoreVersion?: string; structural?: ReadinessAxis; agentic?: ReadinessAxis }
 
 const ENGINE_LABEL: Record<string, string> = {
   gemini: 'Gemini', google_ai_overview: 'Google AI Overview', google_ai_mode: 'Google AI Mode',
@@ -66,6 +83,13 @@ const ladderRungs: LadderRung[] = orderedLevels.map((lvl, i) => {
 })
 const coverageLevelCount = orderedLevels.filter((lvl) => lvl.status !== 'measured' || lvl.score === null).length
 const engines = (model?.engineSnapshot as Engine[]) ?? []
+const provenance = model?.provenance as { providersSampled?: string[]; promptCount?: number; asOfDate?: string; scoreVersion?: string; promptPackVersion?: string } | undefined
+const sourceBreakdown = (model?.citationSourceBreakdown as CitationSourceBreakdown | undefined) ?? null
+const topSourceDomains = (sourceBreakdown?.domains ?? []).slice(0, 6)
+const categorySummary = (model?.categoryTaxonomySummary as CategorySummary | undefined) ?? null
+const categoryRows = categorySummary?.status && categorySummary.status !== 'unknown' ? (categorySummary.categories ?? []).slice(0, 5) : []
+const readiness = (model?.readiness as Readiness | null | undefined) ?? null
+const readinessAxes = [readiness?.agentic, readiness?.structural].filter((axis): axis is ReadinessAxis => !!axis)
 const disclaimer = (model?.disclaimer as string) ?? ''
 
 // Roster canónico de motores: siempre mostramos los 5 principales (incl. Claude). Los que
@@ -75,11 +99,11 @@ const ENGINE_ROSTER = ['gemini', 'chatgpt', 'claude', 'perplexity', 'google_ai_o
 const findEngine = (p: string) => engines.find((e) => e.provider === p || (p === 'chatgpt' && e.provider === 'openai'))
 const rosterEngines = ENGINE_ROSTER.map((p) => {
   const f = findEngine(p)
-  return { provider: p, present: f ? f.present : null }
+  return { provider: p, present: f ? f.present : null, resolved: f ? f.resolved : null }
 })
 const extraEngines = engines
   .filter((e) => !ENGINE_ROSTER.includes(e.provider) && e.provider !== 'openai')
-  .map((e) => ({ provider: e.provider, present: e.present }))
+  .map((e) => ({ provider: e.provider, present: e.present, resolved: e.resolved }))
 const allEngines = [...rosterEngines, ...extraEngines]
 
 const sov = model?.competitiveSov as { competitors?: { name: string; mentions: number }[]; brandMentions?: number } | undefined
@@ -97,6 +121,15 @@ const radarDims = dimensions.filter((d) => d.score !== null).map((d) => ({ name:
 const hasRadar = radarDims.length >= 3
 
 const sev = severityMeta(overallSeverity)
+const axisLabel = (axisId: string) => axisId === 'agentic' ? 'Operabilidad agéntica' : 'Base técnica'
+const categoryLabel = (label: NonNullable<CategorySummary['categories']>[number]['label']) =>
+  typeof label === 'string' ? label : label?.es ?? label?.en ?? 'Categoría detectada'
+const sourceClassLabel: Record<string, string> = {
+  own_domain: 'Sitio propio',
+  competitor: 'Competidor',
+  third_party: 'Tercero',
+  ugc: 'UGC/comunidad'
+}
 
 const findDimension = (label: string) => dimensions.find((d) => d.label === label)
 const entityClarity = findDimension('Entity Clarity')
@@ -130,6 +163,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
       <article>
         {/* ══ HERO NAVY ══ */}
         <header
+          data-capture="report-hero"
           class="relative overflow-hidden px-6 pt-6 pb-14 sm:pt-8 sm:pb-20"
           style={`background:linear-gradient(160deg,${axis.accent[800]} 0%,${axis.accent[900]} 62%,#001a33 100%)`}
         >
@@ -194,7 +228,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
 
         {/* Ejes: card que aterriza sobre la costura del hero */}
         <div class="relative z-10 mx-auto -mt-9 max-w-7xl px-6">
-          <div class="report-panel grid overflow-hidden rounded-2xl bg-white shadow-xl ring-1 sm:grid-cols-2" style="--tw-ring-color:rgba(0,0,0,0.06)">
+          <div data-capture="report-readiness" class="report-panel grid overflow-hidden rounded-2xl bg-white shadow-xl ring-1 sm:grid-cols-2" style="--tw-ring-color:rgba(0,0,0,0.06)">
             <div class="p-5 sm:p-6">
               <div class="flex items-center justify-between gap-3">
                 <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Percepción medida · ¿te mencionan?</p>
@@ -235,9 +269,30 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         </div>
 
         <main class="mx-auto max-w-7xl px-6">
+          {/* ══ METHOD BAND ══ */}
+          <section class="py-10" data-capture="report-method">
+            <div class="report-panel grid gap-4 rounded-2xl border bg-white p-5 sm:grid-cols-3 sm:p-6" style={`border-color:${axis.gray[100]}`}>
+              <div>
+                <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Muestra del diagnóstico</p>
+                <p class="mt-1 text-xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{provenance?.promptCount ?? '—'}</p>
+                <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>prompts evaluados</p>
+              </div>
+              <div>
+                <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Motores muestreados</p>
+                <p class="mt-1 text-xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{provenance?.providersSampled?.length ?? engines.length}</p>
+                <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>{(provenance?.providersSampled ?? engines.map((engine) => engine.provider)).map((provider) => ENGINE_LABEL[provider] ?? provider).join(' · ')}</p>
+              </div>
+              <div>
+                <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Corte de evidencia</p>
+                <p class="mt-1 text-xl font-semibold" style={`color:${axis.gray[900]}`}>{header?.reportDate ?? '—'}</p>
+                <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>snapshot público tokenizado</p>
+              </div>
+            </div>
+          </section>
+
           {/* ══ 01 · EVIDENCIA POR MOTOR ══ */}
           {engines.length > 0 && (
-            <section class="py-16" data-capture="report-engine-visibility">
+            <section class="py-16" data-capture="report-engine-coverage">
               <p class="eyebrow" style={`color:${axis.accent[500]}`}>01 · Cobertura capturada</p>
               <h2 class="section-title" style={`color:${axis.gray[900]}`}>Qué motores de respuesta mencionan a {organizationName}</h2>
               <p class="section-lead" style={`color:${axis.gray[600]}`}>Separamos menciones reales, ausencia de mención y motores que no respondieron. Así el diagnóstico no confunde una consulta sin resultado con una medición que aún está en cobertura.</p>
@@ -250,10 +305,11 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                 <ul role="list">
                   {allEngines.map((e) => {
                     const label = ENGINE_LABEL[e.provider] ?? e.provider
-                    const stateText = e.present === null ? 'Sin datos' : e.present > 0 ? 'Mención detectada' : 'Sin mención'
-                    const mentionText = e.present === null ? '—' : String(e.present)
-                    const stateBg = e.present === null ? axis.gray[50] : e.present > 0 ? axis.success[100] : axis.gray[100]
-                    const stateColor = e.present === null ? axis.gray[600] : e.present > 0 ? axis.success[700] : axis.gray[600]
+                    const presentCount = e.present ?? 0
+                    const stateText = e.resolved === null ? 'Sin datos' : e.resolved === 0 ? 'Sin respuestas evaluables' : presentCount > 0 ? 'Mención detectada' : 'Sin mención'
+                    const mentionText = e.resolved === null ? '—' : `${presentCount}/${e.resolved}`
+                    const stateBg = e.resolved === null || e.resolved === 0 ? axis.gray[50] : presentCount > 0 ? axis.success[100] : axis.gray[100]
+                    const stateColor = e.resolved === null || e.resolved === 0 ? axis.gray[600] : presentCount > 0 ? axis.success[700] : axis.gray[600]
                     return (
                       <li class="data-row grid gap-3 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[1.35fr_0.85fr_1.2fr] sm:items-center" style={`border-color:${axis.gray[100]}`}>
                         <div class="flex items-center gap-3">
@@ -276,10 +332,112 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             </section>
           )}
 
-          {/* ══ 02 · BENCHMARK DE COMPETENCIA ══ */}
+          {/* ══ 02 · FUENTES CITADAS ══ */}
+          {(topSourceDomains.length > 0 || sourceBreakdown?.reason) && (
+            <section class="border-t py-16" data-capture="report-source-evidence" style={`border-color:${axis.gray[100]}`}>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>02 · Fuentes citadas</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Fuentes que sostienen las respuestas</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Dominios citados por los motores al responder sobre {organizationName}. Mostramos dominios agregados, no URLs completas ni texto crudo de proveedores.</p>
+              {topSourceDomains.length > 0 ? (
+                <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+                  <div class="grid gap-4 border-b p-5 sm:grid-cols-3" style={`border-color:${axis.gray[100]}`}>
+                    <div>
+                      <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Citas totales</p>
+                      <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{sourceBreakdown?.totalCitations ?? '—'}</p>
+                    </div>
+                    <div>
+                      <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Dominios únicos</p>
+                      <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{sourceBreakdown?.uniqueDomains ?? topSourceDomains.length}</p>
+                    </div>
+                    <div>
+                      <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Lectura</p>
+                      <p class="mt-1 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>Más fuentes propias y autoritativas reducen dependencia de terceros o competidores.</p>
+                    </div>
+                  </div>
+                  <ul role="list">
+                    {topSourceDomains.map((source) => (
+                      <li class="data-row grid gap-3 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[1.2fr_0.45fr_1fr_0.9fr] sm:items-center" style={`border-color:${axis.gray[100]}`}>
+                        <p class="font-semibold" style={`color:${axis.gray[900]}`}>{source.domain}</p>
+                        <p class="flex justify-between text-sm tabular-nums sm:block sm:text-right" style={`color:${axis.gray[600]}`}>
+                          <span class="font-semibold uppercase tracking-[0.08em] sm:hidden">Citas</span>
+                          {source.count}
+                        </p>
+                        <p class="text-sm" style={`color:${axis.gray[600]}`}>{(source.engines ?? []).map((provider) => ENGINE_LABEL[provider] ?? provider).join(' · ') || 'Motor no especificado'}</p>
+                        <p class="sm:text-right">
+                          <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[800]}`}>{sourceClassLabel[source.classification ?? ''] ?? 'Fuente'}</span>
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <div class="report-panel mt-6 rounded-2xl border bg-white p-5" style={`border-color:${axis.gray[100]}`}>
+                  <p class="font-semibold" style={`color:${axis.gray[900]}`}>Sin evidencia suficiente</p>
+                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Este diagnóstico no trae citas evaluables para mostrar dominios de fuente.</p>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ══ 03 · CATEGORÍA ══ */}
+          {(categoryRows.length > 0 || categorySummary?.status === 'needs_review') && (
+            <section class="border-t py-16" data-capture="report-category-association" style={`border-color:${axis.gray[100]}`}>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>03 · Asociación con la categoría</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Cómo te ubican los motores de respuesta</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Mostramos categorías solo cuando el diagnóstico trae señales reales. Si la categoría viene desconocida, no se inventa narrativa.</p>
+              {categoryRows.length > 0 ? (
+                <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+                  <ul role="list">
+                    {categoryRows.map((cat) => (
+                      <li class="data-row grid gap-3 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[1.4fr_0.75fr_0.45fr] sm:items-center" style={`border-color:${axis.gray[100]}`}>
+                        <p class="font-semibold" style={`color:${axis.gray[900]}`}>{categoryLabel(cat.label)}</p>
+                        <p class="text-sm" style={`color:${axis.gray[600]}`}>{cat.level.replaceAll('_', ' ')}</p>
+                        <p class="text-sm font-semibold tabular-nums sm:text-right" style={`color:${axis.gray[800]}`}>{cat.count}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <div class="report-panel mt-6 rounded-2xl border bg-white p-5" style={`border-color:${axis.gray[100]}`}>
+                  <p class="font-semibold" style={`color:${axis.gray[900]}`}>Categoría en revisión</p>
+                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Hay señales de categoría, pero todavía no alcanzan un mapping público confiable.</p>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ══ 04 · OPERABILIDAD ══ */}
+          {readinessAxes.some((readinessAxis) => readinessAxis.overallScore !== null) && (
+            <section class="border-t py-16" data-capture="report-readiness-detail" style={`border-color:${axis.gray[100]}`}>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>04 · Operabilidad del sitio</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Señales técnicas para que los motores puedan leerte y usarte</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Este eje es ortogonal al score de percepción: mide preparación técnica y agéntica, no popularidad ni share of voice.</p>
+              <div class="mt-6 grid gap-4 md:grid-cols-2">
+                {readinessAxes.map((readinessAxis) => {
+                  const s = severityMeta(readinessAxis.severity)
+                  return (
+                    <div class="report-panel rounded-2xl border bg-white p-5" style={`border-color:${axis.gray[100]};border-left:4px solid ${s.border}`}>
+                      <div class="flex items-start justify-between gap-4">
+                        <div>
+                          <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>{axisLabel(readinessAxis.axis)}</p>
+                          <p class="mt-1 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{readinessAxis.overallScore ?? '—'}<span class="text-base" style={`color:${axis.gray[400]}`}>/100</span></p>
+                        </div>
+                        <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${s.bg};color:${s.fg}`}>{s.label}</span>
+                      </div>
+                      {readinessAxis.coverage && (
+                        <p class="mt-3 text-sm" style={`color:${axis.gray[600]}`}>{readinessAxis.coverage.measured}/{readinessAxis.coverage.probed} pruebas con evidencia medible.</p>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* ══ 05 · BENCHMARK DE COMPETENCIA ══ */}
           {hasBenchmark && (
             <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>02 · Posición competitiva</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>05 · Posición competitiva</p>
               <h2 class="section-title" style={`color:${axis.gray[900]}`}>Share of voice frente al líder detectado</h2>
               <p class="section-lead" style={`color:${axis.gray[600]}`}>Contrasta las menciones de {organizationName} con las entidades competidoras y separa dos señales distintas: aparecer en la respuesta y ser citado como fuente.</p>
               <div class="mt-5">
@@ -295,10 +453,10 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             </section>
           )}
 
-          {/* ══ 03 · LA ESCALERA (narrativa central) ══ */}
+          {/* ══ 06 · LA ESCALERA (narrativa central) ══ */}
           {levels.length > 0 && (
-            <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>03 · Marco de madurez</p>
+            <section class="border-t py-16" data-capture="report-ladder" style={`border-color:${axis.gray[100]}`}>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>06 · Marco de madurez</p>
               <h2 class="section-title" style={`color:${axis.gray[900]}`}>La escalera de visibilidad en motores de respuesta</h2>
               <p class="section-lead max-w-3xl" style={`color:${axis.gray[600]}`}>
                 El diagnóstico organiza menciones, citas y representación en cinco niveles acumulativos: <strong style={`color:${axis.gray[900]}`}>Be Found</strong>, <strong style={`color:${axis.gray[900]}`}>Readable</strong>, <strong style={`color:${axis.gray[900]}`}>Correct</strong>, <strong style={`color:${axis.gray[900]}`}>Actionable</strong> e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong>. El primer peldaño pendiente marca dónde destrabar avance antes de optimizar niveles superiores.
@@ -315,7 +473,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ BRECHA + MOVIMIENTO ══ */}
           {primaryGap?.title && (
             <section class="deferred-report-section border-t py-16" data-capture="report-recommendations" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>04 · Prioridad operativa</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>07 · Prioridad operativa</p>
               <h2 class="section-title" style={`color:${axis.gray[900]}`}>La brecha que más limita el avance</h2>
               <p class="section-lead" style={`color:${axis.gray[600]}`}>El siguiente paso se ordena desde la brecha principal del modelo: primero corregir el bloqueo de base, después expandir cobertura y autoridad.</p>
               <div class="report-panel mt-4 overflow-hidden rounded-2xl border bg-white" style={`border-color:${severityMeta(primaryGap.severity ?? 'critico').border}66`}>
@@ -347,7 +505,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ POR QUÉ OCURRE ══ */}
           {dimensions.length > 0 && (
             <section class="deferred-report-section border-t py-16" data-capture="report-dimension-detail" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>05 · Diagnóstico técnico</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>08 · Diagnóstico técnico</p>
               <h2 id="s-detalle" class="section-title" style={`color:${axis.gray[900]}`}>Qué explica el puntaje</h2>
               <p class="section-lead" style={`color:${axis.gray[600]}`}>Resumen de fortalezas, brechas críticas y dimensiones sin evidencia suficiente. Los campos sin dato se mantienen fuera del cálculo visual.</p>
               {(strongDimensions.length > 0 || criticalDimensions.length > 0 || unmeasuredDimensions.length > 0) && (
