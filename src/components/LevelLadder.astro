@@ -18,7 +18,7 @@ const liquid = (measured: boolean, sevBorder: string) =>
     : `repeating-linear-gradient(135deg, ${axis.gray[100]} 0 10px, ${axis.gray[50]} 10px 20px)`
 
 const rungs = ordered.map((lvl, i) => {
-  const copy = LEVEL_COPY[lvl.id] ?? { ordinal: '', label: lvl.id, labelEn: '', question: '' }
+  const copy = LEVEL_COPY[lvl.id] ?? { ordinal: '', label: lvl.id, labelEn: '', tier: '', result: '', desc: '', question: '' }
   const measured = lvl.status === 'measured' && lvl.score !== null
   return { lvl, copy, measured, sev: severityMeta(measured ? lvl.severity : 'sin_dato'), i, isNext: i === nextIdx }
 })
@@ -57,7 +57,7 @@ const rungs = ordered.map((lvl, i) => {
     display: flex; flex-direction: column;
     border: 1px solid rgba(0,0,0,0.07); border-radius: 16px; overflow: hidden; background: #fff;
     box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    transition: box-shadow 0.18s ease, transform 0.18s ease;
+    transition: box-shadow 0.18s cubic-bezier(0.2, 0, 0, 1), transform 0.18s cubic-bezier(0.2, 0, 0, 1);
   }
   @media (hover: hover) { .col:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -14px rgba(2,60,112,0.3); } }
   .col.is-next {

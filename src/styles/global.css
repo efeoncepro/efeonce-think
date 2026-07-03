@@ -34,6 +34,24 @@ html {
   line-height: 1.55;
 }
 
+/* ── Focus visible (WCAG 2.2 · teclado) — ring de acento; blanco sobre navy ── */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #0375db;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.press:focus-visible {
+  outline-color: #ffffff;
+}
+@media (forced-colors: active) {
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid CanvasText;
+  }
+}
+
 /* ── Microinteracción canónica: hover lift (Tier 1 CSS, motion-design) ── */
 .lift {
   transition:

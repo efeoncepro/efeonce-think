@@ -425,7 +425,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           played = true
           const tl = gsap.timeline()
           tl.to(cols, { opacity: 1, y: 0, duration: 0.5, stagger: 0.14, ease: 'power3.out' })
-            .to(cards, { scale: 1, duration: 0.5, stagger: 0.14, ease: 'back.out(1.6)' }, 0.02)
+            .to(cards, { scale: 1, duration: 0.5, stagger: 0.14, ease: 'back.out(1.2)' }, 0.02)
             .to(risers, { scaleY: 1, duration: 0.7, stagger: 0.14, ease: 'power2.inOut' }, 0.12)
           document.querySelectorAll<HTMLElement>('.ladder [data-rung-score]').forEach((el, i) => {
             const t = parseFloat(el.dataset.rungScore || '0')
