@@ -1,0 +1,74 @@
+---
+export const prerender = false
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { getConceptModel } from '@lib/concept-data'
+import { axis, severityMeta } from '@lib/report-tokens'
+
+const m = await getConceptModel()
+const sev = m ? severityMeta(m.overallSeverity) : severityMeta('sin_dato')
+---
+
+<BaseLayout title="Concepto C — Bold Editorial" noindex>
+  {m && (
+    <div class="min-h-dvh bg-white">
+      <header class="mx-auto flex max-w-5xl items-center justify-between px-6 py-7">
+        <img src="/branding/efeonce-logo.svg" alt="Efeonce" style="height:26px;width:auto" />
+        <span class="text-xs font-semibold tracking-[0.16em] uppercase" style={`color:${axis.gray[400]}`}>Visibilidad en IA</span>
+      </header>
+
+      {/* HERO magazine: número gigante + titular */}
+      <main class="mx-auto max-w-5xl px-6">
+        <section class="grid items-center gap-8 border-y py-12 sm:grid-cols-[auto_1fr] sm:gap-14 sm:py-16" style={`border-color:${axis.gray[900]}`}>
+          {/* Número gigante */}
+          <div class="flex flex-col">
+            <span class="text-[7rem] font-bold leading-[0.85] tracking-tight tabular-nums sm:text-[10rem]" style={`color:${sev.border}`}>
+              {m.overallScore}
+            </span>
+            <span class="mt-2 text-sm font-semibold tracking-wide uppercase" style={`color:${axis.gray[600]}`}>
+              de 100 · visibilidad estimada
+            </span>
+          </div>
+          {/* Titular */}
+          <div>
+            <span class="inline-block rounded-sm px-2.5 py-1 text-xs font-bold tracking-wide uppercase" style={`background:${sev.border};color:white`}>{sev.label}</span>
+            <h1 class="mt-4 text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl" style={`color:${axis.gray[900]}`}>
+              {m.headlineFrame}
+            </h1>
+            <p class="mt-5 text-lg" style={`color:${axis.gray[600]}`}>
+              <span class="font-semibold" style={`color:${axis.gray[900]}`}>{m.organizationName}</span> · {m.periodLabel}
+            </p>
+          </div>
+        </section>
+
+        {/* Ejes como bloques de color */}
+        <section class="grid gap-4 py-10 sm:grid-cols-2">
+          <div class="rounded-2xl p-6" style={`background:${axis.accent[500]}`}>
+            <p class="text-sm font-medium" style="color:rgba(255,255,255,0.85)">Percepción · ¿te mencionan?</p>
+            <p class="mt-2 text-4xl font-bold tabular-nums text-white">{m.perceptionScore ?? '—'}<span class="text-xl font-normal" style="color:rgba(255,255,255,0.6)">/100</span></p>
+          </div>
+          <div class="rounded-2xl p-6" style={`background:${axis.gray[100]}`}>
+            <p class="text-sm font-medium" style={`color:${axis.gray[600]}`}>Operabilidad · ¿te pueden usar?</p>
+            <p class="mt-2 text-4xl font-bold" style={`color:${axis.gray[400]}`}>{m.agenticScore ?? 'En cobertura'}</p>
+          </div>
+        </section>
+
+        {/* Evidencia por motor — chips bold */}
+        <section class="pb-20">
+          <h2 class="text-2xl font-bold tracking-tight" style={`color:${axis.gray[900]}`}>Dónde apareces (y dónde no)</h2>
+          <div class="mt-5 flex flex-wrap gap-3">
+            {m.engines.slice(0, 6).map((e) => (
+              <div
+                class="flex items-center gap-2.5 rounded-full border-2 px-4 py-2.5"
+                style={e.present > 0 ? `border-color:${axis.gray[900]};background:${axis.gray[900]}` : `border-color:${axis.gray[200]}`}
+              >
+                {e.logo && <img src={e.logo} alt={e.label} style={`height:20px;width:20px;object-fit:contain${e.present > 0 ? ';filter:brightness(0) invert(1)' : ''}`} />}
+                <span class="text-sm font-semibold" style={e.present > 0 ? 'color:white' : `color:${axis.gray[600]}`}>{e.label}</span>
+                <span class="text-xs font-bold tabular-nums" style={e.present > 0 ? 'color:rgba(255,255,255,0.7)' : `color:${axis.gray[400]}`}>{e.present > 0 ? e.present : '0'}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+    </div>
+  )}
+</BaseLayout>
