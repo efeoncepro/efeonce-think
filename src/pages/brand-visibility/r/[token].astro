@@ -5,10 +5,9 @@ export const prerender = false
 import BaseLayout from '@layouts/BaseLayout.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import EngineMark from '@/components/EngineMark.astro'
-import LevelLadder from '@/components/LevelLadder.astro'
 import CompetitiveBenchmark from '@/components/CompetitiveBenchmark.astro'
 import { fetchPublicReport } from '@lib/report'
-import { axis, severityMeta } from '@lib/report-tokens'
+import { axis, severityMeta, LEVEL_COPY } from '@lib/report-tokens'
 
 const { token } = Astro.params
 const result = token ? await fetchPublicReport(token) : ({ status: 'not_found' } as const)
@@ -66,6 +65,20 @@ const hasBenchmark = !!(sov && (sov.competitors?.length || citation?.findingsWit
 // Radar de dimensiones (solo medidas; sin_dato NO se plotea como 0 — honestidad dataviz).
 const radarDims = dimensions.filter((d) => d.score !== null).map((d) => ({ name: d.label, score: Math.round(d.score as number) }))
 const hasRadar = radarDims.length >= 3
+
+// Escalera como ECharts bar horizontal: rungs apilados (01→05), largo = score, color = severidad.
+const ladderData = [...levels]
+  .sort((a, b) => Number(LEVEL_COPY[a.id]?.ordinal ?? '99') - Number(LEVEL_COPY[b.id]?.ordinal ?? '99'))
+  .map((l) => {
+    const measured = l.status === 'measured' && l.score !== null
+    return {
+      ordinal: LEVEL_COPY[l.id]?.ordinal ?? '',
+      label: LEVEL_COPY[l.id]?.label ?? l.id,
+      question: LEVEL_COPY[l.id]?.question ?? '',
+      score: measured ? Math.round(l.score as number) : null,
+      severity: measured ? l.severity : 'sin_dato',
+    }
+  })
 
 const sev = severityMeta(overallSeverity)
 
@@ -185,7 +198,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               <p class="mt-1.5 max-w-2xl text-sm" style={`color:${axis.gray[600]}`}>
                 Existir para la IA es subir cinco peldaños: que te <strong style={`color:${axis.gray[900]}`}>encuentre</strong>, te <strong style={`color:${axis.gray[900]}`}>entienda</strong>, te <strong style={`color:${axis.gray[900]}`}>represente bien</strong>, pueda <strong style={`color:${axis.gray[900]}`}>actuar</strong> y finalmente te <strong style={`color:${axis.gray[900]}`}>prefiera</strong>. Cada peldaño se apoya en el anterior — no sirve competir arriba si la base falla.
               </p>
-              <LevelLadder levels={levels} />
+              <div id="ladder-chart" data-ladder={JSON.stringify(ladderData)} style={`width:100%;height:${ladderData.length * 62 + 30}px`}></div>
             </section>
           )}
 
@@ -313,13 +326,63 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
   <script>
     import gsap from 'gsap'
     import * as echarts from 'echarts/core'
-    import { RadarChart } from 'echarts/charts'
-    import { TooltipComponent } from 'echarts/components'
+    import { RadarChart, BarChart } from 'echarts/charts'
+    import { TooltipComponent, GridComponent, MarkLineComponent } from 'echarts/components'
     import { CanvasRenderer } from 'echarts/renderers'
 
-    echarts.use([RadarChart, TooltipComponent, CanvasRenderer])
+    echarts.use([RadarChart, BarChart, TooltipComponent, GridComponent, MarkLineComponent, CanvasRenderer])
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const SEV_COLOR: Record<string, string> = { critico: '#dc2e39', atencion: '#ffb703', optimo: '#157f47', sin_dato: '#d5d4d8' }
+
+    // ── ECharts: la escalera (bar horizontal, rungs 01→05, largo = score) ──
+    const ladderEl = document.getElementById('ladder-chart')
+    if (ladderEl) {
+      const rungs = JSON.parse(ladderEl.dataset.ladder || '[]') as { ordinal: string; label: string; question: string; score: number | null; severity: string }[]
+      if (rungs.length) {
+        const chart = echarts.init(ladderEl)
+        chart.setOption({
+          grid: { left: 4, right: 44, top: 8, bottom: 8, containLabel: true },
+          tooltip: {
+            trigger: 'item',
+            formatter: (p: any) => {
+              const r = rungs[p.dataIndex]
+              const val = r.score === null ? 'En cobertura' : `${r.score}/100`
+              return `<b>${r.ordinal} · ${r.label}</b><br/>${r.question}<br/><span style="color:#6d6777">${val}</span>`
+            },
+          },
+          xAxis: { type: 'value', max: 100, splitLine: { lineStyle: { color: '#f2f2f4' } }, axisLabel: { color: '#c0bec5', fontSize: 10 }, axisLine: { show: false }, axisTick: { show: false } },
+          yAxis: {
+            type: 'category',
+            data: rungs.map((r) => `${r.ordinal}  ${r.label}`),
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: { color: '#433c50', fontSize: 12.5, fontWeight: 600, margin: 12 },
+          },
+          series: [
+            {
+              type: 'bar',
+              barWidth: 20,
+              data: rungs.map((r) =>
+                r.score === null
+                  ? { value: 0, itemStyle: { color: 'transparent' }, label: { show: true, position: 'right', formatter: 'En cobertura', color: '#aba8b1', fontSize: 11, fontStyle: 'italic' } }
+                  : { value: r.score, itemStyle: { color: SEV_COLOR[r.severity] ?? '#d5d4d8', borderRadius: [0, 6, 6, 0] }, label: { show: true, position: 'right', formatter: `${r.score}`, color: '#433c50', fontWeight: 700, fontSize: 13 } },
+              ),
+              markLine: {
+                silent: true,
+                symbol: 'none',
+                data: [{ xAxis: 85 }],
+                lineStyle: { color: '#aba8b1', type: 'dashed', width: 1 },
+                label: { formatter: 'Líderes 85', color: '#827d8b', fontSize: 10, position: 'insideEndTop' },
+              },
+              animationDuration: reduce ? 0 : 900,
+              animationEasing: 'cubicOut',
+            },
+          ],
+        })
+        window.addEventListener('resize', () => chart.resize())
+      }
+    }
 
     // ── ECharts radar de dimensiones (chart signature animado) ──
     const radarEl = document.getElementById('dims-radar')

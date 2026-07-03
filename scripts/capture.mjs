@@ -17,6 +17,7 @@ const OUT_DIR = resolve(__dirname, '../.captures')
 
 const url = process.argv[2]
 const label = process.argv[3] ?? 'capture'
+const clipSelector = process.argv[4] ?? null
 
 if (!url) {
   console.error('Uso: node scripts/capture.mjs <url> <label>')
@@ -41,7 +42,13 @@ try {
     const res = await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 })
     await page.waitForTimeout(400)
     const out = resolve(OUT_DIR, `${label}-${vp.name}.png`)
-    await page.screenshot({ path: out, fullPage: true })
+    if (clipSelector) {
+      const el = await page.$(clipSelector)
+      if (el) { await el.scrollIntoViewIfNeeded(); await page.waitForTimeout(300); await el.screenshot({ path: out }) }
+      else await page.screenshot({ path: out, fullPage: true })
+    } else {
+      await page.screenshot({ path: out, fullPage: true })
+    }
     console.log(`[capture] ${vp.name} HTTP ${res?.status()} → ${out}`)
     await context.close()
   }
