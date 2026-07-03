@@ -1,8 +1,7 @@
 ---
-// LA ESCALERA — framework AEO: 5 peldaños de madurez que la marca sube en orden.
-// Cards uniformes sobre pedestales-"líquido" que crecen (altura = peldaño; color = severidad).
-// El peldaño "próximo nivel" se marca integrado (no pill flotante). Copy: solo nombre +
-// Be X (metodología) + pregunta guía; sin traer la definición del servicio.
+// LA ESCALERA — framework AEO: 5 peldaños de madurez. Cada peldaño es UNA pieza (card +
+// líquido como base, sin costura). Altura del líquido = posición en la escalera; color =
+// severidad. El "próximo nivel" se marca integrado. Copy lean: nombre + Be X + pregunta.
 import { axis, severityMeta, LEVEL_COPY } from '@lib/report-tokens'
 
 interface Level { id: string; axis: string; score: number | null; severity: string; status: string }
@@ -11,14 +10,12 @@ const { levels } = Astro.props as { levels: Level[] }
 const ordered = [...levels].sort(
   (a, b) => Number(LEVEL_COPY[a.id]?.ordinal ?? '99') - Number(LEVEL_COPY[b.id]?.ordinal ?? '99'),
 )
-// "El primero que aún no logras es tu próximo nivel": primer peldaño no-óptimo.
 const nextIdx = ordered.findIndex((l) => l.severity !== 'optimo')
 
-// Líquido del pedestal: gradiente por severidad (measured) / neutro sutil (cobertura).
 const liquid = (measured: boolean, sevBorder: string) =>
   measured
     ? `linear-gradient(180deg, ${sevBorder}cc 0%, ${sevBorder}30 100%)`
-    : `linear-gradient(180deg, ${axis.gray[200]} 0%, ${axis.gray[100]} 100%)`
+    : `repeating-linear-gradient(135deg, ${axis.gray[100]} 0 10px, ${axis.gray[50]} 10px 20px)`
 
 const rungs = ordered.map((lvl, i) => {
   const copy = LEVEL_COPY[lvl.id] ?? { ordinal: '', label: lvl.id, labelEn: '', question: '' }
@@ -29,8 +26,8 @@ const rungs = ordered.map((lvl, i) => {
 
 <div class="ladder" style={`--n:${rungs.length}`}>
   {rungs.map(({ lvl, copy, measured, sev, i, isNext }) => (
-    <div class="col">
-      <div class={`card${isNext ? ' is-next' : ''}`}>
+    <div class={`col${isNext ? ' is-next' : ''}`}>
+      <div class="card">
         {isNext && <p class="next" style={`color:${axis.accent[700]}`}>Empieza aquí</p>}
         <div class="card-top">
           <span class="ord" style={`color:${axis.gray[200]}`}>{copy.ordinal}</span>
@@ -45,9 +42,9 @@ const rungs = ordered.map((lvl, i) => {
         <p class="q" style={`color:${axis.gray[600]}`}>{copy.question}</p>
         {measured && <span class="sev" style={`background:${sev.bg};color:${sev.fg}`}>{sev.label}</span>}
       </div>
-      {/* pedestal-líquido: color = severidad, altura = peldaño */}
-      <div class="riser" style={`--i:${i};background:${liquid(measured, sev.border)}`}>
-        <span class="riser-top" style={`background:${measured ? sev.border : axis.gray[200]}`}></span>
+      {/* líquido = base de la misma pieza (sin costura) */}
+      <div class={`riser${measured ? ' measured' : ''}`} style={`--i:${i};background:${liquid(measured, sev.border)}`}>
+        {measured && <span class="surface" style={`background:${sev.border}`}></span>}
       </div>
     </div>
   ))}
@@ -55,20 +52,23 @@ const rungs = ordered.map((lvl, i) => {
 
 <style>
   .ladder { margin-top: 1.75rem; display: grid; grid-template-columns: repeat(var(--n), 1fr); align-items: end; gap: 0.75rem; }
-  .col { display: flex; flex-direction: column; }
-  .card {
-    position: relative; display: flex; flex-direction: column; gap: 0.12rem;
-    border: 1px solid rgba(0,0,0,0.07); border-radius: 16px 16px 0 0; background: #fff;
-    padding: 1rem 1.05rem 1.15rem; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  /* la PIEZA: card + líquido en un solo objeto con borde/esquinas continuas */
+  .col {
+    display: flex; flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.07); border-radius: 16px; overflow: hidden; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
   }
-  .card.is-next {
-    box-shadow: 0 0 0 2px var(--accent, #0375db), 0 8px 24px -12px rgba(3,117,219,0.4);
-    background: linear-gradient(180deg, rgba(3,117,219,0.05), #fff 40%);
+  @media (hover: hover) { .col:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -14px rgba(2,60,112,0.3); } }
+  .col.is-next {
+    border-color: transparent;
+    box-shadow: 0 0 0 2px #0375db, 0 10px 26px -12px rgba(3,117,219,0.42);
+    background: linear-gradient(180deg, rgba(3,117,219,0.06), #fff 42%);
   }
+  .card { display: flex; flex-direction: column; gap: 0.12rem; padding: 1rem 1.05rem 1.15rem; }
   .next {
     display: inline-flex; align-items: center; gap: 0.28rem;
-    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-    margin-bottom: 0.35rem;
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.35rem;
   }
   .next::before { content: '↑'; font-size: 0.72rem; }
   .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem; }
@@ -79,12 +79,19 @@ const rungs = ordered.map((lvl, i) => {
   .label { margin-top: 0.12rem; font-weight: 600; font-size: 0.92rem; line-height: 1.2; }
   .q { margin-top: 0.2rem; font-size: 0.76rem; line-height: 1.3; }
   .sev { align-self: flex-start; margin-top: 0.55rem; border-radius: 999px; padding: 0.12rem 0.5rem; font-size: 0.68rem; font-weight: 600; }
-  .riser { position: relative; height: calc(8px + var(--i, 0) * 17px); border-radius: 0 0 7px 7px; overflow: hidden; }
-  .riser-top { position: absolute; inset: 0 0 auto 0; height: 2px; opacity: 0.9; }
+  /* líquido: base de la pieza; altura = peldaño; superficie = línea + onda sutil */
+  .riser { position: relative; height: calc(10px + var(--i, 0) * 18px); overflow: hidden; }
+  .surface { position: absolute; inset: 0 0 auto 0; height: 2px; opacity: 0.85; }
+  .riser.measured::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%);
+    transform: translateX(-120%); animation: liquid-sheen 4.5s ease-in-out infinite;
+  }
+  @keyframes liquid-sheen { 0%, 60%, 100% { transform: translateX(-120%); } 80% { transform: translateX(120%); } }
 
   @media (max-width: 720px) {
     .ladder { grid-template-columns: 1fr; gap: 0.55rem; align-items: stretch; }
-    .card { border-radius: 16px 16px 0 0; }
-    .riser { height: 9px !important; }
+    .riser { height: 10px !important; }
   }
+  @media (prefers-reduced-motion: reduce) { .riser.measured::after { animation: none; opacity: 0; } }
 </style>
