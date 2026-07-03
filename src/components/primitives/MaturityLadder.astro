@@ -155,24 +155,25 @@ const rungDefinitions = {
   .ord { font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
   .score { font-size: 1.9rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
   .cover { font-size: 0.6875rem; font-weight: 500; border-radius: 999px; padding: 0.2rem 0.5rem; white-space: nowrap; }
-  .bex-row { position: relative; display: inline-flex; align-items: center; gap: 0.35rem; align-self: flex-start; max-width: 100%; }
+  .bex-row { position: relative; display: inline-flex; align-items: center; gap: 0.26rem; align-self: flex-start; max-width: 100%; }
   .bex { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
   .info-wrap { position: relative; display: inline-flex; align-items: center; z-index: 20; }
   .info-trigger {
-    appearance: none; display: inline-grid; place-items: center; width: 0.98rem; height: 0.98rem;
-    border: 1px solid rgba(46,38,61,0.1); border-radius: 999px; padding: 0;
-    background: linear-gradient(180deg, #433c50, #2e263d);
-    color: #fff; font: 750 0.62rem/1 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    appearance: none; display: inline-grid; place-items: center; width: 0.78rem; height: 0.78rem;
+    border: 0; border-radius: 999px; padding: 0;
+    background: #433c50;
+    color: #fff; font: 760 0.48rem/1 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     cursor: pointer;
-    box-shadow: 0 5px 12px -8px rgba(46,38,61,0.72);
-    transition: transform 0.16s cubic-bezier(0.2,0,0,1), box-shadow 0.16s cubic-bezier(0.2,0,0,1), border-color 0.16s cubic-bezier(0.2,0,0,1);
+    box-shadow: 0 3px 8px -7px rgba(46,38,61,0.7);
+    opacity: 0.92;
+    transition: transform 0.16s cubic-bezier(0.2,0,0,1), box-shadow 0.16s cubic-bezier(0.2,0,0,1), opacity 0.16s cubic-bezier(0.2,0,0,1);
   }
   .info-trigger:hover,
   .info-trigger:focus-visible,
   .info-wrap.is-open .info-trigger {
     transform: translateY(-1px);
-    border-color: rgba(46,38,61,0.2);
-    box-shadow: 0 12px 24px -16px rgba(46,38,61,0.72);
+    opacity: 1;
+    box-shadow: 0 10px 20px -16px rgba(46,38,61,0.72);
     outline: none;
   }
   .info-tip {
