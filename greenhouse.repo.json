@@ -1,0 +1,40 @@
+{
+  "schema": "greenhouse.externalRepo.v1",
+  "repo": "efeoncepro/efeonce-think",
+  "sshUrl": "git@github.com:efeoncepro/efeonce-think.git",
+  "kind": "lead-magnet-hub",
+  "owner": "growth",
+  "governedBy": {
+    "system": "greenhouse-eo",
+    "controlPlaneCandidate": "public-site-github-control-plane.v1",
+    "notes": "Hub público de lead magnets (think.efeoncepro.com). Repo satélite preparado para observabilidad y comandos desde Greenhouse vía el GitHub Control Plane (TASK-1167) + binding Astro (TASK-1161). Integración runtime en greenhouse-eo pendiente: registrar este repo en el binding multi-repo. TASK-1325."
+  },
+  "runtime": {
+    "framework": "Astro",
+    "major": 7,
+    "output": "hybrid",
+    "packageManager": "pnpm",
+    "node": ">=22.0.0"
+  },
+  "vercel": {
+    "teamSlug": "efeonce-7670142f",
+    "teamId": "team_gmNiF4YCHmc1wqsHUTCvqjmN",
+    "projectName": "efeonce-think",
+    "projectId": "prj_F4gvS8jmWjvdJ8cTwM6k60R1XydV"
+  },
+  "domains": {
+    "production": "think.efeoncepro.com"
+  },
+  "surfaces": [
+    {
+      "route": "/brand-visibility/r/[token]",
+      "kind": "report-render",
+      "index": false,
+      "consumes": "greenhouse-eo: GET /api/public/growth/ai-visibility/report/[token] (TASK-1280, headless model+header)"
+    }
+  ],
+  "qualityGates": {
+    "build": "pnpm build",
+    "check": "pnpm type-check"
+  }
+}
