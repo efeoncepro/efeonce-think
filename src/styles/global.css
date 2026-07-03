@@ -14,6 +14,26 @@ html {
   text-rendering: optimizeLegibility;
 }
 
+/* ── Sistema tipográfico (typography-design): roles semánticos, no ad-hoc ── */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.eyebrow-sub {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.lead {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
 /* ── Microinteracción canónica: hover lift (Tier 1 CSS, motion-design) ── */
 .lift {
   transition:
