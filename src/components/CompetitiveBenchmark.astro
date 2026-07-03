@@ -25,30 +25,35 @@ const topCompetitor = competitors.slice().sort((a, b) => b.mentions - a.mentions
 const multiple = topCompetitor && brandMentions > 0 ? (topCompetitor.mentions / brandMentions).toFixed(1) : null
 ---
 
-<div class="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-  {/* Share of Voice */}
-  <div class="report-card rounded-2xl border bg-white p-6" style={`border-color:${axis.gray[100]}`}>
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-      <div>
-        <p class="text-sm font-semibold" style={`color:${axis.gray[900]}`}>Share of Voice · tu marca vs competencia</p>
-        {brandShare !== null && <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>{brandName} concentra {brandShare}% de las menciones detectadas en este set competitivo.</p>}
-      </div>
-      {topCompetitor && multiple && (
-        <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.warning[100]};color:${axis.warning[700]}`}>
-          Líder detectado {multiple}×
-        </span>
-      )}
+<div class="report-panel overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+  <div class="grid sm:grid-cols-3">
+    <div class="border-b p-5 sm:border-b-0 sm:border-r" style={`border-color:${axis.gray[100]}`}>
+      <p class="text-xs font-semibold uppercase tracking-[0.08em]" style={`color:${axis.gray[600]}`}>Share detectado</p>
+      <p class="mt-2 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{brandShare === null ? '—' : `${brandShare}%`}</p>
+      <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>{brandName} en el set competitivo.</p>
     </div>
-    {topCompetitor && multiple && (
-      <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>
-        <span class="font-semibold" style={`color:${axis.gray[900]}`}>{topCompetitor.name}</span> tiene {multiple}× tus menciones en las respuestas de IA.
-      </p>
-    )}
-    <div class="mt-5 flex flex-col gap-3.5">
+    <div class="border-b p-5 sm:border-b-0 sm:border-r" style={`border-color:${axis.gray[100]}`}>
+      <p class="text-xs font-semibold uppercase tracking-[0.08em]" style={`color:${axis.gray[600]}`}>Líder detectado</p>
+      <p class="mt-2 text-lg font-semibold" style={`color:${axis.gray[900]}`}>{topCompetitor?.name ?? '—'}</p>
+      {multiple && <p class="mt-1 text-sm tabular-nums" style={`color:${axis.gray[600]}`}>{multiple}× tus menciones.</p>}
+    </div>
+    <div class="p-5">
+      <p class="text-xs font-semibold uppercase tracking-[0.08em]" style={`color:${axis.gray[600]}`}>Citas propias</p>
+      <p class="mt-2 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{ownDomainShare === null ? '—' : `${ownDomainShare}%`}</p>
+      <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>{findingsCitingOwnDomain} de {findingsWithCitations} respuestas con fuentes.</p>
+    </div>
+  </div>
+
+  <div class="border-t p-5" style={`border-color:${axis.gray[100]}`}>
+    <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <p class="text-sm font-semibold" style={`color:${axis.gray[900]}`}>Menciones por entidad</p>
+      {topCompetitor && multiple && <p class="text-sm" style={`color:${axis.gray[600]}`}><span class="font-semibold" style={`color:${axis.gray[900]}`}>{topCompetitor.name}</span> tiene {multiple}× tus menciones.</p>}
+    </div>
+    <div class="mt-5 flex flex-col gap-4">
       {rows.map((r) => (
-        <div>
-          <div class="flex items-baseline justify-between">
-            <span class="text-sm font-medium" style={`color:${r.isBrand ? axis.accent[700] : axis.gray[900]}`}>{r.name}{r.isBrand && ' · tú'}</span>
+        <div class="data-row rounded-lg px-2 py-1">
+          <div class="flex items-baseline justify-between gap-4">
+            <span class="text-sm font-semibold" style={`color:${r.isBrand ? axis.accent[700] : axis.gray[900]}`}>{r.name}{r.isBrand && ' · tú'}</span>
             <span class="text-sm font-semibold tabular-nums" style={`color:${axis.gray[600]}`}>{r.mentions}</span>
           </div>
           <div class="mt-1.5 h-2.5 w-full overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
@@ -57,23 +62,5 @@ const multiple = topCompetitor && brandMentions > 0 ? (topCompetitor.mentions / 
         </div>
       ))}
     </div>
-  </div>
-
-  {/* Citas propias */}
-  <div class="report-card rounded-2xl border bg-white p-6" style={`border-color:${axis.gray[100]}`}>
-    <div class="flex items-start justify-between gap-4">
-      <p class="text-sm font-semibold" style={`color:${axis.gray[900]}`}>Cuánto te citan</p>
-      {ownDomainShare !== null && (
-        <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>Citas propias</span>
-      )}
-    </div>
-    <p class="mt-4 text-4xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>
-      {ownDomainShare === null ? '—' : `${ownDomainShare}%`}
-    </p>
-    <p class="text-sm" style={`color:${axis.gray[600]}`}>de las citas apuntan a tu dominio</p>
-    <p class="mt-4 border-t pt-4 text-sm" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
-      De <span class="font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{findingsWithCitations}</span> respuestas con fuentes,
-      solo <span class="font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{findingsCitingOwnDomain}</span> te citan a ti.
-    </p>
   </div>
 </div>

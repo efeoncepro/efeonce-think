@@ -39,20 +39,38 @@ html {
   container-type: inline-size;
 }
 
-@container (max-width: 280px) {
-  .report-card {
-    overflow-wrap: anywhere;
+.report-panel {
+  transition:
+    box-shadow 0.22s cubic-bezier(0.2, 0, 0, 1),
+    border-color 0.22s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.22s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.data-row {
+  transition:
+    background-color 0.18s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.18s cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-bar] {
+  transition: width 0.7s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (hover: hover) {
+  .report-panel:hover {
+    border-color: rgba(3, 117, 219, 0.22) !important;
+    box-shadow: 0 18px 44px -28px rgba(2, 60, 112, 0.28);
+  }
+
+  .data-row:hover {
+    background: rgba(3, 117, 219, 0.035);
+    transform: translateX(2px);
   }
 }
 
-/*
- * Modern Web Guidance: deferir solo bloques pesados bajo el fold.
- * El hero y la evidencia inicial quedan fuera para no afectar LCP.
- */
-@supports (content-visibility: auto) {
-  .deferred-report-section {
-    content-visibility: auto;
-    contain-intrinsic-size: auto none auto 620px;
+@container (max-width: 280px) {
+  .report-card {
+    overflow-wrap: anywhere;
   }
 }
 
@@ -108,11 +126,16 @@ button:focus-visible,
 
 @media (prefers-reduced-motion: reduce) {
   .lift,
-  .press {
+  .press,
+  .report-panel,
+  .data-row,
+  [data-bar] {
     transition: none;
   }
   .lift:hover,
-  .press:hover {
+  .press:hover,
+  .report-panel:hover,
+  .data-row:hover {
     transform: none;
   }
 }
