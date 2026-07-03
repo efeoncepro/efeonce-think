@@ -46,8 +46,18 @@ const liquid = (measured: boolean, sevBorder: string) =>
           {r.caption && <p class="q" style={`color:${axis.gray[600]}`}>{r.caption}</p>}
           {measured && <span class="sev" style={`background:${s.bg};color:${s.fg}`}>{s.label}</span>}
         </div>
-        <div class={`riser${measured ? ' measured' : ''}`} style={`--i:${i};--liquid:${s.border};background:${liquid(measured, s.border)}`}>
-          {measured && <span class="surface" style={`--surface:${s.border}`}></span>}
+        <div class={`riser${measured ? ' measured' : ''}`} style={`--i:${i};--liquid:${s.border};background:${measured ? 'transparent' : liquid(measured, s.border)}`}>
+          {measured && (
+            <svg class="liquid-svg" viewBox="0 0 260 72" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <path class="liquid-body liquid-wave" d="M -24 16 C 18 4 54 25 92 14 S 151 4 188 16 S 232 28 284 12 V 86 H -24 Z"></path>
+              <path class="liquid-swell liquid-wave" d="M -24 26 C 20 14 58 32 96 23 S 157 13 194 25 S 235 35 284 22 V 86 H -24 Z"></path>
+              <path class="liquid-depth liquid-wave" d="M -24 45 C 24 36 70 51 114 43 S 170 35 214 44 S 246 54 284 45 V 86 H -24 Z"></path>
+              <path class="liquid-rim liquid-wave" d="M -24 18 C 17 7 51 27 90 16 S 149 7 186 18 S 230 28 284 14"></path>
+              <path class="liquid-glint liquid-wave" d="M 18 26 C 55 15 86 29 123 22 S 176 16 220 21"></path>
+              <path class="liquid-current current-a" d="M -5 39 C 38 31 63 49 104 39 S 166 31 214 39"></path>
+              <path class="liquid-current current-b" d="M 38 56 C 78 49 112 61 151 53 S 203 47 249 55"></path>
+            </svg>
+          )}
         </div>
       </div>
     )
@@ -81,51 +91,19 @@ const liquid = (measured: boolean, sevBorder: string) =>
   .sev { align-self: flex-start; margin-top: 0.55rem; border-radius: 999px; padding: 0.12rem 0.5rem; font-size: 0.6875rem; font-weight: 600; }
   .riser {
     position: relative; height: calc(10px + var(--i, 0) * 18px); overflow: hidden; isolation: isolate;
-    --slosh-x: 0px; --slosh-tilt: 0deg; --current-y: 0px; --current-scale: 1;
+    --liquid-depth: 1;
   }
   .riser.measured {
+    background: color-mix(in srgb, var(--liquid) 18%, #fff 82%);
     box-shadow:
       inset 0 8px 14px rgba(255,255,255,0.26),
       inset 0 -12px 18px rgba(0,0,0,0.1);
   }
   .riser.measured::before {
-    content: ''; position: absolute; z-index: 1; inset: -24px -38px -14px;
+    content: ''; position: absolute; z-index: 1; inset: 0;
     background:
-      radial-gradient(58px 24px at 18% 58%, rgba(255,255,255,0.34), transparent 72%),
-      radial-gradient(64px 28px at 72% 38%, rgba(255,255,255,0.24), transparent 72%),
-      radial-gradient(92px 34px at 48% 106%, rgba(255,255,255,0.22), transparent 76%),
-      linear-gradient(90deg, rgba(255,255,255,0.12), transparent 34%, rgba(255,255,255,0.18) 58%, transparent);
-    opacity: 0.74;
-    filter: blur(0.5px);
-    transform: translate3d(var(--slosh-x), var(--current-y), 0) rotate(var(--slosh-tilt)) scaleX(var(--current-scale));
-    transform-origin: 50% 50%;
-    will-change: transform;
-    pointer-events: none;
-  }
-  .surface {
-    position: absolute; z-index: 3; inset: -7px -18% auto; height: 17px; opacity: 0.98;
-    background:
-      radial-gradient(72% 92% at 50% 88%, rgba(255,255,255,0.56), transparent 68%),
-      linear-gradient(90deg, transparent 0%, var(--surface) 14%, var(--surface) 86%, transparent 100%);
-    border-radius: 999px;
-    box-shadow: 0 5px 14px rgba(0,0,0,0.11);
-    transform-origin: 50% 50%;
-    will-change: transform;
-    pointer-events: none;
-  }
-  .surface::before {
-    content: ''; position: absolute; inset: 7px 13% auto; height: 3px; border-radius: 999px;
-    background: rgba(255,255,255,0.5);
-    filter: blur(0.2px);
-    opacity: 0.78;
-    pointer-events: none;
-  }
-  .surface::after {
-    content: ''; position: absolute; inset: 0 8% auto; height: 11px; border-radius: 999px;
-    background:
-      radial-gradient(24px 8px at 22% 70%, rgba(255,255,255,0.6), transparent 78%),
-      radial-gradient(32px 10px at 78% 42%, rgba(255,255,255,0.42), transparent 78%);
-    opacity: 0.62;
+      linear-gradient(180deg, rgba(255,255,255,0.38), transparent 34%),
+      radial-gradient(80% 120% at 50% 110%, color-mix(in srgb, var(--liquid) 32%, transparent), transparent 70%);
     pointer-events: none;
   }
   .riser.measured::after {
@@ -133,13 +111,44 @@ const liquid = (measured: boolean, sevBorder: string) =>
     background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%);
     transform: translateX(-120%); animation: mladder-sheen 4.5s ease-in-out infinite;
   }
+  .liquid-svg {
+    position: absolute; z-index: 3; inset: -12px -10% -3px;
+    width: 120%; height: calc(100% + 18px); overflow: visible;
+    transform-origin: 50% 14px;
+    will-change: transform;
+    pointer-events: none;
+  }
+  .liquid-body,
+  .liquid-swell,
+  .liquid-depth {
+    fill: var(--liquid); transform-box: fill-box; transform-origin: center top;
+  }
+  .liquid-body { opacity: 0.74; }
+  .liquid-swell { opacity: 0.34; filter: blur(0.2px); }
+  .liquid-depth { opacity: 0.18; mix-blend-mode: multiply; }
+  .liquid-rim {
+    fill: none; stroke: var(--liquid); stroke-width: 4.5; stroke-linecap: round;
+    opacity: 0.98; filter: drop-shadow(0 4px 7px rgba(0,0,0,0.1));
+    transform-box: fill-box; transform-origin: center;
+  }
+  .liquid-glint {
+    fill: none; stroke: rgba(255,255,255,0.72); stroke-width: 2.2; stroke-linecap: round;
+    opacity: 0.8; mix-blend-mode: screen;
+    transform-box: fill-box; transform-origin: center;
+  }
+  .liquid-current {
+    fill: none; stroke: rgba(255,255,255,0.38); stroke-width: 2.4; stroke-linecap: round;
+    opacity: 0.58; mix-blend-mode: screen;
+    transform-box: fill-box; transform-origin: center;
+  }
+  .current-b { opacity: 0.34; stroke-width: 2; }
   @keyframes mladder-sheen { 0%, 60%, 100% { transform: translateX(-120%); } 80% { transform: translateX(120%); } }
   @media (max-width: 720px) {
     .mladder { grid-template-columns: 1fr; gap: 0.55rem; align-items: stretch; }
     .riser { height: 10px !important; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .riser.measured::before, .surface { will-change: auto; }
+    .liquid-svg { will-change: auto; }
     .riser.measured::after { animation: none; opacity: 0; }
   }
 </style>
@@ -156,42 +165,41 @@ const liquid = (measured: boolean, sevBorder: string) =>
     if (reduce) return
     cols.forEach((col) => {
       const riser = col.querySelector<HTMLElement>('.riser.measured')
-      const surface = col.querySelector<HTMLElement>('.surface')
+      const liquid = col.querySelector<SVGElement>('.liquid-svg')
+      const waves = Array.from(col.querySelectorAll<SVGElement>('.liquid-wave'))
+      const currents = Array.from(col.querySelectorAll<SVGElement>('.liquid-current'))
       if (!riser) return
       col.addEventListener('pointerenter', () => {
-        gsap.killTweensOf([riser, surface])
+        gsap.killTweensOf([liquid, waves, currents])
         const tl = gsap.timeline({ defaults: { overwrite: 'auto' } })
-        tl.to(riser, { '--slosh-x': '22px', '--slosh-tilt': '-4deg', '--current-y': '-2px', '--current-scale': 1.08, duration: 0.22, ease: 'sine.out' })
-          .to(riser, { '--slosh-x': '-14px', '--slosh-tilt': '2.6deg', '--current-y': '1px', '--current-scale': 1.03, duration: 0.34, ease: 'sine.inOut' })
-          .to(riser, { '--slosh-x': '6px', '--slosh-tilt': '-1deg', '--current-y': '0px', '--current-scale': 1.01, duration: 0.28, ease: 'sine.inOut' })
-          .to(riser, { '--slosh-x': '0px', '--slosh-tilt': '0deg', '--current-y': '0px', '--current-scale': 1, duration: 0.72, ease: 'elastic.out(1,0.48)' })
-        if (surface) {
-          tl.to(surface, { xPercent: 12, y: -2, rotation: -4.5, scaleX: 1.06, duration: 0.22, ease: 'sine.out' }, 0)
-            .to(surface, { xPercent: -8, y: 1, rotation: 3, scaleX: 1.03, duration: 0.34, ease: 'sine.inOut' }, 0.22)
-            .to(surface, { xPercent: 4, y: 0, rotation: -1.3, scaleX: 1.01, duration: 0.28, ease: 'sine.inOut' }, 0.56)
-            .to(surface, { xPercent: 0, y: 0, rotation: 0, scaleX: 1, duration: 0.72, ease: 'elastic.out(1,0.48)' }, 0.84)
+        if (liquid) {
+          tl.to(liquid, { xPercent: 9, y: -2, rotation: -4.2, scaleX: 1.06, duration: 0.22, ease: 'sine.out' }, 0)
+            .to(liquid, { xPercent: -7, y: 1, rotation: 3.1, scaleX: 1.03, duration: 0.34, ease: 'sine.inOut' }, 0.22)
+            .to(liquid, { xPercent: 3, y: 0, rotation: -1.2, scaleX: 1.01, duration: 0.28, ease: 'sine.inOut' }, 0.56)
+            .to(liquid, { xPercent: 0, y: 0, rotation: 0, scaleX: 1, duration: 0.76, ease: 'elastic.out(1,0.5)' }, 0.84)
+          tl.to(waves, { xPercent: -12, duration: 0.22, stagger: 0.018, ease: 'sine.out' }, 0)
+            .to(waves, { xPercent: 9, duration: 0.34, stagger: 0.018, ease: 'sine.inOut' }, 0.22)
+            .to(waves, { xPercent: -4, duration: 0.28, stagger: 0.018, ease: 'sine.inOut' }, 0.56)
+            .to(waves, { xPercent: 0, duration: 0.76, stagger: 0.018, ease: 'elastic.out(1,0.5)' }, 0.84)
+          tl.to(currents, { xPercent: 18, opacity: 0.72, duration: 0.22, stagger: 0.025, ease: 'sine.out' }, 0)
+            .to(currents, { xPercent: -12, opacity: 0.46, duration: 0.34, stagger: 0.025, ease: 'sine.inOut' }, 0.22)
+            .to(currents, { xPercent: 0, opacity: 0.58, duration: 0.76, stagger: 0.025, ease: 'elastic.out(1,0.5)' }, 0.84)
         }
       })
       col.addEventListener('pointermove', (event) => {
         const e = event as PointerEvent
         const rect = col.getBoundingClientRect()
         const ratio = Math.max(-0.5, Math.min(0.5, (e.clientX - rect.left) / rect.width - 0.5))
-        gsap.to(riser, {
-          '--slosh-x': `${ratio * -34}px`,
-          '--slosh-tilt': `${ratio * 8}deg`,
-          '--current-y': `${Math.abs(ratio) * -3}px`,
-          '--current-scale': 1 + Math.abs(ratio) * 0.1,
-          duration: 0.22,
-          ease: 'sine.out',
-          overwrite: 'auto',
-        })
-        if (surface) {
-          gsap.to(surface, { xPercent: ratio * -18, y: Math.abs(ratio) * -2, rotation: ratio * 8, scaleX: 1 + Math.abs(ratio) * 0.08, duration: 0.22, ease: 'sine.out', overwrite: 'auto' })
+        if (liquid) {
+          gsap.to(liquid, { xPercent: ratio * -18, y: Math.abs(ratio) * -2, rotation: ratio * 9, scaleX: 1 + Math.abs(ratio) * 0.09, duration: 0.22, ease: 'sine.out', overwrite: 'auto' })
+          gsap.to(waves, { xPercent: ratio * 26, duration: 0.28, ease: 'sine.out', overwrite: 'auto' })
+          gsap.to(currents, { xPercent: ratio * -36, opacity: 0.42 + Math.abs(ratio) * 0.48, duration: 0.3, ease: 'sine.out', overwrite: 'auto' })
         }
       })
       col.addEventListener('pointerleave', () => {
-        gsap.to(riser, { '--slosh-x': '0px', '--slosh-tilt': '0deg', '--current-y': '0px', '--current-scale': 1, duration: 0.9, ease: 'elastic.out(1,0.5)', overwrite: 'auto' })
-        if (surface) gsap.to(surface, { xPercent: 0, y: 0, rotation: 0, scaleX: 1, duration: 0.9, ease: 'elastic.out(1,0.5)', overwrite: 'auto' })
+        if (liquid) gsap.to(liquid, { xPercent: 0, y: 0, rotation: 0, scaleX: 1, duration: 0.9, ease: 'elastic.out(1,0.5)', overwrite: 'auto' })
+        gsap.to(waves, { xPercent: 0, duration: 0.9, ease: 'elastic.out(1,0.5)', overwrite: 'auto' })
+        gsap.to(currents, { xPercent: 0, opacity: 0.58, duration: 0.9, ease: 'elastic.out(1,0.5)', overwrite: 'auto' })
       })
     })
     let played = false
@@ -206,18 +214,25 @@ const liquid = (measured: boolean, sevBorder: string) =>
         gsap.to(o, { v: t, duration: 0.8, delay: 0.2 + i * 0.13, ease: 'power2.out', onUpdate: () => { el.textContent = String(Math.round(o.v)) } })
       })
       const risers = Array.from(ladder.querySelectorAll<HTMLElement>('.riser.measured'))
-      const surfaces = risers
-        .map((r) => r.querySelector<HTMLElement>('.surface'))
-        .filter((el): el is HTMLElement => Boolean(el))
+      const liquids = risers
+        .map((r) => r.querySelector<SVGElement>('.liquid-svg'))
+        .filter((el): el is SVGElement => Boolean(el))
+      const waves = Array.from(ladder.querySelectorAll<SVGElement>('.liquid-wave'))
+      const currents = Array.from(ladder.querySelectorAll<SVGElement>('.liquid-current'))
       gsap.fromTo(
-        risers,
-        { '--slosh-x': '-30px', '--slosh-tilt': '-5deg', '--current-y': '-3px', '--current-scale': 1.1 },
-        { '--slosh-x': '0px', '--slosh-tilt': '0deg', '--current-y': '0px', '--current-scale': 1, duration: 1.2, delay: 0.22, stagger: 0.12, ease: 'elastic.out(1,0.46)' },
+        liquids,
+        { xPercent: -20, y: -3, rotation: -5, scaleX: 1.09 },
+        { xPercent: 0, y: 0, rotation: 0, scaleX: 1, duration: 1.22, delay: 0.2, stagger: 0.12, ease: 'elastic.out(1,0.48)' },
       )
       gsap.fromTo(
-        surfaces,
-        { xPercent: -16, y: -2, rotation: -4, scaleX: 1.08 },
-        { xPercent: 0, y: 0, rotation: 0, scaleX: 1, duration: 1.2, delay: 0.22, stagger: 0.12, ease: 'elastic.out(1,0.46)' },
+        waves,
+        { xPercent: 18 },
+        { xPercent: 0, duration: 1.22, delay: 0.2, stagger: 0.018, ease: 'elastic.out(1,0.48)' },
+      )
+      gsap.fromTo(
+        currents,
+        { xPercent: -28, opacity: 0.18 },
+        { xPercent: 0, opacity: 0.58, duration: 1.22, delay: 0.2, stagger: 0.02, ease: 'elastic.out(1,0.48)' },
       )
     }
     const io = new IntersectionObserver((entries) => {
