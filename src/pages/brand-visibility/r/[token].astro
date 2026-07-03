@@ -4,92 +4,322 @@ export const prerender = false
 
 import BaseLayout from '@layouts/BaseLayout.astro'
 import { fetchPublicReport } from '@lib/report'
+import { axis, severityMeta, LEVEL_COPY, AXIS_LABEL, providerLabel } from '@lib/report-tokens'
 
 const { token } = Astro.params
 const result = token ? await fetchPublicReport(token) : ({ status: 'not_found' } as const)
 
-// URL honesta: 404 si no existe/expiró, 429 si rate-limit.
 if (result.status === 'not_found') Astro.response.status = 404
 if (result.status === 'rate_limited') Astro.response.status = 429
+// El informe es un snapshot inmutable por token → cachear (arch-architect: escalabilidad;
+// evita pegarle al backend de Greenhouse en cada request). noindex ya va en el layout.
+if (result.status === 'ok') Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=3600')
 
-const orgName = result.status === 'ok' ? (result.header.organizationName ?? 'tu marca') : null
-const reportDate = result.status === 'ok' ? result.header.reportDate : null
-const periodLabel = result.status === 'ok' ? result.header.periodLabel : null
-const overallScore =
-  result.status === 'ok' && typeof result.model.overallScore === 'number'
-    ? (result.model.overallScore as number)
-    : null
+// ── Tipos laxos del modelo (contrato TASK-1280, variant publicWeb) ────────────
+type Sev = string
+interface Level { id: string; axis: string; score: number | null; severity: Sev; status: string }
+interface Dimension { key: string; label: string; score: number | null; severity: Sev; explainer?: string }
+interface Rec { title: string; action?: string; severity: Sev }
+interface Engine { provider: string; present: number; resolved: number }
+
+const ok = result.status === 'ok'
+const model = ok ? (result.model as Record<string, any>) : null
+const header = ok ? result.header : null
+
+const headline = model?.headline as { frame?: string; value?: string } | undefined
+const gate = model?.gate as { status?: string; reason?: string; nextAction?: string } | undefined
+const overallScore = typeof model?.overallScore === 'number' ? Math.round(model.overallScore) : null
+const overallSeverity = (model?.overallSeverity as Sev) ?? 'sin_dato'
+const perceptionScore = typeof model?.perceptionAxisScore === 'number' ? Math.round(model.perceptionAxisScore) : null
+const agenticScore = typeof model?.agenticAxisScore === 'number' ? Math.round(model.agenticAxisScore) : null
+const levels = (model?.levels as Level[]) ?? []
+const dimensions = (model?.dimensions as Dimension[]) ?? []
+const primaryGap = model?.primaryGap as { title?: string; severity?: Sev } | undefined
+const recommendations = (model?.recommendations as Rec[]) ?? []
+const engineSnapshot = (model?.engineSnapshot as Engine[]) ?? []
+const disclaimer = (model?.disclaimer as string) ?? ''
+
+const perceptionLevels = levels.filter((l) => l.axis === 'perception')
+const agenticLevels = levels.filter((l) => l.axis === 'agentic')
+
+// Gauge: semicírculo 0→100. severidad → color del arco.
+const gaugeSev = severityMeta(overallSeverity)
+const gaugePct = overallScore ?? 0
+// arco semicircular: path de 180°, longitud ~ π·r
+const R = 80
+const CIRC = Math.PI * R
+const dash = (gaugePct / 100) * CIRC
 ---
 
-<!-- El informe per-lead es noindex (ADR §SEO). -->
-<BaseLayout title="Tu informe de visibilidad en IA — Efeonce" noindex>
-  <main class="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center gap-6 px-6 py-16">
-    {
-      result.status === 'ok' && (
-        <section class="flex flex-col gap-6">
-          {/* Masthead desde el header render-ready (TASK-1280). */}
-          <header class="flex flex-col gap-1 border-b border-slate-200 pb-6">
-            <p class="text-sm font-medium tracking-wide text-slate-500 uppercase">
-              Informe de visibilidad en IA
+<BaseLayout title={`Informe de visibilidad en IA${header?.organizationName ? ` — ${header.organizationName}` : ''}`} noindex>
+  {
+    ok && model && (
+      <main class="mx-auto w-full max-w-3xl px-5 py-10 sm:px-8 sm:py-14">
+        {/* ── Banner de reporte parcial ── */}
+        {gate?.status === 'partial' && (
+          <div
+            class="mb-8 rounded-xl border px-4 py-3 text-sm"
+            style={`background:${axis.warning[100]};border-color:${axis.warning[500]}66;color:${axis.warning[700]}`}
+          >
+            <p class="font-semibold">Informe parcial</p>
+            <p class="mt-0.5" style={`color:${axis.gray[800]}`}>{gate.reason}</p>
+            {gate.nextAction && <p class="mt-1" style={`color:${axis.gray[600]}`}>{gate.nextAction}</p>}
+          </div>
+        )}
+
+        {/* ── Masthead ── */}
+        <header class="border-b pb-8" style={`border-color:${axis.gray[100]}`}>
+          <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>
+            Informe de visibilidad en IA
+          </p>
+          <h1 class="mt-2 text-3xl font-semibold tracking-tight text-balance sm:text-4xl" style={`color:${axis.gray[900]}`}>
+            {header?.organizationName ?? 'Tu marca'}
+          </h1>
+          {(header?.periodLabel || header?.reportDate) && (
+            <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>
+              {[header?.periodLabel, header?.reportDate].filter(Boolean).join(' · ')}
             </p>
-            <h1 class="text-3xl font-semibold">{orgName}</h1>
-            {(reportDate || periodLabel) && (
-              <p class="text-sm text-slate-500">
-                {[periodLabel, reportDate].filter(Boolean).join(' · ')}
-              </p>
-            )}
-          </header>
-
-          {overallScore !== null && (
-            <div class="flex items-baseline gap-3">
-              <span class="text-6xl font-semibold tabular-nums">{overallScore}</span>
-              <span class="text-lg text-slate-500">/ 100 de visibilidad</span>
-            </div>
           )}
+          {headline?.frame && (
+            <p class="mt-5 text-lg leading-snug text-pretty" style={`color:${axis.gray[800]}`}>
+              {headline.frame}
+            </p>
+          )}
+        </header>
 
-          {/* El render completo del ReportArtifactModel (secciones, brechas, motores,
-              próximos pasos) con Tailwind + blend AXIS es TASK-1325 Slice 2. */}
-          <p class="rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
-            Informe cargado correctamente. El render completo del reporte está en
-            construcción (TASK-1325 Slice 2).
-          </p>
+        {/* ── Score + ejes ── */}
+        <section class="flex flex-col items-center gap-8 py-10 sm:flex-row sm:items-center sm:gap-10">
+          {/* Gauge — role=img + aria-label (dataviz a11y); el número es el héroe */}
+          <div
+            class="relative shrink-0"
+            style="width:180px;height:104px"
+            role="img"
+            aria-label={`Visibilidad estimada ${overallScore ?? 'sin dato'} de 100 · ${gaugeSev.label}`}
+          >
+            <svg viewBox="0 0 180 100" class="h-full w-full" aria-hidden="true">
+              <path d="M 10 96 A 80 80 0 0 1 170 96" fill="none" stroke={axis.gray[100]} stroke-width="14" stroke-linecap="round" />
+              <path
+                d="M 10 96 A 80 80 0 0 1 170 96"
+                fill="none"
+                stroke={gaugeSev.border}
+                stroke-width="14"
+                stroke-linecap="round"
+                stroke-dasharray={`${dash} ${CIRC}`}
+              />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-end pb-1">
+              <span class="text-4xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>
+                {overallScore ?? '—'}
+              </span>
+              <span class="text-xs" style={`color:${axis.gray[600]}`}>de 100</span>
+            </div>
+          </div>
+          {/* Ejes */}
+          <div class="flex flex-1 flex-col gap-4">
+            <div>
+              <p class="text-xs font-semibold tracking-wide uppercase" style={`color:${axis.gray[600]}`}>Visibilidad estimada</p>
+              <div class="mt-1 flex items-center gap-2">
+                <span
+                  class="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                  style={`background:${gaugeSev.bg};color:${gaugeSev.fg}`}
+                >
+                  {gaugeSev.label}
+                </span>
+                <span class="text-sm" style={`color:${axis.gray[600]}`}>Estimación, no garantía de ranking</span>
+              </div>
+              <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Los líderes de tu categoría superan 85.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="rounded-lg border px-3 py-2.5" style={`border-color:${axis.gray[100]}`}>
+                <p class="text-xs" style={`color:${axis.gray[600]}`}>Percepción · ¿te mencionan?</p>
+                <p class="mt-0.5 text-xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>
+                  {perceptionScore ?? '—'}<span class="text-sm font-normal" style={`color:${axis.gray[400]}`}>/100</span>
+                </p>
+              </div>
+              <div class="rounded-lg border px-3 py-2.5" style={`border-color:${axis.gray[100]}`}>
+                <p class="text-xs" style={`color:${axis.gray[600]}`}>Operabilidad · ¿te usan?</p>
+                <p class="mt-0.5 text-xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>
+                  {agenticScore ?? <span class="text-sm font-normal" style={`color:${axis.gray[400]}`}>En cobertura</span>}
+                  {agenticScore !== null && <span class="text-sm font-normal" style={`color:${axis.gray[400]}`}>/100</span>}
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
-      )
-    }
 
-    {
-      result.status === 'not_found' && (
-        <section class="flex flex-col items-center gap-3 text-center">
-          <h1 class="text-2xl font-semibold">Este enlace no es válido o expiró</h1>
-          <p class="max-w-md text-slate-600">
-            El informe que buscas no existe o su enlace ya venció. Si crees que es un error,
-            escríbenos y te ayudamos.
+        {/* ── Niveles ── */}
+        <section class="border-t py-10" style={`border-color:${axis.gray[100]}`}>
+          <h2 class="text-xl font-semibold" style={`color:${axis.gray[900]}`}>Niveles para existir en un internet de agentes</h2>
+          <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>
+            El diagnóstico se lee en dos ejes: percepción de marca y operabilidad agéntica. El score principal no mezcla ambos.
           </p>
-        </section>
-      )
-    }
 
-    {
-      result.status === 'rate_limited' && (
-        <section class="flex flex-col items-center gap-3 text-center">
-          <h1 class="text-2xl font-semibold">Demasiadas solicitudes</h1>
-          <p class="max-w-md text-slate-600">
-            Recibimos muchas solicitudes desde tu conexión. Espera unos segundos y vuelve a
-            intentar.
-          </p>
+          {[
+            { key: 'perception', items: perceptionLevels },
+            { key: 'agentic', items: agenticLevels },
+          ].map((group) =>
+            group.items.length > 0 ? (
+              <div class="mt-6">
+                <p class="text-xs font-semibold tracking-wide uppercase" style={`color:${axis.accent[700]}`}>
+                  {AXIS_LABEL[group.key]?.tag}
+                </p>
+                <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                  {group.items.map((lvl) => {
+                    const copy = LEVEL_COPY[lvl.id] ?? { ordinal: '', label: lvl.id, question: '' }
+                    const measured = lvl.status === 'measured' && lvl.score !== null
+                    const sev = severityMeta(measured ? lvl.severity : 'sin_dato')
+                    return (
+                      <div class="rounded-xl border p-4" style={`border-color:${axis.gray[100]}`}>
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <p class="text-xs font-semibold tabular-nums" style={`color:${axis.gray[400]}`}>{copy.ordinal}</p>
+                            <p class="mt-0.5 font-semibold" style={`color:${axis.gray[900]}`}>{copy.label}</p>
+                            <p class="mt-0.5 text-sm" style={`color:${axis.gray[600]}`}>{copy.question}</p>
+                          </div>
+                          <div class="shrink-0 text-right">
+                            {measured ? (
+                              <span class="text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{Math.round(lvl.score as number)}</span>
+                            ) : (
+                              <span class="rounded-full px-2 py-0.5 text-xs font-medium" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>En cobertura</span>
+                            )}
+                          </div>
+                        </div>
+                        {measured && (
+                          <span class="mt-3 inline-block rounded-full px-2 py-0.5 text-xs font-semibold" style={`background:${sev.bg};color:${sev.fg}`}>
+                            {sev.label}
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : null,
+          )}
         </section>
-      )
-    }
 
-    {
-      result.status === 'error' && (
-        <section class="flex flex-col items-center gap-3 text-center">
-          <h1 class="text-2xl font-semibold">No pudimos cargar tu informe</h1>
-          <p class="max-w-md text-slate-600">
-            Ocurrió un problema al cargar el informe. Vuelve a intentar en unos minutos.
-          </p>
-        </section>
-      )
-    }
-  </main>
+        {/* ── Brecha principal + movimiento recomendado ── */}
+        {primaryGap?.title && (
+          <section class="border-t py-10" style={`border-color:${axis.gray[100]}`}>
+            <h2 class="text-xl font-semibold" style={`color:${axis.gray[900]}`}>Brecha principal</h2>
+            <div class="mt-4 rounded-xl border p-5" style={`border-color:${severityMeta(primaryGap.severity ?? 'critico').border}55;background:${severityMeta(primaryGap.severity ?? 'critico').bg}`}>
+              <div class="flex items-center gap-2">
+                <span class="rounded-full px-2 py-0.5 text-xs font-semibold" style={`background:white;color:${severityMeta(primaryGap.severity ?? 'critico').fg}`}>
+                  {severityMeta(primaryGap.severity ?? 'critico').label}
+                </span>
+              </div>
+              <p class="mt-2 text-lg font-semibold" style={`color:${axis.gray[900]}`}>{primaryGap.title}</p>
+            </div>
+
+            {recommendations.length > 0 && (
+              <div class="mt-6">
+                <h3 class="text-sm font-semibold tracking-wide uppercase" style={`color:${axis.gray[600]}`}>Movimiento recomendado</h3>
+                <ul class="mt-3 flex flex-col gap-3">
+                  {recommendations.slice(0, 4).map((rec) => (
+                    <li class="rounded-lg border p-4" style={`border-color:${axis.gray[100]}`}>
+                      <p class="font-semibold" style={`color:${axis.gray[900]}`}>{rec.title}</p>
+                      {rec.action && <p class="mt-1 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{rec.action}</p>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* ── Visibilidad por motor ── */}
+        {engineSnapshot.length > 0 && (
+          <section class="border-t py-10" style={`border-color:${axis.gray[100]}`}>
+            <h2 class="text-xl font-semibold" style={`color:${axis.gray[900]}`}>Visibilidad por motor</h2>
+            <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Menciones de tu marca detectadas por cada motor consultado.</p>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+              {engineSnapshot.map((eng) => (
+                <div class="flex items-center justify-between rounded-lg border px-4 py-3" style={`border-color:${axis.gray[100]}`}>
+                  <span class="font-medium" style={`color:${axis.gray[900]}`}>{providerLabel(eng.provider)}</span>
+                  <span class="text-sm tabular-nums" style={`color:${eng.present > 0 ? axis.success[700] : axis.gray[400]}`}>
+                    {eng.present > 0 ? `${eng.present} mención${eng.present === 1 ? '' : 'es'}` : 'Sin presencia'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Por qué ocurre (dimensiones) ── */}
+        {dimensions.length > 0 && (
+          <section class="border-t py-10" style={`border-color:${axis.gray[100]}`}>
+            <h2 class="text-xl font-semibold" style={`color:${axis.gray[900]}`}>Por qué ocurre</h2>
+            <div class="mt-4 flex flex-col gap-2">
+              {dimensions.map((dim) => {
+                const sev = severityMeta(dim.severity)
+                return (
+                  <div class="flex items-start gap-3 rounded-lg border p-3.5" style={`border-color:${axis.gray[100]}`}>
+                    <span class="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full" style={`background:${sev.border}`} aria-hidden="true"></span>
+                    <div class="flex-1">
+                      <div class="flex items-baseline justify-between gap-3">
+                        <p class="font-medium" style={`color:${axis.gray[900]}`}>{dim.label}</p>
+                        <span class="text-sm tabular-nums" style={`color:${axis.gray[600]}`}>{dim.score === null ? '—' : Math.round(dim.score)}</span>
+                      </div>
+                      {dim.explainer && <p class="mt-0.5 text-sm" style={`color:${axis.gray[600]}`}>{dim.explainer}</p>}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* ── Disclaimer + footer ── */}
+        <footer class="border-t pt-8" style={`border-color:${axis.gray[100]}`}>
+          {disclaimer && <p class="text-xs leading-relaxed" style={`color:${axis.gray[400]}`}>{disclaimer}</p>}
+          <p class="mt-4 text-xs" style={`color:${axis.gray[400]}`}>Efeonce · Diagnóstico de visibilidad en IA</p>
+        </footer>
+      </main>
+    )
+  }
+
+  {result.status === 'not_found' && (
+    <main role="status" class="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-4 px-6 text-center">
+      <div class="flex h-14 w-14 items-center justify-center rounded-full" style={`background:${axis.gray[100]}`} aria-hidden="true">
+        <span class="text-2xl">🔗</span>
+      </div>
+      <h1 class="text-2xl font-semibold" style={`color:${axis.gray[900]}`}>Este enlace no es válido o expiró</h1>
+      <p style={`color:${axis.gray[600]}`}>El informe que buscas no existe o su enlace ya venció. Puedes generar uno nuevo desde el diagnóstico.</p>
+      <a
+        href="/brand-visibility"
+        class="mt-1 inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        style={`background:${axis.accent[500]}`}
+      >
+        Hacer un diagnóstico nuevo
+      </a>
+    </main>
+  )}
+
+  {result.status === 'rate_limited' && (
+    <main role="alert" class="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
+      <h1 class="text-2xl font-semibold" style={`color:${axis.gray[900]}`}>Demasiadas solicitudes</h1>
+      <p style={`color:${axis.gray[600]}`}>Recibimos muchas solicitudes desde tu conexión. Espera unos segundos y vuelve a intentar.</p>
+      <a
+        href=""
+        class="mt-1 inline-flex items-center rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors"
+        style={`border-color:${axis.gray[200]};color:${axis.gray[800]}`}
+      >
+        Reintentar
+      </a>
+    </main>
+  )}
+
+  {result.status === 'error' && (
+    <main role="alert" class="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
+      <h1 class="text-2xl font-semibold" style={`color:${axis.gray[900]}`}>No pudimos cargar tu informe</h1>
+      <p style={`color:${axis.gray[600]}`}>Tuvimos un problema al cargar el informe. Vuelve a intentar en unos minutos.</p>
+      <a
+        href=""
+        class="mt-1 inline-flex items-center rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors"
+        style={`border-color:${axis.gray[200]};color:${axis.gray[800]}`}
+      >
+        Reintentar
+      </a>
+    </main>
+  )}
 </BaseLayout>

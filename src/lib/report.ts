@@ -25,14 +25,17 @@ export type ReportFetchResult =
   | { status: 'error' }
 
 export async function fetchPublicReport(token: string): Promise<ReportFetchResult> {
-  const url = `${GREENHOUSE_API_BASE}/api/public/growth/ai-visibility/report/${encodeURIComponent(token)}`
+  const base = (GREENHOUSE_API_BASE || 'https://greenhouse.efeoncepro.com').replace(/\/+$/, '')
+  const url = `${base}/api/public/growth/ai-visibility/report/${encodeURIComponent(token)}`
 
   let res: Response
   try {
     res = await fetch(url, { headers: { accept: 'application/json' } })
-  } catch {
+  } catch (e) {
+    console.error('[report] fetch threw', url, (e as Error).message)
     return { status: 'error' }
   }
+  if (res.status !== 200) console.error('[report] non-200', url, res.status)
 
   // 404 = token inexistente o expirado (el backend no distingue, por diseño).
   if (res.status === 404) return { status: 'not_found' }
