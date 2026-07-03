@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+/*
+ * Config CSS-first de Tailwind 4 para efeonce-think.
+ * La capa de marca compartida (blend AXIS + marca pública) se incorporará como
+ * paquete compartido con efeonce-web (ver TASK-1325). Por ahora, tokens mínimos.
+ */
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}

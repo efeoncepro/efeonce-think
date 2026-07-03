@@ -1,0 +1,27 @@
+---
+import '@styles/global.css'
+
+interface Props {
+  title: string
+  description?: string
+  /** El informe per-lead es noindex (ADR §SEO); las landings de herramientas SÍ se indexan. */
+  noindex?: boolean
+}
+
+const { title, description, noindex = false } = Astro.props
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="min-h-dvh bg-white text-slate-900 antialiased">
+    <slot />
+  </body>
+</html>

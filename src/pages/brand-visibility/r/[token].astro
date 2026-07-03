@@ -1,0 +1,95 @@
+---
+// SSR on-demand: el token se resuelve server-side, nunca se expone al browser.
+export const prerender = false
+
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { fetchPublicReport } from '@lib/report'
+
+const { token } = Astro.params
+const result = token ? await fetchPublicReport(token) : ({ status: 'not_found' } as const)
+
+// URL honesta: 404 si no existe/expiró, 429 si rate-limit.
+if (result.status === 'not_found') Astro.response.status = 404
+if (result.status === 'rate_limited') Astro.response.status = 429
+
+const orgName = result.status === 'ok' ? (result.header.organizationName ?? 'tu marca') : null
+const reportDate = result.status === 'ok' ? result.header.reportDate : null
+const periodLabel = result.status === 'ok' ? result.header.periodLabel : null
+const overallScore =
+  result.status === 'ok' && typeof result.model.overallScore === 'number'
+    ? (result.model.overallScore as number)
+    : null
+---
+
+<!-- El informe per-lead es noindex (ADR §SEO). -->
+<BaseLayout title="Tu informe de visibilidad en IA — Efeonce" noindex>
+  <main class="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center gap-6 px-6 py-16">
+    {
+      result.status === 'ok' && (
+        <section class="flex flex-col gap-6">
+          {/* Masthead desde el header render-ready (TASK-1280). */}
+          <header class="flex flex-col gap-1 border-b border-slate-200 pb-6">
+            <p class="text-sm font-medium tracking-wide text-slate-500 uppercase">
+              Informe de visibilidad en IA
+            </p>
+            <h1 class="text-3xl font-semibold">{orgName}</h1>
+            {(reportDate || periodLabel) && (
+              <p class="text-sm text-slate-500">
+                {[periodLabel, reportDate].filter(Boolean).join(' · ')}
+              </p>
+            )}
+          </header>
+
+          {overallScore !== null && (
+            <div class="flex items-baseline gap-3">
+              <span class="text-6xl font-semibold tabular-nums">{overallScore}</span>
+              <span class="text-lg text-slate-500">/ 100 de visibilidad</span>
+            </div>
+          )}
+
+          {/* El render completo del ReportArtifactModel (secciones, brechas, motores,
+              próximos pasos) con Tailwind + blend AXIS es TASK-1325 Slice 2. */}
+          <p class="rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
+            Informe cargado correctamente. El render completo del reporte está en
+            construcción (TASK-1325 Slice 2).
+          </p>
+        </section>
+      )
+    }
+
+    {
+      result.status === 'not_found' && (
+        <section class="flex flex-col items-center gap-3 text-center">
+          <h1 class="text-2xl font-semibold">Este enlace no es válido o expiró</h1>
+          <p class="max-w-md text-slate-600">
+            El informe que buscas no existe o su enlace ya venció. Si crees que es un error,
+            escríbenos y te ayudamos.
+          </p>
+        </section>
+      )
+    }
+
+    {
+      result.status === 'rate_limited' && (
+        <section class="flex flex-col items-center gap-3 text-center">
+          <h1 class="text-2xl font-semibold">Demasiadas solicitudes</h1>
+          <p class="max-w-md text-slate-600">
+            Recibimos muchas solicitudes desde tu conexión. Espera unos segundos y vuelve a
+            intentar.
+          </p>
+        </section>
+      )
+    }
+
+    {
+      result.status === 'error' && (
+        <section class="flex flex-col items-center gap-3 text-center">
+          <h1 class="text-2xl font-semibold">No pudimos cargar tu informe</h1>
+          <p class="max-w-md text-slate-600">
+            Ocurrió un problema al cargar el informe. Vuelve a intentar en unos minutos.
+          </p>
+        </section>
+      )
+    }
+  </main>
+</BaseLayout>
