@@ -137,7 +137,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                 <span class="text-base" style={`color:${axis.gray[400]}`}>/100</span>
               </div>
               <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
-                <div class="h-full rounded-full" style={`width:${perceptionScore ?? 0}%;background:${axis.accent[500]}`}></div>
+                <div data-bar class="h-full rounded-full" style={`width:${perceptionScore ?? 0}%;background:${axis.accent[500]}`}></div>
               </div>
             </div>
             <div class="border-t p-5 sm:border-t-0 sm:border-l sm:p-6" style={`border-color:${axis.gray[100]}`}>
@@ -149,7 +149,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                     <span class="text-base" style={`color:${axis.gray[400]}`}>/100</span>
                   </div>
                   <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
-                    <div class="h-full rounded-full" style={`width:${agenticScore}%;background:${axis.accent[500]}`}></div>
+                    <div data-bar class="h-full rounded-full" style={`width:${agenticScore}%;background:${axis.accent[500]}`}></div>
                   </div>
                 </>
               ) : (
@@ -401,6 +401,44 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         const dash = parseFloat(arc.dataset.dash || '0')
         const circ = parseFloat(arc.dataset.circ || '0')
         gsap.fromTo(arc, { attr: { 'stroke-dasharray': `0 ${circ}` } }, { attr: { 'stroke-dasharray': `${dash} ${circ}` }, duration: 1.3, ease: 'power2.out' })
+      }
+
+      // ── barras que se llenan (ejes + Share of Voice) ── (seguro: fin = ancho real)
+      document.querySelectorAll<HTMLElement>('[data-bar]').forEach((el) => {
+        gsap.from(el, { width: 0, duration: 1, ease: 'power2.out', delay: 0.2 })
+      })
+
+      // ── LA ESCALERA se anima: peldaños suben en secuencia + pedestales crecen + count-up ──
+      const ladder = document.querySelector<HTMLElement>('.ladder')
+      if (ladder) {
+        const cols = gsap.utils.toArray<HTMLElement>('.ladder .col')
+        const risers = gsap.utils.toArray<HTMLElement>('.ladder .riser')
+        const cards = gsap.utils.toArray<HTMLElement>('.ladder .card')
+        let played = false
+        const revealAll = () => { gsap.set(cols, { clearProps: 'all' }); gsap.set(risers, { clearProps: 'all' }); gsap.set(cards, { clearProps: 'all' }) }
+        // estado inicial (la escalera está bien bajo el fold → sin flash)
+        gsap.set(cols, { opacity: 0, y: 28 })
+        gsap.set(risers, { scaleY: 0, transformOrigin: 'bottom center' })
+        gsap.set(cards, { scale: 0.97 })
+        const play = () => {
+          if (played) return
+          played = true
+          const tl = gsap.timeline()
+          tl.to(cols, { opacity: 1, y: 0, duration: 0.5, stagger: 0.14, ease: 'power3.out' })
+            .to(cards, { scale: 1, duration: 0.5, stagger: 0.14, ease: 'back.out(1.6)' }, 0.02)
+            .to(risers, { scaleY: 1, duration: 0.7, stagger: 0.14, ease: 'power2.inOut' }, 0.12)
+          document.querySelectorAll<HTMLElement>('.ladder [data-rung-score]').forEach((el, i) => {
+            const t = parseFloat(el.dataset.rungScore || '0')
+            const o = { v: 0 }
+            gsap.to(o, { v: t, duration: 0.8, delay: 0.2 + i * 0.14, ease: 'power2.out', onUpdate: () => { el.textContent = String(Math.round(o.v)) } })
+          })
+        }
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => { if (e.isIntersecting) { play(); io.disconnect() } })
+        }, { threshold: 0.15 })
+        io.observe(ladder)
+        // fail-safe: si nunca dispara, mostrar todo a los 3.5s (página de conversión: nunca en blanco)
+        window.setTimeout(() => { if (!played) revealAll() }, 3500)
       }
     }
   </script>

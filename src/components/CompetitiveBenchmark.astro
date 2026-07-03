@@ -40,7 +40,7 @@ const multiple = topCompetitor && brandMentions > 0 ? (topCompetitor.mentions / 
             <span class="text-sm font-semibold tabular-nums" style={`color:${axis.gray[600]}`}>{r.mentions}</span>
           </div>
           <div class="mt-1.5 h-2.5 w-full overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
-            <div class="h-full rounded-full" style={`width:${Math.max(4, (r.mentions / max) * 100)}%;background:${r.isBrand ? axis.accent[500] : axis.gray[400]}`}></div>
+            <div data-bar class="h-full rounded-full" style={`width:${Math.max(4, (r.mentions / max) * 100)}%;background:${r.isBrand ? axis.accent[500] : axis.gray[400]}`}></div>
           </div>
         </div>
       ))}

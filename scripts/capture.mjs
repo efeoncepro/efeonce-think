@@ -44,7 +44,7 @@ try {
     const out = resolve(OUT_DIR, `${label}-${vp.name}.png`)
     if (clipSelector) {
       const el = await page.$(clipSelector)
-      if (el) { await el.scrollIntoViewIfNeeded(); await page.waitForTimeout(300); await el.screenshot({ path: out }) }
+      if (el) { await el.scrollIntoViewIfNeeded(); await page.waitForTimeout(2000); await el.screenshot({ path: out }) }
       else await page.screenshot({ path: out, fullPage: true })
     } else {
       await page.screenshot({ path: out, fullPage: true })

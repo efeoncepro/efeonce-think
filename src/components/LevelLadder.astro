@@ -29,7 +29,7 @@ const rungs = ordered.map((lvl, i) => {
         <div class="card-top">
           <span class="ord" style={`color:${axis.gray[200]}`}>{copy.ordinal}</span>
           {measured ? (
-            <span class="score" style={`color:${axis.gray[900]}`}>{Math.round(lvl.score as number)}</span>
+            <span class="score" data-rung-score={Math.round(lvl.score as number)} style={`color:${axis.gray[900]}`}>{Math.round(lvl.score as number)}</span>
           ) : (
             <span class="cover" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>En cobertura</span>
           )}
