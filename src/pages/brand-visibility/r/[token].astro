@@ -45,9 +45,27 @@ const recommendations = (model?.recommendations as Rec[]) ?? []
 const engines = (model?.engineSnapshot as Engine[]) ?? []
 const disclaimer = (model?.disclaimer as string) ?? ''
 
+// Roster canónico de motores: siempre mostramos los 5 principales (incl. Claude). Los que
+// no vinieron en el snapshot de este análisis se marcan "Sin datos" (honesto, consistente
+// con el banner de informe parcial) — distinto de "Sin mención" (consultado, 0 menciones).
+const ENGINE_ROSTER = ['gemini', 'chatgpt', 'claude', 'perplexity', 'google_ai_overview']
+const findEngine = (p: string) => engines.find((e) => e.provider === p || (p === 'chatgpt' && e.provider === 'openai'))
+const rosterEngines = ENGINE_ROSTER.map((p) => {
+  const f = findEngine(p)
+  return { provider: p, present: f ? f.present : null }
+})
+const extraEngines = engines
+  .filter((e) => !ENGINE_ROSTER.includes(e.provider) && e.provider !== 'openai')
+  .map((e) => ({ provider: e.provider, present: e.present }))
+const allEngines = [...rosterEngines, ...extraEngines]
+
 const sov = model?.competitiveSov as { competitors?: { name: string; mentions: number }[]; brandMentions?: number } | undefined
 const citation = model?.citationInsight as { ownDomainShare?: number | null; findingsWithCitations?: number; findingsCitingOwnDomain?: number } | undefined
 const hasBenchmark = !!(sov && (sov.competitors?.length || citation?.findingsWithCitations))
+
+// Radar de dimensiones (solo medidas; sin_dato NO se plotea como 0 — honestidad dataviz).
+const radarDims = dimensions.filter((d) => d.score !== null).map((d) => ({ name: d.label, score: Math.round(d.score as number) }))
+const hasRadar = radarDims.length >= 3
 
 const sev = severityMeta(overallSeverity)
 
@@ -85,10 +103,10 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               <div class="relative shrink-0" role="img" aria-label={`Visibilidad ${overallScore ?? 'sin dato'} de 100, ${sev.label}`}>
                 <svg viewBox="0 0 220 128" style="width:260px;height:150px">
                   <path d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="13" stroke-linecap="round" />
-                  <path d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke={sev.border} stroke-width="13" stroke-linecap="round" stroke-dasharray={`${dash} ${CIRC}`} style={`filter:drop-shadow(0 0 10px ${sev.border}aa)`} />
+                  <path id="gauge-arc" data-dash={dash} data-circ={CIRC} d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke={sev.border} stroke-width="13" stroke-linecap="round" stroke-dasharray={`${dash} ${CIRC}`} style={`filter:drop-shadow(0 0 10px ${sev.border}aa)`} />
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-end pb-2">
-                  <span class="text-6xl font-semibold tabular-nums text-white">{overallScore ?? '—'}</span>
+                  <span class="text-6xl font-semibold tabular-nums text-white" data-countup={overallScore ?? ''}>{overallScore ?? '—'}</span>
                   <span class="text-xs" style="color:rgba(255,255,255,0.6)">de 100 · líderes &gt;85</span>
                 </div>
               </div>
@@ -107,7 +125,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           <div class="grid grid-cols-2 gap-4 rounded-2xl bg-white p-5 shadow-xl ring-1" style="--tw-ring-color:rgba(0,0,0,0.05)">
             <div class="text-center">
               <p class="text-xs" style={`color:${axis.gray[600]}`}>Percepción · ¿te mencionan?</p>
-              <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{perceptionScore ?? '—'}<span class="text-base font-normal" style={`color:${axis.gray[400]}`}>/100</span></p>
+              <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}><span data-countup={perceptionScore ?? ''}>{perceptionScore ?? '—'}</span><span class="text-base font-normal" style={`color:${axis.gray[400]}`}>/100</span></p>
             </div>
             <div class="text-center">
               <p class="text-xs" style={`color:${axis.gray[600]}`}>Operabilidad · ¿te usan?</p>
@@ -124,15 +142,18 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Visibilidad por motor</h2>
               <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Menciones de tu marca detectadas en cada motor de respuesta consultado.</p>
               <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {engines.map((e) => (
-                  <div class="flex items-center gap-3 rounded-2xl border p-4" style={`border-color:${axis.gray[100]}`}>
-                    <EngineMark provider={e.provider} label={ENGINE_LABEL[e.provider] ?? e.provider} />
-                    <span class="flex-1 font-medium" style={`color:${axis.gray[900]}`}>{ENGINE_LABEL[e.provider] ?? e.provider}</span>
-                    <span class="text-sm font-medium tabular-nums" style={`color:${e.present > 0 ? axis.success[700] : axis.gray[400]}`}>
-                      {e.present > 0 ? `${e.present} mención${e.present === 1 ? '' : 'es'}` : 'Sin mención'}
-                    </span>
-                  </div>
-                ))}
+                {allEngines.map((e) => {
+                  const label = ENGINE_LABEL[e.provider] ?? e.provider
+                  const stateText = e.present === null ? 'Sin datos' : e.present > 0 ? `${e.present} mención${e.present === 1 ? '' : 'es'}` : 'Sin mención'
+                  const stateColor = e.present === null ? axis.gray[400] : e.present > 0 ? axis.success[700] : axis.gray[400]
+                  return (
+                    <div class="flex items-center gap-3 rounded-2xl border p-4" style={`border-color:${axis.gray[100]};opacity:${e.present === null ? '0.65' : '1'}`}>
+                      <EngineMark provider={e.provider} label={label} />
+                      <span class="flex-1 font-medium" style={`color:${axis.gray[900]}`}>{label}</span>
+                      <span class="text-sm font-medium tabular-nums" style={`color:${stateColor}`}>{stateText}</span>
+                    </div>
+                  )
+                })}
               </div>
             </section>
           )}
@@ -202,7 +223,13 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>05 · El detalle</p>
               <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Por qué ocurre</h2>
               <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Las dimensiones técnicas detrás del puntaje. No fabricamos un número cuando no hay evidencia suficiente.</p>
-              <div class="mt-5 grid gap-2 sm:grid-cols-2">
+              <div class="mt-5 grid gap-5 lg:grid-cols-[1fr_1.25fr] lg:items-start">
+                {hasRadar && (
+                  <div class="rounded-2xl border p-4" style={`border-color:${axis.gray[100]}`}>
+                    <div id="dims-radar" data-dims={JSON.stringify(radarDims)} style="width:100%;height:300px"></div>
+                  </div>
+                )}
+                <div class="grid gap-2 sm:grid-cols-2">
                 {dimensions.map((dim) => {
                   const s = severityMeta(dim.severity)
                   return (
@@ -218,6 +245,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                     </div>
                   )
                 })}
+                </div>
               </div>
             </section>
           )}
@@ -281,4 +309,65 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
       <p style={`color:${axis.gray[600]}`}>Tuvimos un problema al cargar el informe. Vuelve a intentar en unos minutos.</p>
     </main>
   )}
+
+  <script>
+    import gsap from 'gsap'
+    import * as echarts from 'echarts/core'
+    import { RadarChart } from 'echarts/charts'
+    import { TooltipComponent } from 'echarts/components'
+    import { CanvasRenderer } from 'echarts/renderers'
+
+    echarts.use([RadarChart, TooltipComponent, CanvasRenderer])
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // ── ECharts radar de dimensiones (chart signature animado) ──
+    const radarEl = document.getElementById('dims-radar')
+    if (radarEl) {
+      const dims = JSON.parse(radarEl.dataset.dims || '[]') as { name: string; score: number }[]
+      if (dims.length >= 3) {
+        const chart = echarts.init(radarEl)
+        chart.setOption({
+          tooltip: {},
+          radar: {
+            indicator: dims.map((d) => ({ name: d.name, max: 100 })),
+            radius: '66%',
+            axisName: { color: '#6d6777', fontSize: 10 },
+            splitLine: { lineStyle: { color: '#eaeaec' } },
+            splitArea: { areaStyle: { color: ['#ffffff', '#f7f7f8'] } },
+            axisLine: { lineStyle: { color: '#eaeaec' } },
+          },
+          series: [
+            {
+              type: 'radar',
+              data: [{ value: dims.map((d) => d.score), name: 'Tu marca' }],
+              symbolSize: 5,
+              areaStyle: { color: 'rgba(3,117,219,0.15)' },
+              lineStyle: { color: '#0375db', width: 2 },
+              itemStyle: { color: '#0375db' },
+              animationDuration: reduce ? 0 : 900,
+            },
+          ],
+        })
+        window.addEventListener('resize', () => chart.resize())
+      }
+    }
+
+    if (!reduce) {
+      // ── count-up (score + eje percepción) ──
+      document.querySelectorAll<HTMLElement>('[data-countup]').forEach((el) => {
+        const target = parseFloat(el.dataset.countup || '')
+        if (isNaN(target)) return
+        const o = { v: 0 }
+        gsap.to(o, { v: target, duration: 1.1, ease: 'power2.out', onUpdate: () => { el.textContent = String(Math.round(o.v)) } })
+      })
+      // ── gauge: el arco se dibuja ──
+      const arc = document.getElementById('gauge-arc')
+      if (arc) {
+        const dash = parseFloat(arc.dataset.dash || '0')
+        const circ = parseFloat(arc.dataset.circ || '0')
+        gsap.fromTo(arc, { attr: { 'stroke-dasharray': `0 ${circ}` } }, { attr: { 'stroke-dasharray': `${dash} ${circ}` }, duration: 1.3, ease: 'power2.out' })
+      }
+    }
+  </script>
 </BaseLayout>
