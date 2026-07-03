@@ -1,0 +1,70 @@
+---
+// LA ESCALERA — el framework AEO: 5 peldaños de madurez que la marca sube en orden.
+// NO trae la definición del servicio (eso vive en /aeo-2); solo muestra los peldaños,
+// el score de la marca en cada uno y cuál es "tu próximo nivel". Staircase ascendente
+// (01 base → 05 meta) con cards uniformes sobre pedestales que crecen.
+import { axis, severityMeta, LEVEL_COPY } from '@lib/report-tokens'
+
+interface Level { id: string; axis: string; score: number | null; severity: string; status: string }
+const { levels } = Astro.props as { levels: Level[] }
+
+const ordered = [...levels].sort(
+  (a, b) => Number(LEVEL_COPY[a.id]?.ordinal ?? '99') - Number(LEVEL_COPY[b.id]?.ordinal ?? '99'),
+)
+// "El primero que aún no logras es tu próximo nivel": primer peldaño no-óptimo.
+const nextIdx = ordered.findIndex((l) => l.severity !== 'optimo')
+
+const rungs = ordered.map((lvl, i) => {
+  const copy = LEVEL_COPY[lvl.id] ?? { ordinal: '', label: lvl.id, labelEn: '', question: '' }
+  const measured = lvl.status === 'measured' && lvl.score !== null
+  return { lvl, copy, measured, sev: severityMeta(measured ? lvl.severity : 'sin_dato'), i, isNext: i === nextIdx }
+})
+---
+
+<div class="ladder" style={`--n:${rungs.length}`}>
+  {rungs.map(({ lvl, copy, measured, sev, i, isNext }) => (
+    <div class="col">
+      <div class="card" style={`border-top:3px solid ${measured ? sev.border : axis.gray[200]}${isNext ? `;box-shadow:0 0 0 2px ${axis.accent[500]}` : ''}`}>
+        {isNext && <span class="next" style={`background:${axis.accent[500]}`}>Tu próximo nivel</span>}
+        <div class="card-top">
+          <span class="ord" style={`color:${axis.gray[200]}`}>{copy.ordinal}</span>
+          {measured ? (
+            <span class="score" style={`color:${axis.gray[900]}`}>{Math.round(lvl.score as number)}</span>
+          ) : (
+            <span class="cover" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>En cobertura</span>
+          )}
+        </div>
+        <p class="bex" style={`color:${axis.accent[500]}`}>{copy.labelEn}</p>
+        <p class="label" style={`color:${axis.gray[900]}`}>{copy.label}</p>
+        <p class="q" style={`color:${axis.gray[600]}`}>{copy.question}</p>
+        {measured && <span class="sev" style={`background:${sev.bg};color:${sev.fg}`}>{sev.label}</span>}
+      </div>
+      <div class="riser" style={`--i:${i};background:linear-gradient(180deg,${axis.gray[200]},${axis.gray[100]})`}></div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .ladder { margin-top: 1.75rem; display: grid; grid-template-columns: repeat(var(--n), 1fr); align-items: end; gap: 0.75rem; }
+  .col { display: flex; flex-direction: column; }
+  .card {
+    position: relative; display: flex; flex-direction: column; gap: 0.12rem;
+    border: 1px solid rgba(0,0,0,0.06); border-radius: 14px 14px 0 0; background: #fff;
+    padding: 0.95rem 1rem 1.1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .next { position: absolute; top: -0.7rem; left: 1rem; border-radius: 999px; padding: 0.15rem 0.55rem; font-size: 0.62rem; font-weight: 700; color: #fff; letter-spacing: 0.02em; }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem; }
+  .ord { font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .score { font-size: 1.9rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
+  .cover { font-size: 0.68rem; font-weight: 500; border-radius: 999px; padding: 0.2rem 0.5rem; white-space: nowrap; }
+  .bex { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; }
+  .label { margin-top: 0.12rem; font-weight: 600; font-size: 0.92rem; line-height: 1.2; }
+  .q { margin-top: 0.2rem; font-size: 0.76rem; line-height: 1.3; }
+  .sev { align-self: flex-start; margin-top: 0.55rem; border-radius: 999px; padding: 0.12rem 0.5rem; font-size: 0.68rem; font-weight: 600; }
+  .riser { height: calc(8px + var(--i) * 17px); border-radius: 0 0 6px 6px; }
+
+  @media (max-width: 720px) {
+    .ladder { grid-template-columns: 1fr; gap: 0.55rem; align-items: stretch; }
+    .riser { height: 8px !important; }
+  }
+</style>

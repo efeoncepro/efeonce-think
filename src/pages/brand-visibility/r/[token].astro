@@ -5,9 +5,10 @@ export const prerender = false
 import BaseLayout from '@layouts/BaseLayout.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import EngineMark from '@/components/EngineMark.astro'
+import LevelLadder from '@/components/LevelLadder.astro'
 import CompetitiveBenchmark from '@/components/CompetitiveBenchmark.astro'
 import { fetchPublicReport } from '@lib/report'
-import { axis, severityMeta, LEVEL_COPY } from '@lib/report-tokens'
+import { axis, severityMeta } from '@lib/report-tokens'
 
 const { token } = Astro.params
 const result = token ? await fetchPublicReport(token) : ({ status: 'not_found' } as const)
@@ -63,22 +64,15 @@ const citation = model?.citationInsight as { ownDomainShare?: number | null; fin
 const hasBenchmark = !!(sov && (sov.competitors?.length || citation?.findingsWithCitations))
 
 // Radar de dimensiones (solo medidas; sin_dato NO se plotea como 0 — honestidad dataviz).
-const radarDims = dimensions.filter((d) => d.score !== null).map((d) => ({ name: d.label, score: Math.round(d.score as number) }))
+// Nombres cortos para que las etiquetas del radar no se encimen.
+const RADAR_SHORT: Record<string, string> = {
+  'AI Visibility': 'Visibilidad', 'Entity Clarity': 'Claridad', 'Category Ownership': 'Categoría',
+  'Competitive Share of Voice': 'Share of Voice', 'Citation Quality': 'Citas',
+  'Message Alignment': 'Mensaje', 'Revenue Intent Coverage': 'Intención',
+}
+const radarDims = dimensions.filter((d) => d.score !== null).map((d) => ({ name: RADAR_SHORT[d.label] ?? d.label, score: Math.round(d.score as number) }))
 const hasRadar = radarDims.length >= 3
 
-// Escalera como ECharts bar horizontal: rungs apilados (01→05), largo = score, color = severidad.
-const ladderData = [...levels]
-  .sort((a, b) => Number(LEVEL_COPY[a.id]?.ordinal ?? '99') - Number(LEVEL_COPY[b.id]?.ordinal ?? '99'))
-  .map((l) => {
-    const measured = l.status === 'measured' && l.score !== null
-    return {
-      ordinal: LEVEL_COPY[l.id]?.ordinal ?? '',
-      label: LEVEL_COPY[l.id]?.label ?? l.id,
-      question: LEVEL_COPY[l.id]?.question ?? '',
-      score: measured ? Math.round(l.score as number) : null,
-      severity: measured ? l.severity : 'sin_dato',
-    }
-  })
 
 const sev = severityMeta(overallSeverity)
 
@@ -99,8 +93,8 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         >
           <div class="mx-auto max-w-4xl">
             <div class="flex items-center justify-between">
-              <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:26px;width:auto" />
-              <span class="rounded-full px-3 py-1 text-xs font-medium" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85)">
+              <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:34px;width:auto" />
+              <span class="rounded-full px-3.5 py-1.5 text-xs font-medium" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.88)">
                 Informe de visibilidad en IA
               </span>
             </div>
@@ -133,16 +127,37 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           </div>
         </header>
 
-        {/* Ejes flotando sobre el borde */}
-        <div class="mx-auto -mt-10 max-w-4xl px-6">
-          <div class="grid grid-cols-2 gap-4 rounded-2xl bg-white p-5 shadow-xl ring-1" style="--tw-ring-color:rgba(0,0,0,0.05)">
-            <div class="text-center">
-              <p class="text-xs" style={`color:${axis.gray[600]}`}>Percepción · ¿te mencionan?</p>
-              <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}><span data-countup={perceptionScore ?? ''}>{perceptionScore ?? '—'}</span><span class="text-base font-normal" style={`color:${axis.gray[400]}`}>/100</span></p>
+        {/* Ejes: card que aterriza sobre la costura del hero */}
+        <div class="relative z-10 mx-auto -mt-9 max-w-4xl px-6">
+          <div class="grid overflow-hidden rounded-2xl bg-white shadow-xl ring-1 sm:grid-cols-2" style="--tw-ring-color:rgba(0,0,0,0.06)">
+            <div class="p-5 sm:p-6">
+              <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Percepción · ¿te mencionan?</p>
+              <div class="mt-1.5 flex items-baseline gap-1">
+                <span class="text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`} data-countup={perceptionScore ?? ''}>{perceptionScore ?? '—'}</span>
+                <span class="text-base" style={`color:${axis.gray[400]}`}>/100</span>
+              </div>
+              <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
+                <div class="h-full rounded-full" style={`width:${perceptionScore ?? 0}%;background:${axis.accent[500]}`}></div>
+              </div>
             </div>
-            <div class="text-center">
-              <p class="text-xs" style={`color:${axis.gray[600]}`}>Operabilidad · ¿te usan?</p>
-              <p class="mt-1 text-2xl font-semibold" style={`color:${axis.gray[400]}`}>{agenticScore ?? 'En cobertura'}</p>
+            <div class="border-t p-5 sm:border-t-0 sm:border-l sm:p-6" style={`border-color:${axis.gray[100]}`}>
+              <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Operabilidad · ¿te pueden usar?</p>
+              {agenticScore !== null ? (
+                <>
+                  <div class="mt-1.5 flex items-baseline gap-1">
+                    <span class="text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{agenticScore}</span>
+                    <span class="text-base" style={`color:${axis.gray[400]}`}>/100</span>
+                  </div>
+                  <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
+                    <div class="h-full rounded-full" style={`width:${agenticScore}%;background:${axis.accent[500]}`}></div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p class="mt-1.5 text-2xl font-semibold" style={`color:${axis.gray[400]}`}>En cobertura</p>
+                  <p class="mt-1.5 text-xs" style={`color:${axis.gray[400]}`}>Aún no medido en este análisis parcial.</p>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -150,7 +165,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         <main class="mx-auto max-w-4xl px-6">
           {/* ══ 01 · EVIDENCIA POR MOTOR ══ */}
           {engines.length > 0 && (
-            <section class="py-14">
+            <section class="py-16">
               <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>01 · La evidencia</p>
               <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Visibilidad por motor</h2>
               <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Menciones de tu marca detectadas en cada motor de respuesta consultado.</p>
@@ -160,7 +175,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                   const stateText = e.present === null ? 'Sin datos' : e.present > 0 ? `${e.present} mención${e.present === 1 ? '' : 'es'}` : 'Sin mención'
                   const stateColor = e.present === null ? axis.gray[400] : e.present > 0 ? axis.success[700] : axis.gray[400]
                   return (
-                    <div class="flex items-center gap-3 rounded-2xl border p-4" style={`border-color:${axis.gray[100]};opacity:${e.present === null ? '0.65' : '1'}`}>
+                    <div class="lift flex items-center gap-3 rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]};opacity:${e.present === null ? '0.7' : '1'}`}>
                       <EngineMark provider={e.provider} label={label} />
                       <span class="flex-1 font-medium" style={`color:${axis.gray[900]}`}>{label}</span>
                       <span class="text-sm font-medium tabular-nums" style={`color:${stateColor}`}>{stateText}</span>
@@ -173,7 +188,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
 
           {/* ══ 02 · BENCHMARK DE COMPETENCIA ══ */}
           {hasBenchmark && (
-            <section class="border-t py-14" style={`border-color:${axis.gray[100]}`}>
+            <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
               <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>02 · Dónde estás parado</p>
               <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Tú frente a tu competencia</h2>
               <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Qué parte del espacio de respuesta de la IA ocupas — y cuánto te citan como fuente.</p>
@@ -192,31 +207,35 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
 
           {/* ══ 03 · LA ESCALERA (narrativa central) ══ */}
           {levels.length > 0 && (
-            <section class="border-t py-14" style={`border-color:${axis.gray[100]}`}>
+            <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
               <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>03 · El framework</p>
               <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>La escalera de visibilidad en IA</h2>
               <p class="mt-1.5 max-w-2xl text-sm" style={`color:${axis.gray[600]}`}>
-                Existir para la IA es subir cinco peldaños: que te <strong style={`color:${axis.gray[900]}`}>encuentre</strong>, te <strong style={`color:${axis.gray[900]}`}>entienda</strong>, te <strong style={`color:${axis.gray[900]}`}>represente bien</strong>, pueda <strong style={`color:${axis.gray[900]}`}>actuar</strong> y finalmente te <strong style={`color:${axis.gray[900]}`}>prefiera</strong>. Cada peldaño se apoya en el anterior — no sirve competir arriba si la base falla.
+                Existir para la IA es subir cinco peldaños — los <strong style={`color:${axis.gray[900]}`}>5 Be</strong> del AEO: <strong style={`color:${axis.gray[900]}`}>Be Found</strong>, <strong style={`color:${axis.gray[900]}`}>Readable</strong>, <strong style={`color:${axis.gray[900]}`}>Correct</strong>, <strong style={`color:${axis.gray[900]}`}>Actionable</strong> e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong>. Cada peldaño se apoya en el anterior — el primero que aún no logras es tu próximo nivel.
               </p>
-              <div id="ladder-chart" data-ladder={JSON.stringify(ladderData)} style={`width:100%;height:${ladderData.length * 62 + 30}px`}></div>
+              <LevelLadder levels={levels} />
             </section>
           )}
 
           {/* ══ BRECHA + MOVIMIENTO ══ */}
           {primaryGap?.title && (
-            <section class="border-t py-14" style={`border-color:${axis.gray[100]}`}>
+            <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
               <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>04 · Qué hacer</p>
               <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Tu brecha principal</h2>
-              <div class="mt-4 rounded-2xl p-6" style={`background:${severityMeta(primaryGap.severity ?? 'critico').bg};border:1px solid ${severityMeta(primaryGap.severity ?? 'critico').border}44`}>
-                <span class="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold" style={`color:${severityMeta(primaryGap.severity ?? 'critico').fg}`}>{severityMeta(primaryGap.severity ?? 'critico').label}</span>
-                <p class="mt-2.5 text-xl font-semibold" style={`color:${axis.gray[900]}`}>{primaryGap.title}</p>
+              <div class="mt-4 flex items-start gap-4 rounded-2xl p-6 sm:gap-5" style={`background:${severityMeta(primaryGap.severity ?? 'critico').bg};border:1px solid ${severityMeta(primaryGap.severity ?? 'critico').border}44`}>
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl" style={`background:${severityMeta(primaryGap.severity ?? 'critico').border}22`} aria-hidden="true">🎯</span>
+                <div>
+                  <span class="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold" style={`color:${severityMeta(primaryGap.severity ?? 'critico').fg}`}>Prioridad · {severityMeta(primaryGap.severity ?? 'critico').label}</span>
+                  <p class="mt-2 text-xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>{primaryGap.title}</p>
+                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>El peldaño que más te frena hoy. Empieza por acá.</p>
+                </div>
               </div>
               {recommendations.length > 0 && (
                 <div class="mt-7">
                   <h3 class="text-sm font-semibold tracking-[0.14em] uppercase" style={`color:${axis.gray[600]}`}>El movimiento recomendado</h3>
                   <ol class="mt-4 flex flex-col gap-3">
                     {recommendations.slice(0, 4).map((rec, i) => (
-                      <li class="flex gap-4 rounded-2xl border p-5" style={`border-color:${axis.gray[100]}`}>
+                      <li class="lift flex gap-4 rounded-2xl border bg-white p-5" style={`border-color:${axis.gray[100]}`}>
                         <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white" style={`background:${axis.accent[500]}`}>{i + 1}</span>
                         <div>
                           <p class="font-semibold" style={`color:${axis.gray[900]}`}>{rec.title}</p>
@@ -232,7 +251,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
 
           {/* ══ POR QUÉ OCURRE ══ */}
           {dimensions.length > 0 && (
-            <section class="border-t py-14" style={`border-color:${axis.gray[100]}`}>
+            <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
               <p class="text-xs font-semibold tracking-[0.14em] uppercase" style={`color:${axis.accent[500]}`}>05 · El detalle</p>
               <h2 class="mt-1 text-2xl font-semibold tracking-tight" style={`color:${axis.gray[900]}`}>Por qué ocurre</h2>
               <p class="mt-1.5 text-sm" style={`color:${axis.gray[600]}`}>Las dimensiones técnicas detrás del puntaje. No fabricamos un número cuando no hay evidencia suficiente.</p>
@@ -246,7 +265,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                 {dimensions.map((dim) => {
                   const s = severityMeta(dim.severity)
                   return (
-                    <div class="flex items-start gap-3 rounded-xl border p-4" style={`border-color:${axis.gray[100]}`}>
+                    <div class="lift flex items-start gap-3 rounded-xl border bg-white p-4" style={`border-color:${axis.gray[100]}`}>
                       <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full" style={`background:${s.border}`} aria-hidden="true"></span>
                       <div class="flex-1">
                         <div class="flex items-baseline justify-between gap-3">
@@ -275,10 +294,11 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             </p>
             <a
               href="https://efeoncepro.com"
-              class="mt-7 inline-flex items-center rounded-full bg-white px-7 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5"
+              class="press mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold"
               style={`color:${axis.accent[800]}`}
             >
               Conversemos sobre tu visibilidad
+              <span aria-hidden="true">→</span>
             </a>
           </div>
         </section>
@@ -326,63 +346,13 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
   <script>
     import gsap from 'gsap'
     import * as echarts from 'echarts/core'
-    import { RadarChart, BarChart } from 'echarts/charts'
-    import { TooltipComponent, GridComponent, MarkLineComponent } from 'echarts/components'
+    import { RadarChart } from 'echarts/charts'
+    import { TooltipComponent } from 'echarts/components'
     import { CanvasRenderer } from 'echarts/renderers'
 
-    echarts.use([RadarChart, BarChart, TooltipComponent, GridComponent, MarkLineComponent, CanvasRenderer])
+    echarts.use([RadarChart, TooltipComponent, CanvasRenderer])
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const SEV_COLOR: Record<string, string> = { critico: '#dc2e39', atencion: '#ffb703', optimo: '#157f47', sin_dato: '#d5d4d8' }
-
-    // ── ECharts: la escalera (bar horizontal, rungs 01→05, largo = score) ──
-    const ladderEl = document.getElementById('ladder-chart')
-    if (ladderEl) {
-      const rungs = JSON.parse(ladderEl.dataset.ladder || '[]') as { ordinal: string; label: string; question: string; score: number | null; severity: string }[]
-      if (rungs.length) {
-        const chart = echarts.init(ladderEl)
-        chart.setOption({
-          grid: { left: 4, right: 44, top: 8, bottom: 8, containLabel: true },
-          tooltip: {
-            trigger: 'item',
-            formatter: (p: any) => {
-              const r = rungs[p.dataIndex]
-              const val = r.score === null ? 'En cobertura' : `${r.score}/100`
-              return `<b>${r.ordinal} · ${r.label}</b><br/>${r.question}<br/><span style="color:#6d6777">${val}</span>`
-            },
-          },
-          xAxis: { type: 'value', max: 100, splitLine: { lineStyle: { color: '#f2f2f4' } }, axisLabel: { color: '#c0bec5', fontSize: 10 }, axisLine: { show: false }, axisTick: { show: false } },
-          yAxis: {
-            type: 'category',
-            data: rungs.map((r) => `${r.ordinal}  ${r.label}`),
-            axisLine: { show: false },
-            axisTick: { show: false },
-            axisLabel: { color: '#433c50', fontSize: 12.5, fontWeight: 600, margin: 12 },
-          },
-          series: [
-            {
-              type: 'bar',
-              barWidth: 20,
-              data: rungs.map((r) =>
-                r.score === null
-                  ? { value: 0, itemStyle: { color: 'transparent' }, label: { show: true, position: 'right', formatter: 'En cobertura', color: '#aba8b1', fontSize: 11, fontStyle: 'italic' } }
-                  : { value: r.score, itemStyle: { color: SEV_COLOR[r.severity] ?? '#d5d4d8', borderRadius: [0, 6, 6, 0] }, label: { show: true, position: 'right', formatter: `${r.score}`, color: '#433c50', fontWeight: 700, fontSize: 13 } },
-              ),
-              markLine: {
-                silent: true,
-                symbol: 'none',
-                data: [{ xAxis: 85 }],
-                lineStyle: { color: '#aba8b1', type: 'dashed', width: 1 },
-                label: { formatter: 'Líderes 85', color: '#827d8b', fontSize: 10, position: 'insideEndTop' },
-              },
-              animationDuration: reduce ? 0 : 900,
-              animationEasing: 'cubicOut',
-            },
-          ],
-        })
-        window.addEventListener('resize', () => chart.resize())
-      }
-    }
 
     // ── ECharts radar de dimensiones (chart signature animado) ──
     const radarEl = document.getElementById('dims-radar')
@@ -394,8 +364,9 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           tooltip: {},
           radar: {
             indicator: dims.map((d) => ({ name: d.name, max: 100 })),
-            radius: '66%',
-            axisName: { color: '#6d6777', fontSize: 10 },
+            radius: '62%',
+            center: ['50%', '54%'],
+            axisName: { color: '#6d6777', fontSize: 10.5, fontWeight: 500 },
             splitLine: { lineStyle: { color: '#eaeaec' } },
             splitArea: { areaStyle: { color: ['#ffffff', '#f7f7f8'] } },
             axisLine: { lineStyle: { color: '#eaeaec' } },

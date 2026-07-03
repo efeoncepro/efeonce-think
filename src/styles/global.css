@@ -2,8 +2,7 @@
 
 /*
  * Config CSS-first de Tailwind 4 para efeonce-think.
- * La capa de marca compartida (blend AXIS + marca pública) se incorporará como
- * paquete compartido con efeonce-web (ver TASK-1325). Por ahora, tokens mínimos.
+ * Capa de marca (blend AXIS) copiada del portal; paquete compartido = follow-up.
  */
 :root {
   color-scheme: light;
@@ -11,5 +10,49 @@
 
 html {
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* ── Microinteracción canónica: hover lift (Tier 1 CSS, motion-design) ── */
+.lift {
+  transition:
+    transform 0.18s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.18s cubic-bezier(0.2, 0, 0, 1),
+    border-color 0.18s cubic-bezier(0.2, 0, 0, 1);
+}
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px -12px rgba(2, 60, 112, 0.28);
+    border-color: rgba(3, 117, 219, 0.35) !important;
+  }
+}
+
+/* CTA press feedback */
+.press {
+  transition:
+    transform 0.16s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.16s cubic-bezier(0.2, 0, 0, 1),
+    opacity 0.16s;
+}
+@media (hover: hover) {
+  .press:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.35);
+  }
+}
+.press:active {
+  transform: translateY(0) scale(0.99);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift,
+  .press {
+    transition: none;
+  }
+  .lift:hover,
+  .press:hover {
+    transform: none;
+  }
 }

@@ -38,23 +38,43 @@ export const severityMeta = (severity: string): SeverityMeta => {
   }
 }
 
-// ── Framework de niveles (labels + pregunta guía) — copy es-CL de greenhouse-eo ─
-export const LEVEL_COPY: Record<string, { ordinal: string; label: string; question: string; coverageNote?: string }> = {
-  found: { ordinal: '01', label: 'Que te encuentre', question: '¿Existes para la IA?' },
-  readable: { ordinal: '02', label: 'Que te entienda', question: '¿Te puede leer sin adivinar?' },
+// ── Framework AEO: los 5 niveles de madurez (fuente: efeoncepro.com/aeo-2) ─────
+// Es una ESCALERA que se sube en orden: cada nivel se apoya en el anterior.
+export interface LevelCopy {
+  ordinal: string
+  label: string
+  labelEn: string
+  tier: string
+  result: string
+  desc: string
+  question: string
+}
+export const LEVEL_COPY: Record<string, LevelCopy> = {
+  found: {
+    ordinal: '01', label: 'Que te encuentre', labelEn: 'Be Found', tier: 'Base', result: 'Visible',
+    desc: 'Estás indexado y visible para los motores de IA. Si no te encuentran, nada más importa.',
+    question: '¿Existes para la IA?',
+  },
+  readable: {
+    ordinal: '02', label: 'Que te entienda', labelEn: 'Be Readable', tier: 'Base', result: 'Legible',
+    desc: 'Los motores leen tu estructura, tu schema y tu contenido sin ambigüedad.',
+    question: '¿Te puede leer sin adivinar?',
+  },
   correct: {
-    ordinal: '03',
-    label: 'Que te represente bien',
+    ordinal: '03', label: 'Que te describa bien', labelEn: 'Be Correct', tier: 'Alto riesgo', result: 'Preciso',
+    desc: 'Lo que la IA dice de ti es verdad: sin features inventadas, precios viejos ni confusión con tu competencia.',
     question: '¿Lo que dice de ti es verdad?',
-    coverageNote: 'Qué tan fielmente te representa la IA.',
   },
   actionable: {
-    ordinal: '04',
-    label: 'Que pueda actuar',
+    ordinal: '04', label: 'Que pueda actuar', labelEn: 'Be Actionable', tier: 'Sistema', result: 'Accionable',
+    desc: 'Un agente de IA puede comparar, reservar o comprar en tu sitio sin fricción.',
     question: '¿Te pueden usar, no solo citar?',
-    coverageNote: 'Si los agentes de IA pueden operar tu sitio.',
   },
-  intrinsic: { ordinal: '05', label: 'Que te prefiera', question: '¿Eres el default?' },
+  intrinsic: {
+    ordinal: '05', label: 'Que te prefiera', labelEn: 'Be Intrinsic', tier: 'La meta', result: 'Preferido',
+    desc: 'Eres la recomendación por defecto: parte de cómo la IA entiende tu categoría.',
+    question: '¿Eres el default?',
+  },
 }
 
 export const AXIS_LABEL: Record<string, { title: string; tag: string; helper: string }> = {
