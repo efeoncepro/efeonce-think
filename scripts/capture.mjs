@@ -47,6 +47,13 @@ try {
       if (el) { await el.scrollIntoViewIfNeeded(); await page.waitForTimeout(2000); await el.screenshot({ path: out }) }
       else await page.screenshot({ path: out, fullPage: true })
     } else {
+      // scroll-through: dispara reveals on-scroll (IntersectionObserver) antes del screenshot
+      await page.evaluate(async () => {
+        const h = document.body.scrollHeight
+        for (let y = 0; y < h; y += 400) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)) }
+        window.scrollTo(0, 0)
+      })
+      await page.waitForTimeout(900)
       await page.screenshot({ path: out, fullPage: true })
     }
     console.log(`[capture] ${vp.name} HTTP ${res?.status()} → ${out}`)

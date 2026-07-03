@@ -440,6 +440,24 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         // fail-safe: si nunca dispara, mostrar todo a los 3.5s (página de conversión: nunca en blanco)
         window.setTimeout(() => { if (!played) revealAll() }, 3500)
       }
+
+      // ── reveal on-scroll sutil de cada sección (robusto: fail-safe global) ──
+      const sections = gsap.utils.toArray<HTMLElement>('main section')
+      if (sections.length) {
+        const shown = new Set<HTMLElement>()
+        gsap.set(sections, { opacity: 0, y: 22 })
+        const reveal = (s: HTMLElement) => {
+          if (shown.has(s)) return
+          shown.add(s)
+          gsap.to(s, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' })
+        }
+        const sio = new IntersectionObserver((entries) => {
+          entries.forEach((e) => { if (e.isIntersecting) { reveal(e.target as HTMLElement); sio.unobserve(e.target) } })
+        }, { threshold: 0.12 })
+        sections.forEach((s) => sio.observe(s))
+        // fail-safe global: si algo falla, todo visible a los 4s (nunca en blanco)
+        window.setTimeout(() => sections.forEach((s) => { if (!shown.has(s)) gsap.set(s, { clearProps: 'opacity,transform' }) }), 4000)
+      }
     }
   </script>
 </BaseLayout>
