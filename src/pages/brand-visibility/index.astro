@@ -265,6 +265,8 @@ const levels = [
   }
 
   .engine-chips {
+    position: relative;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     gap: 0.9rem;
@@ -329,7 +331,7 @@ const levels = [
     grid-template-columns: minmax(0, 1.22fr) minmax(420px, 0.92fr);
     gap: 2.2rem;
     align-items: start;
-    padding: 7.2rem 0 1.8rem;
+    padding: clamp(15.5rem, 20vw, 18rem) 0 1.8rem;
   }
 
   .report-preview,

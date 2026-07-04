@@ -192,7 +192,8 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     position: absolute;
     inset-inline: 0;
     bottom: 0;
-    z-index: 2;
+    z-index: 40;
+    isolation: isolate;
     width: min(1320px, calc(100% - 64px));
     min-width: 0;
     margin-inline: auto;
@@ -269,6 +270,14 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   .analysis-panel[hidden],
   .report-link[hidden] {
     display: none;
+  }
+
+  .form-state-ready {
+    max-block-size: clamp(16rem, 38vh, 25rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 0.35rem;
+    scrollbar-gutter: stable;
   }
 
   greenhouse-form {
@@ -497,6 +506,13 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
 
     .form-intro > p {
       text-align: left;
+    }
+
+    .form-state-ready {
+      max-block-size: none;
+      overflow: visible;
+      padding-right: 0;
+      scrollbar-gutter: auto;
     }
 
     greenhouse-form :global(.ghf-fields),
