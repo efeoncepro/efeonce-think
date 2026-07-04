@@ -1,0 +1,532 @@
+---
+import { GREENHOUSE_API_BASE } from 'astro:env/server'
+
+interface Props {
+  formKey?: string
+  surfaceId?: string
+}
+
+const {
+  formKey = '69cd5269-5f97-4d32-99c4-0b23f41aa2f5',
+  surfaceId = 'fhsf-ai-visibility-grader',
+} = Astro.props
+
+const greenhouseBase = GREENHOUSE_API_BASE.replace(/\/$/, '')
+const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
+---
+
+<aside
+  class="form-card"
+  id="brand-visibility-form"
+  data-brand-visibility-form-dock
+  data-capture="brand-visibility-form"
+  aria-labelledby="brand-visibility-form-title"
+>
+  <div class="form-intro">
+    <div>
+      <p class="governed-label">Formulario gobernado por Greenhouse</p>
+      <h2 id="brand-visibility-form-title">Recibe tu informe de visibilidad de marca</h2>
+    </div>
+    <p>Completa tus datos y comienza el análisis.</p>
+  </div>
+
+  <div class="form-state form-state-ready" data-form-state="ready">
+    <script is:inline defer src={rendererSrc}></script>
+    <greenhouse-form
+      form-key={formKey}
+      surface={surfaceId}
+      locale="es-CL"
+      color-scheme="light"
+      appearance="bare"
+      base-url={greenhouseBase}
+    >
+      <div class="governed-fallback" role="status" aria-live="polite">
+        <span class="fallback-line"></span>
+        <span class="fallback-line short"></span>
+        <span class="fallback-line"></span>
+        <p>Preparando el formulario gobernado de Greenhouse.</p>
+      </div>
+    </greenhouse-form>
+    <noscript>Activa JavaScript para cargar el formulario gobernado de Greenhouse.</noscript>
+  </div>
+
+  <section
+    class="analysis-panel"
+    data-capture="brand-visibility-analysis"
+    data-analysis-panel
+    hidden
+    tabindex="-1"
+    aria-labelledby="analysis-title"
+    aria-live="polite"
+  >
+    <p class="mini-label">Análisis en curso</p>
+    <h2 id="analysis-title">Estamos preparando tu reporte</h2>
+    <p data-analysis-message>
+      El grader revisa señales de presencia, citabilidad, categoría y accionabilidad.
+      Mantén esta pantalla abierta para abrir el reporte cuando esté listo.
+    </p>
+
+    <div class="analysis-skeleton" aria-hidden="true">
+      <span class="skeleton-gauge"></span>
+      <span class="skeleton-line wide"></span>
+      <span class="skeleton-line"></span>
+      <span class="skeleton-line short"></span>
+    </div>
+
+    <ol class="analysis-steps" aria-label="Estados del análisis">
+      <li data-status-step="accepted">Solicitud recibida</li>
+      <li data-status-step="queued">Análisis en cola</li>
+      <li data-status-step="processing">Preparando señales</li>
+      <li data-status-step="ready">Reporte privado</li>
+    </ol>
+
+    <a class="report-link" data-report-link href="#" hidden>Abrir informe</a>
+  </section>
+</aside>
+
+<script is:inline>
+  (() => {
+    const docks = document.querySelectorAll('[data-brand-visibility-form-dock]')
+
+    docks.forEach((dock) => {
+      if (!(dock instanceof HTMLElement) || dock.dataset.formDockBound === 'true') return
+      dock.dataset.formDockBound = 'true'
+
+      const formShell = dock.querySelector('[data-form-state="ready"]')
+      const analysisPanel = dock.querySelector('[data-analysis-panel]')
+      const analysisMessage = dock.querySelector('[data-analysis-message]')
+      const reportLink = dock.querySelector('[data-report-link]')
+      const steps = Array.from(dock.querySelectorAll('[data-status-step]'))
+      const form = dock.querySelector('greenhouse-form')
+
+      const statusCopy = {
+        queued: 'La solicitud quedó en cola. Greenhouse preparará el run y avisará cuando exista un reporte publicable.',
+        processing: 'El grader está preparando señales de presencia, citabilidad, categoría y accionabilidad.',
+        ready: 'Tu informe privado está listo para abrirse en Think.',
+        in_review: 'El análisis requiere revisión antes de publicar el reporte. Te enviaremos una recuperación segura si aplica.',
+        unavailable: 'No pudimos preparar el reporte en este momento. La solicitud quedó registrada para recuperación segura.',
+        not_found: 'No pudimos encontrar el estado del análisis. Intenta nuevamente más tarde.',
+        error: 'No fue posible consultar el estado. Mantén la página abierta o vuelve a intentar en unos minutos.',
+      }
+
+      const setStep = (status) => {
+        steps.forEach((step) => {
+          const isCurrent = step.getAttribute('data-status-step') === status
+          step.toggleAttribute('aria-current', isCurrent)
+        })
+      }
+
+      const showAnalysis = (message, status = 'accepted') => {
+        dock.closest('.hero-shell')?.classList.add('hero-shell--analysis-active')
+        formShell?.setAttribute('hidden', '')
+        analysisPanel?.removeAttribute('hidden')
+        if (analysisMessage && message) analysisMessage.textContent = message
+        setStep(status)
+        if (analysisPanel instanceof HTMLElement) analysisPanel.focus({ preventScroll: true })
+      }
+
+      const showReport = (token) => {
+        const href = `/brand-visibility/r/${encodeURIComponent(token)}`
+        if (reportLink instanceof HTMLAnchorElement) {
+          reportLink.href = href
+          reportLink.hidden = false
+        }
+        showAnalysis(statusCopy.ready, 'ready')
+        window.setTimeout(() => {
+          window.location.assign(href)
+        }, 650)
+      }
+
+      const pollStatus = async (statusUrl, attempt = 0) => {
+        if (!statusUrl || attempt > 90) {
+          showAnalysis(statusCopy.error, 'processing')
+          return
+        }
+
+        try {
+          const response = await fetch(statusUrl, { headers: { accept: 'application/json' } })
+          const payload = await response.json().catch(() => ({}))
+          const status = payload.status || (response.status === 404 ? 'not_found' : 'processing')
+
+          if (status === 'ready' && payload.reportToken) {
+            showReport(payload.reportToken)
+            return
+          }
+
+          if (status === 'in_review' || status === 'unavailable' || status === 'not_found') {
+            showAnalysis(statusCopy[status] || statusCopy.error, status)
+            return
+          }
+
+          const normalizedStatus = status === 'queued' ? 'queued' : 'processing'
+          showAnalysis(statusCopy[normalizedStatus], normalizedStatus)
+          const retry = Number(payload.retryAfterSeconds)
+          const delay = Number.isFinite(retry) ? Math.max(2500, Math.min(retry * 1000, 15000)) : 5000
+          window.setTimeout(() => pollStatus(statusUrl, attempt + 1), delay)
+        } catch {
+          showAnalysis(statusCopy.error, 'processing')
+          window.setTimeout(() => pollStatus(statusUrl, attempt + 1), 8000)
+        }
+      }
+
+      form?.addEventListener('gh_form_submission_accepted', (event) => {
+        const detail = event.detail || {}
+        showAnalysis('Solicitud recibida. Estamos esperando el estado gobernado del análisis.', 'accepted')
+
+        if (typeof detail.status_url === 'string' && detail.status_url.length > 0) {
+          void pollStatus(detail.status_url)
+          return
+        }
+
+        showAnalysis(
+          'Recibimos tu solicitud, pero este formulario aún no entregó una URL de estado para abrir el reporte en pantalla.',
+          'accepted',
+        )
+      })
+    })
+  })()
+</script>
+
+<style>
+  .form-card {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 2;
+    width: min(1320px, calc(100% - 64px));
+    min-width: 0;
+    margin-inline: auto;
+    border: 1px solid rgba(255, 255, 255, 0.74);
+    border-radius: 8px;
+    padding: clamp(1.15rem, 2vw, 1.55rem) clamp(1.25rem, 2.5vw, 1.85rem);
+    background: linear-gradient(180deg, #fff 0%, #fbfcff 100%);
+    color: var(--axis-gray-900);
+    box-shadow:
+      0 36px 86px -46px rgba(0, 0, 0, 0.68),
+      0 1px 0 rgba(255, 255, 255, 0.78) inset;
+    transform: translateY(50%);
+  }
+
+  :global(.hero-shell.hero-shell--analysis-active) .form-card {
+    position: relative;
+    transform: none;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-intro {
+    display: grid;
+    grid-template-columns: minmax(230px, 0.52fr) minmax(220px, 0.48fr);
+    gap: 1rem;
+    align-items: end;
+    border-bottom: 1px solid rgba(119, 126, 144, 0.14);
+    padding-bottom: 0.86rem;
+    margin-bottom: 0.96rem;
+  }
+
+  .form-intro h2,
+  .analysis-panel h2 {
+    margin: 0;
+    color: var(--axis-gray-900);
+    font-size: 1.32rem;
+    font-weight: 740;
+    line-height: 1.25;
+  }
+
+  .mini-label {
+    margin: 0;
+    color: rgba(92, 96, 112, 0.82);
+    font-size: 0.72rem;
+    font-weight: 820;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .form-intro > p {
+    margin: 0;
+    color: rgba(92, 96, 112, 0.86);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    text-align: right;
+  }
+
+  .governed-label {
+    display: flex;
+    align-items: center;
+    gap: 0.44rem;
+    margin: 0 0 0.5rem !important;
+    color: rgba(46, 38, 61, 0.82) !important;
+    font-size: 0.82rem !important;
+    font-weight: 680;
+  }
+
+  .governed-label::before {
+    content: '▢';
+    color: var(--axis-gray-600);
+  }
+
+  .form-state[hidden],
+  .analysis-panel[hidden],
+  .report-link[hidden] {
+    display: none;
+  }
+
+  greenhouse-form {
+    display: block;
+    min-width: 0;
+    --ghf-accent: #0c56d9;
+    --ghf-error: #b42335;
+    --ghf-font: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --ghf-radius: 6px;
+    --ghf-button-shadow: 0 16px 34px -24px rgba(12, 86, 217, 0.7);
+  }
+
+  greenhouse-form :global(.ghf-form) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.74rem;
+    align-items: end;
+  }
+
+  greenhouse-form :global(.ghf-fields) {
+    display: grid !important;
+    grid-column: 1;
+    grid-row: 1;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.05fr) minmax(0, 1.05fr) !important;
+    gap: 0.82rem !important;
+    align-items: start;
+  }
+
+  greenhouse-form :global(.ghf-error-summary),
+  greenhouse-form :global(.ghf-draft-note),
+  greenhouse-form :global(.ghf-progress),
+  greenhouse-form :global(.ghf-summary),
+  greenhouse-form :global(.ghf-field--full:has(.ghf-check)),
+  greenhouse-form :global(.ghf-honeypot) {
+    grid-column: 1 / -1 !important;
+  }
+
+  greenhouse-form :global(.ghf-field),
+  greenhouse-form :global(.ghf-field--full) {
+    grid-column: auto !important;
+    min-width: 0;
+  }
+
+  greenhouse-form :global(.ghf-label) {
+    font-size: 0.78rem;
+    line-height: 1.2;
+  }
+
+  greenhouse-form :global(.ghf-input),
+  greenhouse-form :global(.ghf-select),
+  greenhouse-form :global(.ghf-textarea) {
+    min-height: 42px;
+  }
+
+  greenhouse-form :global(.ghf-actions-wrap) {
+    display: grid;
+    grid-column: 2;
+    grid-row: 1;
+    gap: 0.44rem;
+    align-items: center;
+    min-width: 138px;
+  }
+
+  greenhouse-form :global(.ghf-status) {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  greenhouse-form :global(.ghf-status--error) {
+    border: 1px solid rgba(180, 35, 53, 0.16);
+    border-radius: 7px;
+    padding: 0.74rem 0.82rem;
+    background: rgba(180, 35, 53, 0.045);
+    color: #9f1f31;
+  }
+
+  greenhouse-form :global(.ghf-actions) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+
+  greenhouse-form :global(.ghf-btn) {
+    min-height: 40px;
+    border: 0;
+    border-radius: 7px;
+    padding: 0.62rem 1rem;
+    background: var(--axis-blue);
+    color: #fff;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 720;
+    cursor: pointer;
+    box-shadow: 0 16px 30px -24px rgba(12, 86, 217, 0.72);
+  }
+
+  greenhouse-form :global(.ghf-readiness) {
+    margin: 0;
+    color: var(--axis-gray-600);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .governed-fallback {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(120px, 0.42fr);
+    gap: 0.82rem;
+    align-items: end;
+  }
+
+  .fallback-line,
+  .skeleton-line {
+    display: block;
+    height: 0.8rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--axis-gray-100), #fff, var(--axis-gray-100));
+    background-size: 180% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  .fallback-line {
+    height: 2.65rem;
+    border-radius: 6px;
+  }
+
+  .fallback-line.short,
+  .skeleton-line.short {
+    width: 100%;
+  }
+
+  .governed-fallback p {
+    margin: 0;
+    color: var(--axis-gray-600);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .analysis-panel {
+    outline: none;
+  }
+
+  .analysis-panel p {
+    margin: 0.6rem 0 0;
+    color: var(--axis-gray-600);
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  .analysis-skeleton {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1.1rem;
+    border: 1px solid var(--axis-gray-100);
+    border-radius: 8px;
+    padding: 1rem;
+    background: var(--axis-gray-50);
+  }
+
+  .skeleton-gauge {
+    width: 74px;
+    height: 74px;
+    border: 9px solid var(--axis-gray-100);
+    border-top-color: var(--axis-warning);
+    border-radius: 999px;
+  }
+
+  .skeleton-line.wide {
+    width: 86%;
+  }
+
+  .analysis-steps {
+    display: grid;
+    gap: 0.48rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .analysis-steps li {
+    border-left: 3px solid var(--axis-gray-100);
+    padding: 0.2rem 0 0.2rem 0.72rem;
+    color: var(--axis-gray-600);
+    font-size: 0.86rem;
+  }
+
+  .analysis-steps li[aria-current='true'] {
+    border-left-color: var(--axis-blue);
+    color: var(--axis-gray-900);
+    font-weight: 720;
+  }
+
+  .report-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    margin-top: 1rem;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    background: var(--axis-blue);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 760;
+    text-decoration: none;
+  }
+
+  @keyframes shimmer {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+  }
+
+  @media (max-width: 980px) {
+    .form-card {
+      position: relative;
+      width: min(100% - 32px, 720px);
+      transform: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-intro {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .form-intro > p {
+      text-align: left;
+    }
+
+    greenhouse-form :global(.ghf-fields),
+    .governed-fallback {
+      grid-template-columns: 1fr !important;
+    }
+
+    greenhouse-form :global(.ghf-form) {
+      grid-template-columns: 1fr;
+    }
+
+    greenhouse-form :global(.ghf-actions-wrap) {
+      grid-template-columns: 1fr;
+      min-width: 0;
+    }
+
+    greenhouse-form :global(.ghf-actions),
+    greenhouse-form :global(.ghf-readiness) {
+      grid-column: auto;
+      grid-row: auto;
+    }
+
+    greenhouse-form :global(.ghf-actions) {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .form-card {
+      padding: 1rem;
+    }
+  }
+</style>

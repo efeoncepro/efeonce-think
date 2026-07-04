@@ -1,0 +1,591 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import BrandVisibilityFormDock from '@/components/BrandVisibilityFormDock.astro'
+import EngineAvatarGroup from '@/components/primitives/EngineAvatarGroup.astro'
+import HeroAnswerLens from '@/components/HeroAnswerLens.astro'
+import { axis, LEVEL_COPY } from '@lib/report-tokens'
+
+const engines = ['chatgpt', 'gemini', 'claude', 'perplexity', 'google_ai_overview']
+const previewModules = [
+  { title: 'Presencia', icon: 'presence' },
+  { title: 'Citabilidad', icon: 'citation' },
+  { title: 'Categoría percibida', icon: 'category' },
+  { title: 'Operabilidad', icon: 'operability' },
+]
+const flowSteps = [
+  { label: 'Solicitud recibida', body: 'Registramos tu solicitud de análisis.' },
+  { label: 'Análisis en cola', body: 'Tu solicitud entra en nuestra cola segura.' },
+  { label: 'Consultando motores', body: 'Consultamos múltiples motores de IA.' },
+  { label: 'Mapeando citabilidad', body: 'Evaluamos menciones, fuentes y contexto.' },
+  { label: 'Reporte privado', body: 'Generamos tu informe y lo mostramos en pantalla.' },
+]
+const levels = [
+  { key: 'found', body: 'Que la IA pueda encontrarte.' },
+  { key: 'readable', body: 'Que la IA pueda entenderte.' },
+  { key: 'correct', body: 'Que la IA pueda confiar en ti.' },
+  { key: 'actionable', body: 'Que la IA pueda actuar con tu info.' },
+  { key: 'intrinsic', body: 'Que la IA te prefiera por defecto.' },
+]
+---
+
+<BaseLayout
+  title="Brand Visibility Grader | Efeonce Think"
+  description="Solicita un análisis de Brand Visibility para ver cómo la IA entiende, cita y recomienda tu marca."
+>
+  <main
+    class="brand-visibility-page"
+    data-capture="brand-visibility-landing"
+    style={`--axis-blue:${axis.accent[500]};--axis-blue-dark:${axis.accent[700]};--axis-navy:${axis.accent[900]};--axis-navy-soft:${axis.accent[800]};--axis-success:${axis.success[500]};--axis-warning:${axis.warning[500]};--axis-gray-50:${axis.gray[50]};--axis-gray-100:${axis.gray[100]};--axis-gray-200:${axis.gray[200]};--axis-gray-600:${axis.gray[600]};--axis-gray-800:${axis.gray[800]};--axis-gray-900:${axis.gray[900]};`}
+  >
+    <section class="hero-shell" data-capture="brand-visibility-hero" aria-labelledby="brand-visibility-title">
+      <header class="topbar" aria-label="Efeonce Think">
+        <a class="brand-link" href="/" aria-label="Ir a Efeonce Think">
+          <img class="efeonce-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" />
+          <span aria-hidden="true"></span>
+          <img class="think-mark" src="/branding/eo-think-2.svg" alt="Think" />
+        </a>
+      </header>
+
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Brand Visibility Grader</p>
+          <h1 id="brand-visibility-title">
+            <span>Mide cómo la IA</span>
+            <span>entiende y recomienda</span>
+            <span>tu marca.</span>
+          </h1>
+          <p class="hero-lead">
+            Dejas tus datos en el formulario. Nuestro sistema analiza tu presencia,
+            citabilidad y operabilidad en los principales motores de IA. Al finalizar,
+            verás tu informe completo en pantalla.
+          </p>
+
+          <div class="engine-chips" data-capture="brand-visibility-signal-preview" aria-label="Motores de IA analizados">
+            <p class="mini-label">Motores de IA analizados</p>
+            <div class="engine-stack">
+              <EngineAvatarGroup providers={engines} size="md" max={5} />
+            </div>
+          </div>
+        </div>
+
+        <HeroAnswerLens />
+      </div>
+
+      <BrandVisibilityFormDock />
+    </section>
+
+    <section class="preview-flow-section" data-capture="brand-visibility-report-preview" aria-labelledby="preview-title">
+      <div class="preview-flow-grid">
+        <article class="report-preview">
+          <h2 id="preview-title">Qué verás en tu informe</h2>
+          <div class="preview-module-strip">
+            {previewModules.map((module) => (
+              <div class="preview-module">
+                <span class={module.icon} aria-hidden="true"></span>
+                <h3>{module.title}</h3>
+                <i aria-hidden="true"></i>
+              </div>
+            ))}
+          </div>
+          <p>Un análisis profundo y accionable para entender y mejorar tu visibilidad en la IA.</p>
+        </article>
+
+        <article class="flow-panel" data-capture="brand-visibility-flow" aria-labelledby="flow-title">
+          <h2 id="flow-title">Del formulario al informe</h2>
+          <ol class="flow-grid">
+            {flowSteps.map((step, index) => (
+              <li>
+                <span>{index + 1}</span>
+                <h3>{step.label}</h3>
+                <p>{step.body}</p>
+              </li>
+            ))}
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <section class="framework-band" data-capture="brand-visibility-trust" aria-labelledby="framework-title">
+      <h2 id="framework-title">Nuestro marco de visibilidad en 5 niveles</h2>
+      <ol>
+        {levels.map((level, index) => (
+          <li>
+            <span class={`framework-icon framework-icon-${index + 1}`} aria-hidden="true"></span>
+            <div>
+              <strong>{LEVEL_COPY[level.key].labelEn}</strong>
+              <p>{level.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .brand-visibility-page {
+    min-height: 100vh;
+    overflow-x: clip;
+    background: #fff;
+    color: var(--axis-gray-900);
+  }
+
+  .hero-shell {
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+    background: linear-gradient(160deg, var(--axis-navy-soft) 0%, var(--axis-navy) 62%, #001a33 100%);
+    color: #fff;
+  }
+
+  .hero-shell::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    z-index: -1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(76, 141, 255, 0.72), transparent);
+  }
+
+  .topbar,
+  .hero-grid,
+  .preview-flow-grid,
+  .framework-band {
+    width: min(1320px, calc(100% - 64px));
+    margin-inline: auto;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 26px 0 0;
+  }
+
+  .brand-link {
+    display: inline-grid;
+    grid-template-columns: auto auto auto;
+    align-items: center;
+    column-gap: 0.8rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .brand-link .efeonce-mark {
+    width: 150px;
+    height: auto;
+  }
+
+  .brand-link > span {
+    width: 1px;
+    height: 2.05rem;
+    background: rgba(255, 255, 255, 0.48);
+  }
+
+  .brand-link .think-mark {
+    display: block;
+    width: 70px;
+    height: auto;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 720px) minmax(500px, 1fr);
+    gap: clamp(2.4rem, 4vw, 4.2rem);
+    align-items: center;
+    padding: clamp(34px, 3vw, 52px) 0 176px;
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .eyebrow,
+  .mini-label {
+    font-size: 0.72rem;
+    font-weight: 820;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(255, 179, 26, 0.34);
+    border-radius: 999px;
+    padding: 0.38rem 0.68rem;
+    background: linear-gradient(180deg, #ffd166 0%, var(--axis-warning) 100%);
+    color: #08203a;
+    box-shadow:
+      0 14px 34px -24px rgba(255, 179, 26, 0.95),
+      inset 0 1px 0 rgba(255, 255, 255, 0.48);
+  }
+
+  .mini-label {
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .hero-copy h1 {
+    max-width: 720px;
+    margin: 1.28rem 0 0;
+    color: #fff;
+    font-size: clamp(3rem, 3.65vw, 4rem);
+    font-weight: 650;
+    letter-spacing: 0;
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+
+  .hero-copy h1 span {
+    display: block;
+  }
+
+  .hero-copy h1::after {
+    content: '';
+    display: block;
+    width: 42px;
+    height: 4px;
+    margin-top: 1.22rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #36d7c5 0%, #62f0df 100%);
+    box-shadow: 0 0 22px rgba(54, 215, 197, 0.42);
+  }
+
+  .hero-lead {
+    max-width: 650px;
+    margin-top: 1.24rem;
+    color: rgba(255, 255, 255, 0.74);
+    font-size: 1.02rem;
+    line-height: 1.58;
+  }
+
+  .engine-chips {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-top: 1.92rem;
+  }
+
+  .engine-stack {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.86rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    padding: 0.22rem 0.62rem 0.22rem 0.28rem;
+    background: rgba(255, 255, 255, 0.048);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+
+  .engine-stack :global(.engine-avatar-group) {
+    padding-block: 0;
+  }
+
+  .preview-module > span,
+  .framework-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    margin-bottom: 0.56rem;
+    border-radius: 999px;
+    border: 1.6px solid currentColor;
+    color: var(--axis-success);
+  }
+
+  .preview-module > span::before,
+  .framework-icon::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: inherit;
+    border: 1.6px solid currentColor;
+  }
+
+  .citation {
+    color: var(--axis-warning) !important;
+  }
+
+  .category {
+    color: #5d7cff !important;
+  }
+
+  .operability {
+    color: #7f64ff !important;
+  }
+
+  .preview-flow-section {
+    border-bottom: 1px solid var(--axis-gray-100);
+    background: #fff;
+  }
+
+  .preview-flow-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.22fr) minmax(420px, 0.92fr);
+    gap: 2.2rem;
+    align-items: start;
+    padding: 7.2rem 0 1.8rem;
+  }
+
+  .report-preview,
+  .flow-panel {
+    min-width: 0;
+  }
+
+  .report-preview h2,
+  .flow-panel h2 {
+    margin: 0;
+    color: var(--axis-gray-900);
+    font-size: 1.1rem;
+    font-weight: 740;
+    line-height: 1.25;
+  }
+
+  .preview-module-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 1.15rem;
+    border-right: 1px solid var(--axis-gray-200);
+  }
+
+  .preview-module {
+    min-width: 0;
+    border-left: 1px solid var(--axis-gray-200);
+    padding: 0.2rem 1rem 0.15rem;
+  }
+
+  .preview-module h3 {
+    min-height: 2.1rem;
+    margin: 0;
+    color: var(--axis-gray-900);
+    font-size: 0.82rem;
+    font-weight: 740;
+    line-height: 1.18;
+  }
+
+  .preview-module i {
+    display: block;
+    width: min(82px, 90%);
+    height: 48px;
+    margin-top: 0.7rem;
+    border-radius: 4px;
+    background:
+      linear-gradient(90deg, var(--axis-gray-100) 24%, transparent 24% 34%, var(--axis-gray-100) 34% 58%, transparent 58% 68%, var(--axis-gray-100) 68%);
+    opacity: 0.82;
+  }
+
+  .report-preview > p {
+    margin: 1rem 0 0;
+    color: var(--axis-gray-600);
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .flow-panel {
+    border-left: 1px solid var(--axis-gray-200);
+    padding-left: 2.2rem;
+  }
+
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 1.2rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .flow-grid li {
+    position: relative;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .flow-grid span {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--axis-blue);
+    border-radius: 999px;
+    color: var(--axis-blue);
+    font-weight: 760;
+    background: #fff;
+  }
+
+  .flow-grid h3 {
+    margin: 0.72rem 0 0;
+    color: var(--axis-gray-900);
+    font-size: 0.82rem;
+    font-weight: 760;
+    line-height: 1.18;
+  }
+
+  .flow-grid p {
+    margin: 0.45rem 0 0;
+    color: var(--axis-gray-600);
+    font-size: 0.73rem;
+    line-height: 1.42;
+  }
+
+  .framework-band {
+    padding: 1.35rem 0 1.45rem;
+  }
+
+  .framework-band h2 {
+    margin: 0;
+    text-align: center;
+    color: var(--axis-gray-900);
+    font-size: 1.08rem;
+    font-weight: 740;
+  }
+
+  .framework-band ol {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+    margin: 1.15rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .framework-band li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.75rem;
+    min-width: 0;
+    border-right: 1px solid var(--axis-gray-200);
+    padding: 0 1rem;
+  }
+
+  .framework-band li:last-child {
+    border-right: 0;
+  }
+
+  .framework-icon {
+    margin-top: 0.12rem;
+  }
+
+  .framework-icon-1 { color: var(--axis-success); }
+  .framework-icon-2 { color: var(--axis-blue); }
+  .framework-icon-3 { color: var(--axis-warning); }
+  .framework-icon-4 { color: #7058ff; }
+  .framework-icon-5 { color: var(--axis-success); }
+
+  .framework-band strong {
+    display: block;
+    color: var(--axis-gray-900);
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+
+  .framework-band p {
+    margin: 0.34rem 0 0;
+    color: var(--axis-gray-600);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  @media (max-width: 980px) {
+    .topbar,
+    .hero-grid,
+    .preview-flow-grid,
+    .framework-band {
+      width: min(100% - 32px, 720px);
+    }
+
+    .hero-grid,
+    .preview-flow-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-grid {
+      padding-bottom: 1.4rem;
+    }
+
+    .preview-flow-grid {
+      padding-top: 1.45rem;
+    }
+
+    .preview-module-strip,
+    .framework-band ol,
+    .flow-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .flow-panel {
+      border-left: 0;
+      padding-left: 0;
+    }
+
+    .preview-module,
+    .framework-band li {
+      border-right: 0;
+      border-left: 0;
+      border-bottom: 1px solid var(--axis-gray-100);
+      padding: 0.8rem 0;
+    }
+
+    .framework-band li:last-child,
+    .preview-module:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .topbar {
+      padding-top: 18px;
+      padding-bottom: 2px;
+    }
+
+    .brand-link .efeonce-mark {
+      width: 82px;
+    }
+
+    .brand-link .think-mark {
+      width: 42px;
+    }
+
+    .hero-grid {
+      gap: 1.5rem;
+      padding: 24px 0 32px;
+    }
+
+    .hero-copy h1 {
+      font-size: 2.45rem;
+      line-height: 1;
+    }
+
+    .hero-lead {
+      font-size: 1rem;
+    }
+
+    .engine-stack {
+      align-items: center;
+      border-radius: 10px;
+      padding: 0.44rem 0.58rem;
+    }
+
+    .engine-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
