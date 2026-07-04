@@ -7,7 +7,7 @@
 // - capturas desktop 1440, laptop 1280 y mobile 390;
 // - scrollWidth <= clientWidth;
 // - no prompts/raw provider answers/full citation URLs/internal findings en texto publico;
-// - categoria unknown omitida cuando el fixture/model no trae categorias.
+// - categoria renderizada de forma honesta: sin filas fabricadas, labels internos ni NaN.
 
 import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -35,6 +35,14 @@ const forbiddenTextPatterns = [
   /accuracyFindings/i,
   /providerFindings/i,
   /normalized_findings/i,
+  /ambiguousCount/i,
+  /unmappedCount/i,
+  /mid_category/i,
+  /service_line/i,
+  /adjacent_capability/i,
+  /product_or_service/i,
+  /canonical signals/i,
+  /\bambiguas\b/i,
   /internal reason/i,
   /hallucination detail/i,
   /prompt:\s/i,
@@ -75,6 +83,9 @@ try {
         scrollWidth: document.documentElement.scrollWidth,
         clientWidth: document.documentElement.clientWidth,
         hasCategory: Boolean(document.querySelector('[data-capture="report-category-association"]')),
+        categoryStatus: document.querySelector('[data-capture="report-category-association"]')?.getAttribute('data-category-status') ?? null,
+        hasCategoryRows: Boolean(document.querySelector('[data-capture="report-category-rows"]')),
+        hasNaN: /\bNaN\b/.test(text),
         hasLadder: Boolean(document.querySelector('[data-capture="report-ladder"]')),
         hasHero: Boolean(document.querySelector('[data-capture="report-hero"]')),
         hasEngineCoverage: Boolean(document.querySelector('[data-capture="report-engine-coverage"]')),
@@ -90,7 +101,10 @@ try {
     const errors = []
     if ((response?.status() ?? 0) !== 200) errors.push(`HTTP ${response?.status()}`)
     if (metrics.scrollWidth > metrics.clientWidth) errors.push(`overflow ${metrics.scrollWidth}/${metrics.clientWidth}`)
-    if (metrics.hasCategory) errors.push('category block rendered for unknown fixture')
+    if (metrics.categoryStatus && metrics.categoryStatus !== 'mapped' && metrics.hasCategoryRows) {
+      errors.push(`category rows rendered for ${metrics.categoryStatus}`)
+    }
+    if (metrics.hasNaN) errors.push('visible NaN')
     if (!metrics.hasHero || !metrics.hasEngineCoverage || !metrics.hasSourceEvidence || !metrics.hasLadder) {
       errors.push('required capture marker missing')
     }

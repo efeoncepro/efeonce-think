@@ -171,8 +171,23 @@ const provenance = model?.provenance as { providersSampled?: string[]; promptCou
 const sourceBreakdown = (model?.citationSourceBreakdown as CitationSourceBreakdown | undefined) ?? null
 const topSourceDomains = (sourceBreakdown?.domains ?? []).slice(0, 6)
 const categorySummary = (model?.categoryTaxonomySummary as CategorySummary | undefined) ?? null
-const categoryStatus = categorySummary?.status ?? 'unknown'
-const categoryRows = categoryStatus === 'mapped' ? (categorySummary?.categories ?? []).slice(0, 5) : []
+const rawCategoryStatus = typeof categorySummary?.status === 'string' ? categorySummary.status : 'unknown'
+const normalizeSignalCount = (value: unknown) => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0
+  return Math.max(0, Math.floor(value))
+}
+const rawCategoryRows = Array.isArray(categorySummary?.categories) ? categorySummary.categories : []
+const categoryRows =
+  rawCategoryStatus === 'mapped'
+    ? rawCategoryRows
+        .map((cat) => ({ ...cat, count: normalizeSignalCount(cat.count) }))
+        .filter((cat) => cat.count > 0)
+        .slice(0, 5)
+    : []
+const categorySignalRowsTotal = categoryRows.reduce((sum, cat) => sum + cat.count, 0)
+const categorySignalTotalFromPayload = normalizeSignalCount(categorySummary?.totalSignals)
+const categorySignalTotal = categorySignalTotalFromPayload > 0 ? categorySignalTotalFromPayload : categorySignalRowsTotal
+const categoryStatus = rawCategoryStatus === 'mapped' && categoryRows.length === 0 ? 'unknown' : rawCategoryStatus
 const readiness = (model?.readiness as Readiness | null | undefined) ?? null
 const readinessAxes = [readiness?.agentic, readiness?.structural].filter((axis): axis is ReadinessAxis => !!axis)
 const sentimentFromPayload = (model?.sentimentSummary ?? publicReport?.sentimentSummary) as SentimentSummary | undefined
@@ -310,15 +325,13 @@ const CATEGORY_COVERAGE_LENSES = [
     levels: 'Mercado · Comprador',
   },
 ]
-const categorySignalTotal =
-  typeof categorySummary?.totalSignals === 'number'
-    ? categorySummary.totalSignals
-    : categoryRows.reduce((sum, cat) => sum + cat.count, 0)
 const primaryCategory = categoryRows[0] ?? null
 const primaryCategoryName = primaryCategory ? categoryLabel(primaryCategory.label) : 'Categoría en revisión'
 const primaryCategoryLevel = categoryLevelCopy(primaryCategory?.level)
 const categorySignalLabel = (count: number) => `${count} señal${count === 1 ? '' : 'es'}`
 const showCategorySection = Boolean(categorySummary)
+const categoryReviewSignalCount =
+  normalizeSignalCount(categorySummary?.ambiguousCount) + normalizeSignalCount(categorySummary?.unmappedCount)
 const sourceClassLabel: Record<string, string> = {
   own_domain: 'Sitio propio',
   competitor: 'Competidor',
@@ -1091,14 +1104,19 @@ const sectionNumbers = Object.fromEntries(
 
           {/* ══ 06 · CATEGORÍA PERCIBIDA ══ */}
           {showCategorySection && (
-            <section class="border-t py-16" data-capture="report-category-association" style={`border-color:${axis.gray[100]}`}>
+            <section
+              class="border-t py-16"
+              data-capture="report-category-association"
+              data-category-status={categoryStatus}
+              style={`border-color:${axis.gray[100]}`}
+            >
               <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.category} · Categoría percibida</p>
               <h2 class="section-title" style={`color:${axis.gray[900]}`}>Qué entiende la IA sobre tu categoría</h2>
               <p class="section-lead" style={`color:${axis.gray[600]}`}>
                 Esta lectura revisa si los motores alcanzan a ubicar la marca por industria, sector, oferta, caso de uso, mercado o comprador. Si el run no trae señales suficientes, el informe lo declara como cobertura y no inventa narrativa.
               </p>
               {categoryRows.length > 0 ? (
-                <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+                <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" data-capture="report-category-mapped" style={`border-color:${axis.gray[100]}`}>
                   <div class="grid lg:grid-cols-[1.05fr_0.95fr]">
                     <div class="p-5 sm:p-6 lg:p-7" style={`background:linear-gradient(135deg, ${axis.gray[50]}, #fff 72%)`}>
                       <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold bg-white" style={`color:${axis.accent[700]};border:1px solid ${axis.gray[100]}`}>
@@ -1138,7 +1156,7 @@ const sectionNumbers = Object.fromEntries(
                         <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Mostramos las asociaciones detectadas con su peso relativo en la muestra; no son etiquetas internas del sistema.</p>
                       </div>
                     </div>
-                    <ul class="mt-4 grid gap-3" role="list">
+                    <ul class="mt-4 grid gap-3" role="list" data-capture="report-category-rows">
                       {categoryRows.map((cat) => {
                         const copy = categoryLevelCopy(cat.level)
                         const visual = categoryLevelVisual(cat.level)
@@ -1177,7 +1195,11 @@ const sectionNumbers = Object.fromEntries(
                   </div>
                 </div>
               ) : (
-                <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+                <div
+                  class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white"
+                  data-capture={categoryStatus === 'needs_review' ? 'report-category-review' : 'report-category-empty'}
+                  style={`border-color:${axis.gray[100]}`}
+                >
                   <div class="grid lg:grid-cols-[1.05fr_0.95fr]">
                     <div class="p-5 sm:p-6 lg:p-7" style={`background:linear-gradient(135deg, ${axis.gray[50]}, #fff 72%)`}>
                       <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold bg-white" style={`color:${categoryStatusCopy.tone.fg};border:1px solid ${axis.gray[100]}`}>
@@ -1189,8 +1211,8 @@ const sectionNumbers = Object.fromEntries(
                       <div class="mt-5 flex flex-wrap gap-2">
                         <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${categoryStatusCopy.tone.bg};color:${categoryStatusCopy.tone.fg}`}>{categoryStatusCopy.label}</span>
                         <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[800]}`}>{categorySignalLabel(categorySignalTotal)}</span>
-                        {(categorySummary?.ambiguousCount ?? 0) > 0 && (
-                          <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${axis.warning[100]};color:${axis.warning[700]}`}>{categorySummary?.ambiguousCount} ambiguas</span>
+                        {categoryReviewSignalCount > 0 && (
+                          <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${axis.warning[100]};color:${axis.warning[700]}`}>{categorySignalLabel(categoryReviewSignalCount)} en revisión</span>
                         )}
                       </div>
                     </div>
