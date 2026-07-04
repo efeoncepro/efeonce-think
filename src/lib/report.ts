@@ -63,3 +63,50 @@ export async function fetchPublicReport(token: string): Promise<ReportFetchResul
     return { status: 'error' }
   }
 }
+
+/**
+ * Resolución de un short link del informe (TASK-1330).
+ *
+ * Consume `GET {base}/api/public/growth/ai-visibility/report/short-link/{code}` → resuelve el código
+ * a `{ status: 'active', reportToken }`. El fetch es SERVER-SIDE: el token viaja server-to-server y
+ * NUNCA llega al browser. `/s/[code].astro` usa esto para `Astro.rewrite` a la página del token
+ * (render-in-place, la URL corta se conserva). Estados: `active` (con token), `not_found` (404),
+ * `gone` (410, revocado/expirado), `rate_limited` (429), `error`.
+ */
+export type ShortLinkResolution =
+  | { status: 'active'; reportToken: string }
+  | { status: 'not_found' }
+  | { status: 'gone' }
+  | { status: 'rate_limited' }
+  | { status: 'error' }
+
+export async function resolveShortLink(code: string): Promise<ShortLinkResolution> {
+  const base = (GREENHOUSE_API_BASE || 'https://greenhouse.efeoncepro.com').replace(/\/+$/, '')
+  const url = `${base}/api/public/growth/ai-visibility/report/short-link/${encodeURIComponent(code)}`
+
+  let res: Response
+  try {
+    res = await fetch(url, { headers: { accept: 'application/json' } })
+  } catch (e) {
+    console.error('[short-link] fetch threw', url, (e as Error).message)
+    return { status: 'error' }
+  }
+
+  if (res.status === 404) return { status: 'not_found' }
+  if (res.status === 410) return { status: 'gone' }
+  if (res.status === 429) return { status: 'rate_limited' }
+  if (!res.ok) {
+    console.error('[short-link] non-2xx', url, res.status)
+    return { status: 'error' }
+  }
+
+  try {
+    const data = (await res.json()) as { status?: string; reportToken?: string }
+    if (data.status === 'active' && typeof data.reportToken === 'string' && data.reportToken.length > 0) {
+      return { status: 'active', reportToken: data.reportToken }
+    }
+    return { status: 'error' }
+  } catch {
+    return { status: 'error' }
+  }
+}

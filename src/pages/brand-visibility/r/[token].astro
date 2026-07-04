@@ -171,7 +171,8 @@ const provenance = model?.provenance as { providersSampled?: string[]; promptCou
 const sourceBreakdown = (model?.citationSourceBreakdown as CitationSourceBreakdown | undefined) ?? null
 const topSourceDomains = (sourceBreakdown?.domains ?? []).slice(0, 6)
 const categorySummary = (model?.categoryTaxonomySummary as CategorySummary | undefined) ?? null
-const categoryRows = categorySummary?.status && categorySummary.status !== 'unknown' ? (categorySummary.categories ?? []).slice(0, 5) : []
+const categoryStatus = categorySummary?.status ?? 'unknown'
+const categoryRows = categoryStatus === 'mapped' ? (categorySummary?.categories ?? []).slice(0, 5) : []
 const readiness = (model?.readiness as Readiness | null | undefined) ?? null
 const readinessAxes = [readiness?.agentic, readiness?.structural].filter((axis): axis is ReadinessAxis => !!axis)
 const sentimentFromPayload = (model?.sentimentSummary ?? publicReport?.sentimentSummary) as SentimentSummary | undefined
@@ -229,6 +230,95 @@ const hasRadar = radarDims.length >= 3
 const sev = severityMeta(overallSeverity)
 const categoryLabel = (label: NonNullable<CategorySummary['categories']>[number]['label']) =>
   typeof label === 'string' ? label : label?.es ?? label?.en ?? 'Categoría detectada'
+const CATEGORY_LEVEL_COPY: Record<string, { label: string; helper: string }> = {
+  industry: {
+    label: 'Industria',
+    helper: 'Marco amplio donde la IA ubica el negocio.',
+  },
+  sector: {
+    label: 'Sector competitivo',
+    helper: 'Espacio donde la IA suele comparar a la marca.',
+  },
+  product_service_category: {
+    label: 'Categoría de oferta',
+    helper: 'Producto, servicio o línea de solución reconocida.',
+  },
+  use_case: {
+    label: 'Caso de uso',
+    helper: 'Problema o situación para la que la IA asocia la marca.',
+  },
+  buyer_persona: {
+    label: 'Comprador asociado',
+    helper: 'Perfil de comprador o usuario que aparece en la lectura.',
+  },
+  market: {
+    label: 'Mercado',
+    helper: 'Ámbito geográfico o segmento donde se interpreta la marca.',
+  },
+}
+const categoryLevelCopy = (level?: string) =>
+  CATEGORY_LEVEL_COPY[level ?? ''] ?? {
+    label: 'Señal de categoría',
+    helper: 'Lectura agrupada desde respuestas y fuentes citadas.',
+  }
+type CategoryVisualIcon = 'domain' | 'sourceMap' | 'category' | 'target' | 'market' | 'buyer' | 'sample'
+const CATEGORY_LEVEL_VISUAL: Record<string, { icon: CategoryVisualIcon; bg: string; fg: string }> = {
+  industry: { icon: 'domain', bg: axis.gray[100], fg: axis.gray[800] },
+  sector: { icon: 'sourceMap', bg: axis.accent[500] + '14', fg: axis.accent[700] },
+  product_service_category: { icon: 'category', bg: axis.success[100], fg: axis.success[700] },
+  use_case: { icon: 'target', bg: axis.warning[100], fg: axis.warning[700] },
+  buyer_persona: { icon: 'buyer', bg: axis.gray[100], fg: axis.gray[800] },
+  market: { icon: 'market', bg: axis.accent[500] + '14', fg: axis.accent[700] },
+}
+const categoryLevelVisual = (level?: string) =>
+  CATEGORY_LEVEL_VISUAL[level ?? ''] ?? { icon: 'sample' as const, bg: axis.gray[100], fg: axis.gray[800] }
+const CATEGORY_STATUS_COPY: Record<string, { label: string; title: string; helper: string; tone: { bg: string; fg: string } }> = {
+  mapped: {
+    label: 'Categoría medida',
+    title: 'La IA ya deja una lectura de categoría publicable',
+    helper: 'El diagnóstico encontró lecturas de categoría suficientes para explicar cómo los motores encuadran la marca.',
+    tone: { bg: axis.success[100], fg: axis.success[700] },
+  },
+  unknown: {
+    label: 'En cobertura',
+    title: 'Este corte no trae categoría medible',
+    helper: 'El diagnóstico no recibió señales verificables de industria, sector, oferta, mercado o comprador para este run. No inferimos una etiqueta desde la industria declarada, el sitio o la estrategia.',
+    tone: { bg: axis.gray[100], fg: axis.gray[600] },
+  },
+  needs_review: {
+    label: 'Revisión requerida',
+    title: 'Hay señales, pero no son publicables todavía',
+    helper: 'El diagnóstico detectó señales de categoría que no alcanzan una clasificación confiable. Se muestran como cobertura, no como diagnóstico.',
+    tone: { bg: axis.warning[100], fg: axis.warning[700] },
+  },
+}
+const categoryStatusCopy = CATEGORY_STATUS_COPY[categoryStatus] ?? CATEGORY_STATUS_COPY.unknown
+const CATEGORY_COVERAGE_LENSES = [
+  {
+    title: 'Industria y sector',
+    helper: 'Dónde ubican los motores a la marca dentro del mercado amplio y competitivo.',
+    levels: 'Industria · Sector',
+  },
+  {
+    title: 'Oferta y caso de uso',
+    helper: 'Qué producto, servicio o problema asocian con la marca cuando la mencionan.',
+    levels: 'Oferta · Caso de uso',
+  },
+  {
+    title: 'Mercado y comprador',
+    helper: 'Para qué mercado o perfil de comprador aparece la marca en la lectura.',
+    levels: 'Mercado · Comprador',
+  },
+]
+const categorySignalTotal =
+  typeof categorySummary?.totalSignals === 'number'
+    ? categorySummary.totalSignals
+    : categoryRows.reduce((sum, cat) => sum + cat.count, 0)
+const primaryCategory = categoryRows[0] ?? null
+const primaryCategoryName = primaryCategory ? categoryLabel(primaryCategory.label) : 'Categoría en revisión'
+const primaryCategoryLevel = categoryLevelCopy(primaryCategory?.level)
+const categorySignalLabel = (count: number) => `${count} señal${count === 1 ? '' : 'es'}`
+const showCategorySection = Boolean(categorySummary)
 const sourceClassLabel: Record<string, string> = {
   own_domain: 'Sitio propio',
   competitor: 'Competidor',
@@ -455,8 +545,8 @@ const sectionNumbers = Object.fromEntries(
     ['benchmark', hasBenchmark],
     ['sentiment', Boolean(sentiment)],
     ['sources', topSourceDomains.length > 0 || Boolean(sourceBreakdown?.reason)],
-    ['category', categoryRows.length > 0 || categorySummary?.status === 'needs_review'],
     ['readiness', readinessAxes.some((readinessAxis) => readinessAxis.overallScore !== null)],
+    ['category', showCategorySection],
     ['ladder', levels.length > 0],
     ['recommendations', Boolean(primaryGap?.title)],
     ['dimensions', dimensions.length > 0],
@@ -929,34 +1019,7 @@ const sectionNumbers = Object.fromEntries(
             </section>
           )}
 
-          {/* ══ 05 · CATEGORÍA ══ */}
-          {(categoryRows.length > 0 || categorySummary?.status === 'needs_review') && (
-            <section class="border-t py-16" data-capture="report-category-association" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.category} · Asociación con la categoría</p>
-              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Cómo te ubican los motores de respuesta</h2>
-              <p class="section-lead" style={`color:${axis.gray[600]}`}>Mostramos categorías solo cuando el diagnóstico trae señales reales. Si la categoría viene desconocida, no se inventa narrativa.</p>
-              {categoryRows.length > 0 ? (
-                <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
-                  <ul role="list">
-                    {categoryRows.map((cat) => (
-                      <li class="data-row grid gap-3 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[1.4fr_0.75fr_0.45fr] sm:items-center" style={`border-color:${axis.gray[100]}`}>
-                        <p class="font-semibold" style={`color:${axis.gray[900]}`}>{categoryLabel(cat.label)}</p>
-                        <p class="text-sm" style={`color:${axis.gray[600]}`}>{cat.level.replaceAll('_', ' ')}</p>
-                        <p class="text-sm font-semibold tabular-nums sm:text-right" style={`color:${axis.gray[800]}`}>{cat.count}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <div class="report-panel mt-6 rounded-2xl border bg-white p-5" style={`border-color:${axis.gray[100]}`}>
-                  <p class="font-semibold" style={`color:${axis.gray[900]}`}>Categoría en revisión</p>
-                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Hay señales de categoría, pero todavía no alcanzan una clasificación pública confiable.</p>
-                </div>
-              )}
-            </section>
-          )}
-
-          {/* ══ 06 · OPERABILIDAD ══ */}
+          {/* ══ 05 · OPERABILIDAD ══ */}
           {readinessAxes.some((readinessAxis) => readinessAxis.overallScore !== null) && (
             <section class="border-t py-16" data-capture="report-readiness-detail" style={`border-color:${axis.gray[100]}`}>
               <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.readiness} · Operabilidad del sitio</p>
@@ -1023,6 +1086,154 @@ const sectionNumbers = Object.fromEntries(
                   </div>
                 </aside>
               </div>
+            </section>
+          )}
+
+          {/* ══ 06 · CATEGORÍA PERCIBIDA ══ */}
+          {showCategorySection && (
+            <section class="border-t py-16" data-capture="report-category-association" style={`border-color:${axis.gray[100]}`}>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.category} · Categoría percibida</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Qué entiende la IA sobre tu categoría</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>
+                Esta lectura revisa si los motores alcanzan a ubicar la marca por industria, sector, oferta, caso de uso, mercado o comprador. Si el run no trae señales suficientes, el informe lo declara como cobertura y no inventa narrativa.
+              </p>
+              {categoryRows.length > 0 ? (
+                <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+                  <div class="grid lg:grid-cols-[1.05fr_0.95fr]">
+                    <div class="p-5 sm:p-6 lg:p-7" style={`background:linear-gradient(135deg, ${axis.gray[50]}, #fff 72%)`}>
+                      <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold bg-white" style={`color:${axis.accent[700]};border:1px solid ${axis.gray[100]}`}>
+                        <ReportIcon name="engines" size={14} />
+                        Lectura principal
+                      </span>
+                      <h3 class="mt-4 text-2xl font-semibold leading-tight sm:text-3xl" style={`color:${axis.gray[900]}`}>{primaryCategoryName}</h3>
+                      <p class="mt-3 max-w-2xl text-sm leading-relaxed sm:text-base" style={`color:${axis.gray[600]}`}>
+                        Los motores tienden a encuadrar la marca en este territorio. Eso influye en qué búsquedas apareces, contra quién te comparan y qué autoridad esperan ver antes de recomendarte.
+                      </p>
+                      <div class="mt-5 flex flex-wrap gap-2">
+                        <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.accent[700]}`}>{primaryCategory ? categorySignalLabel(primaryCategory.count) : 'Señal pendiente'}</span>
+                        <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[800]}`}>{primaryCategoryLevel.label}</span>
+                        <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${axis.gray[50]};color:${axis.gray[800]}`}>{categorySignalTotal || categoryRows.length} señales totales</span>
+                      </div>
+                    </div>
+
+                    <div class="border-t p-5 sm:p-6 lg:border-l lg:border-t-0 lg:p-7" style={`border-color:${axis.gray[100]}`}>
+                      <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Qué significa</p>
+                      <div class="mt-4 space-y-4">
+                        <div class="flex gap-3">
+                          <span class="report-icon-badge mt-0.5" style={`--icon-color:${axis.success[700]}`}><ReportIcon name="signal" size={15} /></span>
+                          <p class="text-sm leading-relaxed" style={`color:${axis.gray[600]}`}><strong style={`color:${axis.gray[900]}`}>Si coincide con tu estrategia,</strong> conviene reforzar esa asociación con fuentes propias, casos y páginas que usen el mismo lenguaje.</p>
+                        </div>
+                        <div class="flex gap-3">
+                          <span class="report-icon-badge mt-0.5" style={`--icon-color:${axis.warning[700]}`}><ReportIcon name="priority" size={15} /></span>
+                          <p class="text-sm leading-relaxed" style={`color:${axis.gray[600]}`}><strong style={`color:${axis.gray[900]}`}>Si no coincide,</strong> la IA puede estar activando comparaciones equivocadas o dejando fuera la oferta que más quieres posicionar.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="border-t p-5 sm:p-6" style={`border-color:${axis.gray[100]}`}>
+                    <div class="flex flex-wrap items-end justify-between gap-3">
+                      <div>
+                        <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Señales que sostienen la lectura</p>
+                        <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Mostramos las asociaciones detectadas con su peso relativo en la muestra; no son etiquetas internas del sistema.</p>
+                      </div>
+                    </div>
+                    <ul class="mt-4 grid gap-3" role="list">
+                      {categoryRows.map((cat) => {
+                        const copy = categoryLevelCopy(cat.level)
+                        const visual = categoryLevelVisual(cat.level)
+                        const share = categorySignalTotal > 0 ? Math.round((cat.count / categorySignalTotal) * 100) : null
+                        const barWidth = share === null ? 0 : Math.max(6, share)
+
+                        return (
+                          <li class="rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]}`}>
+                            <div class="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
+                              <div class="flex min-w-0 gap-3">
+                                <span class="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={`background:${visual.bg};color:${visual.fg}`}>
+                                  <ReportIcon name={visual.icon} size={16} />
+                                </span>
+                                <div class="min-w-0">
+                                  <div class="flex flex-wrap items-center gap-2">
+                                    <p class="font-semibold leading-snug" style={`color:${axis.gray[900]}`}>{categoryLabel(cat.label)}</p>
+                                    <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[800]}`}>{copy.label}</span>
+                                  </div>
+                                  <p class="mt-1 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{copy.helper}</p>
+                                </div>
+                              </div>
+                              <p class="text-sm font-semibold tabular-nums sm:text-right" style={`color:${axis.gray[900]}`}>
+                                {categorySignalLabel(cat.count)}
+                                {share !== null && <span class="ml-1 font-medium" style={`color:${axis.gray[600]}`}>· {share}%</span>}
+                              </p>
+                            </div>
+                            {share !== null && (
+                              <div class="mt-3 h-2 overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
+                                <div data-bar class="h-full rounded-full" style={`width:${barWidth}%;background:${axis.accent[500]}`}></div>
+                              </div>
+                            )}
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+                  <div class="grid lg:grid-cols-[1.05fr_0.95fr]">
+                    <div class="p-5 sm:p-6 lg:p-7" style={`background:linear-gradient(135deg, ${axis.gray[50]}, #fff 72%)`}>
+                      <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold bg-white" style={`color:${categoryStatusCopy.tone.fg};border:1px solid ${axis.gray[100]}`}>
+                        <ReportIcon name="sample" size={14} />
+                        {categoryStatusCopy.label}
+                      </span>
+                      <h3 class="mt-4 text-2xl font-semibold leading-tight sm:text-3xl" style={`color:${axis.gray[900]}`}>{categoryStatusCopy.title}</h3>
+                      <p class="mt-3 max-w-2xl text-sm leading-relaxed sm:text-base" style={`color:${axis.gray[600]}`}>{categoryStatusCopy.helper}</p>
+                      <div class="mt-5 flex flex-wrap gap-2">
+                        <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${categoryStatusCopy.tone.bg};color:${categoryStatusCopy.tone.fg}`}>{categoryStatusCopy.label}</span>
+                        <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[800]}`}>{categorySignalLabel(categorySignalTotal)}</span>
+                        {(categorySummary?.ambiguousCount ?? 0) > 0 && (
+                          <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${axis.warning[100]};color:${axis.warning[700]}`}>{categorySummary?.ambiguousCount} ambiguas</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div class="border-t p-5 sm:p-6 lg:border-l lg:border-t-0 lg:p-7" style={`border-color:${axis.gray[100]}`}>
+                      <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Qué significa</p>
+                      <div class="mt-4 space-y-4">
+                        <div class="flex gap-3">
+                          <span class="report-icon-badge mt-0.5" style={`--icon-color:${axis.accent[500]}`}><ReportIcon name="signal" size={15} /></span>
+                          <p class="text-sm leading-relaxed" style={`color:${axis.gray[600]}`}><strong style={`color:${axis.gray[900]}`}>No es ausencia de posicionamiento.</strong> Significa que este corte no trae evidencia suficiente para decir en qué industria, mercado u oferta te está ubicando la IA.</p>
+                        </div>
+                        <div class="flex gap-3">
+                          <span class="report-icon-badge mt-0.5" style={`--icon-color:${axis.warning[700]}`}><ReportIcon name="priority" size={15} /></span>
+                          <p class="text-sm leading-relaxed" style={`color:${axis.gray[600]}`}><strong style={`color:${axis.gray[900]}`}>No rellenamos el hueco.</strong> El reporte evita convertir inferencias de marketing, industria declarada o texto del sitio en una categoría percibida por IA.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="border-t p-5 sm:p-6" style={`border-color:${axis.gray[100]}`}>
+                    <div class="flex flex-wrap items-end justify-between gap-3">
+                      <div>
+                        <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Qué intentó leer el diagnóstico</p>
+                        <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Estos son los frentes de categoría que el reporte puede explicar cuando hay evidencia suficiente.</p>
+                      </div>
+                      <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[800]}`}>Sin señal medible en este corte</span>
+                    </div>
+
+                    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                      {CATEGORY_COVERAGE_LENSES.map((lens) => (
+                        <div class="rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]}`}>
+                          <div class="flex items-start justify-between gap-3">
+                            <p class="font-semibold leading-snug" style={`color:${axis.gray[900]}`}>{lens.title}</p>
+                            <span class="rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>Sin dato</span>
+                          </div>
+                          <p class="mt-2 text-xs font-semibold uppercase tracking-[0.08em]" style={`color:${axis.accent[700]}`}>{lens.levels}</p>
+                          <p class="mt-2 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{lens.helper}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </section>
           )}
 
