@@ -283,104 +283,14 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   greenhouse-form {
     display: block;
     min-width: 0;
-    --ghf-accent: #0c56d9;
-    --ghf-error: #b42335;
     --ghf-font: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --ghf-radius: 6px;
-    --ghf-button-shadow: 0 16px 34px -24px rgba(12, 86, 217, 0.7);
   }
 
-  greenhouse-form :global(.ghf-form) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0.74rem;
-    align-items: end;
-  }
-
-  greenhouse-form :global(.ghf-fields) {
-    display: grid !important;
-    grid-column: 1;
-    grid-row: 1;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.05fr) minmax(0, 1.05fr) !important;
-    gap: 0.82rem !important;
-    align-items: start;
-  }
-
-  greenhouse-form :global(.ghf-error-summary),
-  greenhouse-form :global(.ghf-draft-note),
-  greenhouse-form :global(.ghf-progress),
-  greenhouse-form :global(.ghf-summary),
-  greenhouse-form :global(.ghf-field--full:has(.ghf-check)),
-  greenhouse-form :global(.ghf-honeypot) {
-    grid-column: 1 / -1 !important;
-  }
-
-  greenhouse-form :global(.ghf-field),
-  greenhouse-form :global(.ghf-field--full) {
-    grid-column: auto !important;
+  greenhouse-form :global(.ghf-root),
+  greenhouse-form :global(.ghf-form),
+  greenhouse-form :global(.ghf-fields),
+  greenhouse-form :global(.ghf-field) {
     min-width: 0;
-  }
-
-  greenhouse-form :global(.ghf-label) {
-    font-size: 0.78rem;
-    line-height: 1.2;
-  }
-
-  greenhouse-form :global(.ghf-input),
-  greenhouse-form :global(.ghf-select),
-  greenhouse-form :global(.ghf-textarea) {
-    min-height: 42px;
-  }
-
-  greenhouse-form :global(.ghf-actions-wrap) {
-    display: grid;
-    grid-column: 2;
-    grid-row: 1;
-    gap: 0.44rem;
-    align-items: center;
-    min-width: 138px;
-  }
-
-  greenhouse-form :global(.ghf-status) {
-    margin: 0;
-    font-size: 0.9rem;
-    line-height: 1.45;
-  }
-
-  greenhouse-form :global(.ghf-status--error) {
-    border: 1px solid rgba(180, 35, 53, 0.16);
-    border-radius: 7px;
-    padding: 0.74rem 0.82rem;
-    background: rgba(180, 35, 53, 0.045);
-    color: #9f1f31;
-  }
-
-  greenhouse-form :global(.ghf-actions) {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.75rem;
-  }
-
-  greenhouse-form :global(.ghf-btn) {
-    min-height: 40px;
-    border: 0;
-    border-radius: 7px;
-    padding: 0.62rem 1rem;
-    background: var(--axis-blue);
-    color: #fff;
-    font: inherit;
-    font-size: 0.9rem;
-    font-weight: 720;
-    cursor: pointer;
-    box-shadow: 0 16px 30px -24px rgba(12, 86, 217, 0.72);
-  }
-
-  greenhouse-form :global(.ghf-readiness) {
-    margin: 0;
-    color: var(--axis-gray-600);
-    font-size: 0.78rem;
-    line-height: 1.35;
   }
 
   .governed-fallback {
@@ -515,28 +425,8 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       scrollbar-gutter: auto;
     }
 
-    greenhouse-form :global(.ghf-fields),
     .governed-fallback {
       grid-template-columns: 1fr !important;
-    }
-
-    greenhouse-form :global(.ghf-form) {
-      grid-template-columns: 1fr;
-    }
-
-    greenhouse-form :global(.ghf-actions-wrap) {
-      grid-template-columns: 1fr;
-      min-width: 0;
-    }
-
-    greenhouse-form :global(.ghf-actions),
-    greenhouse-form :global(.ghf-readiness) {
-      grid-column: auto;
-      grid-row: auto;
-    }
-
-    greenhouse-form :global(.ghf-actions) {
-      justify-content: flex-start;
     }
   }
 
