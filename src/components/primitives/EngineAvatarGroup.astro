@@ -1,0 +1,162 @@
+---
+import EngineMark from '@/components/EngineMark.astro'
+import type { EngineAvatarGroupProps } from '@lib/primitives/engine-avatar-group'
+import { axis, providerLabel } from '@lib/report-tokens'
+
+const { providers, max = 6, size = 'md' } = Astro.props as EngineAvatarGroupProps
+const uniqueProviders = providers.filter((provider, index, list) => provider && list.indexOf(provider) === index)
+const visibleProviders = uniqueProviders.slice(0, max)
+const overflowCount = Math.max(uniqueProviders.length - visibleProviders.length, 0)
+const avatarSize = size === 'sm' ? 30 : 36
+const markSize = size === 'sm' ? 18 : 22
+const overlap = Math.round(avatarSize * 0.18)
+const label = uniqueProviders.map(providerLabel).join(', ')
+---
+
+<div
+  class="engine-avatar-group"
+  role="group"
+  aria-label={label ? `Motores muestreados: ${label}` : 'Motores muestreados no especificados'}
+  style={`--avatar-size:${avatarSize}px;--avatar-overlap:${overlap}px;--avatar-border:${axis.gray[100]};--avatar-bg:${axis.gray[50]};--avatar-shadow:0 8px 18px -12px rgba(46,38,61,.42);--avatar-shadow-hover:0 14px 28px -14px rgba(46,38,61,.55);--avatar-text:${axis.gray[800]};--tooltip-bg:${axis.gray[900]};--tooltip-text:${axis.gray[50]};--focus-ring:${axis.accent[500]};`}
+>
+  {visibleProviders.map((provider, index) => (
+    <span
+      class="engine-avatar"
+      tabindex="0"
+      aria-label={providerLabel(provider)}
+      data-tooltip={providerLabel(provider)}
+      style={`--avatar-index:${index}`}
+    >
+      <EngineMark provider={provider} label={providerLabel(provider)} size={markSize} />
+    </span>
+  ))}
+  {overflowCount > 0 && (
+    <span class="engine-avatar engine-avatar-count" aria-hidden="true" style={`--avatar-index:${visibleProviders.length}`}>+{overflowCount}</span>
+  )}
+</div>
+
+<style>
+  .engine-avatar-group {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    padding-block: 5px;
+  }
+
+  .engine-avatar {
+    position: relative;
+    z-index: calc(20 - var(--avatar-index));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border: 2px solid var(--avatar-bg);
+    border-radius: 999px;
+    background: var(--avatar-bg);
+    box-shadow:
+      0 0 0 1px var(--avatar-border),
+      var(--avatar-shadow);
+    cursor: default;
+    transition:
+      transform 0.16s ease,
+      box-shadow 0.16s ease;
+  }
+
+  .engine-avatar + .engine-avatar {
+    margin-left: calc(var(--avatar-overlap) * -1);
+  }
+
+  .engine-avatar:hover,
+  .engine-avatar:focus-visible {
+    z-index: 40;
+    transform: translateY(-5px);
+    box-shadow:
+      0 0 0 1px var(--avatar-border),
+      var(--avatar-shadow-hover);
+  }
+
+  .engine-avatar::before,
+  .engine-avatar::after {
+    position: absolute;
+    left: 50%;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -4px);
+    transition:
+      opacity 0.14s ease,
+      transform 0.14s ease;
+  }
+
+  .engine-avatar::before {
+    content: attr(data-tooltip);
+    top: calc(100% + 8px);
+    width: max-content;
+    max-width: 12rem;
+    border-radius: 8px;
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.45;
+    white-space: nowrap;
+    box-shadow: 0 14px 30px -18px rgba(46, 38, 61, 0.55);
+  }
+
+  .engine-avatar::after {
+    content: '';
+    top: calc(100% + 4px);
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--tooltip-bg);
+    transform: translate(-50%, -4px) rotate(45deg);
+  }
+
+  .engine-avatar:hover::before,
+  .engine-avatar:hover::after,
+  .engine-avatar:focus-visible::before,
+  .engine-avatar:focus-visible::after {
+    opacity: 1;
+  }
+
+  .engine-avatar:hover::before,
+  .engine-avatar:focus-visible::before {
+    transform: translate(-50%, 0);
+  }
+
+  .engine-avatar:hover::after,
+  .engine-avatar:focus-visible::after {
+    transform: translate(-50%, 0) rotate(45deg);
+  }
+
+  .engine-avatar:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  .engine-avatar-count {
+    color: var(--avatar-text);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .engine-avatar {
+      transition: none;
+    }
+
+    .engine-avatar:hover,
+    .engine-avatar:focus-visible {
+      transform: none;
+    }
+
+    .engine-avatar::before,
+    .engine-avatar::after {
+      transition: none;
+    }
+  }
+</style>

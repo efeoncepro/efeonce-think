@@ -19,7 +19,7 @@ export interface ReportHeader {
 }
 
 export type ReportFetchResult =
-  | { status: 'ok'; header: ReportHeader; model: Record<string, unknown>; report: unknown; modelVersion?: string }
+  | { status: 'ok'; header: ReportHeader; model: Record<string, unknown>; report: unknown; modelVersion?: string; runPublicId?: string }
   | { status: 'not_found' }
   | { status: 'rate_limited' }
   | { status: 'error' }
@@ -49,6 +49,7 @@ export async function fetchPublicReport(token: string): Promise<ReportFetchResul
       model?: Record<string, unknown>
       report?: unknown
       modelVersion?: string
+      runPublicId?: string
     }
     return {
       status: 'ok',
@@ -56,6 +57,7 @@ export async function fetchPublicReport(token: string): Promise<ReportFetchResul
       model: data.model ?? {},
       report: data.report,
       modelVersion: data.modelVersion,
+      runPublicId: typeof data.runPublicId === 'string' ? data.runPublicId : undefined,
     }
   } catch {
     return { status: 'error' }

@@ -1,0 +1,201 @@
+---
+/**
+ * ReportIcon — glyphs utilitarios para informes Think.
+ *
+ * Iconografia de apoyo, no fuente de significado: usar siempre junto a texto visible.
+ * Stroke hereda `currentColor`; por defecto queda fuera del arbol accesible.
+ */
+
+const {
+  name,
+  size = 18,
+  strokeWidth = 1.8,
+  label,
+  class: className,
+} = Astro.props as {
+  name:
+    | 'signal'
+    | 'engines'
+    | 'citation'
+    | 'readiness'
+    | 'sample'
+    | 'calendar'
+    | 'sourceMap'
+    | 'domain'
+    | 'dependency'
+    | 'read'
+    | 'validate'
+    | 'act'
+    | 'priority'
+    | 'share'
+    | 'copy'
+    | 'link'
+    | 'download'
+  size?: number
+  strokeWidth?: number
+  label?: string
+  class?: string
+}
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width={strokeWidth}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role={label ? 'img' : undefined}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+>
+  {label && <title>{label}</title>}
+
+  {name === 'signal' && (
+    <>
+      <path d="M4 18.5h16" />
+      <path d="M6.5 15.5l3.2-3.2 3 2.1 4.8-6.9" />
+      <path d="M15.4 7.5h2.1v2.1" />
+    </>
+  )}
+
+  {name === 'engines' && (
+    <>
+      <circle cx="7.2" cy="8" r="2.7" />
+      <circle cx="16.8" cy="8" r="2.7" />
+      <circle cx="12" cy="16.2" r="2.7" />
+      <path d="M9.4 9.6l1.4 3.9" />
+      <path d="M14.6 9.6l-1.4 3.9" />
+    </>
+  )}
+
+  {name === 'citation' && (
+    <>
+      <path d="M7.5 8.2h4.8" />
+      <path d="M7.5 12h9" />
+      <path d="M7.5 15.8h6.2" />
+      <path d="M5.3 4.5h13.4a1.8 1.8 0 0 1 1.8 1.8v10.4a1.8 1.8 0 0 1-1.8 1.8H9l-4.5 2.2v-2.2a1.8 1.8 0 0 1-1.7-1.8V6.3a1.8 1.8 0 0 1 1.8-1.8Z" />
+    </>
+  )}
+
+  {name === 'readiness' && (
+    <>
+      <path d="M12 3.7l6.8 2.8v5.1c0 4.3-2.7 7.2-6.8 8.7-4.1-1.5-6.8-4.4-6.8-8.7V6.5L12 3.7Z" />
+      <path d="M8.8 12.2l2 2 4.5-4.8" />
+    </>
+  )}
+
+  {name === 'sample' && (
+    <>
+      <path d="M6.5 5.5h11" />
+      <path d="M6.5 10h11" />
+      <path d="M6.5 14.5h7.5" />
+      <path d="M6.5 19h4.8" />
+    </>
+  )}
+
+  {name === 'calendar' && (
+    <>
+      <path d="M7 3.8v3" />
+      <path d="M17 3.8v3" />
+      <rect x="4.5" y="5.5" width="15" height="14" rx="2.2" />
+      <path d="M4.5 9.3h15" />
+      <path d="M8 13h2.2" />
+      <path d="M13.8 13H16" />
+      <path d="M8 16.5h2.2" />
+    </>
+  )}
+
+  {name === 'sourceMap' && (
+    <>
+      <circle cx="6" cy="12" r="2.4" />
+      <circle cx="18" cy="7" r="2.4" />
+      <circle cx="17" cy="17" r="2.4" />
+      <path d="M8.3 11.1l7.4-3.1" />
+      <path d="M8.3 12.9l6.4 3.1" />
+    </>
+  )}
+
+  {name === 'domain' && (
+    <>
+      <circle cx="12" cy="12" r="8" />
+      <path d="M4 12h16" />
+      <path d="M12 4c2.2 2.2 3.2 4.8 3.2 8s-1 5.8-3.2 8" />
+      <path d="M12 4C9.8 6.2 8.8 8.8 8.8 12s1 5.8 3.2 8" />
+    </>
+  )}
+
+  {name === 'dependency' && (
+    <>
+      <path d="M12 4.3l7.1 13.2a1.5 1.5 0 0 1-1.3 2.2H6.2a1.5 1.5 0 0 1-1.3-2.2L12 4.3Z" />
+      <path d="M12 9v4.3" />
+      <path d="M12 16.8h.01" />
+    </>
+  )}
+
+  {name === 'read' && (
+    <>
+      <path d="M5.5 5.5h4.3a3.2 3.2 0 0 1 3.2 3.2v10.1a3.8 3.8 0 0 0-3.2-1.8H5.5Z" />
+      <path d="M18.5 5.5h-4.3A3.2 3.2 0 0 0 11 8.7v10.1a3.8 3.8 0 0 1 3.2-1.8h4.3Z" />
+    </>
+  )}
+
+  {name === 'validate' && (
+    <>
+      <path d="M12 4.5a7.5 7.5 0 1 0 7.5 7.5" />
+      <path d="M9 12.4l2.1 2.1 5.7-6.2" />
+    </>
+  )}
+
+  {name === 'act' && (
+    <>
+      <path d="M5 5l13.5 5.2-6.1 2.3-2.3 6.1Z" />
+      <path d="M12.5 12.5l4.8 4.8" />
+    </>
+  )}
+
+  {name === 'priority' && (
+    <>
+      <path d="M12 4.2v15.6" />
+      <path d="M7.2 9l4.8-4.8L16.8 9" />
+      <path d="M6 18h12" />
+    </>
+  )}
+
+  {name === 'share' && (
+    <>
+      <circle cx="18" cy="5.7" r="2.7" />
+      <circle cx="6" cy="12" r="2.7" />
+      <circle cx="18" cy="18.3" r="2.7" />
+      <path d="M8.4 10.8l7.2-3.8" />
+      <path d="M8.4 13.2l7.2 3.8" />
+    </>
+  )}
+
+  {name === 'copy' && (
+    <>
+      <rect x="8.2" y="7.2" width="10.3" height="12" rx="2" />
+      <path d="M5.5 16.8V6.5a2 2 0 0 1 2-2h8.3" />
+    </>
+  )}
+
+  {name === 'link' && (
+    <>
+      <path d="M9.8 13.2a3.1 3.1 0 0 1 0-4.4l2.4-2.4a3.1 3.1 0 0 1 4.4 4.4l-1.1 1.1" />
+      <path d="M14.2 10.8a3.1 3.1 0 0 1 0 4.4l-2.4 2.4a3.1 3.1 0 0 1-4.4-4.4l1.1-1.1" />
+    </>
+  )}
+
+  {name === 'download' && (
+    <>
+      <path d="M12 4.5v10" />
+      <path d="M8.2 10.8L12 14.6l3.8-3.8" />
+      <path d="M5.2 18.8h13.6" />
+      <path d="M6.8 16.2v2.6" />
+      <path d="M17.2 16.2v2.6" />
+    </>
+  )}
+</svg>

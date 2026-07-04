@@ -7,7 +7,9 @@
  * pasa a `<MaturityLadder rungs={...} />`.
  *
  * Encoding de la escalera:
- *  - **posición/altura del pedestal-líquido** = el peldaño (ordinal, 01 abajo → N arriba)
+ *  - **orden/ordinal** = el peldaño de madurez (01 abajo → N arriba)
+ *  - **estatura del escalafón** = posición/valor del nivel Be X
+ *  - **nivel interno del líquido** = score 0-100 cuando está medido
  *  - **color del líquido + chip** = severidad
  *  - **score** = número del peldaño; `null` = "En cobertura" (no medido → pedestal con hatch)
  *  - **isNext** = "tu próximo nivel" (marcar UNO solo)
@@ -16,7 +18,7 @@
  * los tokens de `report-tokens` (capa de design tokens compartida del hub).
  */
 export interface LadderRung {
-  /** "01".."05" — posición en la escalera (define la altura del pedestal). */
+  /** "01".."05" — posición en la escalera. */
   ordinal: string
   /** Tag de metodología opcional (eyebrow en acento), ej. "Be Found". */
   eyebrow?: string

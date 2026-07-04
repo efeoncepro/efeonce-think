@@ -57,12 +57,12 @@ export const LEVEL_COPY: Record<string, LevelCopy> = {
   },
   readable: {
     ordinal: '02', label: 'Que te entienda', labelEn: 'Be Readable', tier: 'Base', result: 'Legible',
-    desc: 'Los motores leen tu estructura, tu schema y tu contenido sin ambigüedad.',
+    desc: 'Los motores leen tu estructura, tus datos estructurados y tu contenido sin ambigüedad.',
     question: '¿Te puede leer sin adivinar?',
   },
   correct: {
     ordinal: '03', label: 'Que te describa bien', labelEn: 'Be Correct', tier: 'Alto riesgo', result: 'Preciso',
-    desc: 'Lo que los motores responden sobre ti es verdad: sin features inventadas, precios viejos ni confusión con tu competencia.',
+    desc: 'Lo que los motores responden sobre ti es verdad: sin atributos inventados, precios viejos ni confusión con tu competencia.',
     question: '¿Lo que dice de ti es verdad?',
   },
   actionable: {
@@ -73,7 +73,7 @@ export const LEVEL_COPY: Record<string, LevelCopy> = {
   intrinsic: {
     ordinal: '05', label: 'Que te prefiera', labelEn: 'Be Intrinsic', tier: 'La meta', result: 'Preferido',
     desc: 'Eres la recomendación por defecto: parte de cómo los motores de respuesta entienden tu categoría.',
-    question: '¿Eres el default?',
+    question: '¿Eres la opción por defecto?',
   },
 }
 
@@ -100,6 +100,7 @@ export const PROVIDER_LABEL: Record<string, string> = {
   perplexity: 'Perplexity',
   copilot: 'Copilot',
   claude: 'Claude',
+  anthropic: 'Claude',
 }
 
 export const providerLabel = (provider: string): string =>

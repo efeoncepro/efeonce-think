@@ -5,8 +5,9 @@
  * Escalera de peldaños de madurez que se suben en orden. Presentación pura + self-contained
  * (estilos + motion propios). Contrato en `@lib/primitives/ladder` (`LadderRung`).
  *
- * Cada peldaño es UNA pieza (card + líquido como base, sin costura):
- *  - altura del pedestal-líquido = posición en la escalera (ordinal)
+ * Cada peldaño es UNA pieza de escalera (card + depósito visual):
+ *  - estatura del escalafón = posición/valor del nivel Be X
+ *  - nivel interno del líquido = score 0-100
  *  - color del líquido + chip = severidad ('critico'|'atencion'|'optimo'|'sin_dato')
  *  - score = número; null = "En cobertura" (pedestal con hatch)
  *  - isNext = marcador "Empieza aquí" + anillo de acento
@@ -31,7 +32,7 @@ const rungDefinitions = {
   },
   '02': {
     axis: 'Percepción',
-    definition: 'Entidad, oferta y contexto quedan claros para los motores: estructura, schema y contenido sin ambigüedad.',
+    definition: 'Entidad, oferta y contexto quedan claros para los motores: estructura, datos estructurados y contenido sin ambigüedad.',
   },
   '03': {
     axis: 'Percepción',
@@ -43,7 +44,7 @@ const rungDefinitions = {
   },
   '05': {
     axis: 'Percepción',
-    definition: 'Tu marca gana preferencia en respuestas de categoría por autoridad, consistencia y share of voice sostenido.',
+    definition: 'Tu marca gana preferencia en respuestas de categoría por autoridad, consistencia y cuota de menciones sostenida.',
   },
 } as const
 ---
@@ -55,8 +56,9 @@ const rungDefinitions = {
     const level = Object.values(LEVEL_COPY).find((item) => item.ordinal === r.ordinal || item.labelEn === r.eyebrow)
     const definition = rungDefinitions[r.ordinal as keyof typeof rungDefinitions]
     const tooltipId = `maturity-rung-tip-${i}`
+    const rungMinHeight = 274 + i * 18
     return (
-      <div class={`col${r.isNext ? ' is-next' : ''}`}>
+      <div class={`col${r.isNext ? ' is-next' : ''}`} style={`--step:${i};--rung-min-height:${rungMinHeight}px`}>
         <div class="card">
           {r.isNext && <p class="next" style={`color:${axis.accent[700]}`}>{nextLabel}</p>}
           <div class="card-top">
@@ -95,7 +97,10 @@ const rungDefinitions = {
           {r.caption && <p class="q" style={`color:${axis.gray[600]}`}>{r.caption}</p>}
           {measured && <span class="sev" style={`background:${s.bg};color:${s.fg}`}>{s.label}</span>}
         </div>
-        <div class={`riser${measured ? ' measured' : ''}`} style={`--i:${i};--liquid:${s.border};background:${measured ? 'transparent' : liquid(measured, s.border)}`}>
+        <div
+          class={`riser${measured ? ' measured' : ''}`}
+          style={`--i:${i};--fill:${measured ? Math.max(0, Math.min(100, Math.round(r.score as number))) : 0};--liquid:${s.border};background:${measured ? 'transparent' : liquid(measured, s.border)}`}
+        >
           {measured && (
             <svg class="liquid-svg" viewBox="0 0 260 72" preserveAspectRatio="none" aria-hidden="true" focusable="false">
               <path
@@ -135,6 +140,7 @@ const rungDefinitions = {
   .col {
     position: relative;
     display: flex; flex-direction: column;
+    min-height: var(--rung-min-height, 274px);
     border: 1px solid rgba(0,0,0,0.07); border-radius: 16px; overflow: visible; background: #fff;
     box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     transition: box-shadow 0.18s cubic-bezier(0.2,0,0,1), transform 0.18s cubic-bezier(0.2,0,0,1);
@@ -148,7 +154,7 @@ const rungDefinitions = {
     box-shadow: 0 0 0 2px #0375db, 0 10px 26px -12px rgba(3,117,219,0.42);
     background: linear-gradient(180deg, rgba(3,117,219,0.06), #fff 42%);
   }
-  .card { position: relative; display: flex; flex-direction: column; gap: 0.12rem; padding: 1rem 1.05rem 1.15rem; border-radius: 16px 16px 0 0; background: inherit; }
+  .card { position: relative; display: flex; flex: 1 1 auto; flex-direction: column; gap: 0.12rem; min-height: 190px; padding: 1rem 1.05rem 1.15rem; border-radius: 16px 16px 0 0; background: inherit; }
   .next { display: inline-flex; align-items: center; gap: 0.28rem; font-size: 0.6875rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.35rem; }
   .next::before { content: '↑'; font-size: 0.72rem; }
   .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem; }
@@ -157,24 +163,38 @@ const rungDefinitions = {
   .cover { font-size: 0.6875rem; font-weight: 500; border-radius: 999px; padding: 0.2rem 0.5rem; white-space: nowrap; }
   .bex-row { position: relative; display: inline-flex; align-items: center; gap: 0.26rem; align-self: flex-start; max-width: 100%; }
   .bex { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
-  .info-wrap { position: relative; display: inline-flex; align-items: center; z-index: 20; }
+  .info-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 1.5rem; min-height: 1.5rem; z-index: 20; }
   .info-trigger {
-    appearance: none; display: inline-grid; place-items: center; width: 0.78rem; height: 0.78rem;
+    position: relative;
+    appearance: none; display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem;
     border: 0; border-radius: 999px; padding: 0;
-    background: #433c50;
+    background: transparent;
     color: #fff; font: 760 0.48rem/1 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     cursor: pointer;
-    box-shadow: 0 3px 8px -7px rgba(46,38,61,0.7);
     opacity: 0.92;
-    transition: transform 0.16s cubic-bezier(0.2,0,0,1), box-shadow 0.16s cubic-bezier(0.2,0,0,1), opacity 0.16s cubic-bezier(0.2,0,0,1);
+    transition: transform 0.16s cubic-bezier(0.2,0,0,1), opacity 0.16s cubic-bezier(0.2,0,0,1);
   }
   .info-trigger:hover,
   .info-trigger:focus-visible,
   .info-wrap.is-open .info-trigger {
     transform: translateY(-1px);
     opacity: 1;
-    box-shadow: 0 10px 20px -16px rgba(46,38,61,0.72);
     outline: none;
+  }
+  .info-trigger::before {
+    content: '';
+    position: absolute;
+    width: 0.78rem;
+    height: 0.78rem;
+    border-radius: 999px;
+    background: #433c50;
+    box-shadow: 0 3px 8px -7px rgba(46,38,61,0.7);
+    z-index: -1;
+  }
+  .info-trigger:hover::before,
+  .info-trigger:focus-visible::before,
+  .info-wrap.is-open .info-trigger::before {
+    box-shadow: 0 10px 20px -16px rgba(46,38,61,0.72);
   }
   .info-tip {
     position: absolute; left: 50%; top: calc(100% + 0.5rem); width: min(15.75rem, 78vw);
@@ -227,15 +247,20 @@ const rungDefinitions = {
   .q { margin-top: 0.2rem; font-size: 0.76rem; line-height: 1.3; }
   .sev { align-self: flex-start; margin-top: 0.55rem; border-radius: 999px; padding: 0.12rem 0.5rem; font-size: 0.6875rem; font-weight: 600; }
   .riser {
-    position: relative; height: calc(10px + var(--i, 0) * 18px); overflow: hidden; isolation: isolate;
+    position: relative; height: 82px; overflow: hidden; isolation: isolate;
     border-radius: 0 0 16px 16px;
     --liquid-depth: 1;
   }
   .riser.measured {
-    background: color-mix(in srgb, var(--liquid) 18%, #fff 82%);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.7), transparent 42%),
+      color-mix(in srgb, var(--liquid) 7%, #fff 93%);
     box-shadow:
       inset 0 8px 14px rgba(255,255,255,0.26),
       inset 0 -12px 18px rgba(0,0,0,0.1);
+  }
+  .riser:not(.measured) {
+    height: 82px;
   }
   .riser.measured::before {
     content: ''; position: absolute; z-index: 1; inset: 0;
@@ -250,8 +275,9 @@ const rungDefinitions = {
     transform: translateX(-120%); animation: mladder-sheen 4.5s ease-in-out infinite;
   }
   .liquid-svg {
-    position: absolute; z-index: 3; inset: -10px -10% -3px;
-    width: 120%; height: calc(100% + 18px); overflow: visible;
+    position: absolute; z-index: 3; left: -10%; right: -10%; bottom: -3px;
+    /* Perceptual floor: keeps measured rungs visibly liquid without changing the score scale. */
+    width: 120%; height: clamp(18px, calc(16px + var(--fill, 0) * 0.95px), 108px); overflow: visible;
     transform-origin: 50% 14px;
     will-change: transform;
     pointer-events: none;
@@ -290,6 +316,8 @@ const rungDefinitions = {
   @keyframes mladder-sheen { 0%, 60%, 100% { transform: translateX(-120%); } 80% { transform: translateX(120%); } }
   @media (max-width: 720px) {
     .mladder { grid-template-columns: 1fr; gap: 0.55rem; align-items: stretch; }
+    .col { min-height: auto; }
+    .card { min-height: auto; }
     .riser { height: 10px !important; }
     .col:nth-last-child(-n+2) .info-tip,
     .info-tip { left: 50%; right: auto; width: min(18rem, calc(100vw - 2.5rem)); transform: translateX(-36%) translateY(-5px) scale(0.98); }
@@ -310,7 +338,7 @@ const rungDefinitions = {
 
 <script>
   // Motion self-contained de la primitiva: los peldaños suben en secuencia + count-up.
-  // El pedestal-líquido NO se anima (estático/lleno siempre → nunca colapsa). Robusto:
+  // El pedestal-líquido codifica score 0-100 y NO colapsa durante motion. Robusto:
   // fail-safe global + reduced-motion + bien bajo el fold. Soporta múltiples instancias.
   import gsap from 'gsap'
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -430,6 +458,6 @@ const rungDefinitions = {
       entries.forEach((e) => { if (e.isIntersecting) { play(); io.disconnect() } })
     }, { threshold: 0.15 })
     io.observe(ladder)
-    window.setTimeout(() => { if (!played) gsap.set(cols, { clearProps: 'all' }) }, 3500)
+    window.setTimeout(() => { if (!played) gsap.set(cols, { clearProps: 'opacity,transform' }) }, 3500)
   })
 </script>

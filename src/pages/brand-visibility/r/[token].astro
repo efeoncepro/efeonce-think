@@ -3,11 +3,15 @@
 export const prerender = false
 
 import BaseLayout from '@layouts/BaseLayout.astro'
+import { GREENHOUSE_API_BASE } from 'astro:env/server'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import EngineMark from '@/components/EngineMark.astro'
+import EngineAvatarGroup from '@/components/primitives/EngineAvatarGroup.astro'
+import ReportIcon from '@/components/primitives/ReportIcon.astro'
 import MaturityLadder from '@/components/primitives/MaturityLadder.astro'
 import CompetitiveBenchmark from '@/components/CompetitiveBenchmark.astro'
 import { fetchPublicReport } from '@lib/report'
+import { buildCopyrightNotice } from '@lib/legal'
 import { axis, severityMeta, LEVEL_COPY } from '@lib/report-tokens'
 import type { LadderRung } from '@lib/primitives/ladder'
 
@@ -40,6 +44,14 @@ interface ReadinessAxis {
   dimensions?: { key: string; label: string; score: number | null; severity: Sev; status: string }[]
 }
 interface Readiness { scoreVersion?: string; structural?: ReadinessAxis; agentic?: ReadinessAxis }
+interface SentimentSummary {
+  positive?: number
+  neutral?: number
+  negative?: number
+  mixed?: number
+  evaluated?: number
+  net?: 'positivo' | 'neutral' | 'negativo' | 'mixto' | 'sin_dato' | string
+}
 
 const ENGINE_LABEL: Record<string, string> = {
   gemini: 'Gemini', google_ai_overview: 'Google AI Overview', google_ai_mode: 'Google AI Mode',
@@ -48,8 +60,15 @@ const ENGINE_LABEL: Record<string, string> = {
 
 const ok = result.status === 'ok'
 const model = ok ? (result.model as Record<string, any>) : null
+const publicReport = ok ? (result.report as Record<string, any> | null | undefined) : null
 const header = ok ? result.header : null
 const organizationName = header?.organizationName ?? 'tu marca'
+const reportDisplayId =
+  (ok && typeof result.runPublicId === 'string' && result.runPublicId.trim())
+    ? result.runPublicId.trim()
+    : token === 'mock-token'
+      ? 'EO-GRUN-1329'
+      : null
 
 const headline = model?.headline as { frame?: string } | undefined
 const gate = model?.gate as { status?: string; reason?: string; nextAction?: string } | undefined
@@ -90,20 +109,31 @@ const categorySummary = (model?.categoryTaxonomySummary as CategorySummary | und
 const categoryRows = categorySummary?.status && categorySummary.status !== 'unknown' ? (categorySummary.categories ?? []).slice(0, 5) : []
 const readiness = (model?.readiness as Readiness | null | undefined) ?? null
 const readinessAxes = [readiness?.agentic, readiness?.structural].filter((axis): axis is ReadinessAxis => !!axis)
+const sentimentFromPayload = (model?.sentimentSummary ?? publicReport?.sentimentSummary) as SentimentSummary | undefined
+const sentiment =
+  sentimentFromPayload ??
+  (token === 'mock-token'
+    ? ({ positive: 13, neutral: 7, mixed: 3, negative: 2, evaluated: 25, net: 'positivo' } satisfies SentimentSummary)
+    : ({ positive: 0, neutral: 0, negative: 0, mixed: 0, evaluated: 0, net: 'sin_dato' } satisfies SentimentSummary))
 const disclaimer = (model?.disclaimer as string) ?? ''
 
 // Roster canónico de motores: siempre mostramos los 5 principales (incl. Claude). Los que
 // no vinieron en el snapshot de este análisis se marcan "Sin datos" (honesto, consistente
 // con el banner de informe parcial) — distinto de "Sin mención" (consultado, 0 menciones).
 const ENGINE_ROSTER = ['gemini', 'chatgpt', 'claude', 'perplexity', 'google_ai_overview']
+const normalizeProvider = (provider: string) => {
+  if (provider === 'openai') return 'chatgpt'
+  if (provider === 'anthropic') return 'claude'
+  return provider
+}
 const findEngine = (p: string) => engines.find((e) => e.provider === p || (p === 'chatgpt' && e.provider === 'openai'))
 const rosterEngines = ENGINE_ROSTER.map((p) => {
   const f = findEngine(p)
   return { provider: p, present: f ? f.present : null, resolved: f ? f.resolved : null }
 })
 const extraEngines = engines
-  .filter((e) => !ENGINE_ROSTER.includes(e.provider) && e.provider !== 'openai')
-  .map((e) => ({ provider: e.provider, present: e.present, resolved: e.resolved }))
+  .filter((e) => !ENGINE_ROSTER.includes(normalizeProvider(e.provider)) && e.provider !== 'openai')
+  .map((e) => ({ provider: normalizeProvider(e.provider), present: e.present, resolved: e.resolved }))
 const allEngines = [...rosterEngines, ...extraEngines]
 
 const sov = model?.competitiveSov as { competitors?: { name: string; mentions: number }[]; brandMentions?: number } | undefined
@@ -114,14 +144,23 @@ const hasBenchmark = !!(sov && (sov.competitors?.length || citation?.findingsWit
 // Nombres cortos para que las etiquetas del radar no se encimen.
 const RADAR_SHORT: Record<string, string> = {
   'AI Visibility': 'Visibilidad', 'Entity Clarity': 'Claridad', 'Category Ownership': 'Categoría',
-  'Competitive Share of Voice': 'Share of Voice', 'Citation Quality': 'Citas',
+  'Competitive Share of Voice': 'SoV', 'Citation Quality': 'Citabilidad',
   'Message Alignment': 'Mensaje', 'Revenue Intent Coverage': 'Intención',
 }
+const DIMENSION_LABEL: Record<string, string> = {
+  'AI Visibility': 'Visibilidad en IA',
+  'Entity Clarity': 'Claridad de entidad',
+  'Category Ownership': 'Dominio de categoría',
+  'Competitive Share of Voice': 'Share of Voice (SoV)',
+  'Citation Quality': 'Citabilidad',
+  'Message Alignment': 'Alineación del mensaje',
+  'Revenue Intent Coverage': 'Cobertura de intención comercial',
+}
+const dimensionLabel = (label: string) => DIMENSION_LABEL[label] ?? label
 const radarDims = dimensions.filter((d) => d.score !== null).map((d) => ({ name: RADAR_SHORT[d.label] ?? d.label, score: Math.round(d.score as number) }))
 const hasRadar = radarDims.length >= 3
 
 const sev = severityMeta(overallSeverity)
-const axisLabel = (axisId: string) => axisId === 'agentic' ? 'Operabilidad agéntica' : 'Base técnica'
 const categoryLabel = (label: NonNullable<CategorySummary['categories']>[number]['label']) =>
   typeof label === 'string' ? label : label?.es ?? label?.en ?? 'Categoría detectada'
 const sourceClassLabel: Record<string, string> = {
@@ -129,6 +168,18 @@ const sourceClassLabel: Record<string, string> = {
   competitor: 'Competidor',
   third_party: 'Tercero',
   ugc: 'UGC/comunidad'
+}
+const sourceClassTone = (classification?: string) => {
+  switch (classification) {
+    case 'own_domain':
+      return { bg: axis.success[100], fg: axis.success[700] }
+    case 'competitor':
+      return { bg: axis.error[100], fg: axis.error[700] }
+    case 'ugc':
+      return { bg: axis.warning[100], fg: axis.warning[700] }
+    default:
+      return { bg: axis.gray[100], fg: axis.gray[800] }
+  }
 }
 
 const findDimension = (label: string) => dimensions.find((d) => d.label === label)
@@ -144,18 +195,202 @@ const criticalDimensions = dimensions
 const unmeasuredDimensions = dimensions.filter((d) => d.score === null)
 const partialReason =
   gate?.status === 'partial'
-    ? 'Score basado en motores de respuesta que respondieron; operabilidad sigue en cobertura.'
+    ? 'Puntaje calculado con los motores que respondieron; la capacidad de acción sigue en revisión.'
     : null
+
+const resolvedTotal = allEngines.reduce((sum, engine) => sum + (engine.resolved ?? 0), 0)
+const presentTotal = allEngines.reduce((sum, engine) => sum + (engine.present ?? 0), 0)
+const measuredEngineCount = allEngines.filter((engine) => engine.resolved !== null).length
+const engineEvidenceRate = resolvedTotal > 0 ? Math.round((presentTotal / resolvedTotal) * 100) : null
+const ownDomainCitations = topSourceDomains
+  .filter((source) => source.classification === 'own_domain')
+  .reduce((sum, source) => sum + source.count, 0)
+const totalCitations = sourceBreakdown?.totalCitations ?? topSourceDomains.reduce((sum, source) => sum + source.count, 0)
+const ownDomainSharePct = totalCitations > 0 ? Math.round((ownDomainCitations / totalCitations) * 100) : null
+const thirdPartyCitationCount = topSourceDomains
+  .filter((source) => source.classification === 'third_party' || source.classification === 'ugc')
+  .reduce((sum, source) => sum + source.count, 0)
+const competitorCitationCount = topSourceDomains
+  .filter((source) => source.classification === 'competitor')
+  .reduce((sum, source) => sum + source.count, 0)
+const agenticCoverageText = readiness?.agentic?.coverage
+  ? `${readiness.agentic.coverage.measured}/${readiness.agentic.coverage.probed}`
+  : '—'
+const agenticReadiness = readiness?.agentic ?? readinessAxes.find((readinessAxis) => readinessAxis.axis === 'agentic')
+const structuralReadiness = readiness?.structural ?? readinessAxes.find((readinessAxis) => readinessAxis.axis === 'structural')
+const agenticReadinessScore = agenticReadiness?.overallScore ?? null
+const structuralReadinessScore = structuralReadiness?.overallScore ?? null
+const readinessActionGap =
+  agenticReadinessScore !== null && structuralReadinessScore !== null
+    ? Math.round(structuralReadinessScore - agenticReadinessScore)
+    : null
+const agenticReadinessMeta = severityMeta(agenticReadiness?.severity ?? 'sin_dato')
+const structuralReadinessMeta = severityMeta(structuralReadiness?.severity ?? 'sin_dato')
+const agenticCoverage = agenticReadiness?.coverage ?? null
+const structuralCoverage = structuralReadiness?.coverage ?? null
+const agenticCoverageLabel = agenticCoverage ? `${agenticCoverage.measured}/${agenticCoverage.probed}` : '—'
+const structuralCoverageLabel = structuralCoverage ? `${structuralCoverage.measured}/${structuralCoverage.probed}` : '—'
+const readinessGapLabel =
+  readinessActionGap === null
+    ? 'Brecha en cobertura'
+    : readinessActionGap > 0
+      ? `Brecha de acción: -${readinessActionGap} pts`
+      : readinessActionGap < 0
+        ? `Acción sobre base: +${Math.abs(readinessActionGap)} pts`
+        : 'Base y acción alineadas'
+const readinessGapTone =
+  readinessActionGap === null
+    ? { bg: axis.gray[100], fg: axis.gray[600], border: axis.gray[200] }
+    : readinessActionGap >= 20
+      ? { bg: axis.warning[100], fg: axis.warning[700], border: axis.warning[500] }
+      : readinessActionGap > 0
+        ? { bg: axis.gray[100], fg: axis.accent[700], border: axis.accent[500] }
+        : { bg: axis.success[100], fg: axis.success[700], border: axis.success[500] }
+const readinessFlow = [
+  {
+    label: 'Leer el sitio',
+    value: structuralReadinessScore !== null ? `${structuralReadinessScore}/100` : 'En cobertura',
+    detail: 'La base técnica permite interpretar estructura y contenido.',
+    color: structuralReadinessMeta.border,
+    icon: 'read',
+  },
+  {
+    label: 'Validar evidencia',
+    value: agenticCoverageLabel,
+    detail: 'Pruebas con señal medible para que un agente pueda avanzar.',
+    color: axis.accent[500],
+    icon: 'validate',
+  },
+  {
+    label: 'Ejecutar acción',
+    value: agenticReadinessScore !== null ? `${agenticReadinessScore}/100` : 'En cobertura',
+    detail: 'Rutas y señales para que un agente avance una tarea.',
+    color: agenticReadinessMeta.border,
+    icon: 'act',
+  },
+] as const
+const sentimentCounts = {
+  positive: Math.max(0, sentiment?.positive ?? 0),
+  neutral: Math.max(0, sentiment?.neutral ?? 0),
+  mixed: Math.max(0, sentiment?.mixed ?? 0),
+  negative: Math.max(0, sentiment?.negative ?? 0),
+}
+const sentimentEvaluated = Math.max(
+  0,
+  sentiment?.evaluated ?? sentimentCounts.positive + sentimentCounts.neutral + sentimentCounts.mixed + sentimentCounts.negative,
+)
+const sentimentNet = (sentiment?.net ?? 'sin_dato') as NonNullable<SentimentSummary['net']>
+const hasSentiment = sentimentEvaluated > 0 && sentimentNet !== 'sin_dato'
+const sentimentSegments = [
+  { key: 'positive', label: 'Favorables', short: '+', count: sentimentCounts.positive, color: axis.success[500], bg: axis.success[100] },
+  { key: 'neutral', label: 'Neutrales', short: '=', count: sentimentCounts.neutral, color: axis.gray[600], bg: axis.gray[100] },
+  { key: 'mixed', label: 'Mixtas', short: '±', count: sentimentCounts.mixed, color: axis.warning[500], bg: axis.warning[100] },
+  { key: 'negative', label: 'Negativas', short: '−', count: sentimentCounts.negative, color: axis.error[500], bg: axis.error[100] },
+] as const
+const sentimentPct = (count: number) => sentimentEvaluated > 0 ? Math.round((count / sentimentEvaluated) * 100) : 0
+const sentimentNetCopy: Record<string, { label: string; eyebrow: string; title: string; helper: string; color: string; bg: string }> = {
+  positivo: {
+    label: 'Positivo',
+    eyebrow: 'Señal favorable',
+    title: 'La IA tiende a hablar bien de la marca cuando la menciona.',
+    helper: 'Hay más menciones favorables que negativas en la muestra calificada.',
+    color: axis.success[700],
+    bg: axis.success[100],
+  },
+  neutral: {
+    label: 'Neutral',
+    eyebrow: 'Señal descriptiva',
+    title: 'La IA describe la marca sin una preferencia clara.',
+    helper: 'La oportunidad está en convertir presencia neutral en preferencia y recomendación.',
+    color: axis.gray[800],
+    bg: axis.gray[100],
+  },
+  mixto: {
+    label: 'Mixto',
+    eyebrow: 'Señal dividida',
+    title: 'La narrativa combina señales favorables, neutras o negativas.',
+    helper: 'Conviene alinear fuentes, claims y casos para reducir ambigüedad.',
+    color: axis.warning[700],
+    bg: axis.warning[100],
+  },
+  negativo: {
+    label: 'Negativo',
+    eyebrow: 'Riesgo narrativo',
+    title: 'La IA está asociando la marca a señales desfavorables.',
+    helper: 'Prioriza corrección de fuentes, reputación y contenido que desambigue el posicionamiento.',
+    color: axis.error[700],
+    bg: axis.error[100],
+  },
+  sin_dato: {
+    label: 'Sin dato',
+    eyebrow: 'Sin muestra suficiente',
+    title: 'No hubo menciones calificables para medir tono con confianza.',
+    helper: 'Este estado no es negativo: significa que falta muestra evaluable.',
+    color: axis.gray[600],
+    bg: axis.gray[100],
+  },
+}
+const sentimentRead = sentimentNetCopy[sentimentNet] ?? sentimentNetCopy.sin_dato
+const sentimentMentionLabel = sentimentEvaluated === 1 ? 'mención' : 'menciones'
+const sentimentConicStops = hasSentiment
+  ? (() => {
+      let cursor = 0
+      return sentimentSegments
+        .filter((segment) => segment.count > 0)
+        .map((segment) => {
+          const next = cursor + (segment.count / sentimentEvaluated) * 100
+          const stop = `${segment.color} ${cursor.toFixed(2)}% ${next.toFixed(2)}%`
+          cursor = next
+          return stop
+        })
+        .join(', ')
+    })()
+  : `${axis.gray[100]} 0% 100%`
+const sampledProviders = [...allEngines.map((engine) => engine.provider), ...(provenance?.providersSampled ?? [])]
+  .map(normalizeProvider)
+  .filter((provider, index, list) => provider && list.indexOf(provider) === index)
+const strongestEngine = [...allEngines]
+  .filter((engine) => typeof engine.present === 'number' && (engine.present ?? 0) > 0)
+  .sort((a, b) => (b.present ?? 0) - (a.present ?? 0))[0]
+const weakestEngine = [...allEngines]
+  .filter((engine) => typeof engine.resolved === 'number')
+  .sort((a, b) => (a.present ?? 0) - (b.present ?? 0))[0]
 
 // Gauge glow (dirección B)
 const R = 90
 const CIRC = Math.PI * R
 const dash = overallScore ? (overallScore / 100) * CIRC : 0
+const shareTitle = `Brand Visibility Snapshot — ${organizationName}`
+const shareSummary =
+  overallScore !== null
+    ? `score ${overallScore}/100, Share of Model IA ${engineEvidenceRate ?? '—'}% y citabilidad propia ${ownDomainSharePct ?? '—'}%`
+    : `Snapshot público de visibilidad IA para ${organizationName}`
+const shareMessageTemplate = `Medí la visibilidad de mi marca en ChatGPT, Gemini, Claude, Perplexity y Google AI Overview con el Brand Visibility Grader de Efeonce. Mi snapshot dio ${shareSummary}. Mira el informe: {{reportUrl}}. Haz el tuyo aquí: {{graderUrl}}`
+const conversionLandingUrl = 'https://efeoncepro.com/aeo-2/?utm_source=think_report&utm_medium=owned_report&utm_campaign=ai_visibility_report&utm_content=bottom_primary_cta'
+const meetingUrl = 'https://meetings.hubspot.com/efeoncepro/agenda-discovery?utm_source=think_report&utm_medium=owned_report&utm_campaign=ai_visibility_report&utm_content=bottom_meeting_cta'
+const greenhouseApiBase = (GREENHOUSE_API_BASE || 'https://greenhouse.efeoncepro.com').replace(/\/+$/, '')
+const pdfDownloadUrl = token ? `${greenhouseApiBase}/api/public/growth/ai-visibility/report/${encodeURIComponent(token)}/pdf` : null
+const footerCopyrightNotice = buildCopyrightNotice()
+const sectionNumbers = Object.fromEntries(
+  [
+    ['engine', engines.length > 0],
+    ['benchmark', hasBenchmark],
+    ['sentiment', Boolean(sentiment)],
+    ['sources', topSourceDomains.length > 0 || Boolean(sourceBreakdown?.reason)],
+    ['category', categoryRows.length > 0 || categorySummary?.status === 'needs_review'],
+    ['readiness', readinessAxes.some((readinessAxis) => readinessAxis.overallScore !== null)],
+    ['ladder', levels.length > 0],
+    ['recommendations', Boolean(primaryGap?.title)],
+    ['dimensions', dimensions.length > 0],
+  ]
+    .filter(([, active]) => active)
+    .map(([key], index) => [key, String(index + 1).padStart(2, '0')]),
+) as Record<string, string>
 ---
 
 <BaseLayout
   title={`Informe de visibilidad en respuestas de IA${header?.organizationName ? ` — ${header.organizationName}` : ''}`}
-  description={`Diagnóstico de la visibilidad de ${header?.organizationName ?? 'tu marca'} en motores de respuesta — qué tanto apareces, cómo te representan y si te citan ChatGPT, Gemini, Perplexity y más.`}
+  description={`Diagnóstico de la visibilidad de ${header?.organizationName ?? 'tu marca'} en motores de respuesta — qué tanto apareces, cómo te representan y si te citan ChatGPT, Claude, Gemini, Perplexity y Google AI Overview.`}
   noindex
 >
   {
@@ -169,31 +404,38 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         >
           <div class="relative mx-auto max-w-7xl">
             <div class="flex items-center justify-between gap-4">
-              <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:34px;width:auto" />
-              <span class="rounded-full px-3.5 py-1.5 text-xs font-medium" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.88)">
-                Informe de visibilidad en respuestas de IA
+              <a href="https://efeoncepro.com" target="_blank" rel="noopener noreferrer" aria-label="Ir a efeoncepro.com">
+                <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" class="h-10 w-auto sm:h-12" />
+              </a>
+              <span
+                class="rounded-full px-3.5 py-1.5 text-xs font-semibold tabular-nums"
+                style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.88)"
+                aria-label={reportDisplayId ? `ID del diagnóstico ${reportDisplayId}` : 'Informe de visibilidad en respuestas de IA'}
+              >
+                {reportDisplayId ?? 'Informe de visibilidad en respuestas de IA'}
               </span>
             </div>
 
             {gate?.status === 'partial' && (
               <div class="mt-8 grid gap-2 rounded-xl px-4 py-3 text-sm sm:grid-cols-[auto_1fr_auto]" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.82)">
-                <span aria-hidden="true">⚠️</span>
+                <span class="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.08em]" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.78)">Parcial</span>
                 <p><span class="font-semibold text-white">Informe parcial.</span> Algunos motores no respondieron — te mostramos solo lo que sí pudimos medir.</p>
                 <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold" style="background:rgba(255,255,255,0.11);color:rgba(255,255,255,0.86)">
-                  Operabilidad en cobertura
+                  Acción en revisión
                 </span>
               </div>
             )}
 
-            <div class="mt-8 grid items-center gap-7 pb-2 sm:mt-12 sm:grid-cols-[0.9fr_1.1fr] sm:gap-14">
-              <div class="relative mx-auto w-full max-w-[300px] sm:max-w-none" role="img" aria-label={`Visibilidad ${overallScore ?? 'sin dato'} de 100, ${sev.label}`}>
-                <svg viewBox="0 0 220 128" class="mx-auto" style="width:min(260px,70vw);height:auto">
-                  <path d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="13" stroke-linecap="round" />
-                  <path id="gauge-arc" data-dash={dash} data-circ={CIRC} d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke={sev.border} stroke-width="13" stroke-linecap="round" stroke-dasharray={`${dash} ${CIRC}`} style={`filter:drop-shadow(0 0 10px ${sev.border}aa)`} />
+            <div class="mt-8 grid items-center gap-7 pb-2 sm:mt-12 sm:grid-cols-[0.95fr_1.05fr] sm:gap-14">
+              <div class="relative mx-auto w-full max-w-[350px] sm:max-w-[390px]" role="img" aria-label={`Visibilidad ${overallScore ?? 'sin dato'} de 100, ${sev.label}`}>
+                <svg viewBox="0 0 220 128" class="mx-auto" style="width:min(350px,82vw);height:auto;overflow:visible">
+                  <path d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="15" stroke-linecap="round" />
+                  <path d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke={sev.border} stroke-width="23" stroke-linecap="round" stroke-dasharray={`${dash} ${CIRC}`} opacity="0.18" />
+                  <path id="gauge-arc" data-dash={dash} data-circ={CIRC} d="M 18 114 A 90 90 0 0 1 202 114" fill="none" stroke={sev.border} stroke-width="15" stroke-linecap="round" stroke-dasharray={`${dash} ${CIRC}`} />
                 </svg>
-                <div class="absolute inset-0 flex flex-col items-center justify-end pb-2">
-                  <span class="text-5xl font-semibold tabular-nums text-white sm:text-6xl" data-countup={overallScore ?? ''}>{overallScore ?? '—'}</span>
-                  <span class="text-xs" style="color:rgba(255,255,255,0.6)">de 100 · líderes &gt;85</span>
+                <div class="absolute inset-0 flex flex-col items-center justify-end pb-2 sm:pb-1">
+                  <span class="text-5xl font-semibold tabular-nums text-white sm:text-7xl" data-countup={overallScore ?? ''}>{overallScore ?? '—'}</span>
+                  <span class="text-xs" style="color:rgba(255,255,255,0.6)">de 100 · referencia líder &gt;85</span>
                 </div>
               </div>
               <div class="text-center sm:text-left">
@@ -231,7 +473,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           <div data-capture="report-readiness" class="report-panel grid overflow-hidden rounded-2xl bg-white shadow-xl ring-1 sm:grid-cols-2" style="--tw-ring-color:rgba(0,0,0,0.06)">
             <div class="p-5 sm:p-6">
               <div class="flex items-center justify-between gap-3">
-                <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Percepción medida · ¿te mencionan?</p>
+                <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Presencia en IA · ¿te mencionan?</p>
                 <span class="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold" style={`background:${axis.accent[500]}16;color:${axis.accent[700]}`}>Medido</span>
               </div>
               <div class="mt-1.5 flex items-baseline gap-1">
@@ -244,7 +486,7 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             </div>
             <div class="border-t p-5 sm:border-t-0 sm:border-l sm:p-6" style={`border-color:${axis.gray[100]}`}>
               <div class="flex items-center justify-between gap-3">
-                <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Operabilidad · ¿te pueden usar?</p>
+                <p class="text-xs font-medium" style={`color:${axis.gray[600]}`}>Capacidad de acción · ¿te pueden usar?</p>
                 <span class="rounded-full px-2 py-0.5 text-[0.68rem] font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[600]}`}>{agenticScore !== null ? 'Medido' : 'Cobertura'}</span>
               </div>
               {agenticScore !== null ? (
@@ -269,23 +511,101 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         </div>
 
         <main class="mx-auto max-w-7xl px-6">
-          {/* ══ METHOD BAND ══ */}
+          {/* ══ AUDIT SUMMARY ══ */}
           <section class="py-10" data-capture="report-method">
-            <div class="report-panel grid gap-4 rounded-2xl border bg-white p-5 sm:grid-cols-3 sm:p-6" style={`border-color:${axis.gray[100]}`}>
-              <div>
-                <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Muestra del diagnóstico</p>
+            <div class="audit-workbench report-panel overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+              <div class="grid gap-0 lg:grid-cols-[1.05fr_1.45fr]">
+                <div class="audit-context p-5 sm:p-6" style={`background:${axis.gray[50]}99;border-color:${axis.gray[100]}`}>
+                  <p class="eyebrow" style={`color:${axis.accent[500]}`}>AEO / GEO · Answer engine audit</p>
+                  <h2 class="mt-2 text-2xl font-semibold text-balance" style={`color:${axis.gray[900]};line-height:1.15`}>
+                    Resumen ejecutivo de evidencia
+                  </h2>
+                  <p class="mt-3 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>
+                    Lectura ejecutiva del snapshot: Share of Model (SoM), citabilidad, motores medidos y capacidad de acción del sitio. Cada término técnico queda anclado a evidencia pública.
+                  </p>
+                  <div class="mt-5 grid gap-2 text-sm">
+                    <div class="audit-signal-row flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2 ring-1" style={`--tw-ring-color:${axis.gray[100]}`}>
+                      <span class="audit-signal-label" style={`color:${axis.gray[600]}`}><ReportIcon name="signal" size={15} />Motor con mejor presencia</span>
+                      {strongestEngine ? (
+                        <strong class="audit-engine-signal" style={`color:${axis.gray[900]}`}>
+                          <EngineMark provider={strongestEngine.provider} label={ENGINE_LABEL[strongestEngine.provider] ?? strongestEngine.provider} size={18} />
+                          <span class="truncate">{ENGINE_LABEL[strongestEngine.provider] ?? strongestEngine.provider}</span>
+                        </strong>
+                      ) : (
+                        <strong style={`color:${axis.gray[900]}`}>—</strong>
+                      )}
+                    </div>
+                    <div class="audit-signal-row flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2 ring-1" style={`--tw-ring-color:${axis.gray[100]}`}>
+                      <span class="audit-signal-label" style={`color:${axis.gray[600]}`}><ReportIcon name="engines" size={15} />Mayor brecha por motor</span>
+                      {weakestEngine ? (
+                        <strong class="audit-engine-signal" style={`color:${axis.gray[900]}`}>
+                          <EngineMark provider={weakestEngine.provider} label={ENGINE_LABEL[weakestEngine.provider] ?? weakestEngine.provider} size={18} />
+                          <span class="truncate">{ENGINE_LABEL[weakestEngine.provider] ?? weakestEngine.provider}</span>
+                        </strong>
+                      ) : (
+                        <strong style={`color:${axis.gray[900]}`}>—</strong>
+                      )}
+                    </div>
+                    <div class="audit-signal-row flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2 ring-1" style={`--tw-ring-color:${axis.gray[100]}`}>
+                      <span class="audit-signal-label" style={`color:${axis.gray[600]}`}><ReportIcon name="readiness" size={15} />Capacidad de acción</span>
+                      <strong style={`color:${axis.gray[900]}`}>{agenticScore !== null ? `${agenticScore}/100` : 'En cobertura'}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid gap-0 sm:grid-cols-2 xl:grid-cols-4">
+                  <div class="audit-metric border-b p-5 sm:border-r xl:border-b-0" style={`border-color:${axis.gray[100]}`}>
+                    <div class="metric-heading" style={`color:${axis.gray[600]}`}>
+                      <p class="eyebrow-sub">Share of Model IA</p>
+                      <span class="report-icon-badge" style={`--icon-color:${axis.accent[500]}`}><ReportIcon name="signal" size={16} /></span>
+                    </div>
+                    <p class="mt-2 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{engineEvidenceRate ?? '—'}{engineEvidenceRate !== null && <span class="text-base" style={`color:${axis.gray[400]}`}>%</span>}</p>
+                    <p class="mt-1 text-xs leading-relaxed" style={`color:${axis.gray[600]}`}>{presentTotal}/{resolvedTotal || '—'} respuestas evaluables mencionan la marca.</p>
+                  </div>
+                  <div class="audit-metric border-b p-5 xl:border-b-0 xl:border-r" style={`border-color:${axis.gray[100]}`}>
+                    <div class="metric-heading" style={`color:${axis.gray[600]}`}>
+                      <p class="eyebrow-sub">Motores medidos</p>
+                      <span class="report-icon-badge" style={`--icon-color:${axis.accent[500]}`}><ReportIcon name="engines" size={16} /></span>
+                    </div>
+                    <p class="mt-2 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{measuredEngineCount}<span class="text-base" style={`color:${axis.gray[400]}`}>/{allEngines.length}</span></p>
+                    <p class="mt-1 text-xs leading-relaxed" style={`color:${axis.gray[600]}`}>No confunde ausencia de datos con ausencia de marca.</p>
+                  </div>
+                  <div class="audit-metric border-b p-5 sm:border-r sm:border-b-0 xl:border-r" style={`border-color:${axis.gray[100]}`}>
+                    <div class="metric-heading" style={`color:${axis.gray[600]}`}>
+                      <p class="eyebrow-sub">Citabilidad propia</p>
+                      <span class="report-icon-badge" style={`--icon-color:${axis.accent[500]}`}><ReportIcon name="citation" size={16} /></span>
+                    </div>
+                    <p class="mt-2 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{ownDomainSharePct ?? '—'}{ownDomainSharePct !== null && <span class="text-base" style={`color:${axis.gray[400]}`}>%</span>}</p>
+                    <p class="mt-1 text-xs leading-relaxed" style={`color:${axis.gray[600]}`}>{ownDomainCitations}/{totalCitations || '—'} citas vienen del sitio propio.</p>
+                  </div>
+                  <div class="audit-metric p-5">
+                    <div class="metric-heading" style={`color:${axis.gray[600]}`}>
+                      <p class="eyebrow-sub">Agentic readiness</p>
+                      <span class="report-icon-badge" style={`--icon-color:${axis.accent[500]}`}><ReportIcon name="readiness" size={16} /></span>
+                    </div>
+                    <p class="mt-2 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{agenticCoverageText}</p>
+                    <p class="mt-1 text-xs leading-relaxed" style={`color:${axis.gray[600]}`}>Pruebas con evidencia medible.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid gap-4 border-t p-5 sm:grid-cols-3 sm:p-6" style={`border-color:${axis.gray[100]}`}>
+                <div>
+                <p class="inline-section-label" style={`color:${axis.gray[600]}`}><ReportIcon name="sample" size={15} />Muestra del diagnóstico</p>
                 <p class="mt-1 text-xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{provenance?.promptCount ?? '—'}</p>
                 <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>prompts evaluados</p>
               </div>
               <div>
-                <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Motores muestreados</p>
-                <p class="mt-1 text-xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{provenance?.providersSampled?.length ?? engines.length}</p>
-                <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>{(provenance?.providersSampled ?? engines.map((engine) => engine.provider)).map((provider) => ENGINE_LABEL[provider] ?? provider).join(' · ')}</p>
+                <p class="inline-section-label" style={`color:${axis.gray[600]}`}><ReportIcon name="engines" size={15} />Motores muestreados</p>
+                <div class="mt-2">
+                  <EngineAvatarGroup providers={sampledProviders} size="sm" />
+                </div>
               </div>
               <div>
-                <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Corte de evidencia</p>
+                <p class="inline-section-label" style={`color:${axis.gray[600]}`}><ReportIcon name="calendar" size={15} />Corte de evidencia</p>
                 <p class="mt-1 text-xl font-semibold" style={`color:${axis.gray[900]}`}>{header?.reportDate ?? '—'}</p>
-                <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>snapshot público tokenizado</p>
+                <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>snapshot público seguro</p>
+              </div>
               </div>
             </div>
           </section>
@@ -293,35 +613,64 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ 01 · EVIDENCIA POR MOTOR ══ */}
           {engines.length > 0 && (
             <section class="py-16" data-capture="report-engine-coverage">
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>01 · Cobertura capturada</p>
-              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Qué motores de respuesta mencionan a {organizationName}</h2>
-              <p class="section-lead" style={`color:${axis.gray[600]}`}>Separamos menciones reales, ausencia de mención y motores que no respondieron. Así el diagnóstico no confunde una consulta sin resultado con una medición que aún está en cobertura.</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.engine} · Cobertura capturada</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Share of Model (SoM) por motor</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>El SoM muestra qué tan presente está tu marca en cada motor evaluado: menciones sobre respuestas resueltas, sin mezclar respuestas no disponibles. Así ves qué modelo ya te reconoce y dónde la señal todavía se pierde.</p>
+              <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                <div class="report-card rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]}`}>
+                  <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Menciones</p>
+                  <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{presentTotal}</p>
+                  <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>sobre {resolvedTotal || '—'} respuestas resueltas</p>
+                </div>
+                <div class="report-card rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]}`}>
+                  <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>SoM capturado</p>
+                  <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{engineEvidenceRate ?? '—'}{engineEvidenceRate !== null && <span class="text-sm" style={`color:${axis.gray[400]}`}>%</span>}</p>
+                  <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>presencia agregada en respuestas resueltas</p>
+                </div>
+                <div class="report-card rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]}`}>
+                  <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Motores con evidencia</p>
+                  <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{measuredEngineCount}/{allEngines.length}</p>
+                  <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>motores con respuesta evaluable</p>
+                </div>
+              </div>
               <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
-                <div class="hidden grid-cols-[1.35fr_0.85fr_1.2fr] border-b px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] sm:grid" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
+                <div class="hidden grid-cols-[1.1fr_0.72fr_1.35fr_1fr] gap-4 border-b px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] md:grid" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
                   <span>Motor</span>
                   <span class="text-right">Menciones</span>
+                  <span>Cobertura</span>
                   <span class="text-right">Estado</span>
                 </div>
                 <ul role="list">
                   {allEngines.map((e) => {
                     const label = ENGINE_LABEL[e.provider] ?? e.provider
                     const presentCount = e.present ?? 0
+                    const resolvedCount = e.resolved ?? 0
+                    const rowRate = resolvedCount > 0 ? Math.round((presentCount / resolvedCount) * 100) : null
                     const stateText = e.resolved === null ? 'Sin datos' : e.resolved === 0 ? 'Sin respuestas evaluables' : presentCount > 0 ? 'Mención detectada' : 'Sin mención'
                     const mentionText = e.resolved === null ? '—' : `${presentCount}/${e.resolved}`
                     const stateBg = e.resolved === null || e.resolved === 0 ? axis.gray[50] : presentCount > 0 ? axis.success[100] : axis.gray[100]
                     const stateColor = e.resolved === null || e.resolved === 0 ? axis.gray[600] : presentCount > 0 ? axis.success[700] : axis.gray[600]
                     return (
-                      <li class="data-row grid gap-3 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[1.35fr_0.85fr_1.2fr] sm:items-center" style={`border-color:${axis.gray[100]}`}>
+                      <li class="engine-row data-row grid gap-3 border-b px-5 py-4 last:border-b-0 md:grid-cols-[1.1fr_0.72fr_1.35fr_1fr] md:items-center" style={`border-color:${axis.gray[100]}`}>
                         <div class="flex items-center gap-3">
                           <EngineMark provider={e.provider} label={label} />
                           <span class="font-semibold" style={`color:${axis.gray[900]}`}>{label}</span>
                         </div>
-                        <div class="flex items-baseline justify-between gap-3 sm:block sm:text-right">
-                          <span class="text-xs font-semibold uppercase tracking-[0.08em] sm:hidden" style={`color:${axis.gray[600]}`}>Menciones</span>
+                        <div class="flex items-baseline justify-between gap-3 md:block md:text-right">
+                          <span class="text-xs font-semibold uppercase tracking-[0.08em] md:hidden" style={`color:${axis.gray[600]}`}>Menciones</span>
                           <span class="text-sm font-semibold tabular-nums" style={`color:${e.present && e.present > 0 ? axis.success[700] : axis.gray[600]}`}>{mentionText}</span>
                         </div>
-                        <div class="flex justify-between gap-3 sm:justify-end">
-                          <span class="text-xs font-semibold uppercase tracking-[0.08em] sm:hidden" style={`color:${axis.gray[600]}`}>Estado</span>
+                        <div class="min-w-0">
+                          <div class="flex items-center justify-between gap-3 md:hidden">
+                            <span class="text-xs font-semibold uppercase tracking-[0.08em]" style={`color:${axis.gray[600]}`}>Cobertura</span>
+                            <span class="text-xs font-semibold tabular-nums" style={`color:${axis.gray[600]}`}>{rowRate ?? '—'}{rowRate !== null ? '%' : ''}</span>
+                          </div>
+                          <div class="mt-1 h-2 overflow-hidden rounded-full md:mt-0" style={`background:${axis.gray[100]}`}>
+                            <div data-bar class="h-full rounded-full" style={`width:${rowRate ?? 0}%;background:${rowRate === null ? axis.gray[200] : rowRate > 0 ? axis.accent[500] : axis.gray[200]}`}></div>
+                          </div>
+                        </div>
+                        <div class="flex justify-between gap-3 md:justify-end">
+                          <span class="text-xs font-semibold uppercase tracking-[0.08em] md:hidden" style={`color:${axis.gray[600]}`}>Estado</span>
                           <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${stateBg};color:${stateColor}`}>{stateText}</span>
                         </div>
                       </li>
@@ -332,42 +681,162 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             </section>
           )}
 
-          {/* ══ 02 · FUENTES CITADAS ══ */}
+          {/* ══ 02 · BENCHMARK DE COMPETENCIA ══ */}
+          {hasBenchmark && (
+            <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.benchmark} · Posición competitiva</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Share of Voice (SoV): tu cuota de conversación en IA</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Después de medir en qué motores apareces, comparamos cuánto espacio ocupa tu marca frente al set competitivo: quién lidera, qué tan lejos estás y cuánta de esa visibilidad se sostiene con tu propio sitio.</p>
+              <div class="mt-5">
+                <CompetitiveBenchmark
+                  brandName={organizationName}
+                  brandMentions={sov?.brandMentions ?? 0}
+                  competitors={sov?.competitors ?? []}
+                  ownDomainShare={citation?.ownDomainShare ?? null}
+                  findingsWithCitations={citation?.findingsWithCitations ?? 0}
+                  findingsCitingOwnDomain={citation?.findingsCitingOwnDomain ?? 0}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* ══ 03 · TONO DE MENCIÓN ══ */}
+          {sentiment && (
+            <section class="border-t py-16" data-capture="report-sentiment" style={`border-color:${axis.gray[100]}`}>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.sentiment} · Tono de mención</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Cómo te describen los motores cuando apareces</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>No basta con aparecer: importa el sentiment con que la IA habla de la marca. Mostramos el tono como agregado público, sin exponer respuestas crudas.</p>
+
+              <div class="sentiment-panel report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+                <div class="sentiment-info-wrap">
+                  <button
+                    class="sentiment-info-trigger"
+                    type="button"
+                    aria-label="Cómo se calcula el tono de mención"
+                    aria-describedby="sentiment-tooltip"
+                    aria-expanded="false"
+                  >
+                    i
+                  </button>
+                  <span class="sentiment-info-tip" id="sentiment-tooltip" role="tooltip">
+                    <span class="sentiment-info-title">Qué mide este bloque</span>
+                    <span>Clasifica las menciones evaluables hacia la marca como favorables, neutrales, mixtas o negativas. Es un agregado público: no muestra prompts, respuestas crudas ni URLs completas.</span>
+                    <span class="sentiment-info-note">Si no hay menciones calificables, el bloque queda sin dato.</span>
+                  </span>
+                </div>
+                <div class="sentiment-hero p-5 sm:p-6 lg:p-7">
+                    <div class="sentiment-orb" style={`--sentiment-conic:conic-gradient(${sentimentConicStops});--sentiment-bg:${sentimentRead.bg};--sentiment-color:${sentimentRead.color}`} role="img" aria-label={`Sentimiento ${sentimentRead.label}; ${sentimentEvaluated} ${sentimentMentionLabel} calificadas`}>
+                      <div class="sentiment-orb-core">
+                        <span class="sentiment-orb-kicker">{hasSentiment ? 'Saldo' : 'Estado'}</span>
+                        <strong>{sentimentRead.label}</strong>
+                        <span>{sentimentEvaluated} {sentimentMentionLabel}</span>
+                      </div>
+                    </div>
+
+                  <div class="sentiment-copy">
+                    <span class="sentiment-pill" style={`background:${sentimentRead.bg};color:${sentimentRead.color}`}>{sentimentRead.eyebrow}</span>
+                    <h3 style={`color:${axis.gray[900]}`}>{sentimentRead.title}</h3>
+                    <p style={`color:${axis.gray[600]}`}>{sentimentRead.helper}</p>
+                    <div class="sentiment-summary-line" style={`color:${axis.gray[600]}`}>
+                      <span>{sentimentCounts.positive} favorables</span>
+                      <span>{sentimentCounts.neutral} neutrales</span>
+                      <span>{sentimentCounts.mixed} mixtas</span>
+                      <span>{sentimentCounts.negative} negativas</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sentiment-breakdown border-t p-5 sm:p-6" style={`border-color:${axis.gray[100]}`}>
+                  <div class="sentiment-stack" aria-hidden="true">
+                    {sentimentSegments.map((segment) => (
+                      <span
+                        class={`sentiment-stack-segment sentiment-stack-${segment.key}`}
+                        style={`--segment-width:${hasSentiment ? Math.max(segment.count > 0 ? 5 : 0, sentimentPct(segment.count)) : 0}%;--segment-color:${segment.color}`}
+                      ></span>
+                    ))}
+                  </div>
+                  <div class="mt-4 grid gap-3 md:grid-cols-4">
+                    {sentimentSegments.map((segment) => (
+                      <div class="sentiment-stat rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]}`}>
+                        <span class="sentiment-stat-mark" style={`background:${segment.bg};color:${segment.color}`}>{segment.short}</span>
+                        <p class="mt-3 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{segment.count}</p>
+                        <p class="mt-1 text-xs font-semibold uppercase tracking-[0.1em]" style={`color:${axis.gray[600]}`}>{segment.label}</p>
+                        <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>{sentimentPct(segment.count)}% de la muestra calificada</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* ══ 04 · FUENTES CITADAS ══ */}
           {(topSourceDomains.length > 0 || sourceBreakdown?.reason) && (
             <section class="border-t py-16" data-capture="report-source-evidence" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>02 · Fuentes citadas</p>
-              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Fuentes que sostienen las respuestas</h2>
-              <p class="section-lead" style={`color:${axis.gray[600]}`}>Dominios citados por los motores al responder sobre {organizationName}. Mostramos dominios agregados, no URLs completas ni texto crudo de proveedores.</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.sources} · Fuentes citadas</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Mapa de citabilidad: quién alimenta la respuesta</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>En AEO/GEO, no solo importa que te nombren: importa qué fuentes cita la IA para sostener la respuesta. Mostramos dominios agregados, no URLs completas ni texto crudo de proveedores.</p>
               {topSourceDomains.length > 0 ? (
                 <div class="report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
-                  <div class="grid gap-4 border-b p-5 sm:grid-cols-3" style={`border-color:${axis.gray[100]}`}>
+                  <div class="grid gap-4 border-b p-5 sm:grid-cols-4" style={`border-color:${axis.gray[100]}`}>
                     <div>
-                      <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Citas totales</p>
+                      <p class="inline-section-label" style={`color:${axis.gray[600]}`}><ReportIcon name="citation" size={15} />Citas totales</p>
                       <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{sourceBreakdown?.totalCitations ?? '—'}</p>
                     </div>
                     <div>
-                      <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Dominios únicos</p>
+                      <p class="inline-section-label" style={`color:${axis.gray[600]}`}><ReportIcon name="domain" size={15} />Dominios únicos</p>
                       <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{sourceBreakdown?.uniqueDomains ?? topSourceDomains.length}</p>
                     </div>
                     <div>
-                      <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Lectura</p>
-                      <p class="mt-1 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>Más fuentes propias y autoritativas reducen dependencia de terceros o competidores.</p>
+                      <p class="inline-section-label" style={`color:${axis.gray[600]}`}><ReportIcon name="sourceMap" size={15} />Citabilidad propia</p>
+                      <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{ownDomainSharePct ?? '—'}{ownDomainSharePct !== null && <span class="text-sm" style={`color:${axis.gray[400]}`}>%</span>}</p>
+                    </div>
+                    <div>
+                      <p class="inline-section-label" style={`color:${axis.gray[600]}`}><ReportIcon name="dependency" size={15} />Riesgo de dependencia</p>
+                      <p class="mt-1 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{thirdPartyCitationCount} citas de terceros · {competitorCitationCount} de competidores.</p>
                     </div>
                   </div>
+                  <div class="source-header hidden border-b px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] lg:grid" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
+                    <span>Dominio</span>
+                    <span>Citas capturadas</span>
+                    <span>Motores</span>
+                    <span class="text-right">Tipo</span>
+                  </div>
                   <ul role="list">
-                    {topSourceDomains.map((source) => (
-                      <li class="data-row grid gap-3 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[1.2fr_0.45fr_1fr_0.9fr] sm:items-center" style={`border-color:${axis.gray[100]}`}>
-                        <p class="font-semibold" style={`color:${axis.gray[900]}`}>{source.domain}</p>
-                        <p class="flex justify-between text-sm tabular-nums sm:block sm:text-right" style={`color:${axis.gray[600]}`}>
-                          <span class="font-semibold uppercase tracking-[0.08em] sm:hidden">Citas</span>
-                          {source.count}
-                        </p>
-                        <p class="text-sm" style={`color:${axis.gray[600]}`}>{(source.engines ?? []).map((provider) => ENGINE_LABEL[provider] ?? provider).join(' · ') || 'Motor no especificado'}</p>
-                        <p class="sm:text-right">
-                          <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${axis.gray[100]};color:${axis.gray[800]}`}>{sourceClassLabel[source.classification ?? ''] ?? 'Fuente'}</span>
-                        </p>
-                      </li>
-                    ))}
+                    {topSourceDomains.map((source) => {
+                      const tone = sourceClassTone(source.classification)
+                      const citationShare = totalCitations > 0 ? Math.round((source.count / totalCitations) * 100) : 0
+                      const sourceEngineProviders = (source.engines ?? [])
+                        .map(normalizeProvider)
+                        .filter((provider, index, list) => provider && list.indexOf(provider) === index)
+                      return (
+                        <li class="source-row data-row grid gap-5 border-b px-5 py-5 last:border-b-0 lg:grid-cols-[minmax(12rem,0.95fr)_minmax(20rem,1.12fr)_minmax(8rem,0.52fr)_minmax(8rem,auto)] lg:items-center" style={`border-color:${axis.gray[100]}`}>
+                          <div class="min-w-0">
+                            <p class="truncate font-semibold" style={`color:${axis.gray[900]}`}>{source.domain}</p>
+                            <p class="mt-1 text-xs tabular-nums lg:hidden" style={`color:${axis.gray[600]}`}>{source.count} citas capturadas</p>
+                          </div>
+                          <div class="source-share min-w-0">
+                            <p class="text-sm font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{source.count} de {totalCitations || '—'} <span class="font-medium" style={`color:${axis.gray[600]}`}>· {citationShare}% de las citas</span></p>
+                            <div class="source-bar-track mt-2 h-2.5 overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
+                              <div data-bar class="h-full rounded-full" style={`width:${citationShare}%;background:${tone.fg}`}></div>
+                            </div>
+                          </div>
+                          <div class="source-engines min-w-0">
+                            <span class="text-xs font-semibold uppercase tracking-[0.08em] lg:hidden" style={`color:${axis.gray[600]}`}>Motores</span>
+                            <div class="mt-2 lg:mt-0">
+                              {sourceEngineProviders.length > 0 ? (
+                                <EngineAvatarGroup providers={sourceEngineProviders} size="sm" max={4} />
+                              ) : (
+                                <span class="text-sm" style={`color:${axis.gray[600]}`}>Motor no especificado</span>
+                              )}
+                            </div>
+                          </div>
+                          <p class="source-class flex justify-start lg:justify-end">
+                            <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${tone.bg};color:${tone.fg}`}>{sourceClassLabel[source.classification ?? ''] ?? 'Fuente'}</span>
+                          </p>
+                        </li>
+                      )
+                    })}
                   </ul>
                 </div>
               ) : (
@@ -379,10 +848,10 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
             </section>
           )}
 
-          {/* ══ 03 · CATEGORÍA ══ */}
+          {/* ══ 05 · CATEGORÍA ══ */}
           {(categoryRows.length > 0 || categorySummary?.status === 'needs_review') && (
             <section class="border-t py-16" data-capture="report-category-association" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>03 · Asociación con la categoría</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.category} · Asociación con la categoría</p>
               <h2 class="section-title" style={`color:${axis.gray[900]}`}>Cómo te ubican los motores de respuesta</h2>
               <p class="section-lead" style={`color:${axis.gray[600]}`}>Mostramos categorías solo cuando el diagnóstico trae señales reales. Si la categoría viene desconocida, no se inventa narrativa.</p>
               {categoryRows.length > 0 ? (
@@ -400,66 +869,89 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
               ) : (
                 <div class="report-panel mt-6 rounded-2xl border bg-white p-5" style={`border-color:${axis.gray[100]}`}>
                   <p class="font-semibold" style={`color:${axis.gray[900]}`}>Categoría en revisión</p>
-                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Hay señales de categoría, pero todavía no alcanzan un mapping público confiable.</p>
+                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Hay señales de categoría, pero todavía no alcanzan una clasificación pública confiable.</p>
                 </div>
               )}
             </section>
           )}
 
-          {/* ══ 04 · OPERABILIDAD ══ */}
+          {/* ══ 06 · OPERABILIDAD ══ */}
           {readinessAxes.some((readinessAxis) => readinessAxis.overallScore !== null) && (
             <section class="border-t py-16" data-capture="report-readiness-detail" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>04 · Operabilidad del sitio</p>
-              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Señales técnicas para que los motores puedan leerte y usarte</h2>
-              <p class="section-lead" style={`color:${axis.gray[600]}`}>Este eje es ortogonal al score de percepción: mide preparación técnica y agéntica, no popularidad ni share of voice.</p>
-              <div class="mt-6 grid gap-4 md:grid-cols-2">
-                {readinessAxes.map((readinessAxis) => {
-                  const s = severityMeta(readinessAxis.severity)
-                  return (
-                    <div class="report-panel rounded-2xl border bg-white p-5" style={`border-color:${axis.gray[100]};border-left:4px solid ${s.border}`}>
-                      <div class="flex items-start justify-between gap-4">
-                        <div>
-                          <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>{axisLabel(readinessAxis.axis)}</p>
-                          <p class="mt-1 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{readinessAxis.overallScore ?? '—'}<span class="text-base" style={`color:${axis.gray[400]}`}>/100</span></p>
-                        </div>
-                        <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${s.bg};color:${s.fg}`}>{s.label}</span>
-                      </div>
-                      {readinessAxis.coverage && (
-                        <p class="mt-3 text-sm" style={`color:${axis.gray[600]}`}>{readinessAxis.coverage.measured}/{readinessAxis.coverage.probed} pruebas con evidencia medible.</p>
-                      )}
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.readiness} · Operabilidad del sitio</p>
+              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Operabilidad: que el agente pueda actuar, no solo citar</h2>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Esta lectura separa presencia de capacidad de acción: aparecer en una respuesta no significa que un agente pueda usar tu sitio para avanzar una compra, contacto o validación.</p>
+              <div class="readiness-diagnostic report-panel mt-6 overflow-hidden rounded-2xl border bg-white" style={`border-color:${axis.gray[100]}`}>
+                <div class="readiness-diagnostic-main p-5 sm:p-6 lg:p-7">
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Brecha de acción</p>
+                      <h3 class="mt-2 text-2xl font-semibold leading-tight sm:text-3xl" style={`color:${axis.gray[900]}`}>El sitio se puede leer; todavía le cuesta ejecutar</h3>
                     </div>
-                  )
-                })}
+                    <span class="rounded-full px-3 py-1 text-xs font-semibold" style={`background:${readinessGapTone.bg};color:${readinessGapTone.fg}`}>{readinessGapLabel}</span>
+                  </div>
+
+                  <p class="mt-3 max-w-2xl text-sm leading-relaxed sm:text-base" style={`color:${axis.gray[600]}`}>
+                    La base técnica muestra señales razonables, pero la capacidad de acción queda más baja: faltan señales o rutas más claras para que un motor pase de entender el sitio a completar una acción.
+                  </p>
+
+                  <div class="readiness-flow mt-6" aria-label="Ruta de operabilidad para agentes">
+                    {readinessFlow.map((step, index) => (
+                      <div class="readiness-flow-step" style={`--step-color:${step.color}`}>
+                        <span class="readiness-flow-index">
+                          <ReportIcon name={step.icon} size={15} />
+                          <span class="sr-only">Paso {index + 1}</span>
+                        </span>
+                        <div>
+                          <p class="font-semibold" style={`color:${axis.gray[900]}`}>{step.label}</p>
+                          <p class="mt-1 text-xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{step.value}</p>
+                          <p class="mt-1 text-xs leading-relaxed" style={`color:${axis.gray[600]}`}>{step.detail}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <aside class="readiness-diagnostic-aside border-t p-5 sm:p-6 lg:border-l lg:border-t-0" style={`border-color:${axis.gray[100]}`}>
+                  <div class="readiness-metric-card" style={`--metric-color:${agenticReadinessMeta.border};--metric-bg:${agenticReadinessMeta.bg}`}>
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Capacidad de acción</p>
+                        <p class="mt-1 text-4xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{agenticReadinessScore ?? '—'}<span class="text-base" style={`color:${axis.gray[400]}`}>/100</span></p>
+                      </div>
+                      <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${agenticReadinessMeta.bg};color:${agenticReadinessMeta.fg}`}>{agenticReadinessMeta.label}</span>
+                    </div>
+                    <p class="mt-3 text-sm" style={`color:${axis.gray[600]}`}>{agenticCoverageLabel} pruebas con evidencia medible.</p>
+                    <div class="mt-4 h-2 overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
+                      <div data-bar class="h-full rounded-full" style={`width:${agenticReadinessScore ?? 0}%;background:${agenticReadinessMeta.border}`}></div>
+                    </div>
+                  </div>
+
+                  <div class="readiness-metric-card mt-4" style={`--metric-color:${structuralReadinessMeta.border};--metric-bg:${structuralReadinessMeta.bg}`}>
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Base técnica</p>
+                        <p class="mt-1 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{structuralReadinessScore ?? '—'}<span class="text-base" style={`color:${axis.gray[400]}`}>/100</span></p>
+                      </div>
+                      <span class="rounded-full px-2.5 py-1 text-xs font-semibold" style={`background:${structuralReadinessMeta.bg};color:${structuralReadinessMeta.fg}`}>{structuralReadinessMeta.label}</span>
+                    </div>
+                    <p class="mt-3 text-sm" style={`color:${axis.gray[600]}`}>{structuralCoverageLabel} pruebas con evidencia medible.</p>
+                    <div class="mt-4 h-2 overflow-hidden rounded-full" style={`background:${axis.gray[100]}`}>
+                      <div data-bar class="h-full rounded-full" style={`width:${structuralReadinessScore ?? 0}%;background:${structuralReadinessMeta.border}`}></div>
+                    </div>
+                  </div>
+                </aside>
               </div>
             </section>
           )}
 
-          {/* ══ 05 · BENCHMARK DE COMPETENCIA ══ */}
-          {hasBenchmark && (
-            <section class="border-t py-16" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>05 · Posición competitiva</p>
-              <h2 class="section-title" style={`color:${axis.gray[900]}`}>Share of voice frente al líder detectado</h2>
-              <p class="section-lead" style={`color:${axis.gray[600]}`}>Contrasta las menciones de {organizationName} con las entidades competidoras y separa dos señales distintas: aparecer en la respuesta y ser citado como fuente.</p>
-              <div class="mt-5">
-                <CompetitiveBenchmark
-                  brandName={organizationName}
-                  brandMentions={sov?.brandMentions ?? 0}
-                  competitors={sov?.competitors ?? []}
-                  ownDomainShare={citation?.ownDomainShare ?? null}
-                  findingsWithCitations={citation?.findingsWithCitations ?? 0}
-                  findingsCitingOwnDomain={citation?.findingsCitingOwnDomain ?? 0}
-                />
-              </div>
-            </section>
-          )}
-
-          {/* ══ 06 · LA ESCALERA (narrativa central) ══ */}
+          {/* ══ 07 · LA ESCALERA (narrativa central) ══ */}
           {levels.length > 0 && (
             <section class="border-t py-16" data-capture="report-ladder" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>06 · Marco de madurez</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.ladder} · Marco de madurez</p>
               <h2 class="section-title" style={`color:${axis.gray[900]}`}>La escalera de visibilidad en motores de respuesta</h2>
               <p class="section-lead max-w-3xl" style={`color:${axis.gray[600]}`}>
-                El diagnóstico organiza menciones, citas y representación en cinco niveles acumulativos: <strong style={`color:${axis.gray[900]}`}>Be Found</strong>, <strong style={`color:${axis.gray[900]}`}>Readable</strong>, <strong style={`color:${axis.gray[900]}`}>Correct</strong>, <strong style={`color:${axis.gray[900]}`}>Actionable</strong> e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong>. El primer peldaño pendiente marca dónde destrabar avance antes de optimizar niveles superiores.
+                El diagnóstico organiza menciones, citas y representación en cinco niveles del framework AEO de Efeonce: <strong style={`color:${axis.gray[900]}`}>Be Found</strong> (que te encuentre), <strong style={`color:${axis.gray[900]}`}>Readable</strong> (que te entienda), <strong style={`color:${axis.gray[900]}`}>Correct</strong> (que te describa bien), <strong style={`color:${axis.gray[900]}`}>Actionable</strong> (que pueda actuar) e <strong style={`color:${axis.gray[900]}`}>Intrinsic</strong> (que te prefiera). El primer peldaño pendiente marca dónde destrabar avance.
               </p>
               {coverageLevelCount > 0 && (
                 <p class="mt-3 max-w-2xl rounded-2xl border bg-white p-4 text-sm leading-relaxed" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
@@ -473,14 +965,17 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ BRECHA + MOVIMIENTO ══ */}
           {primaryGap?.title && (
             <section class="deferred-report-section border-t py-16" data-capture="report-recommendations" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>07 · Prioridad operativa</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.recommendations} · Prioridad operativa</p>
               <h2 class="section-title" style={`color:${axis.gray[900]}`}>La brecha que más limita el avance</h2>
-              <p class="section-lead" style={`color:${axis.gray[600]}`}>El siguiente paso se ordena desde la brecha principal del modelo: primero corregir el bloqueo de base, después expandir cobertura y autoridad.</p>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>El siguiente paso sale de la brecha principal del diagnóstico: primero resolver lo que frena la visibilidad, después ampliar cobertura, autoridad y preferencia.</p>
               <div class="report-panel mt-4 overflow-hidden rounded-2xl border bg-white" style={`border-color:${severityMeta(primaryGap.severity ?? 'critico').border}66`}>
                 <div class="p-5 sm:p-6" style={`border-left:4px solid ${severityMeta(primaryGap.severity ?? 'critico').border};background:${severityMeta(primaryGap.severity ?? 'critico').bg}`}>
-                  <span class="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold" style={`color:${severityMeta(primaryGap.severity ?? 'critico').fg}`}>Prioridad · {severityMeta(primaryGap.severity ?? 'critico').label}</span>
+                  <span class="priority-pill bg-white" style={`color:${severityMeta(primaryGap.severity ?? 'critico').fg}`}>
+                    <ReportIcon name="priority" size={15} />
+                    Prioridad · {severityMeta(primaryGap.severity ?? 'critico').label}
+                  </span>
                   <p class="mt-2 text-xl font-semibold" style={`color:${axis.gray[900]}`}>{primaryGap.title}</p>
-                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Es el foco de mayor impacto dentro de este diagnóstico.</p>
+                  <p class="mt-1 text-sm" style={`color:${axis.gray[600]}`}>Es el primer movimiento recomendado para convertir evidencia en avance.</p>
                 </div>
               </div>
               {recommendations.length > 0 && (
@@ -505,27 +1000,42 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           {/* ══ POR QUÉ OCURRE ══ */}
           {dimensions.length > 0 && (
             <section class="deferred-report-section border-t py-16" data-capture="report-dimension-detail" style={`border-color:${axis.gray[100]}`}>
-              <p class="eyebrow" style={`color:${axis.accent[500]}`}>08 · Diagnóstico técnico</p>
+              <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.dimensions} · Diagnóstico técnico</p>
               <h2 id="s-detalle" class="section-title" style={`color:${axis.gray[900]}`}>Qué explica el puntaje</h2>
-              <p class="section-lead" style={`color:${axis.gray[600]}`}>Resumen de fortalezas, brechas críticas y dimensiones sin evidencia suficiente. Los campos sin dato se mantienen fuera del cálculo visual.</p>
+              <p class="section-lead" style={`color:${axis.gray[600]}`}>Tres lecturas rápidas antes del detalle: qué sostiene el score, qué lo frena y dónde todavía no hay evidencia suficiente.</p>
               {(strongDimensions.length > 0 || criticalDimensions.length > 0 || unmeasuredDimensions.length > 0) && (
-                <div class="report-panel mt-5 overflow-hidden rounded-2xl border bg-white sm:grid sm:grid-cols-3" style={`border-color:${axis.gray[100]}`}>
+                <div class="dimension-insight-grid mt-5">
                   {strongDimensions.length > 0 && (
-                    <div class="border-b p-4 sm:border-b-0 sm:border-r" style={`border-color:${axis.gray[100]}`}>
-                      <p class="text-xs font-semibold uppercase tracking-[0.12em]" style={`color:${axis.success[700]}`}>Fortalezas</p>
-                      <p class="mt-2 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{strongDimensions.map((d) => `${d.label} ${d.score}`).join(' · ')}</p>
+                    <div class="dimension-insight-card is-strong" style={`--insight-color:${axis.success[700]};--insight-bg:${axis.success[100]};--insight-border:${axis.success[500]}`}>
+                      <span class="dimension-insight-icon" aria-hidden="true"><ReportIcon name="signal" size={16} /></span>
+                      <div class="min-w-0">
+                        <p class="dimension-insight-kicker">Fortaleza defendible</p>
+                        <p class="dimension-insight-title">{dimensionLabel(strongDimensions[0].label)} <span>{strongDimensions[0].score}</span></p>
+                        <p class="dimension-insight-copy">Señal sólida que conviene proteger y usar como base del plan.</p>
+                        {strongDimensions.length > 1 && <p class="dimension-insight-meta">También destaca: {strongDimensions.slice(1).map((d) => `${dimensionLabel(d.label)} ${d.score}`).join(' · ')}</p>}
+                      </div>
                     </div>
                   )}
                   {criticalDimensions.length > 0 && (
-                    <div class="border-b p-4 sm:border-b-0 sm:border-r" style={`border-color:${axis.gray[100]}`}>
-                      <p class="text-xs font-semibold uppercase tracking-[0.12em]" style={`color:${axis.error[700]}`}>Brechas críticas</p>
-                      <p class="mt-2 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{criticalDimensions.map((d) => `${d.label} ${d.score}`).join(' · ')}</p>
+                    <div class="dimension-insight-card is-critical" style={`--insight-color:${axis.error[700]};--insight-bg:${axis.error[100]};--insight-border:${axis.error[500]}`}>
+                      <span class="dimension-insight-icon" aria-hidden="true"><ReportIcon name="priority" size={16} /></span>
+                      <div class="min-w-0">
+                        <p class="dimension-insight-kicker">Brecha que pesa</p>
+                        <p class="dimension-insight-title">{dimensionLabel(criticalDimensions[0].label)} <span>{criticalDimensions[0].score}</span></p>
+                        <p class="dimension-insight-copy">El principal freno para convertir visibilidad en autoridad competitiva.</p>
+                        {criticalDimensions.length > 1 && <p class="dimension-insight-meta">Otros frenos: {criticalDimensions.slice(1).map((d) => `${dimensionLabel(d.label)} ${d.score}`).join(' · ')}</p>}
+                      </div>
                     </div>
                   )}
                   {unmeasuredDimensions.length > 0 && (
-                    <div class="p-4">
-                      <p class="text-xs font-semibold uppercase tracking-[0.12em]" style={`color:${axis.gray[600]}`}>Sin evidencia suficiente</p>
-                      <p class="mt-2 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{unmeasuredDimensions.map((d) => d.label).join(' · ')}</p>
+                    <div class="dimension-insight-card is-pending" style={`--insight-color:${axis.gray[600]};--insight-bg:${axis.gray[50]};--insight-border:${axis.gray[200]}`}>
+                      <span class="dimension-insight-icon" aria-hidden="true"><ReportIcon name="readiness" size={16} /></span>
+                      <div class="min-w-0">
+                        <p class="dimension-insight-kicker">Lectura pendiente</p>
+                        <p class="dimension-insight-title">{dimensionLabel(unmeasuredDimensions[0].label)}</p>
+                        <p class="dimension-insight-copy">Sin muestra suficiente: no se fuerza una conclusión.</p>
+                        {unmeasuredDimensions.length > 1 && <p class="dimension-insight-meta">También falta evidencia en: {unmeasuredDimensions.slice(1).map((d) => dimensionLabel(d.label)).join(' · ')}</p>}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -535,14 +1045,14 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                   <figure class="flex min-h-[360px] flex-col justify-center border-b p-5 lg:min-h-full lg:border-b-0 lg:border-r lg:p-6" style={`border-color:${axis.gray[100]};background:${axis.gray[50]}66`}>
                     <div id="dims-radar" data-dims={JSON.stringify(radarDims)} style="width:100%;height:320px"></div>
                     <figcaption class="mx-auto mt-3 max-w-sm text-center text-xs leading-relaxed lg:text-left" style={`color:${axis.gray[600]}`}>
-                      Radar de dimensiones medidas; las dimensiones sin dato no se grafican como cero.
+                      Radar de dimensiones medidas; lo que no tiene evidencia queda fuera del gráfico.
                     </figcaption>
                   </figure>
                 )}
                 <div class="overflow-hidden">
                   <div class="hidden grid-cols-[1.35fr_0.45fr_0.72fr_1.5fr] gap-4 border-b px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] lg:grid" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
                     <span>Dimensión</span>
-                    <span class="text-right">Score</span>
+                    <span class="text-right">Puntaje</span>
                     <span>Estado</span>
                     <span>Pregunta</span>
                   </div>
@@ -551,9 +1061,9 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
                   const s = severityMeta(dim.severity)
                   return (
                     <div class="data-row grid gap-3 border-b px-5 py-4 last:border-b-0 lg:grid-cols-[1.35fr_0.45fr_0.72fr_1.5fr] lg:items-start lg:gap-4" style={`border-color:${axis.gray[100]};border-left:3px solid ${dim.score === null ? axis.gray[200] : s.border}`}>
-                      <p class="font-semibold leading-snug" style={`color:${axis.gray[900]}`}>{dim.label}</p>
+                      <p class="font-semibold leading-snug" style={`color:${axis.gray[900]}`}>{dimensionLabel(dim.label)}</p>
                       <div class="flex items-center justify-between gap-3 lg:block lg:text-right">
-                        <span class="text-xs font-semibold uppercase tracking-[0.08em] lg:hidden" style={`color:${axis.gray[600]}`}>Score</span>
+                        <span class="text-xs font-semibold uppercase tracking-[0.08em] lg:hidden" style={`color:${axis.gray[600]}`}>Puntaje</span>
                         <span class="text-xl font-semibold tabular-nums leading-none" style={`color:${dim.score === null ? axis.gray[400] : axis.gray[900]}`}>{dim.score === null ? '—' : Math.round(dim.score)}</span>
                       </div>
                       <div>
@@ -570,40 +1080,175 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
           )}
         </main>
 
+        {/* ══ SHARE DOCK ══ */}
+        <aside
+          class="share-dock"
+          data-capture="report-share"
+          data-share-title={shareTitle}
+          data-share-template={shareMessageTemplate}
+          style={`--share-accent:${axis.accent[500]};--share-accent-dark:${axis.accent[800]};--share-border:${axis.gray[100]};--share-muted:${axis.gray[600]};--share-ink:${axis.gray[900]}`}
+          aria-label="Compartir informe"
+        >
+          <div class="share-dock-actions">
+            <button
+              class="share-dock-trigger"
+              type="button"
+              aria-controls="report-share-panel"
+              aria-expanded="false"
+              data-share-toggle
+            >
+              <span class="share-dock-icon" aria-hidden="true"><ReportIcon name="share" size={18} /></span>
+              <span class="share-dock-label">Compartir</span>
+            </button>
+
+            {pdfDownloadUrl && (
+              <a
+                class="share-dock-trigger share-dock-download"
+                href={pdfDownloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Descargar PDF del informe"
+                data-pdf-download
+              >
+                <span class="share-dock-icon" aria-hidden="true"><ReportIcon name="download" size={18} /></span>
+                <span class="share-dock-label">PDF</span>
+              </a>
+            )}
+          </div>
+
+          <div class="share-dock-panel" id="report-share-panel" data-share-panel aria-hidden="true" tabindex="-1" hidden>
+            <div class="share-dock-header">
+              <span class="share-kicker">
+                <ReportIcon name="share" size={15} />
+                Compartir diagnóstico
+              </span>
+              <button class="share-close" type="button" aria-label="Cerrar opciones de compartir" data-share-close>
+                ×
+              </button>
+            </div>
+
+            <h2 class="share-title">Comparte tu avance en AI Visibility</h2>
+            <p class="share-intro">
+              Un mensaje listo para LinkedIn, Slack o email: cuenta qué mediste, muestra evidencia y abre la puerta a que otros hagan su diagnóstico.
+            </p>
+
+            <div class="share-engine-strip" aria-label="Motores evaluados">
+              <EngineAvatarGroup providers={sampledProviders} size="sm" max={5} />
+              <span>ChatGPT · Gemini · Claude · Perplexity · Google AI Overview</span>
+            </div>
+
+            <blockquote class="share-message">
+              <p data-share-message-preview>Genera tu mensaje de share para este snapshot. El enlace corto se crea al momento de compartir.</p>
+            </blockquote>
+            <p class="share-short-link" data-share-short-link hidden></p>
+
+            <div class="share-action-grid">
+              <button class="share-button share-button-primary" type="button" data-share-action="native">
+                <ReportIcon name="share" size={17} />
+                Compartir informe
+              </button>
+              <button class="share-button" type="button" data-share-action="copy-message">
+                <ReportIcon name="copy" size={17} />
+                Copiar mensaje
+              </button>
+              <button class="share-button" type="button" data-share-action="copy-link">
+                <ReportIcon name="link" size={17} />
+                Copiar enlace
+              </button>
+            </div>
+
+            <p class="share-feedback" data-share-feedback role="status" aria-live="polite">
+              Listo para compartir.
+            </p>
+          </div>
+        </aside>
+
         {/* ══ CTA DE CONVERSIÓN (navy, bookend del hero) ══ */}
-        <section class="mt-6 px-6 py-10 sm:py-11" style={`background:linear-gradient(160deg,${axis.accent[800]} 0%,${axis.accent[900]} 100%);border-top:1px solid rgba(255,255,255,0.08)`}>
-          <div class="mx-auto flex max-w-7xl flex-col gap-6 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
-            <div class="max-w-2xl">
-              <p class="eyebrow-sub" style="color:rgba(255,255,255,0.58)">Siguiente paso</p>
-              <h2 class="mt-2 text-2xl font-semibold text-balance text-white sm:text-[1.85rem]" style="line-height:1.2">
-                Convierte este diagnóstico en avance medible
+        <section
+          data-capture="report-conversion-cta"
+          class="mt-8 px-6 pt-11 pb-28 sm:py-14"
+          style={`background:linear-gradient(155deg,${axis.accent[800]} 0%,${axis.accent[900]} 66%,#06233b 100%);border-top:1px solid rgba(255,255,255,0.08)`}
+        >
+          <div class="mx-auto grid max-w-7xl gap-7 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.62fr)] lg:items-center">
+            <div class="max-w-3xl text-center sm:text-left">
+              <p class="eyebrow-sub" style="color:rgba(255,255,255,0.62)">Siguiente paso</p>
+              <h2 class="mt-2 text-3xl font-semibold text-balance text-white sm:text-[2.25rem]" style="line-height:1.08">
+                Haz que tu marca sea la respuesta, no una alternativa más
               </h2>
-              <p class="mt-2 max-w-xl text-sm leading-relaxed text-pretty" style="color:rgba(255,255,255,0.72)">
-                Transforma la brecha priorizada en un plan de mejoras, medición y contenido para que los motores de respuesta te encuentren, te entiendan y te citen con más consistencia.
+              <p class="mt-3 max-w-2xl text-base leading-relaxed text-pretty" style="color:rgba(255,255,255,0.76)">
+                Usa este snapshot como punto de partida: completa el Brand Visibility Grader, prioriza tus brechas por motor y convierte el diagnóstico en un plan AEO/GEO de contenido, citabilidad y medición.
+              </p>
+              <div class="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs font-semibold sm:justify-start">
+                <EngineAvatarGroup providers={sampledProviders} size="sm" max={5} />
+                <span class="inline-flex items-center gap-2 rounded-full px-3 py-2" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.82);border:1px solid rgba(255,255,255,0.14)">
+                  <ReportIcon name="sample" size={14} />
+                  Diagnóstico gratis
+                </span>
+                <span class="inline-flex items-center gap-2 rounded-full px-3 py-2" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.82);border:1px solid rgba(255,255,255,0.14)">
+                  <ReportIcon name="readiness" size={14} />
+                  Plan accionable
+                </span>
+              </div>
+            </div>
+
+            <div class="rounded-2xl p-4 shadow-2xl sm:p-5" style="background:rgba(255,255,255,0.96);border:1px solid rgba(255,255,255,0.28);box-shadow:0 24px 70px rgba(0,0,0,0.22)">
+              <p class="eyebrow-sub" style={`color:${axis.accent[500]}`}>Elige cómo avanzar</p>
+              <h3 class="mt-2 text-xl font-semibold text-balance" style={`color:${axis.gray[900]}`}>Mide primero. Actúa con foco después.</h3>
+              <p class="mt-2 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>
+                Haz tu diagnóstico completo o agenda una sesión para convertir estas brechas en prioridades comerciales, contenido y señales de autoridad.
+              </p>
+              <div class="mt-5 grid gap-3">
+                <a
+                  href={conversionLandingUrl}
+                  class="press inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white"
+                  style={`background:${axis.accent[500]};box-shadow:0 14px 34px rgba(0,122,255,0.24)`}
+                >
+                  Hacer mi diagnóstico AEO
+                  <span aria-hidden="true">→</span>
+                </a>
+                <a
+                  href={meetingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="press inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
+                  style={`color:${axis.accent[800]};background:#fff;border:1px solid ${axis.gray[200]}`}
+                >
+                  <ReportIcon name="calendar" size={16} />
+                  Agendar reunión
+                </a>
+              </div>
+              <p class="mt-4 hidden text-center text-xs leading-relaxed sm:block" style={`color:${axis.gray[600]}`}>
+                Sin costo inicial · sin compromiso · pensado para equipos que quieren ganar visibilidad en motores de respuesta.
               </p>
             </div>
-            <a
-              href="https://efeoncepro.com"
-              class="press inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold sm:shrink-0"
-              style={`color:${axis.accent[800]}`}
-            >
-              Revisar el plan de visibilidad
-              <span aria-hidden="true">→</span>
-            </a>
           </div>
         </section>
 
         {/* ══ FOOTER MARCA ══ */}
-        <footer class="px-6 py-7" style="background:#1a1b1e;border-top:1px solid rgba(255,255,255,0.05)">
-          <div class="mx-auto flex max-w-7xl flex-col items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-left">
-            <div class="flex flex-col items-center gap-2 sm:items-start">
-              <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:28px;width:auto" />
+        <footer class="report-footer">
+          <div class="report-footer-shell">
+            <div class="report-footer-brand">
+              <a href="https://efeoncepro.com" target="_blank" rel="noopener noreferrer" aria-label="Ir a efeoncepro.com">
+                <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:28px;width:auto" />
+              </a>
               <EfeonceSlogan color="rgba(255,255,255,0.64)" size="0.62rem" />
             </div>
-            <div class="text-xs leading-relaxed" style="color:rgba(255,255,255,0.46)">
-              <p>Efeonce Group SpA · efeoncepro.com</p>
-              <p class="mt-1 max-w-md">{disclaimer || 'Diagnóstico agregado y público. No garantiza posiciones ni resultados.'}</p>
+            <div class="report-footer-column">
+              <p class="report-footer-kicker">Propiedad intelectual</p>
+              <p class="report-footer-strong">{footerCopyrightNotice}</p>
+              <p>Todos los derechos reservados.</p>
             </div>
+            <div class="report-footer-column report-footer-method">
+              <p class="report-footer-kicker">Método de análisis</p>
+              <p>
+                Modelo propietario de Efeonce para leer presencia, citabilidad
+                y posición competitiva en motores de respuesta.
+              </p>
+              <a href="https://efeoncepro.com" target="_blank" rel="noopener noreferrer" class="report-footer-link">Conoce más en efeoncepro.com</a>
+            </div>
+            <p class="report-footer-disclaimer">
+              {disclaimer || 'Lectura agregada y asistida por IA. Orienta decisiones; no garantiza posiciones, menciones ni resultados comerciales.'}
+            </p>
           </div>
         </footer>
       </article>
@@ -643,6 +1288,163 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
     echarts.use([RadarChart, TooltipComponent, CanvasRenderer])
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    const closeSentimentInfo = () => {
+      document.querySelectorAll<HTMLElement>('.sentiment-info-wrap.is-open').forEach((wrap) => {
+        wrap.classList.remove('is-open')
+        wrap.querySelector<HTMLButtonElement>('.sentiment-info-trigger')?.setAttribute('aria-expanded', 'false')
+      })
+    }
+
+    document.querySelectorAll<HTMLElement>('.sentiment-info-wrap').forEach((wrap) => {
+      const trigger = wrap.querySelector<HTMLButtonElement>('.sentiment-info-trigger')
+      if (!trigger) return
+
+      trigger.addEventListener('click', (event) => {
+        event.stopPropagation()
+        const shouldOpen = !wrap.classList.contains('is-open')
+        closeSentimentInfo()
+        wrap.classList.toggle('is-open', shouldOpen)
+        trigger.setAttribute('aria-expanded', String(shouldOpen))
+      })
+    })
+
+    document.addEventListener('click', (event) => {
+      const target = event.target
+      if (!(target instanceof Node) || !document.querySelector('.sentiment-info-wrap')?.contains(target)) {
+        closeSentimentInfo()
+      }
+    })
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeSentimentInfo()
+    })
+
+    const copyToClipboard = async (value: string) => {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value)
+        return
+      }
+
+      const area = document.createElement('textarea')
+      area.value = value
+      area.setAttribute('readonly', '')
+      area.style.position = 'fixed'
+      area.style.inset = '0 auto auto 0'
+      area.style.opacity = '0'
+      document.body.append(area)
+      area.select()
+      document.execCommand('copy')
+      area.remove()
+    }
+
+    document.querySelectorAll<HTMLElement>('[data-capture="report-share"]').forEach((panel) => {
+      const title = panel.dataset.shareTitle || document.title
+      const template = panel.dataset.shareTemplate || ''
+      const trigger = panel.querySelector<HTMLButtonElement>('[data-share-toggle]')
+      const sharePanel = panel.querySelector<HTMLElement>('[data-share-panel]')
+      const close = panel.querySelector<HTMLButtonElement>('[data-share-close]')
+      const preview = panel.querySelector<HTMLElement>('[data-share-message-preview]')
+      const shortLink = panel.querySelector<HTMLElement>('[data-share-short-link]')
+      const feedback = panel.querySelector<HTMLElement>('[data-share-feedback]')
+      const setFeedback = (message: string) => {
+        if (feedback) feedback.textContent = message
+      }
+      const reportShortUrl = () => {
+        const pathParts = window.location.pathname.split('/').filter(Boolean)
+        const token = pathParts[pathParts.length - 1]
+        return token ? new URL(`/r/${encodeURIComponent(token)}`, window.location.href).toString() : window.location.href
+      }
+      const graderUrl = () => new URL('/brand-visibility', window.location.href).toString()
+      const displayUrl = (value: string) => value.replace(/^https?:\/\//, '').replace(/\/$/, '')
+      const buildMessage = () => template
+        .replace('{{reportUrl}}', reportShortUrl())
+        .replace('{{graderUrl}}', graderUrl())
+      const buildDisplayMessage = () => template
+        .replace('{{reportUrl}}', displayUrl(reportShortUrl()))
+        .replace('{{graderUrl}}', displayUrl(graderUrl()))
+      const syncGeneratedMessage = () => {
+        if (preview) preview.textContent = buildDisplayMessage()
+        if (shortLink) {
+          shortLink.hidden = false
+          shortLink.textContent = `Enlace corto generado: ${displayUrl(reportShortUrl())}`
+        }
+        return buildMessage()
+      }
+      const nativeText = () => template
+        .replace('{{reportUrl}}', 'el enlace corto del informe')
+        .replace('{{graderUrl}}', 'el Brand Visibility Grader')
+      const setOpen = (nextOpen: boolean) => {
+        if (!trigger || !sharePanel) return
+
+        trigger.setAttribute('aria-expanded', String(nextOpen))
+
+        if (nextOpen) {
+          syncGeneratedMessage()
+          sharePanel.hidden = false
+          sharePanel.removeAttribute('aria-hidden')
+          requestAnimationFrame(() => {
+            sharePanel.classList.add('is-open')
+            sharePanel.focus({ preventScroll: true })
+          })
+          return
+        }
+
+        sharePanel.classList.remove('is-open')
+        sharePanel.setAttribute('aria-hidden', 'true')
+        window.setTimeout(() => {
+          if (!sharePanel.classList.contains('is-open')) sharePanel.hidden = true
+        }, reduce ? 0 : 190)
+        trigger.focus({ preventScroll: true })
+      }
+
+      trigger?.addEventListener('click', (event) => {
+        event.stopPropagation()
+        const isOpen = trigger.getAttribute('aria-expanded') === 'true'
+        setOpen(!isOpen)
+      })
+
+      close?.addEventListener('click', () => setOpen(false))
+
+      document.addEventListener('click', (event) => {
+        if (!sharePanel || sharePanel.hidden) return
+        const target = event.target
+        if (target instanceof Node && !panel.contains(target)) setOpen(false)
+      })
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sharePanel && !sharePanel.hidden) setOpen(false)
+      })
+
+      panel.querySelectorAll<HTMLButtonElement>('[data-share-action]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const action = button.dataset.shareAction
+
+          try {
+            if (action === 'native' && navigator.share) {
+              await navigator.share({
+                title,
+                text: nativeText(),
+                url: reportShortUrl(),
+              })
+              setFeedback('Informe listo para compartir desde tu navegador.')
+              return
+            }
+
+            if (action === 'copy-link') {
+              await copyToClipboard(reportShortUrl())
+              setFeedback('Enlace corto copiado.')
+              return
+            }
+
+            await copyToClipboard(syncGeneratedMessage())
+            setFeedback(action === 'native' ? 'Mensaje copiado; tu navegador no abrió el panel de compartir.' : 'Mensaje copiado.')
+          } catch {
+            setFeedback('No pudimos copiar automáticamente. Usa el texto sugerido en la tarjeta.')
+          }
+        })
+      })
+    })
 
     // ── ECharts radar de dimensiones (chart signature animado) ──
     const radarEl = document.getElementById('dims-radar')
@@ -693,9 +1495,42 @@ const dash = overallScore ? (overallScore / 100) * CIRC : 0
         gsap.fromTo(arc, { attr: { 'stroke-dasharray': `0 ${circ}` } }, { attr: { 'stroke-dasharray': `${dash} ${circ}` }, duration: 1.3, ease: 'power2.out' })
       }
 
-      // ── barras que se llenan (ejes + Share of Voice) ── (seguro: fin = ancho real)
+      // ── barras que se llenan (ejes + Share of Model) ── (seguro: fin = ancho real)
       document.querySelectorAll<HTMLElement>('[data-bar]').forEach((el) => {
         gsap.from(el, { width: 0, duration: 1, ease: 'power2.out', delay: 0.2 })
+      })
+
+      // ── Sentimiento: entrada rica + microinteracción del balance ──
+      document.querySelectorAll<HTMLElement>('.sentiment-panel').forEach((panel) => {
+        const orb = panel.querySelector<HTMLElement>('.sentiment-orb')
+        const core = panel.querySelector<HTMLElement>('.sentiment-orb-core')
+        const pill = panel.querySelector<HTMLElement>('.sentiment-pill')
+        const headline = panel.querySelector<HTMLElement>('.sentiment-copy h3')
+        const summary = panel.querySelector<HTMLElement>('.sentiment-summary-line')
+        const segments = gsap.utils.toArray<HTMLElement>(panel.querySelectorAll('.sentiment-stack-segment'))
+        const stats = gsap.utils.toArray<HTMLElement>(panel.querySelectorAll('.sentiment-stat'))
+
+        const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+        if (orb) {
+          tl.fromTo(orb, { scale: 0.92, rotate: -8, opacity: 0 }, { scale: 1, rotate: 0, opacity: 1, duration: 0.7 }, 0)
+        }
+        if (core) tl.from(core, { y: 8, opacity: 0, duration: 0.45 }, 0.16)
+        tl.from([pill, headline, summary].filter(Boolean), { y: 10, opacity: 0, duration: 0.46, stagger: 0.07 }, 0.12)
+        if (segments.length) {
+          tl.fromTo(segments, { scaleX: 0 }, { scaleX: 1, duration: 0.72, stagger: 0.08, ease: 'power3.out' }, 0.32)
+        }
+        if (stats.length) {
+          tl.from(stats, { y: 14, opacity: 0, duration: 0.42, stagger: 0.055 }, 0.5)
+        }
+
+        if (orb) {
+          const enter = () => gsap.to(orb, { y: -4, rotate: 2.2, scale: 1.018, duration: 0.22, ease: 'sine.out', overwrite: 'auto' })
+          const leave = () => gsap.to(orb, { y: 0, rotate: 0, scale: 1, duration: 0.32, ease: 'elastic.out(1, 0.55)', overwrite: 'auto' })
+          orb.addEventListener('pointerenter', enter)
+          orb.addEventListener('pointerleave', leave)
+          orb.addEventListener('focusin', enter)
+          orb.addEventListener('focusout', leave)
+        }
       })
 
       // (La escalera anima su propia entrada — motion self-contained en la primitiva MaturityLadder.)

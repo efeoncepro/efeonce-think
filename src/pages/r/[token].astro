@@ -1,0 +1,11 @@
+---
+export const prerender = false
+
+const { token } = Astro.params
+
+if (!token) {
+  return Astro.redirect('/brand-visibility')
+}
+
+return Astro.redirect(`/brand-visibility/r/${encodeURIComponent(token)}`, 302)
+---
