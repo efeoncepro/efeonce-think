@@ -5,6 +5,18 @@ import { axis } from '@lib/report-tokens'
 import ReportIcon from '@/components/primitives/ReportIcon.astro'
 
 interface Competitor { name: string; mentions: number }
+interface BenchmarkRow { name: string; mentions: number; rank: number; isBrand: boolean; deltaVsBrand: number; sharePct: number | null }
+interface BenchmarkFacts {
+  totalMentions?: number
+  brandShare?: number | null
+  brandRank?: number | null
+  leaderName?: string | null
+  leaderMentions?: number | null
+  leaderGap?: number | null
+  nextGap?: number | null
+  leaderMultiple?: number | null
+  rows?: BenchmarkRow[]
+}
 interface Props {
   brandName: string
   brandMentions: number
@@ -12,24 +24,33 @@ interface Props {
   ownDomainShare: number | null
   findingsWithCitations: number
   findingsCitingOwnDomain: number
+  benchmark?: BenchmarkFacts | null
 }
-const { brandName, brandMentions, competitors, ownDomainShare, findingsWithCitations, findingsCitingOwnDomain } = Astro.props
+const { brandName, brandMentions, competitors, ownDomainShare, findingsWithCitations, findingsCitingOwnDomain, benchmark } = Astro.props
 
-const rows = [
+const fallbackRows = [
   { name: brandName, mentions: brandMentions, isBrand: true },
   ...competitors.map((c) => ({ name: c.name, mentions: c.mentions, isBrand: false })),
 ].sort((a, b) => b.mentions - a.mentions)
+const rows = benchmark?.rows?.length ? benchmark.rows : fallbackRows.map((row, index) => ({
+  ...row,
+  rank: index + 1,
+  deltaVsBrand: row.mentions - brandMentions,
+  sharePct: null,
+}))
 const max = Math.max(1, ...rows.map((r) => r.mentions))
-const totalMentions = rows.reduce((sum, r) => sum + r.mentions, 0)
-const brandShare = totalMentions > 0 ? Math.round((brandMentions / totalMentions) * 100) : null
+const totalMentions = benchmark?.totalMentions ?? rows.reduce((sum, r) => sum + r.mentions, 0)
+const brandShare = benchmark?.brandShare ?? (totalMentions > 0 ? Math.round((brandMentions / totalMentions) * 100) : null)
 const topCompetitor = competitors.slice().sort((a, b) => b.mentions - a.mentions)[0]
 const leader = rows[0]
 const brandIndex = rows.findIndex((r) => r.isBrand)
-const brandRank = brandIndex >= 0 ? brandIndex + 1 : null
+const brandRank = benchmark?.brandRank ?? (brandIndex >= 0 ? brandIndex + 1 : null)
 const nextAbove = brandIndex > 0 ? rows[brandIndex - 1] : null
-const leaderGap = leader && !leader.isBrand ? Math.max(0, leader.mentions - brandMentions) : 0
-const nextGap = nextAbove ? Math.max(0, nextAbove.mentions - brandMentions) : 0
-const multiple = topCompetitor && brandMentions > 0 ? (topCompetitor.mentions / brandMentions).toFixed(1) : null
+const leaderGap = benchmark?.leaderGap ?? (leader && !leader.isBrand ? Math.max(0, leader.mentions - brandMentions) : 0)
+const nextGap = benchmark?.nextGap ?? (nextAbove ? Math.max(0, nextAbove.mentions - brandMentions) : 0)
+const multiple = benchmark?.leaderMultiple !== undefined && benchmark?.leaderMultiple !== null
+  ? String(benchmark.leaderMultiple)
+  : topCompetitor && brandMentions > 0 ? (topCompetitor.mentions / brandMentions).toFixed(1) : null
 const normalizedOwnDomainShare =
   ownDomainShare === null
     ? null
@@ -38,7 +59,7 @@ const brandPositionCopy =
   brandRank === 1
     ? 'Tu marca lidera el set competitivo medido.'
     : leader
-      ? `${leader.name} lidera con ${leaderGap} mención${leaderGap === 1 ? '' : 'es'} más que tú.`
+      ? `${benchmark?.leaderName ?? leader.name} lidera con ${leaderGap} mención${leaderGap === 1 ? '' : 'es'} más que tú.`
       : 'No hay líder competitivo suficiente en esta muestra.'
 const nextMoveCopy =
   brandRank === 1
@@ -123,7 +144,7 @@ const authorityCopy =
     </div>
     <div class="mt-5 flex flex-col gap-4">
       {rows.map((r, index) => {
-        const delta = r.mentions - brandMentions
+      const delta = r.deltaVsBrand ?? (r.mentions - brandMentions)
         const deltaText = r.isBrand ? 'tú' : delta > 0 ? `+${delta} vs tú` : delta < 0 ? `${delta} vs tú` : 'empatado'
         return (
         <div class={`benchmark-row data-row rounded-xl border px-3 py-3${r.isBrand ? ' is-brand' : ''}`} style={`border-color:${r.isBrand ? `${axis.accent[500]}44` : axis.gray[100]};background:${r.isBrand ? `${axis.accent[500]}08` : '#fff'}`}>

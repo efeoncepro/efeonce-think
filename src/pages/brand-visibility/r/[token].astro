@@ -52,6 +52,70 @@ interface SentimentSummary {
   evaluated?: number
   net?: 'positivo' | 'neutral' | 'negativo' | 'mixto' | 'sin_dato' | string
 }
+interface EngineCoverageProvider {
+  providerId: string
+  displayId: string
+  label: string
+  resolved: number | null
+  present: number | null
+  mentionRate: number | null
+  status: string
+}
+interface ViewFacts {
+  engineCoverage?: {
+    providers?: EngineCoverageProvider[]
+    summary?: {
+      roster?: number
+      sampled?: number
+      resolved?: number
+      present?: number
+      shareOfModel?: number | null
+      strongestDisplayId?: string | null
+      weakestMeasuredDisplayId?: string | null
+    }
+  }
+  citationTotals?: {
+    totalCitations?: number
+    uniqueDomains?: number
+    ownDomainShare?: number | null
+    ownDomain?: number | null
+    competitor?: number | null
+    thirdParty?: number | null
+    ugc?: number | null
+  }
+  competitiveBenchmark?: {
+    totalMentions?: number
+    brandShare?: number | null
+    brandRank?: number | null
+    leaderName?: string | null
+    leaderMentions?: number | null
+    leaderGap?: number | null
+    nextGap?: number | null
+    leaderMultiple?: number | null
+    rows?: { name: string; mentions: number; rank: number; isBrand: boolean; deltaVsBrand: number; sharePct: number | null }[]
+  }
+  sentimentFacts?: SentimentSummary
+  readinessSummary?: {
+    structuralScore?: number | null
+    agenticScore?: number | null
+    actionGap?: number | null
+    structuralCoverage?: { measured: number; probed: number } | null
+    agenticCoverage?: { measured: number; probed: number } | null
+  }
+  dimensionHighlights?: {
+    strengths?: { key: string; label: string; score: number }[]
+    critical?: { key: string; label: string; score: number }[]
+    unmeasured?: { key: string; label: string }[]
+  }
+  shareFacts?: {
+    reportUrl?: string | null
+    graderUrl?: string
+    scoreText?: string
+    shareOfModelText?: string
+    citabilityText?: string
+    providersText?: string
+  }
+}
 
 const ENGINE_LABEL: Record<string, string> = {
   gemini: 'Gemini', google_ai_overview: 'Google AI Overview', google_ai_mode: 'Google AI Mode',
@@ -60,6 +124,7 @@ const ENGINE_LABEL: Record<string, string> = {
 
 const ok = result.status === 'ok'
 const model = ok ? (result.model as Record<string, any>) : null
+const viewFacts = (model?.viewFacts as ViewFacts | undefined) ?? null
 const publicReport = ok ? (result.report as Record<string, any> | null | undefined) : null
 const header = ok ? result.header : null
 const organizationName = header?.organizationName ?? 'tu marca'
@@ -111,34 +176,35 @@ const readiness = (model?.readiness as Readiness | null | undefined) ?? null
 const readinessAxes = [readiness?.agentic, readiness?.structural].filter((axis): axis is ReadinessAxis => !!axis)
 const sentimentFromPayload = (model?.sentimentSummary ?? publicReport?.sentimentSummary) as SentimentSummary | undefined
 const sentiment =
+  viewFacts?.sentimentFacts ??
   sentimentFromPayload ??
   (token === 'mock-token'
     ? ({ positive: 13, neutral: 7, mixed: 3, negative: 2, evaluated: 25, net: 'positivo' } satisfies SentimentSummary)
     : ({ positive: 0, neutral: 0, negative: 0, mixed: 0, evaluated: 0, net: 'sin_dato' } satisfies SentimentSummary))
 const disclaimer = (model?.disclaimer as string) ?? ''
 
-// Roster canónico de motores: siempre mostramos los 5 principales (incl. Claude). Los que
-// no vinieron en el snapshot de este análisis se marcan "Sin datos" (honesto, consistente
-// con el banner de informe parcial) — distinto de "Sin mención" (consultado, 0 menciones).
-const ENGINE_ROSTER = ['gemini', 'chatgpt', 'claude', 'perplexity', 'google_ai_overview']
 const normalizeProvider = (provider: string) => {
   if (provider === 'openai') return 'chatgpt'
   if (provider === 'anthropic') return 'claude'
   return provider
 }
-const findEngine = (p: string) => engines.find((e) => e.provider === p || (p === 'chatgpt' && e.provider === 'openai'))
-const rosterEngines = ENGINE_ROSTER.map((p) => {
-  const f = findEngine(p)
-  return { provider: p, present: f ? f.present : null, resolved: f ? f.resolved : null }
-})
-const extraEngines = engines
-  .filter((e) => !ENGINE_ROSTER.includes(normalizeProvider(e.provider)) && e.provider !== 'openai')
-  .map((e) => ({ provider: normalizeProvider(e.provider), present: e.present, resolved: e.resolved }))
-const allEngines = [...rosterEngines, ...extraEngines]
+const engineCoverageProviders = viewFacts?.engineCoverage?.providers ?? null
+const allEngines = engineCoverageProviders
+  ? engineCoverageProviders.map((engine) => ({
+      provider: engine.displayId,
+      label: engine.label,
+      present: engine.present,
+      resolved: engine.resolved,
+      mentionRate: engine.mentionRate,
+      status: engine.status,
+    }))
+  : engines.map((engine) => ({ provider: normalizeProvider(engine.provider), label: ENGINE_LABEL[normalizeProvider(engine.provider)] ?? engine.provider, present: engine.present, resolved: engine.resolved, mentionRate: engine.resolved ? Math.round(((engine.present ?? 0) / engine.resolved) * 100) : null, status: engine.resolved === null ? 'not_sampled' : engine.resolved === 0 ? 'no_response' : (engine.present ?? 0) > 0 ? 'measured_with_mentions' : 'measured_without_mentions' }))
 
 const sov = model?.competitiveSov as { competitors?: { name: string; mentions: number }[]; brandMentions?: number } | undefined
 const citation = model?.citationInsight as { ownDomainShare?: number | null; findingsWithCitations?: number; findingsCitingOwnDomain?: number } | undefined
-const hasBenchmark = !!(sov && (sov.competitors?.length || citation?.findingsWithCitations))
+const benchmarkFacts = viewFacts?.competitiveBenchmark ?? null
+const citationTotals = viewFacts?.citationTotals ?? null
+const hasBenchmark = !!(benchmarkFacts?.rows?.length || (sov && (sov.competitors?.length || citation?.findingsWithCitations)))
 
 // Radar de dimensiones (solo medidas; sin_dato NO se plotea como 0 — honestidad dataviz).
 // Nombres cortos para que las etiquetas del radar no se encimen.
@@ -186,48 +252,55 @@ const findDimension = (label: string) => dimensions.find((d) => d.label === labe
 const entityClarity = findDimension('Entity Clarity')
 const categoryOwnership = findDimension('Category Ownership')
 const citationQuality = findDimension('Citation Quality')
-const strongDimensions = dimensions
+const strongDimensions = viewFacts?.dimensionHighlights?.strengths ?? dimensions
   .filter((d) => d.score !== null && d.severity === 'optimo')
   .map((d) => ({ ...d, score: Math.round(d.score as number) }))
-const criticalDimensions = dimensions
+const criticalDimensions = viewFacts?.dimensionHighlights?.critical ?? dimensions
   .filter((d) => d.score !== null && d.severity === 'critico')
   .map((d) => ({ ...d, score: Math.round(d.score as number) }))
-const unmeasuredDimensions = dimensions.filter((d) => d.score === null)
+const unmeasuredDimensions = viewFacts?.dimensionHighlights?.unmeasured ?? dimensions.filter((d) => d.score === null)
 const partialReason =
   gate?.status === 'partial'
     ? 'Puntaje calculado con los motores que respondieron; la capacidad de acción sigue en revisión.'
     : null
 
-const resolvedTotal = allEngines.reduce((sum, engine) => sum + (engine.resolved ?? 0), 0)
-const presentTotal = allEngines.reduce((sum, engine) => sum + (engine.present ?? 0), 0)
-const measuredEngineCount = allEngines.filter((engine) => engine.resolved !== null).length
-const engineEvidenceRate = resolvedTotal > 0 ? Math.round((presentTotal / resolvedTotal) * 100) : null
-const ownDomainCitations = topSourceDomains
+const resolvedTotal = viewFacts?.engineCoverage?.summary?.resolved ?? allEngines.reduce((sum, engine) => sum + (engine.resolved ?? 0), 0)
+const presentTotal = viewFacts?.engineCoverage?.summary?.present ?? allEngines.reduce((sum, engine) => sum + (engine.present ?? 0), 0)
+const measuredEngineCount = viewFacts?.engineCoverage?.summary?.sampled ?? allEngines.filter((engine) => engine.resolved !== null).length
+const engineRosterCount = viewFacts?.engineCoverage?.summary?.roster ?? allEngines.length
+const engineEvidenceRate = viewFacts?.engineCoverage?.summary?.shareOfModel ?? (resolvedTotal > 0 ? Math.round((presentTotal / resolvedTotal) * 100) : null)
+const ownDomainCitations = citationTotals?.ownDomain ?? topSourceDomains
   .filter((source) => source.classification === 'own_domain')
   .reduce((sum, source) => sum + source.count, 0)
-const totalCitations = sourceBreakdown?.totalCitations ?? topSourceDomains.reduce((sum, source) => sum + source.count, 0)
-const ownDomainSharePct = totalCitations > 0 ? Math.round((ownDomainCitations / totalCitations) * 100) : null
-const thirdPartyCitationCount = topSourceDomains
-  .filter((source) => source.classification === 'third_party' || source.classification === 'ugc')
-  .reduce((sum, source) => sum + source.count, 0)
-const competitorCitationCount = topSourceDomains
+const totalCitations = citationTotals?.totalCitations ?? sourceBreakdown?.totalCitations ?? topSourceDomains.reduce((sum, source) => sum + source.count, 0)
+const ownDomainSharePct = citationTotals?.ownDomainShare ?? (totalCitations > 0 ? Math.round((ownDomainCitations / totalCitations) * 100) : null)
+const dependencyRiskInCoverage = citationTotals && (citationTotals.thirdParty === null || citationTotals.competitor === null || citationTotals.ugc === null)
+const thirdPartyCitationCount = (citationTotals?.thirdParty ?? null) === null && (citationTotals?.ugc ?? null) === null
+  ? topSourceDomains
+      .filter((source) => source.classification === 'third_party' || source.classification === 'ugc')
+      .reduce((sum, source) => sum + source.count, 0)
+  : (citationTotals?.thirdParty ?? 0) + (citationTotals?.ugc ?? 0)
+const competitorCitationCount = citationTotals?.competitor ?? topSourceDomains
   .filter((source) => source.classification === 'competitor')
   .reduce((sum, source) => sum + source.count, 0)
-const agenticCoverageText = readiness?.agentic?.coverage
+const agenticCoverageText = viewFacts?.readinessSummary?.agenticCoverage
+  ? `${viewFacts.readinessSummary.agenticCoverage.measured}/${viewFacts.readinessSummary.agenticCoverage.probed}`
+  : readiness?.agentic?.coverage
   ? `${readiness.agentic.coverage.measured}/${readiness.agentic.coverage.probed}`
   : '—'
 const agenticReadiness = readiness?.agentic ?? readinessAxes.find((readinessAxis) => readinessAxis.axis === 'agentic')
 const structuralReadiness = readiness?.structural ?? readinessAxes.find((readinessAxis) => readinessAxis.axis === 'structural')
-const agenticReadinessScore = agenticReadiness?.overallScore ?? null
-const structuralReadinessScore = structuralReadiness?.overallScore ?? null
-const readinessActionGap =
+const agenticReadinessScore = viewFacts?.readinessSummary?.agenticScore ?? agenticReadiness?.overallScore ?? null
+const structuralReadinessScore = viewFacts?.readinessSummary?.structuralScore ?? structuralReadiness?.overallScore ?? null
+const readinessActionGap = viewFacts?.readinessSummary?.actionGap ?? (
   agenticReadinessScore !== null && structuralReadinessScore !== null
     ? Math.round(structuralReadinessScore - agenticReadinessScore)
     : null
+)
 const agenticReadinessMeta = severityMeta(agenticReadiness?.severity ?? 'sin_dato')
 const structuralReadinessMeta = severityMeta(structuralReadiness?.severity ?? 'sin_dato')
-const agenticCoverage = agenticReadiness?.coverage ?? null
-const structuralCoverage = structuralReadiness?.coverage ?? null
+const agenticCoverage = viewFacts?.readinessSummary?.agenticCoverage ?? agenticReadiness?.coverage ?? null
+const structuralCoverage = viewFacts?.readinessSummary?.structuralCoverage ?? structuralReadiness?.coverage ?? null
 const agenticCoverageLabel = agenticCoverage ? `${agenticCoverage.measured}/${agenticCoverage.probed}` : '—'
 const structuralCoverageLabel = structuralCoverage ? `${structuralCoverage.measured}/${structuralCoverage.probed}` : '—'
 const readinessGapLabel =
@@ -349,12 +422,12 @@ const sentimentConicStops = hasSentiment
 const sampledProviders = [...allEngines.map((engine) => engine.provider), ...(provenance?.providersSampled ?? [])]
   .map(normalizeProvider)
   .filter((provider, index, list) => provider && list.indexOf(provider) === index)
-const strongestEngine = [...allEngines]
-  .filter((engine) => typeof engine.present === 'number' && (engine.present ?? 0) > 0)
-  .sort((a, b) => (b.present ?? 0) - (a.present ?? 0))[0]
-const weakestEngine = [...allEngines]
-  .filter((engine) => typeof engine.resolved === 'number')
-  .sort((a, b) => (a.present ?? 0) - (b.present ?? 0))[0]
+const strongestEngine = viewFacts?.engineCoverage?.summary?.strongestDisplayId
+  ? allEngines.find((engine) => engine.provider === viewFacts.engineCoverage?.summary?.strongestDisplayId)
+  : [...allEngines].filter((engine) => typeof engine.present === 'number' && (engine.present ?? 0) > 0).sort((a, b) => (b.present ?? 0) - (a.present ?? 0))[0]
+const weakestEngine = viewFacts?.engineCoverage?.summary?.weakestMeasuredDisplayId
+  ? allEngines.find((engine) => engine.provider === viewFacts.engineCoverage?.summary?.weakestMeasuredDisplayId)
+  : [...allEngines].filter((engine) => typeof engine.resolved === 'number').sort((a, b) => (a.present ?? 0) - (b.present ?? 0))[0]
 
 // Gauge glow (dirección B)
 const R = 90
@@ -362,18 +435,23 @@ const CIRC = Math.PI * R
 const dash = overallScore ? (overallScore / 100) * CIRC : 0
 const shareTitle = `Brand Visibility Snapshot — ${organizationName}`
 const shareSummary =
-  overallScore !== null
+  viewFacts?.shareFacts
+    ? `${viewFacts.shareFacts.scoreText}, ${viewFacts.shareFacts.shareOfModelText} y ${viewFacts.shareFacts.citabilityText}`
+    : overallScore !== null
     ? `score ${overallScore}/100, Share of Model IA ${engineEvidenceRate ?? '—'}% y citabilidad propia ${ownDomainSharePct ?? '—'}%`
     : `Snapshot público de visibilidad IA para ${organizationName}`
-const shareMessageTemplate = `Medí la visibilidad de mi marca en ChatGPT, Gemini, Claude, Perplexity y Google AI Overview con el Brand Visibility Grader de Efeonce. Mi snapshot dio ${shareSummary}. Mira el informe: {{reportUrl}}. Haz el tuyo aquí: {{graderUrl}}`
-const conversionLandingUrl = 'https://efeoncepro.com/aeo-2/?utm_source=think_report&utm_medium=owned_report&utm_campaign=ai_visibility_report&utm_content=bottom_primary_cta'
+const shareProvidersText = viewFacts?.shareFacts?.providersText ?? 'ChatGPT · Gemini · Claude · Perplexity · Google AI Overview'
+const shareMessageTemplate = `Medí la visibilidad de mi marca en ${shareProvidersText} con el Brand Visibility Grader de Efeonce. Mi snapshot dio ${shareSummary}. Mira el informe: {{reportUrl}}. Haz el tuyo aquí: {{graderUrl}}`
+const conversionLandingUrl = `${viewFacts?.shareFacts?.graderUrl ?? 'https://efeoncepro.com/aeo-2/'}?utm_source=think_report&utm_medium=owned_report&utm_campaign=ai_visibility_report&utm_content=bottom_primary_cta`
+const shareReportUrl = viewFacts?.shareFacts?.reportUrl ?? null
+const shareGraderUrl = viewFacts?.shareFacts?.graderUrl ?? 'https://efeoncepro.com/aeo-2/'
 const meetingUrl = 'https://meetings.hubspot.com/efeoncepro/agenda-discovery?utm_source=think_report&utm_medium=owned_report&utm_campaign=ai_visibility_report&utm_content=bottom_meeting_cta'
 const greenhouseApiBase = (GREENHOUSE_API_BASE || 'https://greenhouse.efeoncepro.com').replace(/\/+$/, '')
 const pdfDownloadUrl = token ? `${greenhouseApiBase}/api/public/growth/ai-visibility/report/${encodeURIComponent(token)}/pdf` : null
 const footerCopyrightNotice = buildCopyrightNotice()
 const sectionNumbers = Object.fromEntries(
   [
-    ['engine', engines.length > 0],
+    ['engine', allEngines.length > 0],
     ['benchmark', hasBenchmark],
     ['sentiment', Boolean(sentiment)],
     ['sources', topSourceDomains.length > 0 || Boolean(sourceBreakdown?.reason)],
@@ -528,8 +606,8 @@ const sectionNumbers = Object.fromEntries(
                       <span class="audit-signal-label" style={`color:${axis.gray[600]}`}><ReportIcon name="signal" size={15} />Motor con mejor presencia</span>
                       {strongestEngine ? (
                         <strong class="audit-engine-signal" style={`color:${axis.gray[900]}`}>
-                          <EngineMark provider={strongestEngine.provider} label={ENGINE_LABEL[strongestEngine.provider] ?? strongestEngine.provider} size={18} />
-                          <span class="truncate">{ENGINE_LABEL[strongestEngine.provider] ?? strongestEngine.provider}</span>
+                          <EngineMark provider={strongestEngine.provider} label={strongestEngine.label ?? ENGINE_LABEL[strongestEngine.provider] ?? strongestEngine.provider} size={18} />
+                          <span class="truncate">{strongestEngine.label ?? ENGINE_LABEL[strongestEngine.provider] ?? strongestEngine.provider}</span>
                         </strong>
                       ) : (
                         <strong style={`color:${axis.gray[900]}`}>—</strong>
@@ -539,8 +617,8 @@ const sectionNumbers = Object.fromEntries(
                       <span class="audit-signal-label" style={`color:${axis.gray[600]}`}><ReportIcon name="engines" size={15} />Mayor brecha por motor</span>
                       {weakestEngine ? (
                         <strong class="audit-engine-signal" style={`color:${axis.gray[900]}`}>
-                          <EngineMark provider={weakestEngine.provider} label={ENGINE_LABEL[weakestEngine.provider] ?? weakestEngine.provider} size={18} />
-                          <span class="truncate">{ENGINE_LABEL[weakestEngine.provider] ?? weakestEngine.provider}</span>
+                          <EngineMark provider={weakestEngine.provider} label={weakestEngine.label ?? ENGINE_LABEL[weakestEngine.provider] ?? weakestEngine.provider} size={18} />
+                          <span class="truncate">{weakestEngine.label ?? ENGINE_LABEL[weakestEngine.provider] ?? weakestEngine.provider}</span>
                         </strong>
                       ) : (
                         <strong style={`color:${axis.gray[900]}`}>—</strong>
@@ -567,7 +645,7 @@ const sectionNumbers = Object.fromEntries(
                       <p class="eyebrow-sub">Motores medidos</p>
                       <span class="report-icon-badge" style={`--icon-color:${axis.accent[500]}`}><ReportIcon name="engines" size={16} /></span>
                     </div>
-                    <p class="mt-2 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{measuredEngineCount}<span class="text-base" style={`color:${axis.gray[400]}`}>/{allEngines.length}</span></p>
+                    <p class="mt-2 text-3xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{measuredEngineCount}<span class="text-base" style={`color:${axis.gray[400]}`}>/{engineRosterCount}</span></p>
                     <p class="mt-1 text-xs leading-relaxed" style={`color:${axis.gray[600]}`}>No confunde ausencia de datos con ausencia de marca.</p>
                   </div>
                   <div class="audit-metric border-b p-5 sm:border-r sm:border-b-0 xl:border-r" style={`border-color:${axis.gray[100]}`}>
@@ -611,7 +689,7 @@ const sectionNumbers = Object.fromEntries(
           </section>
 
           {/* ══ 01 · EVIDENCIA POR MOTOR ══ */}
-          {engines.length > 0 && (
+          {allEngines.length > 0 && (
             <section class="py-16" data-capture="report-engine-coverage">
               <p class="eyebrow" style={`color:${axis.accent[500]}`}>{sectionNumbers.engine} · Cobertura capturada</p>
               <h2 class="section-title" style={`color:${axis.gray[900]}`}>Share of Model (SoM) por motor</h2>
@@ -629,7 +707,7 @@ const sectionNumbers = Object.fromEntries(
                 </div>
                 <div class="report-card rounded-2xl border bg-white p-4" style={`border-color:${axis.gray[100]}`}>
                   <p class="eyebrow-sub" style={`color:${axis.gray[600]}`}>Motores con evidencia</p>
-                  <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{measuredEngineCount}/{allEngines.length}</p>
+                  <p class="mt-1 text-2xl font-semibold tabular-nums" style={`color:${axis.gray[900]}`}>{measuredEngineCount}/{engineRosterCount}</p>
                   <p class="mt-1 text-xs" style={`color:${axis.gray[600]}`}>motores con respuesta evaluable</p>
                 </div>
               </div>
@@ -642,7 +720,7 @@ const sectionNumbers = Object.fromEntries(
                 </div>
                 <ul role="list">
                   {allEngines.map((e) => {
-                    const label = ENGINE_LABEL[e.provider] ?? e.provider
+                    const label = e.label ?? ENGINE_LABEL[e.provider] ?? e.provider
                     const presentCount = e.present ?? 0
                     const resolvedCount = e.resolved ?? 0
                     const rowRate = resolvedCount > 0 ? Math.round((presentCount / resolvedCount) * 100) : null
@@ -695,6 +773,7 @@ const sectionNumbers = Object.fromEntries(
                   ownDomainShare={citation?.ownDomainShare ?? null}
                   findingsWithCitations={citation?.findingsWithCitations ?? 0}
                   findingsCitingOwnDomain={citation?.findingsCitingOwnDomain ?? 0}
+                  benchmark={benchmarkFacts}
                 />
               </div>
             </section>
@@ -793,7 +872,9 @@ const sectionNumbers = Object.fromEntries(
                     </div>
                     <div>
                       <p class="inline-section-label" style={`color:${axis.gray[600]}`}><ReportIcon name="dependency" size={15} />Riesgo de dependencia</p>
-                      <p class="mt-1 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>{thirdPartyCitationCount} citas de terceros · {competitorCitationCount} de competidores.</p>
+                      <p class="mt-1 text-sm leading-relaxed" style={`color:${axis.gray[600]}`}>
+                        {dependencyRiskInCoverage ? 'Riesgo de dependencia: en cobertura' : `${thirdPartyCitationCount} citas de terceros · ${competitorCitationCount} de competidores.`}
+                      </p>
                     </div>
                   </div>
                   <div class="source-header hidden border-b px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] lg:grid" style={`border-color:${axis.gray[100]};color:${axis.gray[600]}`}>
@@ -1086,6 +1167,8 @@ const sectionNumbers = Object.fromEntries(
           data-capture="report-share"
           data-share-title={shareTitle}
           data-share-template={shareMessageTemplate}
+          data-share-report-url={shareReportUrl ?? undefined}
+          data-share-grader-url={shareGraderUrl}
           style={`--share-accent:${axis.accent[500]};--share-accent-dark:${axis.accent[800]};--share-border:${axis.gray[100]};--share-muted:${axis.gray[600]};--share-ink:${axis.gray[900]}`}
           aria-label="Compartir informe"
         >
@@ -1134,7 +1217,7 @@ const sectionNumbers = Object.fromEntries(
 
             <div class="share-engine-strip" aria-label="Motores evaluados">
               <EngineAvatarGroup providers={sampledProviders} size="sm" max={5} />
-              <span>ChatGPT · Gemini · Claude · Perplexity · Google AI Overview</span>
+              <span>{shareProvidersText}</span>
             </div>
 
             <blockquote class="share-message">
@@ -1351,11 +1434,12 @@ const sectionNumbers = Object.fromEntries(
         if (feedback) feedback.textContent = message
       }
       const reportShortUrl = () => {
+        if (panel.dataset.shareReportUrl) return panel.dataset.shareReportUrl
         const pathParts = window.location.pathname.split('/').filter(Boolean)
         const token = pathParts[pathParts.length - 1]
         return token ? new URL(`/r/${encodeURIComponent(token)}`, window.location.href).toString() : window.location.href
       }
-      const graderUrl = () => new URL('/brand-visibility', window.location.href).toString()
+      const graderUrl = () => panel.dataset.shareGraderUrl || new URL('/brand-visibility', window.location.href).toString()
       const displayUrl = (value: string) => value.replace(/^https?:\/\//, '').replace(/\/$/, '')
       const buildMessage = () => template
         .replace('{{reportUrl}}', reportShortUrl())
