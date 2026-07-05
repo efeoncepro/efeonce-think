@@ -23,11 +23,8 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   aria-labelledby="brand-visibility-form-title"
 >
   <div class="form-intro">
-    <div>
-      <p class="governed-label">Formulario gobernado por Greenhouse</p>
-      <h2 id="brand-visibility-form-title">Recibe tu informe de visibilidad de marca</h2>
-    </div>
-    <p>Completa tus datos y comienza el análisis.</p>
+    <h2 id="brand-visibility-form-title">Completa tus datos y comienza el análisis</h2>
+    <p>Calibramos mercado, categoría y competidores para mostrarte tu informe en pantalla.</p>
   </div>
 
   <div class="form-state form-state-ready" data-form-state="ready">
@@ -44,10 +41,10 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
         <span class="fallback-line"></span>
         <span class="fallback-line short"></span>
         <span class="fallback-line"></span>
-        <p>Preparando el formulario gobernado de Greenhouse.</p>
+        <p>Preparando el formulario.</p>
       </div>
     </greenhouse-form>
-    <noscript>Activa JavaScript para cargar el formulario gobernado de Greenhouse.</noscript>
+    <noscript>Activa JavaScript para cargar el formulario.</noscript>
   </div>
 
   <section
@@ -62,7 +59,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     <p class="mini-label">Análisis en curso</p>
     <h2 id="analysis-title">Estamos preparando tu reporte</h2>
     <p data-analysis-message>
-      El grader revisa señales de presencia, citabilidad, categoría y accionabilidad.
+      Estamos revisando señales de presencia, citabilidad, categoría y accionabilidad.
       Mantén esta pantalla abierta para abrir el reporte cuando esté listo.
     </p>
 
@@ -103,8 +100,8 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       const desktopQuery = window.matchMedia('(min-width: 981px)')
 
       const statusCopy = {
-        queued: 'La solicitud quedó en cola. Greenhouse preparará el run y avisará cuando exista un reporte publicable.',
-        processing: 'El grader está preparando señales de presencia, citabilidad, categoría y accionabilidad.',
+        queued: 'La solicitud quedó en cola. Prepararemos el análisis y abriremos el informe cuando esté listo.',
+        processing: 'Estamos preparando señales de presencia, citabilidad, categoría y accionabilidad.',
         ready: 'Tu informe privado está listo para abrirse en Think.',
         in_review: 'El análisis requiere revisión antes de publicar el reporte. Te enviaremos una recuperación segura si aplica.',
         unavailable: 'No pudimos preparar el reporte en este momento. La solicitud quedó registrada para recuperación segura.',
@@ -252,12 +249,12 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
 
   .form-intro {
     display: grid;
-    grid-template-columns: minmax(230px, 0.52fr) minmax(220px, 0.48fr);
-    gap: 1rem;
-    align-items: end;
+    gap: 0.36rem;
+    justify-items: center;
     border-bottom: 1px solid rgba(119, 126, 144, 0.14);
     padding-bottom: 0.86rem;
     margin-bottom: 0.96rem;
+    text-align: center;
   }
 
   .form-intro h2,
@@ -284,22 +281,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     color: rgba(92, 96, 112, 0.86);
     font-size: 0.9rem;
     line-height: 1.45;
-    text-align: right;
-  }
-
-  .governed-label {
-    display: flex;
-    align-items: center;
-    gap: 0.44rem;
-    margin: 0 0 0.5rem !important;
-    color: rgba(46, 38, 61, 0.82) !important;
-    font-size: 0.82rem !important;
-    font-weight: 680;
-  }
-
-  .governed-label::before {
-    content: '▢';
-    color: var(--axis-gray-600);
+    max-width: 48rem;
   }
 
   .form-state[hidden],
@@ -440,15 +422,6 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       width: min(100% - 32px, 720px);
       transform: none;
       margin-bottom: 1.5rem;
-    }
-
-    .form-intro {
-      grid-template-columns: 1fr;
-      align-items: start;
-    }
-
-    .form-intro > p {
-      text-align: left;
     }
 
     .governed-fallback {
