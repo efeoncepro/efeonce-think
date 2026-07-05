@@ -308,6 +308,10 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     min-width: 0;
   }
 
+  greenhouse-form :global(.ghf-progress[tabindex='-1']:focus-visible) {
+    outline: 0;
+  }
+
   .governed-fallback {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(120px, 0.42fr);
