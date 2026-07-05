@@ -5,8 +5,8 @@
 export const prerender = false
 
 import BaseLayout from '@layouts/BaseLayout.astro'
+import StatusScreen from '@/components/primitives/StatusScreen.astro'
 import { resolveShortLink } from '@lib/report'
-import { axis } from '@lib/report-tokens'
 
 const { code } = Astro.params
 const resolution = code ? await resolveShortLink(code) : ({ status: 'not_found' } as const)
@@ -23,35 +23,11 @@ if (resolution.status === 'error') Astro.response.status = 502
 ---
 
 <BaseLayout title="Informe de visibilidad en respuestas de IA — Efeonce" noindex>
-  {resolution.status === 'not_found' && (
-    <main role="status" class="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-4 px-6 text-center">
-      <div class="flex h-14 w-14 items-center justify-center rounded-full" style={`background:${axis.gray[100]}`} aria-hidden="true"><span class="text-2xl">🔗</span></div>
-      <h1 class="text-2xl font-semibold" style={`color:${axis.gray[900]}`}>Este enlace no es válido</h1>
-      <p style={`color:${axis.gray[600]}`}>El informe que buscas no existe. Puedes generar uno nuevo desde el diagnóstico.</p>
-      <a href="/brand-visibility" class="mt-1 inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90" style={`background:${axis.accent[500]}`}>Hacer un diagnóstico nuevo</a>
-    </main>
-  )}
+  {resolution.status === 'not_found' && <StatusScreen kind="not_found" />}
 
-  {resolution.status === 'gone' && (
-    <main role="status" class="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-4 px-6 text-center">
-      <div class="flex h-14 w-14 items-center justify-center rounded-full" style={`background:${axis.gray[100]}`} aria-hidden="true"><span class="text-2xl">🔗</span></div>
-      <h1 class="text-2xl font-semibold" style={`color:${axis.gray[900]}`}>Este enlace expiró o fue revocado</h1>
-      <p style={`color:${axis.gray[600]}`}>Este enlace ya no está disponible. Puedes generar un informe nuevo desde el diagnóstico.</p>
-      <a href="/brand-visibility" class="mt-1 inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90" style={`background:${axis.accent[500]}`}>Hacer un diagnóstico nuevo</a>
-    </main>
-  )}
+  {resolution.status === 'gone' && <StatusScreen kind="gone" />}
 
-  {resolution.status === 'rate_limited' && (
-    <main role="alert" class="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
-      <h1 class="text-2xl font-semibold" style={`color:${axis.gray[900]}`}>Demasiadas solicitudes</h1>
-      <p style={`color:${axis.gray[600]}`}>Recibimos muchas solicitudes desde tu conexión. Espera unos segundos y vuelve a intentar.</p>
-    </main>
-  )}
+  {resolution.status === 'rate_limited' && <StatusScreen kind="rate_limited" />}
 
-  {resolution.status === 'error' && (
-    <main role="alert" class="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
-      <h1 class="text-2xl font-semibold" style={`color:${axis.gray[900]}`}>No pudimos abrir tu informe</h1>
-      <p style={`color:${axis.gray[600]}`}>Tuvimos un problema al resolver el enlace. Vuelve a intentar en unos minutos.</p>
-    </main>
-  )}
+  {resolution.status === 'error' && <StatusScreen kind="error" />}
 </BaseLayout>

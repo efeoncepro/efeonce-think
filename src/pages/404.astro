@@ -1,0 +1,20 @@
+---
+/**
+ * 404 global del hub. Cualquier ruta inexistente cae acá. Reusa la primitiva `StatusScreen`
+ * (misma capa ambiental + personaje Nexa) con copy override: no es un token vencido sino una
+ * ruta que no existe, así que el CTA vuelve al inicio del hub.
+ */
+import BaseLayout from '@layouts/BaseLayout.astro'
+import StatusScreen from '@/components/primitives/StatusScreen.astro'
+---
+
+<BaseLayout title="Página no encontrada — Efeonce" noindex>
+  <StatusScreen
+    kind="not_found"
+    eyebrow="Error 404"
+    title="Esta página no existe"
+    body="La página que buscas no está aquí o se movió. Volvamos a un lugar conocido."
+    ctaLabel="Volver al inicio"
+    ctaHref="/"
+  />
+</BaseLayout>

@@ -23,6 +23,7 @@ Reglas:
 | **`EngineAvatarGroup`** | `@lib/primitives/engine-avatar-group` (`EngineAvatarGroupProps`) | Grupo compacto de logos de motores con solape, pull-up hover/focus, tooltip accesible y overflow `+N`. Inspirado en el patrón `TeamAvatarGroup` de Greenhouse, adaptado al hub Think. | Informe AEO (`brand-visibility/r/[token]`, resumen ejecutivo y tablas de evidencia) |
 | **`MaturityLadder`** | `@lib/primitives/ladder` (`LadderRung`) | La "escalera" — N peldaños de madurez que se suben en orden. Estatura del escalafón = posición/valor Be X con altura precomputada en SSR; nivel interno del líquido = score 0-100; color = severidad; `null` = "En cobertura" (hatch); `isNext` = "Empieza aquí". Anima su entrada (peldaños suben + count-up) self-contained. | Informe AEO (`brand-visibility/r/[token]`, sección "La escalera de visibilidad en IA") |
 | **`ReportIcon`** | props locales (`name`, `size`, `strokeWidth`, `label`) | Set sobrio de glyphs stroke-only para informes: hereda `currentColor`, es decorativo por defecto y sólo debe acompañar texto visible. | Informe AEO (`brand-visibility/r/[token]`, métricas ejecutivas, fuente citada, operabilidad y prioridad) |
+| **`StatusScreen`** | `@lib/primitives/status-screen` (`StatusKind`) | Pantalla de estado full-screen (hero ambiental): personaje Nexa por estado + capa navy con órbitas y bokeh de profundidad + título display + CTA. Self-contained (estilos + motion bajo `prefers-reduced-motion`, primer paint determinista). Copy canónico es-CL por estado (`not_found`/`gone`/`rate_limited`/`error`) con override puntual. | `/brand-visibility/r/[token]`, `/s/[code]`, `404.astro` |
 
 ### Uso — EngineAvatarGroup
 
@@ -78,3 +79,27 @@ Props: `rungs` (obligatorio), `animate` (default `true`), `nextLabel` (default `
 Nota de robustez: la altura de cada peldaño se precomputa en SSR como `--rung-min-height`.
 No uses multiplicaciones dentro de `calc()` para la estructura de la escalera ni limpies custom
 properties con `clearProps: all`; el motion sólo puede limpiar `opacity`/`transform`.
+
+### Uso — StatusScreen
+
+```astro
+---
+import StatusScreen from '@/components/primitives/StatusScreen.astro'
+---
+{/* Estado token-gated: el kind sale del status del resolver (not_found / gone / rate_limited / error). */}
+<StatusScreen kind="gone" />
+
+{/* 404 global u otra ruta: mismo primitive con copy override. */}
+<StatusScreen
+  kind="not_found"
+  eyebrow="Error 404"
+  title="Esta página no existe"
+  body="La página que buscas no está aquí o se movió."
+  ctaLabel="Volver al inicio"
+  ctaHref="/"
+/>
+```
+
+Props: `kind` (obligatorio: `not_found` | `gone` | `rate_limited` | `error`), y overrides opcionales
+`eyebrow` / `title` / `body` / `ctaLabel` / `ctaHref`. El copy canónico por estado vive en el contrato
+(`STATUS_CONTENT`); los assets del personaje viven en `public/characters/nexa-<pose>.webp`.

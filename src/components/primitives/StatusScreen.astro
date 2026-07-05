@@ -1,0 +1,321 @@
+---
+/**
+ * StatusScreen — pantalla de estado full-screen del hub (hero ambiental).
+ *
+ * Primitive self-contained: trae su fondo navy ambiental (órbita + partículas que ecoan el isotipo
+ * cohete-en-órbita de Efeonce), el personaje Nexa por estado, su tipografía display, su CTA y su
+ * motion (entrada + drift de la órbita), todo bajo `prefers-reduced-motion`. Primer paint
+ * determinista: el contenido es visible sin JS; el motion es sólo enhancement.
+ *
+ * Consumers: `/brand-visibility/r/[token]`, `/s/[code]`, y el `404.astro` global.
+ */
+import { axis } from '@lib/report-tokens'
+import { STATUS_CONTENT, type StatusKind } from '@lib/primitives/status-screen'
+
+interface Props {
+  kind: StatusKind
+  /** Overrides puntuales (p. ej. el 404 global no es un token sino una ruta inexistente). */
+  eyebrow?: string
+  title?: string
+  body?: string
+  ctaLabel?: string
+  ctaHref?: string
+}
+
+const { kind, eyebrow, title, body, ctaLabel, ctaHref } = Astro.props
+const base = STATUS_CONTENT[kind]
+
+const content = {
+  ...base,
+  eyebrow: eyebrow ?? base.eyebrow,
+  title: title ?? base.title,
+  body: body ?? base.body,
+  action: base.action
+    ? { ...base.action, label: ctaLabel ?? base.action.label, href: ctaHref ?? base.action.href }
+    : ctaHref
+      ? { label: ctaLabel ?? 'Volver al inicio', href: ctaHref }
+      : null
+}
+
+// Dimensiones intrínsecas por pose → width/height explícitos = sin CLS.
+const POSE_DIMS: Record<string, { w: number; h: number }> = {
+  'not-found': { w: 437, h: 953 },
+  expired: { w: 840, h: 1493 },
+  'rate-limited': { w: 840, h: 1260 },
+  error: { w: 840, h: 1260 }
+}
+const dims = POSE_DIMS[content.pose]
+const src = `/characters/nexa-${content.pose}.webp`
+
+/**
+ * Capa de profundidad bokeh — círculos suaves calibrados, distribuidos hacia los bordes para no
+ * competir con el personaje (centro-arriba) ni el copy (centro-abajo). Data-driven con clase propia
+ * `.bk` (NO usar `p-*` → colisiona con las utilidades de padding de Tailwind). `size` en px, `o` en %.
+ */
+const BOKEH = [
+  { top: 10, left: 12, size: 148, o: 20, d: 0 },
+  { top: 22, left: 84, size: 190, o: 24, d: 2.4 },
+  { top: 58, left: 5, size: 168, o: 20, d: 1.1 },
+  { top: 66, left: 90, size: 132, o: 24, d: 3.2 },
+  { top: 40, left: 79, size: 88, o: 26, d: 0.7 },
+  { top: 30, left: 19, size: 80, o: 22, d: 4.0 },
+  { top: 80, left: 30, size: 108, o: 16, d: 1.8 },
+  { top: 13, left: 63, size: 60, o: 20, d: 2.9 },
+  { top: 50, left: 95, size: 118, o: 24, d: 3.6 }
+]
+
+// Navy ambiental derivado del token accent[900] (nunca HEX crudo suelto).
+const navy = axis.accent[900]
+const navyDeep = `color-mix(in srgb, ${navy}, #000 55%)`
+const glow = axis.accent[500]
+const glowSoft = axis.accent[700]
+---
+
+<main
+  role={content.role}
+  class="status-screen"
+  style={`--navy:${navy};--navy-deep:${navyDeep};--glow:${glow};--glow-soft:${glowSoft};--accent:${axis.accent[500]}`}
+>
+  {/* Fondo ambiental decorativo — órbita + partículas (eco del isotipo). */}
+  <div class="ambient" aria-hidden="true">
+    <div class="glow"></div>
+    <svg class="orbits" viewBox="0 0 800 800" preserveAspectRatio="xMidYMid slice">
+      <g class="orbit-spin">
+        <ellipse cx="400" cy="400" rx="360" ry="150" />
+        <ellipse cx="400" cy="400" rx="280" ry="300" transform="rotate(28 400 400)" />
+        <ellipse cx="400" cy="400" rx="330" ry="230" transform="rotate(-24 400 400)" />
+      </g>
+    </svg>
+    <div class="bokeh">
+      {BOKEH.map((b) => (
+        <span
+          class="bk"
+          style={`top:${b.top}%;left:${b.left}%;width:${b.size}px;height:${b.size}px;opacity:${b.o / 100};animation-delay:${b.d}s`}
+        ></span>
+      ))}
+    </div>
+  </div>
+
+  <div class="stage">
+    <figure class="character">
+      <img src={src} width={dims.w} height={dims.h} alt="" fetchpriority="high" decoding="async" />
+    </figure>
+
+    <div class="copy">
+      <p class="eyebrow">
+        <img src="/branding/efeonce-isotipo-negative.svg" width="16" height="16" alt="" aria-hidden="true" />
+        <span>{content.eyebrow}</span>
+      </p>
+      <h1 class="title">{content.title}</h1>
+      <p class="body">{content.body}</p>
+
+      {content.action && (
+        content.action.reload ? (
+          <button type="button" class="cta" data-status-reload>
+            {content.action.label}
+          </button>
+        ) : (
+          <a href={content.action.href} class="cta">{content.action.label}</a>
+        )
+      )}
+    </div>
+  </div>
+
+  <footer class="brand">
+    <a href="/" aria-label="Ir al inicio de Efeonce">
+      <img src="/branding/efeonce-logo-negative.svg" width="96" height="24" alt="Efeonce" />
+    </a>
+  </footer>
+</main>
+
+<script>
+  // Reintento in-place para estados transitorios (429 / 5xx). Enhancement — el estado se ve sin JS.
+  document.querySelector('[data-status-reload]')?.addEventListener('click', () => {
+    window.location.reload()
+  })
+</script>
+
+<style>
+  .status-screen {
+    position: relative;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1.5rem, 4vh, 3rem);
+    padding: clamp(2rem, 6vw, 4rem) 1.5rem clamp(2.5rem, 6vh, 4rem);
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 50% 8%, var(--navy) 0%, var(--navy-deep) 70%),
+      var(--navy-deep);
+    color: #fff;
+    text-align: center;
+  }
+
+  /* ── Fondo ambiental ─────────────────────────────────────────────── */
+  .ambient {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow {
+    position: absolute;
+    top: 22%;
+    left: 50%;
+    width: min(70vw, 620px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--glow) 55%, transparent) 0%, transparent 62%);
+    filter: blur(12px);
+    opacity: 0.55;
+  }
+  .orbits {
+    position: absolute;
+    top: 24%;
+    left: 50%;
+    width: min(150vw, 1100px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+  }
+  .orbits ellipse {
+    fill: none;
+    stroke: color-mix(in srgb, var(--glow) 60%, #fff 8%);
+    stroke-width: 1;
+    opacity: 0.16;
+  }
+  .orbit-spin {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: orbit-spin 90s linear infinite;
+  }
+  @keyframes orbit-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .bokeh { position: absolute; inset: 0; }
+  .bk {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--glow) 55%, transparent) 0%, transparent 68%);
+    filter: blur(3px);
+    animation: drift 11s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes drift {
+    0%, 100% { transform: translate(-50%, -50%); }
+    50%      { transform: translate(-50%, calc(-50% - 16px)); }
+  }
+
+  /* ── Escenario ───────────────────────────────────────────────────── */
+  .stage {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1.25rem, 3.5vh, 2.25rem);
+    max-width: 34rem;
+  }
+  .character {
+    margin: 0;
+    animation: float 6s ease-in-out infinite;
+    filter: drop-shadow(0 30px 60px color-mix(in srgb, var(--navy-deep) 80%, #000));
+  }
+  .character img {
+    height: clamp(220px, 42vh, 400px);
+    width: auto;
+    display: block;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+  }
+
+  .copy { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--glow) 22%, transparent);
+    border: 1px solid color-mix(in srgb, var(--glow) 40%, transparent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--glow) 25%, #fff 75%);
+  }
+  .title {
+    margin: 0;
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .body {
+    margin: 0;
+    max-width: 32rem;
+    font-size: clamp(1rem, 2.2vw, 1.125rem);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.74);
+  }
+  .cta {
+    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.875rem;
+    padding: 0 1.5rem;
+    border: 0;
+    border-radius: 0.75rem;
+    background: #fff;
+    color: var(--navy);
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--glow) 30%, transparent);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+  }
+  .cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px color-mix(in srgb, var(--glow) 42%, transparent);
+    background: color-mix(in srgb, #fff 92%, var(--glow));
+  }
+  .cta:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+
+  /* ── Marca ───────────────────────────────────────────────────────── */
+  .brand { position: relative; z-index: 1; }
+  .brand img { height: 24px; width: auto; opacity: 0.7; transition: opacity 0.16s ease; }
+  .brand a:hover img { opacity: 1; }
+  .brand a:focus-visible { outline: 2px solid #fff; outline-offset: 4px; border-radius: 4px; }
+
+  /* ── Entrada (enhancement) ───────────────────────────────────────── */
+  .stage > * { animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .character { animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both, float 6s ease-in-out 0.7s infinite; }
+  .copy .eyebrow { animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both; }
+  .copy .title   { animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+  .copy .body    { animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both; }
+  .copy .cta     { animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Contrato reduced-motion ─────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .orbit-spin, .bk, .character, .stage > *, .copy .eyebrow, .copy .title, .copy .body, .copy .cta {
+      animation: none !important;
+    }
+    .character { transform: none; }
+  }
+</style>
