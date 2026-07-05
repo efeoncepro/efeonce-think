@@ -98,6 +98,9 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       const reportLink = dock.querySelector('[data-report-link]')
       const steps = Array.from(dock.querySelectorAll('[data-status-step]'))
       const form = dock.querySelector('greenhouse-form')
+      const hero = dock.closest('.hero-shell')
+      const page = dock.closest('.brand-visibility-page')
+      const desktopQuery = window.matchMedia('(min-width: 981px)')
 
       const statusCopy = {
         queued: 'La solicitud quedó en cola. Greenhouse preparará el run y avisará cuando exista un reporte publicable.',
@@ -108,6 +111,38 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
         not_found: 'No pudimos encontrar el estado del análisis. Intenta nuevamente más tarde.',
         error: 'No fue posible consultar el estado. Mantén la página abierta o vuelve a intentar en unos minutos.',
       }
+
+      const syncDockClearance = () => {
+        if (!(hero instanceof HTMLElement) || !(page instanceof HTMLElement)) return
+
+        if (!desktopQuery.matches) {
+          page.style.removeProperty('--brand-form-dock-clearance')
+          return
+        }
+
+        if (hero.classList.contains('hero-shell--analysis-active')) {
+          page.style.setProperty('--brand-form-dock-clearance', '2rem')
+          return
+        }
+
+        const rem = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16
+        const fallback = Math.min(Math.max(window.innerWidth * 0.28, 21 * rem), 26 * rem)
+        const heroRect = hero.getBoundingClientRect()
+        const dockRect = dock.getBoundingClientRect()
+        const needed = Math.max(0, dockRect.bottom - heroRect.bottom + 32)
+
+        page.style.setProperty('--brand-form-dock-clearance', `${Math.ceil(Math.max(fallback, needed))}px`)
+      }
+
+      const scheduleDockClearance = () => window.requestAnimationFrame(syncDockClearance)
+      const resizeObserver = new ResizeObserver(scheduleDockClearance)
+      resizeObserver.observe(dock)
+      resizeObserver.observe(form || dock)
+      const mutationObserver = new MutationObserver(scheduleDockClearance)
+      mutationObserver.observe(dock, { childList: true, subtree: true, attributes: true })
+      desktopQuery.addEventListener?.('change', scheduleDockClearance)
+      window.addEventListener('resize', scheduleDockClearance, { passive: true })
+      scheduleDockClearance()
 
       const setStep = (status) => {
         steps.forEach((step) => {
@@ -122,6 +157,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
         analysisPanel?.removeAttribute('hidden')
         if (analysisMessage && message) analysisMessage.textContent = message
         setStep(status)
+        scheduleDockClearance()
         if (analysisPanel instanceof HTMLElement) analysisPanel.focus({ preventScroll: true })
       }
 
