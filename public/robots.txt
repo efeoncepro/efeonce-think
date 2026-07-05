@@ -1,0 +1,33 @@
+User-agent: *
+Allow: /
+
+# Retrieval / answer engines: allow discovery and citation.
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+# Training / broad AI crawlers: allowed for this public lead-magnet hub.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+Sitemap: https://think.efeoncepro.com/sitemap-index.xml

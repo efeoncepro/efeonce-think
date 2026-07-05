@@ -1,0 +1,26 @@
+# Efeonce Think
+
+> Public lead-magnet hub by Efeonce Group SpA. This site explains and renders tools for measuring brand visibility in answer engines and generative search surfaces.
+
+## Canonical Site
+
+- https://think.efeoncepro.com/
+
+## Public Pages
+
+- https://think.efeoncepro.com/brand-visibility
+  - Brand Visibility Grader landing.
+  - Explains how the private report evaluates presence, citability, exactness, operability, and brand preference.
+  - The page embeds a governed Greenhouse Growth Forms renderer for requesting a private report.
+
+## Private / Token-Gated Pages
+
+- `/brand-visibility/r/{token}` renders a private report for a specific submitted lead.
+- Token-gated report URLs are not intended for indexing or broad retrieval.
+
+## Method
+
+- Framework: Be Found, Be Readable, Be Correct, Be Actionable, Be Intrinsic.
+- Analysis focus: answer engines, AI Overviews, ChatGPT, Perplexity, Claude, Gemini, and generative search surfaces.
+- Owner: Efeonce Group SpA.
+- Main organization site: https://efeoncepro.com/

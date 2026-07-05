@@ -15,11 +15,12 @@ const greenhouseBase = GREENHOUSE_API_BASE.replace(/\/$/, '')
 const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
 ---
 
-<aside
+<div
   class="form-card"
   id="brand-visibility-form"
   data-brand-visibility-form-dock
   data-capture="brand-visibility-form"
+  role="region"
   aria-labelledby="brand-visibility-form-title"
 >
   <div class="form-intro">
@@ -179,7 +180,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       <a class="report-transition-fallback" data-report-transition-link href="#" hidden>Si no avanza, abrir informe</a>
     </div>
   </div>
-</aside>
+</div>
 
 <script>
   import gsap from 'gsap'
@@ -206,8 +207,11 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     const hero = dock.closest('.hero-shell')
     const page = dock.closest('.brand-visibility-page')
     const desktopQuery = window.matchMedia('(min-width: 981px)')
+    const compactQuery = window.matchMedia('(max-width: 980px)')
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const select = gsap.utils.selector(dock)
+    let lastObservedFormStep = ''
+    let formStepTimer = 0
 
     const statusMeta = {
       accepted: {
@@ -274,7 +278,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
         'Tomamos número. El análisis ya está en la fila correcta.',
         'Guardamos tu solicitud; ahora esperamos turno sin hacer ruido.',
         'Buen momento para respirar: el envío ya quedó protegido.',
-        'Estamos preparando el contexto antes de tocar los motores de IA.',
+        'Estamos preparando el contexto antes de consultar los canales de respuesta.',
       ],
       queued: [
         'La cola está viva. Tu informe no se perdió, sólo está esperando pista.',
@@ -285,7 +289,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       ],
       processing: [
         'Leyendo presencia: dónde aparece tu marca y dónde todavía no.',
-        'Revisando citabilidad: quién sostiene la confianza cuando la IA responde.',
+        'Revisando citabilidad: qué señales sostienen la confianza cuando se genera una respuesta.',
         'Comparando contexto competitivo sin inflar el marcador.',
         'Traduciendo hallazgos en acciones, no en adornos.',
         'Estamos dejando fuera el ruido. El informe sólo muestra evidencia consolidada.',
@@ -310,7 +314,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       error: [
         'La conexión al estado hizo una pausa breve; seguimos intentando.',
         'Esto no está congelado: estamos esperando una respuesta confiable.',
-        'Algunos motores se toman su tiempo. Preferimos esperar bien a mostrar humo.',
+        'Algunas consultas se toman su tiempo. Preferimos esperar bien a mostrar humo.',
       ],
     }
 
@@ -394,12 +398,107 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     }
 
     const scheduleDockClearance = () => window.requestAnimationFrame(syncDockClearance)
+
+    const getCurrentFormStep = () => {
+      if (!(form instanceof HTMLElement)) return ''
+
+      const progressText = form.textContent?.match(/(?:Paso|Step)\s+(\d+)\s+(?:de|of)\s+(\d+)/i)
+      if (!progressText) return ''
+
+      return `${progressText[1]}:${progressText[2]}`
+    }
+
+    const isVisibleFocusable = (element: Element): element is HTMLElement => {
+      if (!(element instanceof HTMLElement)) return false
+      if (element.hasAttribute('disabled') || element.getAttribute('aria-hidden') === 'true') return false
+
+      const style = window.getComputedStyle(element)
+      if (style.visibility === 'hidden' || style.display === 'none') return false
+
+      const rect = element.getBoundingClientRect()
+      return (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        rect.bottom >= 0 &&
+        rect.top <= window.innerHeight &&
+        rect.right >= 0 &&
+        rect.left <= window.innerWidth
+      )
+    }
+
+    const focusFirstVisibleFormControl = () => {
+      if (!(form instanceof HTMLElement)) return
+      if (form.contains(document.activeElement) && document.activeElement !== document.body) return
+
+      const preferredTargets = [
+        'input:not([type="hidden"]):not([tabindex="-1"])',
+        'select:not([tabindex="-1"])',
+        'textarea:not([tabindex="-1"])',
+        '[role="combobox"]:not([tabindex="-1"])',
+        'button:not([tabindex="-1"])',
+        '.ghf-progress',
+      ]
+
+      const target = preferredTargets
+        .flatMap((selector) => Array.from(form.querySelectorAll(selector)))
+        .find(isVisibleFocusable)
+
+      target?.focus({ preventScroll: true })
+    }
+
+    const scrollActiveFormStepIntoView = () => {
+      if (!(dock instanceof HTMLElement)) return
+      if (!compactQuery.matches) return
+      if (document.documentElement.classList.contains('brand-analysis-active')) return
+
+      const alignDock = () => {
+        dock.scrollIntoView({
+          block: 'start',
+          inline: 'nearest',
+          behavior: reduceMotion.matches ? 'auto' : 'smooth',
+        })
+      }
+
+      alignDock()
+      window.setTimeout(() => {
+        focusFirstVisibleFormControl()
+        window.setTimeout(alignDock, reduceMotion.matches ? 20 : 180)
+      }, reduceMotion.matches ? 20 : 220)
+    }
+
+    const syncFormStepPosition = () => {
+      const currentStep = getCurrentFormStep()
+      if (!currentStep) return
+
+      if (!lastObservedFormStep) {
+        lastObservedFormStep = currentStep
+        return
+      }
+
+      if (currentStep === lastObservedFormStep) return
+
+      lastObservedFormStep = currentStep
+      scrollActiveFormStepIntoView()
+    }
+
+    const scheduleFormStepPosition = () => {
+      window.clearTimeout(formStepTimer)
+      formStepTimer = window.setTimeout(syncFormStepPosition, 90)
+    }
+
     const resizeObserver = new ResizeObserver(scheduleDockClearance)
     resizeObserver.observe(dock)
     resizeObserver.observe(form || dock)
     const mutationObserver = new MutationObserver(scheduleDockClearance)
     mutationObserver.observe(dock, { childList: true, subtree: true, attributes: true })
+    const formStepObserver = new MutationObserver(scheduleFormStepPosition)
+    if (form instanceof HTMLElement) {
+      formStepObserver.observe(form, { childList: true, subtree: true, characterData: true, attributes: true })
+      window.setTimeout(scheduleFormStepPosition, 400)
+      window.setTimeout(scheduleFormStepPosition, 1200)
+    }
     desktopQuery.addEventListener?.('change', scheduleDockClearance)
+    compactQuery.addEventListener?.('change', scheduleFormStepPosition)
     window.addEventListener('resize', scheduleDockClearance, { passive: true })
     scheduleDockClearance()
 
@@ -629,6 +728,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     padding: clamp(1.15rem, 2vw, 1.55rem) clamp(1.25rem, 2.5vw, 1.85rem);
     background: linear-gradient(180deg, white 0%, color-mix(in srgb, var(--axis-gray-50) 64%, white) 100%);
     color: var(--axis-gray-900);
+    scroll-margin-top: 1rem;
     box-shadow:
       0 36px 86px -46px rgba(0, 0, 0, 0.68),
       0 1px 0 rgba(255, 255, 255, 0.78) inset;

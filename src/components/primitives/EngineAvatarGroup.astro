@@ -22,6 +22,7 @@ const label = uniqueProviders.map(providerLabel).join(', ')
   {visibleProviders.map((provider, index) => (
     <span
       class="engine-avatar"
+      role="img"
       tabindex="0"
       aria-label={providerLabel(provider)}
       data-tooltip={providerLabel(provider)}
