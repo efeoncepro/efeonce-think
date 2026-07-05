@@ -1632,21 +1632,11 @@ const sectionNumbers = Object.fromEntries(
     })
 
     const copyToClipboard = async (value: string) => {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(value)
-        return
+      if (!navigator.clipboard?.writeText) {
+        throw new Error('Clipboard API unavailable')
       }
 
-      const area = document.createElement('textarea')
-      area.value = value
-      area.setAttribute('readonly', '')
-      area.style.position = 'fixed'
-      area.style.inset = '0 auto auto 0'
-      area.style.opacity = '0'
-      document.body.append(area)
-      area.select()
-      document.execCommand('copy')
-      area.remove()
+      await navigator.clipboard.writeText(value)
     }
 
     document.querySelectorAll<HTMLElement>('[data-capture="report-share"]').forEach((panel) => {
