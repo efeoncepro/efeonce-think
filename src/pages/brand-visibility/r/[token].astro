@@ -1604,6 +1604,17 @@ const sectionNumbers = Object.fromEntries(
     echarts.use([RadarChart, TooltipComponent, CanvasRenderer])
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const arrivedFromAnalysisLoader = (() => {
+      try {
+        const raw = window.sessionStorage.getItem('brandVisibilityReportArrival')
+        if (!raw) return false
+        window.sessionStorage.removeItem('brandVisibilityReportArrival')
+        const payload = JSON.parse(raw) as { source?: string; at?: number }
+        return payload.source === 'analysis-loader' && typeof payload.at === 'number' && Date.now() - payload.at < 30000
+      } catch {
+        return false
+      }
+    })()
 
     const closeSentimentInfo = () => {
       document.querySelectorAll<HTMLElement>('.sentiment-info-wrap.is-open').forEach((wrap) => {
@@ -1797,6 +1808,40 @@ const sectionNumbers = Object.fromEntries(
     }
 
     if (!reduce) {
+      if (arrivedFromAnalysisLoader) {
+        const reportHero = document.querySelector<HTMLElement>('[data-capture="report-hero"]')
+        const readinessPanel = document.querySelector<HTMLElement>('[data-capture="report-readiness"]')
+        const firstSection = document.querySelector<HTMLElement>('[data-capture="report-method"]')
+        const arrival = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+        if (reportHero) {
+          arrival.fromTo(
+            reportHero,
+            { autoAlpha: 0, y: 18, scale: 0.992 },
+            { autoAlpha: 1, y: 0, scale: 1, duration: 0.62, clearProps: 'opacity,visibility,transform' },
+            0,
+          )
+        }
+
+        if (readinessPanel) {
+          arrival.fromTo(
+            readinessPanel,
+            { autoAlpha: 0, y: 24, scale: 0.985 },
+            { autoAlpha: 1, y: 0, scale: 1, duration: 0.58, clearProps: 'opacity,visibility,transform' },
+            0.22,
+          )
+        }
+
+        if (firstSection) {
+          arrival.fromTo(
+            firstSection,
+            { autoAlpha: 0, y: 18 },
+            { autoAlpha: 1, y: 0, duration: 0.5, clearProps: 'opacity,visibility,transform' },
+            0.34,
+          )
+        }
+      }
+
       // ── count-up (score + eje percepción) ──
       document.querySelectorAll<HTMLElement>('[data-countup]').forEach((el) => {
         const target = parseFloat(el.dataset.countup || '')

@@ -51,173 +51,444 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     class="analysis-panel"
     data-capture="brand-visibility-analysis"
     data-analysis-panel
+    data-phase="accepted"
     hidden
     tabindex="-1"
     aria-labelledby="analysis-title"
+    aria-describedby="analysis-description"
     aria-live="polite"
+    aria-busy="true"
   >
-    <p class="mini-label">Análisis en curso</p>
-    <h2 id="analysis-title">Estamos preparando tu reporte</h2>
-    <p data-analysis-message>
-      Estamos revisando señales de presencia, citabilidad, categoría y accionabilidad.
-      Mantén esta pantalla abierta para abrir el reporte cuando esté listo.
-    </p>
+    <div class="analysis-grid">
+      <div class="analysis-copy">
+        <div class="analysis-kicker-row">
+          <p class="mini-label">Pipeline de análisis</p>
+          <span class="analysis-status-chip" data-analysis-status-chip>Solicitud recibida</span>
+        </div>
+        <h2 id="analysis-title">Estamos construyendo tu informe privado</h2>
+        <p id="analysis-description" data-analysis-message>
+          Recibimos tu solicitud y estamos esperando el estado gobernado del análisis.
+        </p>
+        <p class="analysis-assurance" data-analysis-assurance>
+          El reporte se abrirá en una ruta privada apenas Greenhouse confirme que está listo.
+        </p>
 
-    <div class="analysis-skeleton" aria-hidden="true">
-      <span class="skeleton-gauge"></span>
-      <span class="skeleton-line wide"></span>
-      <span class="skeleton-line"></span>
-      <span class="skeleton-line short"></span>
+        <div
+          class="analysis-progress"
+          role="progressbar"
+          aria-label="Progreso del análisis"
+          aria-valuemin="1"
+          aria-valuemax="4"
+          aria-valuenow="1"
+          data-analysis-progressbar
+        >
+          <span data-analysis-progress></span>
+        </div>
+
+        <ol class="analysis-steps" aria-label="Estados del análisis">
+          <li data-status-step="accepted">
+            <span class="step-index">01</span>
+            <span>
+              <strong>Solicitud recibida</strong>
+              <em>Validamos el envío y protegemos la ruta del informe.</em>
+            </span>
+          </li>
+          <li data-status-step="queued">
+            <span class="step-index">02</span>
+            <span>
+              <strong>Análisis en cola</strong>
+              <em>El sistema prepara mercado, categoría y competidores.</em>
+            </span>
+          </li>
+          <li data-status-step="processing">
+            <span class="step-index">03</span>
+            <span>
+              <strong>Señales en preparación</strong>
+              <em>Ordenamos presencia, citabilidad, categoría y operabilidad.</em>
+            </span>
+          </li>
+          <li data-status-step="ready">
+            <span class="step-index">04</span>
+            <span>
+              <strong>Reporte privado</strong>
+              <em>Think abrirá el resultado cuando el token esté disponible.</em>
+            </span>
+          </li>
+        </ol>
+      </div>
+
+      <div class="analysis-visual" aria-hidden="true">
+        <div class="analysis-core" data-analysis-core>
+          <svg viewBox="0 0 220 220" role="presentation">
+            <defs>
+              <linearGradient id="analysis-core-stroke" x1="30" x2="190" y1="34" y2="186" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="var(--axis-success)" />
+                <stop offset="0.48" stop-color="var(--axis-blue)" />
+                <stop offset="1" stop-color="var(--axis-warning)" />
+              </linearGradient>
+            </defs>
+            <circle class="analysis-ring analysis-ring-outer" cx="110" cy="110" r="88"></circle>
+            <circle class="analysis-ring analysis-ring-mid" cx="110" cy="110" r="62"></circle>
+            <path
+              class="analysis-scan-path"
+              data-analysis-scan-path
+              d="M 31 113 C 68 56 149 52 189 112 C 152 168 69 169 31 113"
+            ></path>
+            <path
+              class="analysis-scan-path analysis-scan-path-soft"
+              d="M 54 114 C 82 83 138 80 166 113 C 138 144 83 145 54 114"
+            ></path>
+            <g class="analysis-nodes">
+              <circle data-analysis-node cx="110" cy="22" r="4.5"></circle>
+              <circle data-analysis-node cx="188" cy="110" r="4.5"></circle>
+              <circle data-analysis-node cx="110" cy="198" r="4.5"></circle>
+              <circle data-analysis-node cx="32" cy="110" r="4.5"></circle>
+            </g>
+            <g class="analysis-core-mark">
+              <circle cx="110" cy="110" r="23"></circle>
+              <path d="M98 112.5h24M110 100.5v24M101.5 101.5l17 17M118.5 101.5l-17 17"></path>
+            </g>
+          </svg>
+          <span class="analysis-core-label">Visibilidad IA</span>
+        </div>
+
+        <div class="analysis-signal-grid" data-analysis-signals>
+          <span data-analysis-signal><strong>Presencia</strong><em>En preparación</em></span>
+          <span data-analysis-signal><strong>Citabilidad</strong><em>En preparación</em></span>
+          <span data-analysis-signal><strong>Categoría</strong><em>En preparación</em></span>
+          <span data-analysis-signal><strong>Operabilidad</strong><em>En preparación</em></span>
+        </div>
+      </div>
     </div>
-
-    <ol class="analysis-steps" aria-label="Estados del análisis">
-      <li data-status-step="accepted">Solicitud recibida</li>
-      <li data-status-step="queued">Análisis en cola</li>
-      <li data-status-step="processing">Preparando señales</li>
-      <li data-status-step="ready">Reporte privado</li>
-    </ol>
 
     <a class="report-link" data-report-link href="#" hidden>Abrir informe</a>
   </section>
+
+  <div class="report-transition" data-report-transition hidden aria-hidden="true">
+    <div class="report-transition-card">
+      <span class="report-transition-kicker">Reporte listo</span>
+      <strong>Abriendo tu informe privado</strong>
+      <span class="report-transition-line"></span>
+    </div>
+  </div>
 </aside>
 
-<script is:inline>
-  (() => {
-    const docks = document.querySelectorAll('[data-brand-visibility-form-dock]')
+<script>
+  import gsap from 'gsap'
 
-    docks.forEach((dock) => {
-      if (!(dock instanceof HTMLElement) || dock.dataset.formDockBound === 'true') return
-      dock.dataset.formDockBound = 'true'
+  const docks = document.querySelectorAll('[data-brand-visibility-form-dock]')
 
-      const formShell = dock.querySelector('[data-form-state="ready"]')
-      const analysisPanel = dock.querySelector('[data-analysis-panel]')
-      const analysisMessage = dock.querySelector('[data-analysis-message]')
-      const reportLink = dock.querySelector('[data-report-link]')
-      const steps = Array.from(dock.querySelectorAll('[data-status-step]'))
-      const form = dock.querySelector('greenhouse-form')
-      const hero = dock.closest('.hero-shell')
-      const page = dock.closest('.brand-visibility-page')
-      const desktopQuery = window.matchMedia('(min-width: 981px)')
+  docks.forEach((dock) => {
+    if (!(dock instanceof HTMLElement) || dock.dataset.formDockBound === 'true') return
+    dock.dataset.formDockBound = 'true'
 
-      const statusCopy = {
-        queued: 'La solicitud quedó en cola. Prepararemos el análisis y abriremos el informe cuando esté listo.',
-        processing: 'Estamos preparando señales de presencia, citabilidad, categoría y accionabilidad.',
-        ready: 'Tu informe privado está listo para abrirse en Think.',
-        in_review: 'El análisis requiere revisión antes de publicar el reporte. Te enviaremos una recuperación segura si aplica.',
-        unavailable: 'No pudimos preparar el reporte en este momento. La solicitud quedó registrada para recuperación segura.',
-        not_found: 'No pudimos encontrar el estado del análisis. Intenta nuevamente más tarde.',
-        error: 'No fue posible consultar el estado. Mantén la página abierta o vuelve a intentar en unos minutos.',
+    const formShell = dock.querySelector('[data-form-state="ready"]')
+    const analysisPanel = dock.querySelector('[data-analysis-panel]')
+    const analysisMessage = dock.querySelector('[data-analysis-message]')
+    const analysisAssurance = dock.querySelector('[data-analysis-assurance]')
+    const analysisStatusChip = dock.querySelector('[data-analysis-status-chip]')
+    const analysisProgress = dock.querySelector('[data-analysis-progress]')
+    const analysisProgressbar = dock.querySelector('[data-analysis-progressbar]')
+    const reportTransition = dock.querySelector('[data-report-transition]')
+    const reportLink = dock.querySelector('[data-report-link]')
+    const steps = Array.from(dock.querySelectorAll('[data-status-step]'))
+    const form = dock.querySelector('greenhouse-form')
+    const hero = dock.closest('.hero-shell')
+    const page = dock.closest('.brand-visibility-page')
+    const desktopQuery = window.matchMedia('(min-width: 981px)')
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const select = gsap.utils.selector(dock)
+
+    const statusMeta = {
+      accepted: {
+        chip: 'Solicitud recibida',
+        message: 'Recibimos tu solicitud y estamos esperando el estado gobernado del análisis.',
+        assurance: 'El reporte se abrirá en una ruta privada apenas Greenhouse confirme que está listo.',
+        step: 1,
+        progress: 0.18,
+      },
+      queued: {
+        chip: 'En cola segura',
+        message: 'La solicitud quedó en cola. Prepararemos el análisis y abriremos el informe cuando esté listo.',
+        assurance: 'Puedes mantener esta pestaña abierta; no hace falta volver a enviar el formulario.',
+        step: 2,
+        progress: 0.42,
+      },
+      processing: {
+        chip: 'Construyendo señales',
+        message: 'Estamos preparando señales de presencia, citabilidad, categoría y accionabilidad.',
+        assurance: 'Mostraremos sólo evidencia consolidada cuando el reporte esté disponible.',
+        step: 3,
+        progress: 0.74,
+      },
+      ready: {
+        chip: 'Reporte listo',
+        message: 'Tu informe privado está listo para abrirse en Think.',
+        assurance: 'Estamos preparando una transición segura hacia el reporte.',
+        step: 4,
+        progress: 1,
+      },
+      in_review: {
+        chip: 'En revisión',
+        message: 'El análisis requiere revisión antes de publicar el reporte. Te enviaremos una recuperación segura si aplica.',
+        assurance: 'La solicitud quedó registrada; no pierdes el envío.',
+        step: 3,
+        progress: 0.78,
+      },
+      unavailable: {
+        chip: 'Recuperación segura',
+        message: 'No pudimos preparar el reporte en este momento. La solicitud quedó registrada para recuperación segura.',
+        assurance: 'Si el sistema confirma el análisis más tarde, se podrá retomar por el canal configurado.',
+        step: 3,
+        progress: 0.68,
+      },
+      not_found: {
+        chip: 'Estado no encontrado',
+        message: 'No pudimos encontrar el estado del análisis. Intenta nuevamente más tarde.',
+        assurance: 'No vuelvas a enviar datos sensibles hasta confirmar que el servicio responde.',
+        step: 2,
+        progress: 0.42,
+      },
+      error: {
+        chip: 'Consulta intermitente',
+        message: 'No fue posible consultar el estado. Mantén la página abierta o vuelve a intentar en unos minutos.',
+        assurance: 'El envío ya fue aceptado; seguimos intentando leer el estado gobernado.',
+        step: 3,
+        progress: 0.62,
+      },
+    }
+    type AnalysisStatus = keyof typeof statusMeta
+
+    let introPlayed = false
+    let ambientTimeline: gsap.core.Timeline | null = null
+    const getStatusMeta = (status: string) => statusMeta[status as AnalysisStatus] ?? statusMeta.processing
+
+    const syncDockClearance = () => {
+      if (!(hero instanceof HTMLElement) || !(page instanceof HTMLElement)) return
+
+      if (!desktopQuery.matches) {
+        page.style.removeProperty('--brand-form-dock-clearance')
+        return
       }
 
-      const syncDockClearance = () => {
-        if (!(hero instanceof HTMLElement) || !(page instanceof HTMLElement)) return
-
-        if (!desktopQuery.matches) {
-          page.style.removeProperty('--brand-form-dock-clearance')
-          return
-        }
-
-        if (hero.classList.contains('hero-shell--analysis-active')) {
-          page.style.setProperty('--brand-form-dock-clearance', '2rem')
-          return
-        }
-
-        const rem = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16
-        const fallback = Math.min(Math.max(window.innerWidth * 0.12, 9 * rem), 14 * rem)
-        const heroRect = hero.getBoundingClientRect()
-        const dockRect = dock.getBoundingClientRect()
-        const needed = Math.max(0, dockRect.bottom - heroRect.bottom + 32)
-
-        page.style.setProperty('--brand-form-dock-clearance', `${Math.ceil(Math.max(fallback, needed))}px`)
+      if (hero.classList.contains('hero-shell--analysis-active')) {
+        page.style.setProperty('--brand-form-dock-clearance', '2rem')
+        return
       }
 
-      const scheduleDockClearance = () => window.requestAnimationFrame(syncDockClearance)
-      const resizeObserver = new ResizeObserver(scheduleDockClearance)
-      resizeObserver.observe(dock)
-      resizeObserver.observe(form || dock)
-      const mutationObserver = new MutationObserver(scheduleDockClearance)
-      mutationObserver.observe(dock, { childList: true, subtree: true, attributes: true })
-      desktopQuery.addEventListener?.('change', scheduleDockClearance)
-      window.addEventListener('resize', scheduleDockClearance, { passive: true })
-      scheduleDockClearance()
+      const rem = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16
+      const fallback = Math.min(Math.max(window.innerWidth * 0.12, 9 * rem), 14 * rem)
+      const heroRect = hero.getBoundingClientRect()
+      const dockRect = dock.getBoundingClientRect()
+      const needed = Math.max(0, dockRect.bottom - heroRect.bottom + 32)
 
-      const setStep = (status) => {
-        steps.forEach((step) => {
-          const isCurrent = step.getAttribute('data-status-step') === status
-          step.toggleAttribute('aria-current', isCurrent)
-        })
-      }
+      page.style.setProperty('--brand-form-dock-clearance', `${Math.ceil(Math.max(fallback, needed))}px`)
+    }
 
-      const showAnalysis = (message, status = 'accepted') => {
-        dock.closest('.hero-shell')?.classList.add('hero-shell--analysis-active')
-        formShell?.setAttribute('hidden', '')
-        analysisPanel?.removeAttribute('hidden')
-        if (analysisMessage && message) analysisMessage.textContent = message
-        setStep(status)
-        scheduleDockClearance()
-        if (analysisPanel instanceof HTMLElement) analysisPanel.focus({ preventScroll: true })
-      }
+    const scheduleDockClearance = () => window.requestAnimationFrame(syncDockClearance)
+    const resizeObserver = new ResizeObserver(scheduleDockClearance)
+    resizeObserver.observe(dock)
+    resizeObserver.observe(form || dock)
+    const mutationObserver = new MutationObserver(scheduleDockClearance)
+    mutationObserver.observe(dock, { childList: true, subtree: true, attributes: true })
+    desktopQuery.addEventListener?.('change', scheduleDockClearance)
+    window.addEventListener('resize', scheduleDockClearance, { passive: true })
+    scheduleDockClearance()
 
-      const showReport = (token) => {
-        const href = `/brand-visibility/r/${encodeURIComponent(token)}`
-        if (reportLink instanceof HTMLAnchorElement) {
-          reportLink.href = href
-          reportLink.hidden = false
-        }
-        showAnalysis(statusCopy.ready, 'ready')
-        window.setTimeout(() => {
-          window.location.assign(href)
-        }, 650)
-      }
+    const playIntro = () => {
+      if (!(analysisPanel instanceof HTMLElement) || reduceMotion.matches) return
 
-      const pollStatus = async (statusUrl, attempt = 0) => {
-        if (!statusUrl || attempt > 90) {
-          showAnalysis(statusCopy.error, 'processing')
-          return
-        }
+      const copyPieces = [
+        ...select('.analysis-kicker-row, .analysis-panel h2, [data-analysis-message], .analysis-assurance'),
+        ...select('.analysis-progress'),
+      ]
+      const visualPieces = [
+        ...select('.analysis-core'),
+        ...select('[data-analysis-signal]'),
+      ]
 
-        try {
-          const response = await fetch(statusUrl, { headers: { accept: 'application/json' } })
-          const payload = await response.json().catch(() => ({}))
-          const status = payload.status || (response.status === 404 ? 'not_found' : 'processing')
+      gsap.set(copyPieces, { autoAlpha: 0, y: 14 })
+      gsap.set(visualPieces, { autoAlpha: 0, y: 10, scale: 0.985 })
+      gsap.set(select('[data-analysis-progress]'), { scaleX: 0.04, transformOrigin: 'left center' })
+      gsap.set(select('[data-analysis-node]'), { scale: 0.6, transformOrigin: '50% 50%' })
 
-          if (status === 'ready' && payload.reportToken) {
-            showReport(payload.reportToken)
-            return
-          }
+      const intro = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      intro
+        .fromTo(analysisPanel, { autoAlpha: 0, y: 22, scale: 0.985 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5 })
+        .to(visualPieces, { autoAlpha: 1, y: 0, scale: 1, duration: 0.44, stagger: 0.035 }, 0.08)
+        .to(copyPieces, { autoAlpha: 1, y: 0, duration: 0.48, stagger: 0.04 }, 0.14)
+        .to(select('[data-analysis-progress]'), { scaleX: statusMeta.accepted.progress, duration: 0.72, ease: 'power2.out' }, 0.3)
+        .to(select('[data-analysis-node]'), { scale: 1, duration: 0.5, stagger: 0.075, ease: 'back.out(1.8)' }, 0.35)
 
-          if (status === 'in_review' || status === 'unavailable' || status === 'not_found') {
-            showAnalysis(statusCopy[status] || statusCopy.error, status)
-            return
-          }
+      ambientTimeline?.kill()
+      ambientTimeline = gsap.timeline({ repeat: -1, defaults: { ease: 'sine.inOut' } })
+      ambientTimeline
+        .to(select('.analysis-ring-outer'), { rotation: 360, svgOrigin: '110 110', duration: 18, ease: 'none' }, 0)
+        .to(select('.analysis-ring-mid'), { rotation: -360, svgOrigin: '110 110', duration: 14, ease: 'none' }, 0)
+        .fromTo(select('[data-analysis-scan-path]'), { strokeDashoffset: 420 }, { strokeDashoffset: 0, duration: 2.6, ease: 'power1.inOut', repeat: -1 }, 0)
+        .to(select('[data-analysis-node]'), { opacity: 0.48, scale: 0.72, duration: 0.72, stagger: { each: 0.16, yoyo: true, repeat: -1 } }, 0.2)
+    }
 
-          const normalizedStatus = status === 'queued' ? 'queued' : 'processing'
-          showAnalysis(statusCopy[normalizedStatus], normalizedStatus)
-          const retry = Number(payload.retryAfterSeconds)
-          const delay = Number.isFinite(retry) ? Math.max(2500, Math.min(retry * 1000, 15000)) : 5000
-          window.setTimeout(() => pollStatus(statusUrl, attempt + 1), delay)
-        } catch {
-          showAnalysis(statusCopy.error, 'processing')
-          window.setTimeout(() => pollStatus(statusUrl, attempt + 1), 8000)
-        }
-      }
+    const setStep = (status: string) => {
+      const meta = getStatusMeta(status)
+      const currentIndex = meta.step
 
-      form?.addEventListener('gh_form_submission_accepted', (event) => {
-        const detail = event.detail || {}
-        showAnalysis('Solicitud recibida. Estamos esperando el estado gobernado del análisis.', 'accepted')
-
-        if (typeof detail.status_url === 'string' && detail.status_url.length > 0) {
-          void pollStatus(detail.status_url)
-          return
-        }
-
-        showAnalysis(
-          'Recibimos tu solicitud, pero este formulario aún no entregó una URL de estado para abrir el reporte en pantalla.',
-          'accepted',
-        )
+      steps.forEach((step, index) => {
+        const isCurrent = index + 1 === currentIndex
+        const state = index + 1 < currentIndex ? 'complete' : isCurrent ? 'current' : 'pending'
+        step.toggleAttribute('aria-current', isCurrent)
+        step.setAttribute('data-step-state', state)
       })
+    }
+
+    const animateStatus = (status: string) => {
+      const meta = getStatusMeta(status)
+      if (analysisProgressbar instanceof HTMLElement) analysisProgressbar.setAttribute('aria-valuenow', String(meta.step))
+
+      if (reduceMotion.matches) {
+        if (analysisProgress instanceof HTMLElement) analysisProgress.style.transform = `scaleX(${meta.progress})`
+        return
+      }
+
+      if (analysisProgress instanceof HTMLElement) {
+        gsap.to(analysisProgress, { scaleX: meta.progress, duration: 0.6, ease: 'power3.out', overwrite: 'auto' })
+      }
+
+      const currentStep = steps.find((step) => step.getAttribute('data-step-state') === 'current')
+      if (currentStep instanceof HTMLElement) {
+        gsap.fromTo(currentStep, { y: 5, opacity: 0.72 }, { y: 0, opacity: 1, duration: 0.32, ease: 'power2.out', overwrite: 'auto' })
+      }
+    }
+
+    const setAnalysisState = (status: string, message?: string) => {
+      const meta = getStatusMeta(status)
+
+      if (analysisPanel instanceof HTMLElement) {
+        analysisPanel.dataset.phase = status
+        analysisPanel.setAttribute(
+          'aria-busy',
+          status === 'ready' || status === 'in_review' || status === 'unavailable' || status === 'not_found' ? 'false' : 'true',
+        )
+      }
+      if (analysisStatusChip instanceof HTMLElement) analysisStatusChip.textContent = meta.chip
+      if (analysisMessage instanceof HTMLElement) analysisMessage.textContent = message || meta.message
+      if (analysisAssurance instanceof HTMLElement) analysisAssurance.textContent = meta.assurance
+      setStep(status)
+      animateStatus(status)
+    }
+
+    const showAnalysis = (message: string, status = 'accepted') => {
+      dock.closest('.hero-shell')?.classList.add('hero-shell--analysis-active')
+      formShell?.setAttribute('hidden', '')
+      analysisPanel?.removeAttribute('hidden')
+
+      if (!introPlayed) {
+        introPlayed = true
+        playIntro()
+      }
+
+      setAnalysisState(status, message)
+      scheduleDockClearance()
+      if (analysisPanel instanceof HTMLElement) analysisPanel.focus({ preventScroll: true })
+    }
+
+    const rememberReportArrival = () => {
+      try {
+        window.sessionStorage.setItem('brandVisibilityReportArrival', JSON.stringify({ source: 'analysis-loader', at: Date.now() }))
+      } catch {
+        // Navigation still works if sessionStorage is unavailable.
+      }
+    }
+
+    const navigateWithTransition = (href: string) => {
+      rememberReportArrival()
+
+      if (reduceMotion.matches || !(reportTransition instanceof HTMLElement)) {
+        window.location.assign(href)
+        return
+      }
+
+      reportTransition.hidden = false
+      reportTransition.removeAttribute('aria-hidden')
+      document.body.style.overflow = 'hidden'
+
+      const transitionItems = select('.report-transition-card > *')
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        onComplete: () => window.location.assign(href),
+      })
+
+      tl
+        .set(reportTransition, { autoAlpha: 0 })
+        .set(transitionItems, { autoAlpha: 0, y: 16 })
+        .to(reportTransition, { autoAlpha: 1, duration: 0.32 })
+
+      if (analysisPanel instanceof HTMLElement) {
+        tl.to(analysisPanel, { y: -10, scale: 0.985, autoAlpha: 0.68, duration: 0.44 }, 0)
+      }
+
+      tl
+        .to(transitionItems, { autoAlpha: 1, y: 0, duration: 0.44, stagger: 0.065 }, 0.12)
+        .fromTo(select('.report-transition-line'), { scaleX: 0.08, transformOrigin: 'left center' }, { scaleX: 1, duration: 0.62, ease: 'power2.inOut' }, 0.28)
+    }
+
+    const showReport = (token: string) => {
+      const href = `/brand-visibility/r/${encodeURIComponent(token)}`
+      if (reportLink instanceof HTMLAnchorElement) {
+        reportLink.href = href
+        reportLink.hidden = false
+      }
+      showAnalysis(statusMeta.ready.message, 'ready')
+      window.setTimeout(() => navigateWithTransition(href), reduceMotion.matches ? 120 : 860)
+    }
+
+    const pollStatus = async (statusUrl: string, attempt = 0) => {
+      if (!statusUrl || attempt > 90) {
+        showAnalysis(statusMeta.error.message, 'processing')
+        return
+      }
+
+      try {
+        const response = await fetch(statusUrl, { headers: { accept: 'application/json' } })
+        const payload = await response.json().catch(() => ({}))
+        const status = payload.status || (response.status === 404 ? 'not_found' : 'processing')
+
+        if (status === 'ready' && payload.reportToken) {
+          showReport(payload.reportToken)
+          return
+        }
+
+        if (status === 'in_review' || status === 'unavailable' || status === 'not_found') {
+          showAnalysis(getStatusMeta(status).message, status)
+          return
+        }
+
+        const normalizedStatus = status === 'queued' ? 'queued' : 'processing'
+        showAnalysis(statusMeta[normalizedStatus].message, normalizedStatus)
+        const retry = Number(payload.retryAfterSeconds)
+        const delay = Number.isFinite(retry) ? Math.max(2500, Math.min(retry * 1000, 15000)) : 5000
+        window.setTimeout(() => pollStatus(statusUrl, attempt + 1), delay)
+      } catch {
+        showAnalysis(statusMeta.error.message, 'processing')
+        window.setTimeout(() => pollStatus(statusUrl, attempt + 1), 8000)
+      }
+    }
+
+    form?.addEventListener('gh_form_submission_accepted', (event) => {
+      const detail = (event as CustomEvent).detail || {}
+      showAnalysis(statusMeta.accepted.message, 'accepted')
+
+      if (typeof detail.status_url === 'string' && detail.status_url.length > 0) {
+        void pollStatus(detail.status_url)
+        return
+      }
+
+      showAnalysis(
+        'Recibimos tu solicitud, pero este formulario aún no entregó una URL de estado para abrir el reporte en pantalla.',
+        'accepted',
+      )
     })
-  })()
+  })
 </script>
 
 <style>
@@ -233,7 +504,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     border: 1px solid rgba(255, 255, 255, 0.74);
     border-radius: var(--brand-form-card-radius, 1.25rem);
     padding: clamp(1.15rem, 2vw, 1.55rem) clamp(1.25rem, 2.5vw, 1.85rem);
-    background: linear-gradient(180deg, #fff 0%, #fbfcff 100%);
+    background: linear-gradient(180deg, white 0%, color-mix(in srgb, var(--axis-gray-50) 64%, white) 100%);
     color: var(--axis-gray-900);
     box-shadow:
       0 36px 86px -46px rgba(0, 0, 0, 0.68),
@@ -263,6 +534,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     color: var(--axis-gray-900);
     font-size: 1.32rem;
     font-weight: 740;
+    letter-spacing: 0;
     line-height: 1.25;
   }
 
@@ -286,7 +558,8 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
 
   .form-state[hidden],
   .analysis-panel[hidden],
-  .report-link[hidden] {
+  .report-link[hidden],
+  .report-transition[hidden] {
     display: none;
   }
 
@@ -319,23 +592,16 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     align-items: end;
   }
 
-  .fallback-line,
-  .skeleton-line {
+  .fallback-line {
     display: block;
-    height: 0.8rem;
-    border-radius: 999px;
-    background: linear-gradient(90deg, var(--axis-gray-100), #fff, var(--axis-gray-100));
+    height: 2.65rem;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--axis-gray-100), white, var(--axis-gray-100));
     background-size: 180% 100%;
     animation: shimmer 1.4s ease-in-out infinite;
   }
 
-  .fallback-line {
-    height: 2.65rem;
-    border-radius: 6px;
-  }
-
-  .fallback-line.short,
-  .skeleton-line.short {
+  .fallback-line.short {
     width: 100%;
   }
 
@@ -347,7 +613,63 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   }
 
   .analysis-panel {
+    position: relative;
+    min-width: 0;
     outline: none;
+  }
+
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+    gap: clamp(1rem, 2.4vw, 1.55rem);
+    align-items: stretch;
+  }
+
+  .analysis-copy {
+    min-width: 0;
+    border: 1px solid rgba(119, 126, 144, 0.16);
+    border-radius: 8px;
+    padding: clamp(1rem, 1.6vw, 1.22rem);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(246, 248, 251, 0.82)),
+      var(--axis-gray-50);
+  }
+
+  .analysis-kicker-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.82rem;
+  }
+
+  .analysis-status-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border: 1px solid rgba(3, 117, 219, 0.18);
+    border-radius: 999px;
+    padding: 0.3rem 0.62rem;
+    background: rgba(3, 117, 219, 0.08);
+    color: var(--axis-blue-dark);
+    font-size: 0.74rem;
+    font-weight: 780;
+    line-height: 1;
+  }
+
+  .analysis-panel[data-phase='ready'] .analysis-status-chip {
+    border-color: rgba(34, 197, 94, 0.22);
+    background: rgba(34, 197, 94, 0.11);
+    color: color-mix(in srgb, var(--axis-success) 70%, black);
+  }
+
+  .analysis-panel[data-phase='in_review'] .analysis-status-chip,
+  .analysis-panel[data-phase='unavailable'] .analysis-status-chip,
+  .analysis-panel[data-phase='not_found'] .analysis-status-chip {
+    border-color: rgba(255, 179, 26, 0.26);
+    background: rgba(255, 179, 26, 0.12);
+    color: color-mix(in srgb, var(--axis-warning) 64%, black);
   }
 
   .analysis-panel p {
@@ -357,47 +679,234 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     line-height: 1.55;
   }
 
-  .analysis-skeleton {
-    display: grid;
-    gap: 0.7rem;
-    margin-top: 1.1rem;
-    border: 1px solid var(--axis-gray-100);
-    border-radius: 8px;
-    padding: 1rem;
-    background: var(--axis-gray-50);
+  .analysis-assurance {
+    max-width: 42rem;
   }
 
-  .skeleton-gauge {
-    width: 74px;
-    height: 74px;
-    border: 9px solid var(--axis-gray-100);
-    border-top-color: var(--axis-warning);
+  .analysis-progress {
+    position: relative;
+    overflow: hidden;
+    height: 0.58rem;
+    margin-top: 1rem;
+    border: 1px solid rgba(119, 126, 144, 0.12);
     border-radius: 999px;
+    background:
+      linear-gradient(90deg, rgba(246, 248, 251, 0.95), rgba(255, 255, 255, 0.76)),
+      var(--axis-gray-100);
   }
 
-  .skeleton-line.wide {
-    width: 86%;
+  .analysis-progress span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--axis-success), var(--axis-blue), var(--axis-warning));
+    box-shadow: 0 0 22px rgba(3, 117, 219, 0.18);
+    transform: scaleX(0.18);
+    transform-origin: left center;
   }
 
   .analysis-steps {
     display: grid;
-    gap: 0.48rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.56rem;
     margin: 1rem 0 0;
     padding: 0;
     list-style: none;
   }
 
   .analysis-steps li {
-    border-left: 3px solid var(--axis-gray-100);
-    padding: 0.2rem 0 0.2rem 0.72rem;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.62rem;
+    min-width: 0;
+    border: 1px solid rgba(119, 126, 144, 0.14);
+    border-radius: 8px;
+    padding: 0.72rem;
+    background: rgba(255, 255, 255, 0.78);
     color: var(--axis-gray-600);
-    font-size: 0.86rem;
   }
 
-  .analysis-steps li[aria-current='true'] {
-    border-left-color: var(--axis-blue);
+  .analysis-steps li[data-step-state='complete'],
+  .analysis-steps li[data-step-state='current'] {
+    border-color: rgba(3, 117, 219, 0.18);
+    background: rgba(3, 117, 219, 0.055);
+  }
+
+  .analysis-steps li[data-step-state='current'] {
+    box-shadow:
+      0 16px 40px -34px rgba(3, 117, 219, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
+
+  .step-index {
+    display: inline-grid;
+    place-items: center;
+    width: 1.62rem;
+    height: 1.62rem;
+    border-radius: 999px;
+    background: var(--axis-gray-100);
+    color: var(--axis-gray-600);
+    font-size: 0.66rem;
+    font-weight: 820;
+  }
+
+  .analysis-steps li[data-step-state='complete'] .step-index,
+  .analysis-steps li[data-step-state='current'] .step-index {
+    background: var(--axis-blue);
+    color: white;
+  }
+
+  .analysis-steps strong {
+    display: block;
     color: var(--axis-gray-900);
-    font-weight: 720;
+    font-size: 0.82rem;
+    line-height: 1.2;
+  }
+
+  .analysis-steps em {
+    display: block;
+    margin-top: 0.22rem;
+    color: var(--axis-gray-600);
+    font-size: 0.72rem;
+    font-style: normal;
+    line-height: 1.36;
+  }
+
+  .analysis-visual {
+    position: relative;
+    display: grid;
+    grid-template-rows: minmax(230px, 1fr) auto;
+    gap: 0.82rem;
+    overflow: hidden;
+    min-width: 0;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 8px;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(54, 215, 197, 0.16), transparent 35%),
+      linear-gradient(160deg, var(--axis-navy-soft) 0%, var(--axis-navy) 68%, color-mix(in srgb, var(--axis-navy) 82%, black) 100%);
+    color: white;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .analysis-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.66), transparent 88%);
+    pointer-events: none;
+  }
+
+  .analysis-core {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    min-height: 232px;
+  }
+
+  .analysis-core svg {
+    width: min(240px, 72vw);
+    max-width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .analysis-ring {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.18);
+    stroke-width: 1.4;
+    stroke-dasharray: 8 12;
+  }
+
+  .analysis-ring-mid {
+    stroke: rgba(255, 255, 255, 0.12);
+    stroke-dasharray: 4 10;
+  }
+
+  .analysis-scan-path {
+    fill: none;
+    stroke: url(#analysis-core-stroke);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-dasharray: 96 324;
+    opacity: 0.92;
+    filter: drop-shadow(0 0 14px rgba(54, 215, 197, 0.28));
+  }
+
+  .analysis-scan-path-soft {
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 1.2;
+    stroke-dasharray: 10 12;
+    filter: none;
+  }
+
+  .analysis-nodes circle {
+    fill: white;
+    stroke: rgba(54, 215, 197, 0.72);
+    stroke-width: 2;
+  }
+
+  .analysis-core-mark circle {
+    fill: rgba(255, 255, 255, 0.1);
+    stroke: rgba(255, 255, 255, 0.24);
+  }
+
+  .analysis-core-mark path {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.86);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+
+  .analysis-core-label {
+    position: absolute;
+    inset: auto auto 0.76rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    padding: 0.36rem 0.62rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.68rem;
+    font-weight: 760;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .analysis-signal-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .analysis-signal-grid span {
+    display: grid;
+    gap: 0.18rem;
+    min-width: 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 0.64rem;
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .analysis-signal-grid strong {
+    color: white;
+    font-size: 0.78rem;
+    line-height: 1.1;
+  }
+
+  .analysis-signal-grid em {
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.68rem;
+    font-style: normal;
+    line-height: 1.2;
   }
 
   .report-link {
@@ -409,10 +918,59 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     border-radius: 8px;
     padding: 0.7rem 1rem;
     background: var(--axis-blue);
-    color: #fff;
+    color: white;
     font-size: 0.9rem;
     font-weight: 760;
     text-decoration: none;
+  }
+
+  .report-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background:
+      radial-gradient(circle at 50% 40%, rgba(54, 215, 197, 0.16), transparent 32%),
+      linear-gradient(160deg, rgba(0, 30, 59, 0.96), rgba(0, 18, 35, 0.98));
+    color: white;
+  }
+
+  .report-transition-card {
+    display: grid;
+    gap: 0.62rem;
+    width: min(440px, 100%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    padding: 1.1rem;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 32px 86px -52px rgba(0, 0, 0, 0.86),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .report-transition-kicker {
+    color: rgba(255, 255, 255, 0.64);
+    font-size: 0.7rem;
+    font-weight: 820;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .report-transition-card strong {
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    line-height: 1.08;
+  }
+
+  .report-transition-line {
+    display: block;
+    height: 0.42rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--axis-success), var(--axis-blue), var(--axis-warning));
+    transform-origin: left center;
   }
 
   @keyframes shimmer {
@@ -428,14 +986,35 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       margin-bottom: 1.5rem;
     }
 
-    .governed-fallback {
+    .governed-fallback,
+    .analysis-grid,
+    .analysis-steps {
       grid-template-columns: 1fr !important;
+    }
+
+    .analysis-visual {
+      grid-template-rows: auto auto;
     }
   }
 
   @media (max-width: 640px) {
     .form-card {
       padding: 1rem;
+    }
+
+    .analysis-copy,
+    .analysis-visual {
+      padding: 0.86rem;
+    }
+
+    .analysis-signal-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fallback-line {
+      animation: none;
     }
   }
 </style>
