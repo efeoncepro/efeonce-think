@@ -73,6 +73,11 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
           El reporte se abrirá en una ruta privada apenas Greenhouse confirme que está listo.
         </p>
 
+        <div class="analysis-live-log" data-analysis-live-log aria-hidden="true">
+          <span class="analysis-live-log-label">Bitácora en vivo</span>
+          <p data-analysis-live-log-line>Tomamos número. El análisis ya está en la fila correcta.</p>
+        </div>
+
         <div
           class="analysis-progress"
           role="progressbar"
@@ -111,7 +116,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
             <span class="step-index">04</span>
             <span>
               <strong>Reporte privado</strong>
-              <em>Think abrirá el resultado cuando el token esté disponible.</em>
+              <em>Efeonce abrirá el informe automáticamente apenas esté listo.</em>
             </span>
           </li>
         </ol>
@@ -149,19 +154,21 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
               <path d="M98 112.5h24M110 100.5v24M101.5 101.5l17 17M118.5 101.5l-17 17"></path>
             </g>
           </svg>
-          <span class="analysis-core-label">Visibilidad IA</span>
+          <span class="analysis-core-label">
+            <img src="/branding/efeonce-logo-negative.svg" alt="" loading="eager" decoding="async" />
+          </span>
         </div>
 
         <div class="analysis-signal-grid" data-analysis-signals>
-          <span data-analysis-signal><strong>Presencia</strong><em>En preparación</em></span>
-          <span data-analysis-signal><strong>Citabilidad</strong><em>En preparación</em></span>
-          <span data-analysis-signal><strong>Categoría</strong><em>En preparación</em></span>
-          <span data-analysis-signal><strong>Operabilidad</strong><em>En preparación</em></span>
+          <span data-analysis-signal><strong>Presencia</strong><em>Leyendo cobertura</em></span>
+          <span data-analysis-signal><strong>Citabilidad</strong><em>Ordenando fuentes</em></span>
+          <span data-analysis-signal><strong>Categoría</strong><em>Calibrando contexto</em></span>
+          <span data-analysis-signal><strong>Operabilidad</strong><em>Evaluando acción</em></span>
         </div>
       </div>
     </div>
 
-    <a class="report-link" data-report-link href="#" hidden>Abrir informe</a>
+    <a class="report-link" data-report-link href="#" hidden>Si no avanza, abrir informe</a>
   </section>
 
   <div class="report-transition" data-report-transition hidden aria-hidden="true">
@@ -169,6 +176,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       <span class="report-transition-kicker">Reporte listo</span>
       <strong>Abriendo tu informe privado</strong>
       <span class="report-transition-line"></span>
+      <a class="report-transition-fallback" data-report-transition-link href="#" hidden>Si no avanza, abrir informe</a>
     </div>
   </div>
 </aside>
@@ -187,9 +195,11 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     const analysisMessage = dock.querySelector('[data-analysis-message]')
     const analysisAssurance = dock.querySelector('[data-analysis-assurance]')
     const analysisStatusChip = dock.querySelector('[data-analysis-status-chip]')
+    const analysisLiveLogLine = dock.querySelector('[data-analysis-live-log-line]')
     const analysisProgress = dock.querySelector('[data-analysis-progress]')
     const analysisProgressbar = dock.querySelector('[data-analysis-progressbar]')
     const reportTransition = dock.querySelector('[data-report-transition]')
+    const reportTransitionLink = dock.querySelector('[data-report-transition-link]')
     const reportLink = dock.querySelector('[data-report-link]')
     const steps = Array.from(dock.querySelectorAll('[data-status-step]'))
     const form = dock.querySelector('greenhouse-form')
@@ -202,29 +212,29 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     const statusMeta = {
       accepted: {
         chip: 'Solicitud recibida',
-        message: 'Recibimos tu solicitud y estamos esperando el estado gobernado del análisis.',
-        assurance: 'El reporte se abrirá en una ruta privada apenas Greenhouse confirme que está listo.',
+        message: 'Recibimos tu solicitud. Efeonce prepara la lectura y abrirá tu informe privado en esta misma pestaña apenas esté listo.',
+        assurance: 'Puedes mantener esta página abierta; el formulario ya no necesita volver a enviarse.',
         step: 1,
         progress: 0.18,
       },
       queued: {
         chip: 'En cola segura',
-        message: 'La solicitud quedó en cola. Prepararemos el análisis y abriremos el informe cuando esté listo.',
-        assurance: 'Puedes mantener esta pestaña abierta; no hace falta volver a enviar el formulario.',
+        message: 'Tu solicitud quedó en cola. Efeonce abrirá el resultado automáticamente en esta misma pestaña.',
+        assurance: 'Estamos esperando turno sin exponer datos sensibles en pantalla.',
         step: 2,
         progress: 0.42,
       },
       processing: {
         chip: 'Construyendo señales',
-        message: 'Estamos preparando señales de presencia, citabilidad, categoría y accionabilidad.',
+        message: 'Estamos leyendo presencia, citabilidad, categoría y operabilidad. Efeonce abrirá tu informe privado en esta misma pestaña apenas esté listo.',
         assurance: 'Mostraremos sólo evidencia consolidada cuando el reporte esté disponible.',
         step: 3,
         progress: 0.74,
       },
       ready: {
         chip: 'Reporte listo',
-        message: 'Tu informe privado está listo para abrirse en Think.',
-        assurance: 'Estamos preparando una transición segura hacia el reporte.',
+        message: 'Tu informe privado está listo. Efeonce está abriendo la ruta segura del reporte.',
+        assurance: 'Si la navegación no avanza, dejaremos un acceso de respaldo.',
         step: 4,
         progress: 1,
       },
@@ -251,17 +261,115 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       },
       error: {
         chip: 'Consulta intermitente',
-        message: 'No fue posible consultar el estado. Mantén la página abierta o vuelve a intentar en unos minutos.',
-        assurance: 'El envío ya fue aceptado; seguimos intentando leer el estado gobernado.',
+        message: 'La conexión al estado se interrumpió por momentos. Mantén esta página abierta; Efeonce seguirá reintentando la consulta de forma automática.',
+        assurance: 'El envío ya fue aceptado; no vuelvas a enviar el formulario mientras la consulta sigue activa.',
         step: 3,
         progress: 0.62,
       },
     }
     type AnalysisStatus = keyof typeof statusMeta
 
+    const liveLogDecks: Record<AnalysisStatus, string[]> = {
+      accepted: [
+        'Tomamos número. El análisis ya está en la fila correcta.',
+        'Guardamos tu solicitud; ahora esperamos turno sin hacer ruido.',
+        'Buen momento para respirar: el envío ya quedó protegido.',
+        'Estamos preparando el contexto antes de tocar los motores de IA.',
+      ],
+      queued: [
+        'La cola está viva. Tu informe no se perdió, sólo está esperando pista.',
+        'Separando evidencia útil de decoración bonita.',
+        'Buscando señales reales, no métricas para la foto.',
+        'Calibrando la categoría para que el informe no hable en genérico.',
+        'Preparando una lectura que puedas mostrar sin pedir disculpas.',
+      ],
+      processing: [
+        'Leyendo presencia: dónde aparece tu marca y dónde todavía no.',
+        'Revisando citabilidad: quién sostiene la confianza cuando la IA responde.',
+        'Comparando contexto competitivo sin inflar el marcador.',
+        'Traduciendo hallazgos en acciones, no en adornos.',
+        'Estamos dejando fuera el ruido. El informe sólo muestra evidencia consolidada.',
+      ],
+      ready: [
+        'Ya está. Cerramos la lectura y preparamos la transición.',
+        'Reporte consolidado. Vamos a abrirlo sin exponer el token en pantalla.',
+        'Informe listo. Abrimos la ruta privada en esta pestaña.',
+      ],
+      in_review: [
+        'Encontramos algo que merece revisión humana antes de publicar.',
+        'Preferimos pausar con criterio antes que mostrar una lectura dudosa.',
+      ],
+      unavailable: [
+        'El análisis quedó registrado, pero hoy el sistema pidió recuperación segura.',
+        'No perdimos la solicitud; sólo evitamos mostrar un resultado incompleto.',
+      ],
+      not_found: [
+        'No encontramos el estado todavía. Mejor no reenviar datos hasta confirmar.',
+        'La consulta no volvió con una ruta clara; mantenemos el modo seguro.',
+      ],
+      error: [
+        'La conexión al estado hizo una pausa breve; seguimos intentando.',
+        'Esto no está congelado: estamos esperando una respuesta confiable.',
+        'Algunos motores se toman su tiempo. Preferimos esperar bien a mostrar humo.',
+      ],
+    }
+
     let introPlayed = false
     let ambientTimeline: gsap.core.Timeline | null = null
+    let activeLiveLogStatus = ''
+    let liveLogIndex = 0
+    let liveLogTypeTimer = 0
+    let liveLogNextTimer = 0
     const getStatusMeta = (status: string) => statusMeta[status as AnalysisStatus] ?? statusMeta.processing
+
+    const stopLiveLog = () => {
+      window.clearTimeout(liveLogTypeTimer)
+      window.clearTimeout(liveLogNextTimer)
+    }
+
+    const typeLiveLogLine = (text: string) => {
+      if (!(analysisLiveLogLine instanceof HTMLElement)) return
+
+      stopLiveLog()
+      analysisLiveLogLine.textContent = ''
+
+      if (reduceMotion.matches) {
+        analysisLiveLogLine.textContent = text
+        liveLogNextTimer = window.setTimeout(() => rotateLiveLog(activeLiveLogStatus), 5600)
+        return
+      }
+
+      let cursor = 0
+      const writeNext = () => {
+        analysisLiveLogLine.textContent = text.slice(0, cursor)
+        cursor += 1
+
+        if (cursor <= text.length) {
+          liveLogTypeTimer = window.setTimeout(writeNext, cursor < 12 ? 24 : 17)
+          return
+        }
+
+        liveLogNextTimer = window.setTimeout(() => rotateLiveLog(activeLiveLogStatus), 4400)
+      }
+
+      writeNext()
+    }
+
+    const rotateLiveLog = (status: string) => {
+      const deck = liveLogDecks[status as AnalysisStatus] || liveLogDecks.processing
+      const text = deck[liveLogIndex % deck.length] || deck[0]
+      liveLogIndex += 1
+      typeLiveLogLine(text)
+    }
+
+    const startLiveLog = (status: string) => {
+      const normalizedStatus = (status in liveLogDecks ? status : 'processing') as AnalysisStatus
+      if (activeLiveLogStatus === normalizedStatus) return
+
+      activeLiveLogStatus = normalizedStatus
+      liveLogIndex = 0
+      rotateLiveLog(normalizedStatus)
+    }
 
     const syncDockClearance = () => {
       if (!(hero instanceof HTMLElement) || !(page instanceof HTMLElement)) return
@@ -299,7 +407,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       if (!(analysisPanel instanceof HTMLElement) || reduceMotion.matches) return
 
       const copyPieces = [
-        ...select('.analysis-kicker-row, .analysis-panel h2, [data-analysis-message], .analysis-assurance'),
+        ...select('.analysis-kicker-row, .analysis-panel h2, [data-analysis-message], .analysis-assurance, .analysis-live-log'),
         ...select('.analysis-progress'),
       ]
       const visualPieces = [
@@ -317,7 +425,6 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
         .fromTo(analysisPanel, { autoAlpha: 0, y: 22, scale: 0.985 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5 })
         .to(visualPieces, { autoAlpha: 1, y: 0, scale: 1, duration: 0.44, stagger: 0.035 }, 0.08)
         .to(copyPieces, { autoAlpha: 1, y: 0, duration: 0.48, stagger: 0.04 }, 0.14)
-        .to(select('[data-analysis-progress]'), { scaleX: statusMeta.accepted.progress, duration: 0.72, ease: 'power2.out' }, 0.3)
         .to(select('[data-analysis-node]'), { scale: 1, duration: 0.5, stagger: 0.075, ease: 'back.out(1.8)' }, 0.35)
 
       ambientTimeline?.kill()
@@ -327,6 +434,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
         .to(select('.analysis-ring-mid'), { rotation: -360, svgOrigin: '110 110', duration: 14, ease: 'none' }, 0)
         .fromTo(select('[data-analysis-scan-path]'), { strokeDashoffset: 420 }, { strokeDashoffset: 0, duration: 2.6, ease: 'power1.inOut', repeat: -1 }, 0)
         .to(select('[data-analysis-node]'), { opacity: 0.48, scale: 0.72, duration: 0.72, stagger: { each: 0.16, yoyo: true, repeat: -1 } }, 0.2)
+        .to(select('[data-analysis-signal]'), { y: -4, opacity: 0.86, duration: 1.15, stagger: { each: 0.18, yoyo: true, repeat: -1 } }, 0.1)
     }
 
     const setStep = (status: string) => {
@@ -375,9 +483,11 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       if (analysisAssurance instanceof HTMLElement) analysisAssurance.textContent = meta.assurance
       setStep(status)
       animateStatus(status)
+      startLiveLog(status)
     }
 
     const showAnalysis = (message: string, status = 'accepted') => {
+      document.documentElement.classList.add('brand-analysis-active')
       dock.closest('.hero-shell')?.classList.add('hero-shell--analysis-active')
       formShell?.setAttribute('hidden', '')
       analysisPanel?.removeAttribute('hidden')
@@ -412,6 +522,13 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       reportTransition.removeAttribute('aria-hidden')
       document.body.style.overflow = 'hidden'
 
+      if (reportTransitionLink instanceof HTMLAnchorElement) {
+        reportTransitionLink.hidden = true
+        window.setTimeout(() => {
+          if (document.visibilityState === 'visible') reportTransitionLink.hidden = false
+        }, 3200)
+      }
+
       const transitionItems = select('.report-transition-card > *')
       const tl = gsap.timeline({
         defaults: { ease: 'power3.out' },
@@ -436,10 +553,16 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       const href = `/brand-visibility/r/${encodeURIComponent(token)}`
       if (reportLink instanceof HTMLAnchorElement) {
         reportLink.href = href
-        reportLink.hidden = false
+        reportLink.hidden = true
+        window.setTimeout(() => {
+          if (document.visibilityState === 'visible') reportLink.hidden = false
+        }, 4200)
+      }
+      if (reportTransitionLink instanceof HTMLAnchorElement) {
+        reportTransitionLink.href = href
       }
       showAnalysis(statusMeta.ready.message, 'ready')
-      window.setTimeout(() => navigateWithTransition(href), reduceMotion.matches ? 120 : 860)
+      window.setTimeout(() => navigateWithTransition(href), reduceMotion.matches ? 120 : 720)
     }
 
     const pollStatus = async (statusUrl: string, attempt = 0) => {
@@ -513,9 +636,23 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   }
 
   :global(.hero-shell.hero-shell--analysis-active) .form-card {
-    position: relative;
+    position: fixed;
+    inset: 0;
     transform: none;
-    margin-bottom: 1.5rem;
+    z-index: 2141;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  :global(.hero-shell.hero-shell--analysis-active) .form-intro {
+    display: none;
   }
 
   .form-intro {
@@ -561,6 +698,29 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   .report-link[hidden],
   .report-transition[hidden] {
     display: none;
+  }
+
+  :global(html.brand-analysis-active),
+  :global(html.brand-analysis-active body) {
+    block-size: 100%;
+    overflow: hidden;
+  }
+
+  :global(html.brand-analysis-active .brand-visibility-page) {
+    block-size: 100dvh;
+    max-block-size: 100dvh;
+    overflow: hidden;
+  }
+
+  :global(html.brand-analysis-active .hero-shell.hero-shell--analysis-active) {
+    z-index: 2140;
+    min-block-size: 100dvh;
+    overflow: hidden;
+  }
+
+  :global(html.brand-analysis-active .brand-visibility-page > :not(.hero-shell)),
+  :global(html.brand-analysis-active .hero-shell.hero-shell--analysis-active > :not(.form-card)) {
+    display: none !important;
   }
 
   .form-state-ready {
@@ -613,26 +773,67 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   }
 
   .analysis-panel {
-    position: relative;
+    position: fixed;
+    inset: 0;
+    z-index: 920;
+    display: grid;
+    place-items: center;
+    block-size: 100dvh;
+    min-block-size: 100dvh;
+    box-sizing: border-box;
+    padding: clamp(1rem, 3vw, 2.5rem);
+    overflow: auto;
+    background:
+      radial-gradient(circle at 26% 18%, rgba(54, 215, 197, 0.18), transparent 28%),
+      radial-gradient(circle at 76% 26%, rgba(3, 117, 219, 0.18), transparent 30%),
+      linear-gradient(160deg, rgb(0, 40, 77) 0%, rgb(0, 24, 48) 72%, rgb(10, 12, 18) 100%);
+    color: white;
     min-width: 0;
     outline: none;
   }
 
+  .analysis-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at 50% 42%, black 0%, transparent 72%);
+    pointer-events: none;
+  }
+
   .analysis-grid {
+    position: relative;
+    z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
-    gap: clamp(1rem, 2.4vw, 1.55rem);
+    grid-template-columns: minmax(0, 0.98fr) minmax(380px, 0.82fr);
+    gap: clamp(1rem, 2.4vw, 1.6rem);
     align-items: stretch;
+    width: min(1180px, 100%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 18px;
+    padding: clamp(1rem, 2vw, 1.35rem);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.075)),
+      rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 44px 120px -64px rgba(0, 0, 0, 0.82),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(18px);
   }
 
   .analysis-copy {
     min-width: 0;
-    border: 1px solid rgba(119, 126, 144, 0.16);
-    border-radius: 8px;
-    padding: clamp(1rem, 1.6vw, 1.22rem);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: clamp(1.05rem, 1.9vw, 1.45rem);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(246, 248, 251, 0.82)),
-      var(--axis-gray-50);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(245, 249, 252, 0.84)),
+      rgba(255, 255, 255, 0.84);
+    color: var(--axis-gray-900);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
   }
 
   .analysis-kicker-row {
@@ -683,6 +884,66 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     max-width: 42rem;
   }
 
+  .analysis-live-log {
+    position: relative;
+    display: grid;
+    gap: 0.32rem;
+    min-height: 4.35rem;
+    margin-top: 1rem;
+    border: 1px solid rgba(3, 117, 219, 0.12);
+    border-radius: 10px;
+    padding: 0.72rem 0.86rem;
+    background:
+      linear-gradient(180deg, rgba(3, 117, 219, 0.05), rgba(54, 215, 197, 0.035)),
+      rgba(255, 255, 255, 0.62);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .analysis-live-log::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, rgba(54, 215, 197, 0.12), transparent 28%, rgba(3, 117, 219, 0.08));
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .analysis-live-log-label,
+  .analysis-live-log p {
+    position: relative;
+    z-index: 1;
+  }
+
+  .analysis-live-log-label {
+    color: color-mix(in srgb, var(--axis-blue-dark) 70%, var(--axis-gray-700));
+    font-size: 0.66rem;
+    font-weight: 820;
+    letter-spacing: 0.09em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .analysis-live-log p {
+    min-height: 1.5em;
+    margin: 0;
+    color: var(--axis-gray-700);
+    font-size: 0.86rem;
+    font-weight: 560;
+    line-height: 1.45;
+  }
+
+  .analysis-live-log p::after {
+    content: '';
+    display: inline-block;
+    width: 0.48em;
+    height: 1.05em;
+    margin-left: 0.1em;
+    border-right: 2px solid rgba(3, 117, 219, 0.58);
+    transform: translateY(0.16em);
+    animation: liveLogCaret 0.9s steps(2, jump-none) infinite;
+  }
+
   .analysis-progress {
     position: relative;
     overflow: hidden;
@@ -693,6 +954,15 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     background:
       linear-gradient(90deg, rgba(246, 248, 251, 0.95), rgba(255, 255, 255, 0.76)),
       var(--axis-gray-100);
+  }
+
+  .analysis-progress::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+    transform: translateX(-120%);
+    animation: analysisSweep 2.4s ease-in-out infinite;
   }
 
   .analysis-progress span {
@@ -781,8 +1051,8 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     overflow: hidden;
     min-width: 0;
     border: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: 8px;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: clamp(0.95rem, 1.6vw, 1.2rem);
     background:
       radial-gradient(circle at 50% 42%, rgba(54, 215, 197, 0.16), transparent 35%),
       linear-gradient(160deg, var(--axis-navy-soft) 0%, var(--axis-navy) 68%, color-mix(in srgb, var(--axis-navy) 82%, black) 100%);
@@ -867,15 +1137,22 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   .analysis-core-label {
     position: absolute;
     inset: auto auto 0.76rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 999px;
-    padding: 0.36rem 0.62rem;
+    min-width: 92px;
+    min-height: 29px;
+    padding: 0.34rem 0.72rem;
     background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.78);
-    font-size: 0.68rem;
-    font-weight: 760;
-    letter-spacing: 0;
-    text-transform: uppercase;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .analysis-core-label img {
+    display: block;
+    width: 72px;
+    height: auto;
   }
 
   .analysis-signal-grid {
@@ -894,6 +1171,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     border-radius: 8px;
     padding: 0.64rem;
     background: rgba(255, 255, 255, 0.07);
+    will-change: transform, opacity;
   }
 
   .analysis-signal-grid strong {
@@ -910,18 +1188,23 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   }
 
   .report-link {
+    position: fixed;
+    inset: auto auto clamp(1rem, 3vw, 2rem) 50%;
+    z-index: 2;
+    transform: translateX(-50%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 42px;
-    margin-top: 1rem;
-    border-radius: 8px;
-    padding: 0.7rem 1rem;
-    background: var(--axis-blue);
-    color: white;
-    font-size: 0.9rem;
-    font-weight: 760;
+    min-height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    padding: 0.52rem 0.82rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.78rem;
+    font-weight: 700;
     text-decoration: none;
+    backdrop-filter: blur(12px);
   }
 
   .report-transition {
@@ -973,9 +1256,31 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     transform-origin: left center;
   }
 
+  .report-transition-fallback {
+    justify-self: start;
+    margin-top: 0.08rem;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration-color: rgba(54, 215, 197, 0.55);
+    text-underline-offset: 0.22em;
+  }
+
   @keyframes shimmer {
     from { background-position: 100% 0; }
     to { background-position: -100% 0; }
+  }
+
+  @keyframes analysisSweep {
+    0% { transform: translateX(-120%); opacity: 0; }
+    18% { opacity: 1; }
+    74% { opacity: 1; }
+    100% { transform: translateX(120%); opacity: 0; }
+  }
+
+  @keyframes liveLogCaret {
+    0%, 44% { opacity: 1; }
+    45%, 100% { opacity: 0; }
   }
 
   @media (max-width: 980px) {
@@ -995,6 +1300,10 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     .analysis-visual {
       grid-template-rows: auto auto;
     }
+
+    .analysis-panel {
+      align-items: start;
+    }
   }
 
   @media (max-width: 640px) {
@@ -1010,10 +1319,15 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     .analysis-signal-grid {
       grid-template-columns: 1fr;
     }
+
+    .analysis-live-log {
+      min-height: 5.15rem;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .fallback-line {
+    .fallback-line,
+    .analysis-live-log p::after {
       animation: none;
     }
   }
