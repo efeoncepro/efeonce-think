@@ -1,16 +1,38 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro'
 import BrandVisibilityFormDock from '@/components/BrandVisibilityFormDock.astro'
+import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import EngineAvatarGroup from '@/components/primitives/EngineAvatarGroup.astro'
 import HeroAnswerLens from '@/components/HeroAnswerLens.astro'
+import { buildCopyrightNotice } from '@lib/legal'
 import { axis, LEVEL_COPY } from '@lib/report-tokens'
 
 const engines = ['chatgpt', 'gemini', 'claude', 'perplexity', 'google_ai_overview']
 const previewModules = [
-  { title: 'Presencia', icon: 'presence' },
-  { title: 'Citabilidad', icon: 'citation' },
-  { title: 'Categoría percibida', icon: 'category' },
-  { title: 'Operabilidad', icon: 'operability' },
+  {
+    title: 'Presencia',
+    icon: 'presence',
+    label: 'Cobertura',
+    body: 'Dónde aparece tu marca, en qué motores y con qué consistencia frente al mercado.',
+  },
+  {
+    title: 'Citabilidad',
+    icon: 'citation',
+    label: 'Fuentes',
+    body: 'Qué dominios y señales sostienen la confianza de la IA cuando recomienda opciones.',
+  },
+  {
+    title: 'Categoría percibida',
+    icon: 'category',
+    label: 'Posición',
+    body: 'Cómo interpreta tu oferta, con qué competidores te compara y en qué categoría te ubica.',
+  },
+  {
+    title: 'Operabilidad',
+    icon: 'operability',
+    label: 'Acción',
+    body: 'Si tu presencia digital está lista para ser leída, citada y usada por motores de respuesta.',
+  },
 ]
 const levels = [
   { key: 'found', body: 'Que la IA pueda encontrarte.' },
@@ -19,6 +41,7 @@ const levels = [
   { key: 'actionable', body: 'Que la IA pueda actuar con tu info.' },
   { key: 'intrinsic', body: 'Que la IA te prefiera por defecto.' },
 ]
+const footerCopyrightNotice = buildCopyrightNotice()
 ---
 
 <BaseLayout
@@ -68,7 +91,6 @@ const levels = [
     </section>
 
     <section class="framework-band" data-capture="brand-visibility-trust" aria-labelledby="framework-title">
-      <span class="capture-only" data-capture="brand-visibility-flow" aria-hidden="true"></span>
       <h2 id="framework-title">Nuestro marco de visibilidad en 5 niveles</h2>
       <ol>
         {levels.map((level, index) => (
@@ -84,22 +106,69 @@ const levels = [
     </section>
 
     <section class="preview-flow-section" data-capture="brand-visibility-report-preview" aria-labelledby="preview-title">
+      <span class="capture-only" data-capture="brand-visibility-flow" aria-hidden="true"></span>
       <div class="preview-flow-grid">
         <article class="report-preview">
-          <h2 id="preview-title">Qué verás en tu informe</h2>
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Informe privado</p>
+              <h2 id="preview-title">Qué verás en tu informe</h2>
+            </div>
+            <p>
+              Una lectura ejecutiva para entender qué ve la IA, por qué lo ve
+              y qué puedes mejorar primero.
+            </p>
+          </div>
+
           <div class="preview-module-strip">
             {previewModules.map((module) => (
               <div class="preview-module">
-                <span class={module.icon} aria-hidden="true"></span>
+                <div class="preview-module-top">
+                  <span class={module.icon} aria-hidden="true"></span>
+                  <small>{module.label}</small>
+                </div>
                 <h3>{module.title}</h3>
-                <i aria-hidden="true"></i>
+                <p>{module.body}</p>
               </div>
             ))}
           </div>
-          <p>Un análisis profundo y accionable para entender y mejorar tu visibilidad en la IA.</p>
+
+          <div class="report-proof-row" aria-label="Características del informe">
+            <p><strong>Reporte privado.</strong> El resultado queda en una ruta segura para revisión interna.</p>
+            <p><strong>Sin métricas decorativas.</strong> Mostramos hallazgos cuando el análisis ya tiene evidencia.</p>
+            <p><strong>Accionable.</strong> Priorizamos señales que tu equipo puede convertir en mejoras concretas.</p>
+          </div>
         </article>
       </div>
     </section>
+
+    <footer class="report-footer brand-visibility-footer" data-capture="brand-visibility-footer">
+      <div class="report-footer-shell">
+        <div class="report-footer-brand">
+          <a href="https://efeoncepro.com" target="_blank" rel="noopener noreferrer" aria-label="Ir a efeoncepro.com">
+            <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" style="height:28px;width:auto" />
+          </a>
+          <EfeonceSlogan color="rgba(255,255,255,0.64)" size="0.62rem" />
+        </div>
+        <div class="report-footer-column">
+          <p class="report-footer-kicker">Propiedad intelectual</p>
+          <p class="report-footer-strong">{footerCopyrightNotice}</p>
+          <p>Todos los derechos reservados.</p>
+        </div>
+        <div class="report-footer-column report-footer-method">
+          <p class="report-footer-kicker">Método de análisis</p>
+          <p>
+            Modelo propietario de Efeonce para leer presencia, citabilidad
+            y posición competitiva en motores de respuesta.
+          </p>
+          <a href="https://efeoncepro.com" target="_blank" rel="noopener noreferrer" class="report-footer-link">Conoce más en efeoncepro.com</a>
+        </div>
+        <p class="report-footer-disclaimer">
+          Lectura agregada y asistida por IA. Orienta decisiones; no garantiza posiciones,
+          menciones ni resultados comerciales.
+        </p>
+      </div>
+    </footer>
   </main>
 </BaseLayout>
 
@@ -273,19 +342,18 @@ const levels = [
     padding-block: 0;
   }
 
-  .preview-module > span,
+  .preview-module-top > span,
   .framework-icon {
     display: inline-grid;
     place-items: center;
     width: 25px;
     height: 25px;
-    margin-bottom: 0.56rem;
     border-radius: 999px;
     border: 1.6px solid currentColor;
     color: var(--axis-success);
   }
 
-  .preview-module > span::before,
+  .preview-module-top > span::before,
   .framework-icon::before {
     content: '';
     width: 10px;
@@ -308,68 +376,137 @@ const levels = [
 
   .preview-flow-section {
     border-bottom: 1px solid var(--axis-gray-100);
-    background: #fff;
+    background:
+      linear-gradient(180deg, #fff 0%, rgba(246, 248, 251, 0.7) 100%);
   }
 
   .preview-flow-grid {
     display: block;
-    padding: 1.45rem 0 1.8rem;
+    padding: clamp(2rem, 4vw, 3.25rem) 0 clamp(2.7rem, 5vw, 4rem);
   }
 
   .report-preview {
+    display: grid;
+    gap: 1.2rem;
     min-width: 0;
   }
 
-  .report-preview h2 {
+  .section-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 0.62fr) minmax(280px, 0.38fr);
+    gap: clamp(1rem, 3vw, 2rem);
+    align-items: end;
+  }
+
+  .section-kicker {
+    margin: 0 0 0.3rem;
+    color: var(--axis-blue);
+    font-size: 0.72rem;
+    font-weight: 820;
+    letter-spacing: 0;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .section-heading h2 {
     margin: 0;
     color: var(--axis-gray-900);
-    font-size: 1.1rem;
+    font-size: clamp(1.22rem, 1.7vw, 1.55rem);
     font-weight: 740;
     line-height: 1.25;
   }
 
-  .preview-module-strip {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin-top: 1.15rem;
-    border-right: 1px solid var(--axis-gray-200);
-  }
-
-  .preview-module {
-    min-width: 0;
-    border-left: 1px solid var(--axis-gray-200);
-    padding: 0.2rem 1rem 0.15rem;
-  }
-
-  .preview-module h3 {
-    min-height: 2.1rem;
+  .section-heading > p {
     margin: 0;
-    color: var(--axis-gray-900);
-    font-size: 0.82rem;
-    font-weight: 740;
-    line-height: 1.18;
-  }
-
-  .preview-module i {
-    display: block;
-    width: min(82px, 90%);
-    height: 48px;
-    margin-top: 0.7rem;
-    border-radius: 4px;
-    background:
-      linear-gradient(90deg, var(--axis-gray-100) 24%, transparent 24% 34%, var(--axis-gray-100) 34% 58%, transparent 58% 68%, var(--axis-gray-100) 68%);
-    opacity: 0.82;
-  }
-
-  .report-preview > p {
-    margin: 1rem 0 0;
     color: var(--axis-gray-600);
     font-size: 0.92rem;
     line-height: 1.55;
   }
 
+  .preview-module-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: clip;
+    border: 1px solid var(--axis-gray-100);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 24px 64px -56px rgba(17, 24, 39, 0.38),
+      inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  }
+
+  .preview-module {
+    display: grid;
+    align-content: start;
+    gap: 0.54rem;
+    min-width: 0;
+    border-left: 1px solid var(--axis-gray-100);
+    padding: clamp(1rem, 2vw, 1.3rem);
+  }
+
+  .preview-module:first-child {
+    border-left: 0;
+  }
+
+  .preview-module-top {
+    display: flex;
+    align-items: center;
+    gap: 0.58rem;
+  }
+
+  .preview-module small {
+    color: var(--axis-gray-600);
+    font-size: 0.72rem;
+    font-weight: 760;
+    line-height: 1.2;
+  }
+
+  .preview-module h3 {
+    margin: 0;
+    color: var(--axis-gray-900);
+    font-size: 0.92rem;
+    font-weight: 740;
+    line-height: 1.22;
+  }
+
+  .preview-module p {
+    margin: 0;
+    color: var(--axis-gray-600);
+    font-size: 0.82rem;
+    line-height: 1.48;
+  }
+
+  .report-proof-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    overflow: clip;
+    border: 1px solid var(--axis-gray-100);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .report-proof-row p {
+    min-width: 0;
+    margin: 0;
+    border-left: 1px solid var(--axis-gray-100);
+    padding: 0.9rem 1rem;
+    color: var(--axis-gray-600);
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .report-proof-row p:first-child {
+    border-left: 0;
+  }
+
+  .report-proof-row strong {
+    color: var(--axis-gray-900);
+    font-weight: 760;
+  }
+
   .framework-band {
-    padding: var(--brand-form-dock-clearance, clamp(21rem, 28vw, 26rem)) 0 1.45rem;
+    padding: var(--brand-form-dock-clearance, clamp(9rem, 12vw, 14rem)) 0 clamp(2.25rem, 4vw, 3.25rem);
   }
 
   .framework-band h2 {
@@ -462,7 +599,9 @@ const levels = [
     }
 
     .preview-module-strip,
-    .framework-band ol {
+    .framework-band ol,
+    .report-proof-row,
+    .section-heading {
       grid-template-columns: 1fr;
     }
 
@@ -477,6 +616,20 @@ const levels = [
     .framework-band li:last-child,
     .preview-module:last-child {
       border-bottom: 0;
+    }
+
+    .preview-module {
+      border-left: 0;
+    }
+
+    .report-proof-row p,
+    .report-proof-row p:first-child {
+      border-left: 0;
+      border-top: 1px solid var(--axis-gray-100);
+    }
+
+    .report-proof-row p:first-child {
+      border-top: 0;
     }
   }
 

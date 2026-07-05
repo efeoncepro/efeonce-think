@@ -123,7 +123,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
         }
 
         const rem = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16
-        const fallback = Math.min(Math.max(window.innerWidth * 0.28, 21 * rem), 26 * rem)
+        const fallback = Math.min(Math.max(window.innerWidth * 0.12, 9 * rem), 14 * rem)
         const heroRect = hero.getBoundingClientRect()
         const dockRect = dock.getBoundingClientRect()
         const needed = Math.max(0, dockRect.bottom - heroRect.bottom + 32)
