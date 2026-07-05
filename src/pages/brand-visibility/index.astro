@@ -4,6 +4,7 @@ import BrandVisibilityFormDock from '@/components/BrandVisibilityFormDock.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import EngineAvatarGroup from '@/components/primitives/EngineAvatarGroup.astro'
 import HeroAnswerLens from '@/components/HeroAnswerLens.astro'
+import ReportIcon from '@/components/primitives/ReportIcon.astro'
 import { buildCopyrightNotice } from '@lib/legal'
 import { axis, LEVEL_COPY } from '@lib/report-tokens'
 
@@ -11,36 +12,40 @@ const engines = ['chatgpt', 'gemini', 'claude', 'perplexity', 'google_ai_overvie
 const previewModules = [
   {
     title: 'Presencia',
-    icon: 'presence',
+    icon: 'signal',
+    tone: 'presence',
     label: 'Cobertura',
     body: 'Dónde aparece tu marca, en qué motores y con qué consistencia frente al mercado.',
   },
   {
     title: 'Citabilidad',
     icon: 'citation',
+    tone: 'citation',
     label: 'Fuentes',
     body: 'Qué dominios y señales sostienen la confianza de la IA cuando recomienda opciones.',
   },
   {
     title: 'Categoría percibida',
     icon: 'category',
+    tone: 'category',
     label: 'Posición',
     body: 'Cómo interpreta tu oferta, con qué competidores te compara y en qué categoría te ubica.',
   },
   {
     title: 'Operabilidad',
-    icon: 'operability',
+    icon: 'readiness',
+    tone: 'operability',
     label: 'Acción',
     body: 'Si tu presencia digital está lista para ser leída, citada y usada por motores de respuesta.',
   },
-]
+] as const
 const levels = [
-  { key: 'found', body: 'Que la IA pueda encontrarte.' },
-  { key: 'readable', body: 'Que la IA pueda entenderte.' },
-  { key: 'correct', body: 'Que la IA pueda confiar en ti.' },
-  { key: 'actionable', body: 'Que la IA pueda actuar con tu info.' },
-  { key: 'intrinsic', body: 'Que la IA te prefiera por defecto.' },
-]
+  { key: 'found', icon: 'target', body: 'Que la IA pueda encontrarte.' },
+  { key: 'readable', icon: 'read', body: 'Que la IA pueda entenderte.' },
+  { key: 'correct', icon: 'validate', body: 'Que la IA pueda confiar en ti.' },
+  { key: 'actionable', icon: 'act', body: 'Que la IA pueda actuar con tu info.' },
+  { key: 'intrinsic', icon: 'priority', body: 'Que la IA te prefiera por defecto.' },
+] as const
 const footerCopyrightNotice = buildCopyrightNotice()
 ---
 
@@ -95,7 +100,9 @@ const footerCopyrightNotice = buildCopyrightNotice()
       <ol>
         {levels.map((level, index) => (
           <li>
-            <span class={`framework-icon framework-icon-${index + 1}`} aria-hidden="true"></span>
+            <span class={`framework-icon framework-icon-${index + 1}`} aria-hidden="true">
+              <ReportIcon name={level.icon} size={18} />
+            </span>
             <div>
               <strong>{LEVEL_COPY[level.key].labelEn}</strong>
               <p>{level.body}</p>
@@ -124,7 +131,9 @@ const footerCopyrightNotice = buildCopyrightNotice()
             {previewModules.map((module) => (
               <div class="preview-module">
                 <div class="preview-module-top">
-                  <span class={module.icon} aria-hidden="true"></span>
+                  <span class={`preview-icon preview-icon-${module.tone}`} aria-hidden="true">
+                    <ReportIcon name={module.icon} size={19} />
+                  </span>
                   <small>{module.label}</small>
                 </div>
                 <h3>{module.title}</h3>
@@ -342,35 +351,38 @@ const footerCopyrightNotice = buildCopyrightNotice()
     padding-block: 0;
   }
 
-  .preview-module-top > span,
+  .preview-icon,
   .framework-icon {
     display: inline-grid;
     place-items: center;
-    width: 25px;
-    height: 25px;
-    border-radius: 999px;
-    border: 1.6px solid currentColor;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38)),
+      color-mix(in srgb, currentColor 9%, transparent);
     color: var(--axis-success);
+    box-shadow:
+      0 16px 34px -28px currentColor,
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
   }
 
-  .preview-module-top > span::before,
-  .framework-icon::before {
-    content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: inherit;
-    border: 1.6px solid currentColor;
+  .preview-icon :global(svg),
+  .framework-icon :global(svg) {
+    filter: drop-shadow(0 6px 10px color-mix(in srgb, currentColor 20%, transparent));
   }
 
-  .citation {
+  .preview-icon-citation {
     color: var(--axis-warning) !important;
   }
 
-  .category {
+  .preview-icon-category {
     color: #5d7cff !important;
   }
 
-  .operability {
+  .preview-icon-operability {
     color: #7f64ff !important;
   }
 
@@ -451,7 +463,7 @@ const footerCopyrightNotice = buildCopyrightNotice()
   .preview-module-top {
     display: flex;
     align-items: center;
-    gap: 0.58rem;
+    gap: 0.72rem;
   }
 
   .preview-module small {
@@ -529,7 +541,7 @@ const footerCopyrightNotice = buildCopyrightNotice()
   .framework-band li {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 0.75rem;
+    gap: 0.85rem;
     min-width: 0;
     border-right: 1px solid var(--axis-gray-200);
     padding: 0 1rem;
@@ -540,7 +552,9 @@ const footerCopyrightNotice = buildCopyrightNotice()
   }
 
   .framework-icon {
-    margin-top: 0.12rem;
+    width: 38px;
+    height: 38px;
+    margin-top: 0.06rem;
   }
 
   .framework-icon-1 { color: var(--axis-success); }
