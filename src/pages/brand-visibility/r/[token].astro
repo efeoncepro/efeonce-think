@@ -1637,11 +1637,18 @@ const sectionNumbers = Object.fromEntries(
     })
 
     const copyToClipboard = async (value: string) => {
+      // Camino moderno: Clipboard API (secure context, todos los navegadores actuales).
       if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(value)
-        return
+        try {
+          await navigator.clipboard.writeText(value)
+          return
+        } catch {
+          // Bloqueado por permisos/gesto no confiable → cae al último recurso legacy.
+        }
       }
 
+      // Último recurso legacy (execCommand deprecado): solo se alcanza si la Clipboard
+      // API no existe o rechazó. Envuelto para que nunca lance ni ensucie la consola.
       const area = document.createElement('textarea')
       area.value = value
       area.setAttribute('readonly', '')
@@ -1650,8 +1657,13 @@ const sectionNumbers = Object.fromEntries(
       area.style.opacity = '0'
       document.body.append(area)
       area.select()
-      document.execCommand('copy')
-      area.remove()
+      try {
+        document.execCommand('copy')
+      } catch {
+        // Sin camino de copia disponible; el caller ya maneja el feedback al usuario.
+      } finally {
+        area.remove()
+      }
     }
 
     document.querySelectorAll<HTMLElement>('[data-capture="report-share"]').forEach((panel) => {
