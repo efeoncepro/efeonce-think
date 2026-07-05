@@ -12,13 +12,6 @@ const previewModules = [
   { title: 'Categoría percibida', icon: 'category' },
   { title: 'Operabilidad', icon: 'operability' },
 ]
-const flowSteps = [
-  { label: 'Solicitud recibida', body: 'Registramos tu solicitud de análisis.' },
-  { label: 'Análisis en cola', body: 'Tu solicitud entra en nuestra cola segura.' },
-  { label: 'Consultando motores', body: 'Consultamos múltiples motores de IA.' },
-  { label: 'Mapeando citabilidad', body: 'Evaluamos menciones, fuentes y contexto.' },
-  { label: 'Reporte privado', body: 'Generamos tu informe y lo mostramos en pantalla.' },
-]
 const levels = [
   { key: 'found', body: 'Que la IA pueda encontrarte.' },
   { key: 'readable', body: 'Que la IA pueda entenderte.' },
@@ -74,6 +67,22 @@ const levels = [
       <BrandVisibilityFormDock />
     </section>
 
+    <section class="framework-band" data-capture="brand-visibility-trust" aria-labelledby="framework-title">
+      <span class="capture-only" data-capture="brand-visibility-flow" aria-hidden="true"></span>
+      <h2 id="framework-title">Nuestro marco de visibilidad en 5 niveles</h2>
+      <ol>
+        {levels.map((level, index) => (
+          <li>
+            <span class={`framework-icon framework-icon-${index + 1}`} aria-hidden="true"></span>
+            <div>
+              <strong>{LEVEL_COPY[level.key].labelEn}</strong>
+              <p>{level.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+
     <section class="preview-flow-section" data-capture="brand-visibility-report-preview" aria-labelledby="preview-title">
       <div class="preview-flow-grid">
         <article class="report-preview">
@@ -89,35 +98,7 @@ const levels = [
           </div>
           <p>Un análisis profundo y accionable para entender y mejorar tu visibilidad en la IA.</p>
         </article>
-
-        <article class="flow-panel" data-capture="brand-visibility-flow" aria-labelledby="flow-title">
-          <h2 id="flow-title">Del formulario al informe</h2>
-          <ol class="flow-grid">
-            {flowSteps.map((step, index) => (
-              <li>
-                <span>{index + 1}</span>
-                <h3>{step.label}</h3>
-                <p>{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </article>
       </div>
-    </section>
-
-    <section class="framework-band" data-capture="brand-visibility-trust" aria-labelledby="framework-title">
-      <h2 id="framework-title">Nuestro marco de visibilidad en 5 niveles</h2>
-      <ol>
-        {levels.map((level, index) => (
-          <li>
-            <span class={`framework-icon framework-icon-${index + 1}`} aria-hidden="true"></span>
-            <div>
-              <strong>{LEVEL_COPY[level.key].labelEn}</strong>
-              <p>{level.body}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
     </section>
   </main>
 </BaseLayout>
@@ -125,7 +106,7 @@ const levels = [
 <style>
   .brand-visibility-page {
     --brand-form-card-radius: clamp(1rem, 1.7vw, 1.55rem);
-    --brand-hero-bottom-radius: clamp(3rem, 6vw, 5rem);
+    --brand-hero-bottom-radius: clamp(1.25rem, 2.6vw, 2.5rem);
     min-height: 100vh;
     overflow-x: clip;
     background: #fff;
@@ -331,20 +312,15 @@ const levels = [
   }
 
   .preview-flow-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.22fr) minmax(420px, 0.92fr);
-    gap: 2.2rem;
-    align-items: start;
-    padding: var(--brand-form-dock-clearance, clamp(21rem, 28vw, 26rem)) 0 1.8rem;
+    display: block;
+    padding: 1.45rem 0 1.8rem;
   }
 
-  .report-preview,
-  .flow-panel {
+  .report-preview {
     min-width: 0;
   }
 
-  .report-preview h2,
-  .flow-panel h2 {
+  .report-preview h2 {
     margin: 0;
     color: var(--axis-gray-900);
     font-size: 1.1rem;
@@ -392,55 +368,8 @@ const levels = [
     line-height: 1.55;
   }
 
-  .flow-panel {
-    border-left: 1px solid var(--axis-gray-200);
-    padding-left: 2.2rem;
-  }
-
-  .flow-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0.75rem;
-    margin: 1.2rem 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .flow-grid li {
-    position: relative;
-    min-width: 0;
-    text-align: center;
-  }
-
-  .flow-grid span {
-    display: inline-grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    border: 1px solid var(--axis-blue);
-    border-radius: 999px;
-    color: var(--axis-blue);
-    font-weight: 760;
-    background: #fff;
-  }
-
-  .flow-grid h3 {
-    margin: 0.72rem 0 0;
-    color: var(--axis-gray-900);
-    font-size: 0.82rem;
-    font-weight: 760;
-    line-height: 1.18;
-  }
-
-  .flow-grid p {
-    margin: 0.45rem 0 0;
-    color: var(--axis-gray-600);
-    font-size: 0.73rem;
-    line-height: 1.42;
-  }
-
   .framework-band {
-    padding: 1.35rem 0 1.45rem;
+    padding: var(--brand-form-dock-clearance, clamp(21rem, 28vw, 26rem)) 0 1.45rem;
   }
 
   .framework-band h2 {
@@ -497,10 +426,20 @@ const levels = [
     line-height: 1.35;
   }
 
+  .capture-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   @media (max-width: 980px) {
     .brand-visibility-page {
       --brand-form-card-radius: 1rem;
-      --brand-hero-bottom-radius: clamp(1.75rem, 9vw, 3rem);
+      --brand-hero-bottom-radius: clamp(1rem, 6vw, 1.75rem);
     }
 
     .topbar,
@@ -510,8 +449,7 @@ const levels = [
       width: min(100% - 32px, 720px);
     }
 
-    .hero-grid,
-    .preview-flow-grid {
+    .hero-grid {
       grid-template-columns: 1fr;
     }
 
@@ -519,19 +457,13 @@ const levels = [
       padding-bottom: 1.4rem;
     }
 
-    .preview-flow-grid {
+    .framework-band {
       padding-top: 1.45rem;
     }
 
     .preview-module-strip,
-    .framework-band ol,
-    .flow-grid {
+    .framework-band ol {
       grid-template-columns: 1fr;
-    }
-
-    .flow-panel {
-      border-left: 0;
-      padding-left: 0;
     }
 
     .preview-module,
