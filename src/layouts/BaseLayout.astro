@@ -25,6 +25,14 @@ const safeJsonLd = (value: Record<string, unknown>) => JSON.stringify(value).rep
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {/* Google Tag Manager — medición unificada con efeoncepro.com (misma propiedad GA4, container GTM-NGHPGRLZ).
+        El page_view lo dispara un GA4 Config gateado por hostname dentro del container; los forms `<greenhouse-form>`
+        emiten `gh_form_submission_accepted` → el tag genérico `generate_lead`. Doc: greenhouse-eo docs/reference/measurement-gtm-ga4. */}
+    <script is:inline>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NGHPGRLZ');
+    </script>
+
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     <link rel="canonical" href={canonicalUrl} />
@@ -52,6 +60,8 @@ const safeJsonLd = (value: Record<string, unknown>) => JSON.stringify(value).rep
     <slot name="head" />
   </head>
   <body class="min-h-dvh bg-white text-slate-900 antialiased" style="font-family:'Geist Variable',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+    {/* Google Tag Manager (noscript) */}
+    <noscript is:inline><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NGHPGRLZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <slot />
   </body>
 </html>
