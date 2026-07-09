@@ -1,0 +1,119 @@
+---
+import { GREENHOUSE_API_BASE } from 'astro:env/server'
+
+/**
+ * TASK-1374 — Form dock del ebook "El fin de la web" (/web-agentica).
+ *
+ * Embebe el `<greenhouse-form>` gobernado del ebook y, al aceptarse el submit, dispara la
+ * DESCARGA GATED en pantalla usando el `download_url` que el renderer emite en el evento
+ * `gh_form_submission_accepted` (handoff TASK-1375 assetDownload). Sin form completado no hay
+ * download_url → no hay descarga. Luego muta a la tarjeta de agradecimiento inline (NO overlay).
+ */
+interface Props {
+  formKey?: string
+  surfaceId?: string
+}
+
+const {
+  formKey = 'db1e254c-e762-41ae-a85f-50b29dc33ba5',
+  surfaceId = 'fhsf-web-agentica-ebook',
+} = Astro.props
+
+const greenhouseBase = GREENHOUSE_API_BASE.replace(/\/$/, '')
+const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
+---
+
+<div
+  class="ebook-form-card"
+  id="web-agentica-form"
+  data-web-agentica-form-dock
+  data-capture="web-agentica-form"
+  role="region"
+  aria-labelledby="web-agentica-form-title"
+>
+  <div class="form-intro">
+    <p class="form-eyebrow">Descarga gratis</p>
+    <h2 id="web-agentica-form-title">Descarga el ebook</h2>
+    <p class="form-lead">Déjanos tus datos y te enviamos «El fin de la web» a tu correo. Léelo en 20 minutos, aplícalo esta semana.</p>
+  </div>
+
+  <div class="form-state form-state-ready" data-form-state="ready">
+    <script is:inline defer src={rendererSrc}></script>
+    <greenhouse-form
+      form-key={formKey}
+      surface={surfaceId}
+      locale="es-CL"
+      color-scheme="light"
+      appearance="bare"
+      base-url={greenhouseBase}
+    >
+      <div class="governed-fallback" role="status" aria-live="polite">
+        <span class="fallback-line"></span>
+        <span class="fallback-line short"></span>
+        <span class="fallback-line"></span>
+        <p>Preparando el formulario.</p>
+      </div>
+    </greenhouse-form>
+    <noscript>Activa JavaScript para cargar el formulario y descargar el ebook.</noscript>
+  </div>
+
+  <!-- Tarjeta de agradecimiento inline (reemplaza el form post-submit; NO overlay) -->
+  <div
+    class="form-state form-state-success"
+    data-form-state="success"
+    role="status"
+    aria-live="polite"
+    tabindex="-1"
+    hidden
+  >
+    <div class="success-mark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="48" height="48" fill="none"><circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2" opacity="0.35"/><path d="M15 24.5l6 6 12-13" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h2>Tu ebook va en camino</h2>
+    <p>Te enviamos «El fin de la web» a tu correo y lo abrimos aquí mismo. ¿No ves el email? Revisa spam o promociones en unos minutos.</p>
+    <a class="redownload-cta" data-redownload href="#" hidden>Descargar de nuevo</a>
+    <div class="bridge">
+      <p class="bridge-kicker">El siguiente paso</p>
+      <p class="bridge-title">¿Cómo te ve la IA hoy?</p>
+      <p class="bridge-body">Mide si ChatGPT, Perplexity y Google AI te encuentran, entienden y recomiendan.</p>
+      <a class="bridge-cta" href="/brand-visibility">Medir mi visibilidad</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const dock = document.querySelector('[data-web-agentica-form-dock]')
+  if (dock) {
+    const ready = dock.querySelector('[data-form-state="ready"]') as HTMLElement | null
+    const success = dock.querySelector('[data-form-state="success"]') as HTMLElement | null
+    const redownload = dock.querySelector('[data-redownload]') as HTMLAnchorElement | null
+
+    const triggerDownload = (url: string) => {
+      const a = document.createElement('a')
+      a.href = url
+      a.rel = 'noopener'
+      a.setAttribute('download', '')
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+    }
+
+    dock.addEventListener('gh_form_submission_accepted', (event: Event) => {
+      const detail = (event as CustomEvent).detail ?? {}
+      const downloadUrl = typeof detail.download_url === 'string' ? detail.download_url : null
+
+      if (ready) ready.hidden = true
+      if (success) {
+        success.hidden = false
+        success.focus()
+      }
+      if (downloadUrl) {
+        triggerDownload(downloadUrl)
+        if (redownload) {
+          redownload.href = downloadUrl
+          redownload.hidden = false
+        }
+      }
+    })
+  }
+</script>

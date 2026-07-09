@@ -37,6 +37,12 @@
       "kind": "report-render",
       "index": false,
       "consumes": "greenhouse-eo: GET /api/public/growth/ai-visibility/report/[token] (TASK-1280, headless model+header)"
+    },
+    {
+      "route": "/web-agentica",
+      "kind": "lead-magnet-landing",
+      "index": true,
+      "consumes": "greenhouse-eo: <greenhouse-form> renderer-latest.js + ebook formKey db1e254c-e762-41ae-a85f-50b29dc33ba5 surface fhsf-web-agentica-ebook + TASK-1375 assetDownload handoff (download_url) → descarga gated /api/public/growth/forms/efeonce-web-agentica-ebook/asset/[handle]"
     }
   ],
   "qualityGates": {

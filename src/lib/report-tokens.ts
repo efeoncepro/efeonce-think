@@ -15,6 +15,11 @@ export const axis = {
   gray: { 50: '#f7f7f8', 100: '#eaeaec', 200: '#d5d4d8', 400: '#aba8b1', 600: '#6d6777', 800: '#433c50', 900: '#2e263d' },
 } as const
 
+// ── Teal de firma de Think (TASK-1374) — el acento que ya usa el hero de brand-visibility
+// (`HeroAnswerLens.astro`, `#36c8bf`). NO viene de AXIS: es la firma visual del hub. Tokenizado
+// acá para consumirlo como var, no HEX crudo. Navy (axis.accent.900) + Teal = paleta de /web-agentica.
+export const teal = { 300: '#7fe0da', 400: '#54d3cb', 500: '#36c8bf', 700: '#1f9a92', 900: '#0f5f5a' } as const
+
 // ── Severidad → tono semántico (nunca color-only) ─────────────────────────────
 export type GraderSeverity = 'optimo' | 'atencion' | 'critico' | 'sin_dato'
 
