@@ -49,10 +49,7 @@ const jsonLd = [
 ]
 ---
 
-<!-- TASK-1374 — noindex TEMPORAL: la landing está viva pero NO se indexa hasta que la entrega
-     del ebook (form gobernado + descarga gated + email) esté en prod (release greenhouse-eo +
-     form publicado en prod DB). Quitar `noindex` en el flip de activación. -->
-<BaseLayout title={pageTitle} description={pageDescription} canonical="/web-agentica" noindex={true} ogImage="/web-agentica/ebook-hero.png" jsonLd={jsonLd}>
+<BaseLayout title={pageTitle} description={pageDescription} canonical="/web-agentica" ogImage="/web-agentica/ebook-hero.png" jsonLd={jsonLd}>
   <main
     class="wa"
     data-capture="web-agentica-landing"
