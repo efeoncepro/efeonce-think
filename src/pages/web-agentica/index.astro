@@ -7,8 +7,10 @@ import { axis, teal } from '@lib/report-tokens'
 
 /**
  * TASK-1374 — Landing pública del ebook "El fin de la web" (/web-agentica).
- * Re-autoría nativa del PR #12 (NO el export estático): BaseLayout (SEO+GTM), tokens AXIS navy +
- * teal `#36c8bf`, Geist/Poppins, form gobernado + descarga gated tokenizada. Paleta Navy + Teal.
+ * Re-autoría FIEL al PR #12 (misma composición y narrativa): hero 2-col con el mockup del
+ * ebook + secciones numeradas + 5 actos + banda de cierre. Cambia solo el mecanismo: tokens
+ * AXIS navy + teal `#36c8bf` (no el naranja/DM Sans/design system foráneo del export),
+ * Geist/Poppins, BaseLayout (SEO+GTM+JSON-LD), form gobernado + descarga gated tokenizada.
  */
 const siteUrl = 'https://think.efeoncepro.com'
 const landingUrl = `${siteUrl}/web-agentica`
@@ -17,21 +19,21 @@ const pageDescription =
   'Descarga gratis el ebook sobre la web agéntica: cómo la IA cambia quién encuentra tu marca y qué hacer esta semana.'
 
 const stats = [
-  { value: '−27%', label: 'Caída del tráfico orgánico interanual', source: 'HubSpot, 2026' },
-  { value: '3×', label: 'El tráfico referido por IA se triplicó', source: '' },
-  { value: '7×', label: 'Más ventas con integración agéntica', source: 'Cyber Week 2025' },
+  { value: '−27%', tag: 'YoY', label: 'Caída del tráfico orgánico interanual', source: 'HubSpot, 2026' },
+  { value: '3×', tag: 'IA', label: 'El tráfico referido por inteligencia artificial se triplicó', source: '' },
+  { value: '7×', tag: 'ventas', label: 'Más ventas con integración agéntica', source: 'Cyber Week 2025' },
 ]
 
-const inside = [
-  'Qué es un agente de IA y por qué ya visita tu sitio',
-  'AEO: cómo ser la respuesta, no solo un resultado',
-  'llms.txt y las señales que la IA lee de tu marca',
-  'Zero-click commerce y el flujo de venta agéntico',
-  'Un checklist para aplicar esta semana',
+const actos = [
+  { n: 'I', title: 'El día que cruzamos la línea' },
+  { n: 'II', title: 'La infraestructura silenciosa' },
+  { n: 'III', title: 'La analogía que sí aplica' },
+  { n: 'IV', title: 'Los 4 niveles donde existir' },
+  { n: 'V', title: 'El modelo que se rompe' },
 ]
 
-const forWho = ['Dirección y C-level que deciden estrategia', 'Marketing y Growth que buscan tráfico que convierte', 'SEO y contenidos frente al cambio de la IA', 'Producto y tech que preparan el sitio']
-const notForWho = ['Buscas un truco rápido de una semana', 'No te interesa cómo la IA cambia la web', 'Prefieres esperar a que "se calme"']
+const forWho = ['Lideras marketing, growth o digital.', 'Sientes que el SEO «ya no rinde igual».', 'Quieres aparecer en ChatGPT, Perplexity y Claude.']
+const notForWho = ['Buscas trucos rápidos de SEO tradicional.', 'No estás dispuesto a cambiar la estrategia.']
 
 const faqs = [
   { q: '¿Qué es un agente de inteligencia artificial?', a: 'Un software que actúa por ti: navega, compara, decide y ejecuta tareas en la web sin que tengas que hacer clic. ChatGPT, Gemini o Claude ya operan así cuando les pides que investiguen o compren algo.' },
@@ -42,49 +44,34 @@ const faqs = [
 ]
 
 const jsonLd = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    '@id': `${landingUrl}#webpage`,
-    url: landingUrl,
-    name: pageTitle,
-    description: pageDescription,
-    inLanguage: 'es-CL',
-    isPartOf: { '@type': 'WebSite', url: siteUrl, name: 'Efeonce Think' },
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map(f => ({
-      '@type': 'Question',
-      name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: f.a },
-    })),
-  },
+  { '@context': 'https://schema.org', '@type': 'WebPage', '@id': `${landingUrl}#webpage`, url: landingUrl, name: pageTitle, description: pageDescription, inLanguage: 'es-CL', isPartOf: { '@type': 'WebSite', url: siteUrl, name: 'Efeonce Think' } },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
 ]
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} canonical="/web-agentica" jsonLd={jsonLd}>
+<BaseLayout title={pageTitle} description={pageDescription} canonical="/web-agentica" ogImage="/web-agentica/ebook-hero.png" jsonLd={jsonLd}>
   <main
-    class="web-agentica"
+    class="wa"
     data-capture="web-agentica-landing"
-    style={`--navy:${axis.accent[900]};--navy-soft:${axis.accent[800]};--blue:${axis.accent[500]};--teal:${teal[500]};--teal-soft:${teal[400]};--teal-deep:${teal[700]};--ink:${axis.gray[900]};--muted:${axis.gray[600]};--line:${axis.gray[200]};--surface:${axis.gray[50]};`}
+    style={`--navy:${axis.accent[900]};--navy-2:${axis.accent[800]};--blue:${axis.accent[500]};--teal:${teal[500]};--teal-2:${teal[400]};--teal-3:${teal[300]};--teal-deep:${teal[700]};--ink:${axis.gray[900]};--muted:${axis.gray[600]};--line:${axis.gray[200]};--surface:${axis.gray[50]};`}
   >
     <!-- HERO -->
     <section class="hero" data-capture="web-agentica-hero">
       <header class="topbar">
-        <a class="brand-link" href="/" aria-label="Ir a Efeonce Think">
-          <img class="efeonce-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" />
-          <span class="brand-divider" aria-hidden="true"></span>
-          <img class="think-mark" src="/branding/eo-think-2.svg" alt="Think" />
-        </a>
+        <a class="brand-link" href="/" aria-label="Efeonce Think"><img class="efeonce-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" /></a>
       </header>
-      <div class="hero-inner">
-        <p class="eyebrow">Marketing digital + IA</p>
-        <h1 class="hero-title">El <span class="accent">fin</span> de la web como la conoces</h1>
-        <p class="hero-lead">Tu sitio ya recibe dos tipos de visitantes: personas y agentes de IA. Este ebook te muestra cómo dejar de diseñar solo para uno.</p>
-        <a class="hero-cta" href="#web-agentica-form">Descargar el ebook gratis</a>
-        <p class="hero-reassurance">Sin spam. Solo el ebook y contenido que sí sirve.</p>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>Ebook gratuito</span><span class="dot" aria-hidden="true"></span><span>Marketing digital + IA</span></p>
+          <h1 class="hero-title">El fin de la <span class="accent">web</span><br />solo para humanos</h1>
+          <p class="hero-lead">El 3 de junio de 2026 los bots superaron al tráfico humano por primera vez en la historia de internet. Cinco actos para entender qué cambió — y qué hacer esta semana.</p>
+          <p class="stat-pill"><span class="stat-pill-strong">57.5% bots · 42.5% humanos</span><span class="stat-pill-source">— Cloudflare, 2026</span></p>
+          <a class="cta cta-primary" href="#web-agentica-form">Descargar el ebook gratis <span aria-hidden="true">→</span></a>
+          <p class="hero-reassurance">Sin spam. Solo el ebook y contenido que sí sirve.</p>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <img src="/web-agentica/ebook-hero.png" alt="" width="1536" height="1024" loading="eager" />
+        </div>
       </div>
     </section>
 
@@ -92,59 +79,76 @@ const jsonLd = [
     <section class="stats" data-capture="web-agentica-stats" aria-label="Lo que ya está pasando">
       {stats.map(s => (
         <div class="stat-card">
-          <p class="stat-value">{s.value}</p>
-          <p class="stat-label">{s.label}</p>
-          {s.source ? <p class="stat-source">{s.source}</p> : null}
+          <p class="stat-value">{s.value}<span class="stat-tag">{s.tag}</span></p>
+          <p class="stat-label">{s.label}{s.source ? <span class="stat-src"> ({s.source})</span> : null}</p>
         </div>
       ))}
     </section>
 
-    <!-- THESIS -->
-    <section class="thesis" data-capture="web-agentica-thesis">
-      <h2>Tu sitio ya tiene dos tipos de visitantes.</h2>
-      <p class="thesis-sub">Solo estás diseñado para uno.</p>
+    <!-- 01 · EL PROBLEMA -->
+    <section class="problema" data-capture="web-agentica-thesis">
+      <p class="sec-label"><span class="sec-num">01</span> El problema</p>
+      <h2>Tu sitio web ya tiene dos tipos de visitantes. <span class="accent">Solo estás diseñado para uno.</span></h2>
+      <p class="problema-body">Millones de personas le piden a ChatGPT, Gemini o Claude que hagan tareas por ellos. Esos agentes no hacen clic en anuncios, no ven banners y no perdonan HTML ruidoso. Si tu presencia digital está optimizada solo para humanos, eres invisible para la mitad del tráfico que crece.</p>
+      <a class="link-teal" href="/brand-visibility">¿En qué nivel está tu empresa hoy? →</a>
     </section>
 
-    <!-- INSIDE -->
-    <section class="inside" data-capture="web-agentica-inside">
-      <div class="section-head">
-        <p class="kicker">Qué vas a encontrar dentro</p>
+    <!-- 02 · QUÉ VAS A ENCONTRAR -->
+    <section class="dentro" data-capture="web-agentica-inside">
+      <div class="sec-head">
+        <p class="sec-label"><span class="sec-num">02</span> Qué vas a encontrar dentro</p>
         <h2>Cinco actos para leer la nueva web</h2>
       </div>
-      <ul class="inside-list">
-        {inside.map(item => (
-          <li><span class="tick" aria-hidden="true">→</span>{item}</li>
+      <div class="actos">
+        {actos.map(a => (
+          <div class="acto-card">
+            <span class="acto-n">{a.n}</span>
+            <p class="acto-label">Acto {a.n}</p>
+            <p class="acto-title">{a.title}</p>
+          </div>
         ))}
-      </ul>
-      <p class="inside-note">Incluye checklist «Lo que haces esta semana».</p>
+      </div>
+      <p class="checklist-chip"><span aria-hidden="true">✓</span> Incluye checklist «Lo que haces esta semana»</p>
     </section>
 
-    <!-- AUDIENCE -->
-    <section class="audience" data-capture="web-agentica-audience">
-      <div class="audience-col">
-        <h3>Para quién es este ebook</h3>
-        <ul>{forWho.map(x => <li><span class="tick tick-yes" aria-hidden="true">✓</span>{x}</li>)}</ul>
-      </div>
-      <div class="audience-col audience-col-no">
-        <h3>No es para ti si…</h3>
-        <ul>{notForWho.map(x => <li><span class="tick tick-no" aria-hidden="true">—</span>{x}</li>)}</ul>
+    <!-- 03 · PARA QUIÉN -->
+    <section class="quien" data-capture="web-agentica-audience">
+      <p class="sec-label center"><span class="sec-num">03</span> Para quién es este ebook</p>
+      <div class="quien-grid">
+        <div class="quien-card quien-yes">
+          <h3><span class="q-icon yes" aria-hidden="true">✓</span> Es para ti si…</h3>
+          <ul>{forWho.map(x => <li><span aria-hidden="true">✓</span>{x}</li>)}</ul>
+        </div>
+        <div class="quien-card quien-no">
+          <h3><span class="q-icon no" aria-hidden="true">✕</span> No es para ti si…</h3>
+          <ul>{notForWho.map(x => <li><span aria-hidden="true">✕</span>{x}</li>)}</ul>
+        </div>
       </div>
     </section>
 
     <!-- FORM -->
-    <section class="form-section" data-capture="web-agentica-form-section">
+    <section class="form-band" data-capture="web-agentica-form-section">
       <WebAgenticaFormDock />
     </section>
 
-    <!-- FAQ -->
+    <!-- Autor -->
+    <section class="autor" data-capture="web-agentica-author">
+      <img class="autor-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" />
+      <div>
+        <p class="autor-kicker">Escrito por el equipo de Efeonce</p>
+        <p class="autor-body">Agencia especializada en SEO + AEO y estrategias de descubrimiento para la era agéntica. Trabajamos donde tus clientes ya están preguntando: Google y los motores de respuesta.</p>
+      </div>
+    </section>
+
+    <!-- 04 · FAQ -->
     <section class="faq" data-capture="web-agentica-faq">
-      <div class="section-head">
-        <p class="kicker">Preguntas frecuentes</p>
-        <h2>Lo que quizá te estás preguntando</h2>
+      <div class="sec-head">
+        <p class="sec-label"><span class="sec-num">04</span> Preguntas frecuentes</p>
+        <h2>Lo que la gente pregunta</h2>
       </div>
       <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
+        {faqs.map((f, i) => (
+          <details class="faq-item" open={i === 0}>
             <summary>{f.q}</summary>
             <p>{f.a}</p>
           </details>
@@ -152,141 +156,154 @@ const jsonLd = [
       </div>
     </section>
 
-    <!-- FOOTER -->
+    <!-- Cierre -->
+    <section class="cierre" data-capture="web-agentica-close">
+      <h2>El cambio ya ocurrió. Lo que viene es la brecha entre los que lo <span class="accent">leyeron</span> y los que <span class="accent">actuaron</span>.</h2>
+      <a class="cta cta-primary" href="#web-agentica-form">Descargar el ebook gratis <span aria-hidden="true">→</span></a>
+    </section>
+
     <footer class="footer" data-capture="web-agentica-footer">
       <img class="footer-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" />
-      <p>Escrito por el equipo de Efeonce. Agencia especializada en growth con IA.</p>
+      <p>Efeonce Group SpA · <a href="https://efeoncepro.com/politica-de-privacidad/">Privacidad</a></p>
     </footer>
   </main>
 </BaseLayout>
 
 <style>
-  .web-agentica {
-    font-family: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: var(--ink);
-    background: #fff;
-  }
-  .web-agentica h1, .web-agentica h2, .web-agentica h3, .eyebrow, .kicker, .stat-value, .hero-cta, .bridge-cta {
-    font-family: 'Poppins', 'Geist Variable', sans-serif;
-  }
+  .wa { font-family: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--ink); background: #fff; }
+  .wa h1, .wa h2, .wa h3, .eyebrow, .sec-label, .stat-value, .cta, .acto-label, .acto-title, .autor-kicker, .checklist-chip { font-family: 'Poppins', 'Geist Variable', sans-serif; }
+  .accent { color: var(--teal); }
+  .cta-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--teal); color: #04222f; font-weight: 700; font-size: 1.0625rem; padding: 0.95rem 1.9rem; border-radius: 12px; text-decoration: none; box-shadow: 0 14px 34px -14px color-mix(in srgb, var(--teal) 60%, transparent); transition: transform .15s ease, background .15s ease; }
+  .cta-primary:hover { transform: translateY(-2px); background: var(--teal-2); }
 
   /* HERO */
-  .hero {
-    position: relative;
-    background: radial-gradient(120% 90% at 50% 0%, var(--navy-soft) 0%, var(--navy) 55%, #001a33 100%);
-    color: #fff;
-    padding: 0 clamp(1.25rem, 5vw, 3rem) clamp(3.5rem, 8vw, 6rem);
-    overflow: hidden;
-  }
-  .hero::after {
-    content: '';
-    position: absolute;
-    inset: -30% -10% auto -10%;
-    height: 70%;
-    background: radial-gradient(60% 60% at 50% 40%, color-mix(in srgb, var(--teal) 26%, transparent) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .topbar { display: flex; align-items: center; padding: clamp(1.25rem, 4vw, 2rem) 0; position: relative; z-index: 1; }
-  .brand-link { display: inline-flex; align-items: center; gap: 12px; }
-  .efeonce-mark, .think-mark { height: 26px; width: auto; }
-  .brand-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.3); }
-  .hero-inner { position: relative; z-index: 1; max-width: 720px; margin: clamp(1.5rem, 5vw, 3rem) auto 0; text-align: center; }
-  .eyebrow {
-    display: inline-block; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--teal-soft); margin: 0 0 1rem;
-  }
-  .hero-title { font-size: clamp(2.25rem, 6vw, 4rem); font-weight: 700; line-height: 1.05; margin: 0 0 1.25rem; letter-spacing: -0.02em; }
-  .hero-title .accent { color: var(--teal); }
-  .hero-lead { font-size: clamp(1.0625rem, 2.4vw, 1.375rem); line-height: 1.55; color: rgba(255,255,255,0.82); margin: 0 auto 2rem; max-width: 620px; }
-  .hero-cta, .bridge-cta {
-    display: inline-flex; align-items: center; justify-content: center;
-    background: var(--teal); color: #04222f; font-weight: 600; font-size: 1.0625rem;
-    padding: 0.95rem 1.9rem; border-radius: 12px; text-decoration: none;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-    box-shadow: 0 12px 32px -12px color-mix(in srgb, var(--teal) 60%, transparent);
-  }
-  .hero-cta:hover, .bridge-cta:hover { transform: translateY(-2px); background: var(--teal-soft); }
-  .hero-reassurance { font-size: 0.9375rem; color: rgba(255,255,255,0.6); margin: 1rem 0 0; }
+  .hero { position: relative; background: radial-gradient(130% 100% at 70% -10%, var(--navy-2) 0%, var(--navy) 52%, #001a33 100%); color: #fff; overflow: hidden; padding: 0 clamp(1.25rem, 5vw, 4rem) clamp(3rem, 7vw, 5.5rem); }
+  .hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(120,176,216,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(120,176,216,.10) 1px, transparent 1px); background-size: 44px 44px; -webkit-mask-image: radial-gradient(ellipse 80% 60% at 40% 30%, #000 20%, transparent 85%); mask-image: radial-gradient(ellipse 80% 60% at 40% 30%, #000 20%, transparent 85%); pointer-events: none; }
+  .hero::after { content: ''; position: absolute; inset: -20% -20% auto 30%; height: 70%; background: radial-gradient(50% 55% at 60% 40%, color-mix(in srgb, var(--teal) 28%, transparent) 0%, transparent 72%); pointer-events: none; }
+  .topbar { position: relative; z-index: 1; padding: clamp(1.25rem, 4vw, 2rem) 0; }
+  .efeonce-mark { height: 26px; width: auto; }
+  .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.05fr 1.15fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: center; max-width: 1240px; margin: 0 auto; min-height: 60vh; }
+  .hero-copy { max-width: 560px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-2); margin: 0 0 1.1rem; }
+  .eyebrow .dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: .6; }
+  .hero-title { font-size: clamp(2.4rem, 5.5vw, 4.25rem); font-weight: 700; line-height: 1.03; margin: 0 0 1.25rem; letter-spacing: -0.025em; }
+  .hero-lead { font-size: clamp(1.0625rem, 2.2vw, 1.25rem); line-height: 1.55; color: rgba(255,255,255,.8); margin: 0 0 1.5rem; }
+  .stat-pill { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: 0.5rem 1rem; font-size: 0.875rem; margin: 0 0 1.75rem; }
+  .stat-pill-strong { color: #fff; font-weight: 600; } .stat-pill-source { color: rgba(255,255,255,.55); }
+  .hero-reassurance { font-size: 0.9375rem; color: rgba(255,255,255,.55); margin: 1rem 0 0; }
+  .hero-visual { position: relative; }
+  .hero-visual img { width: 116%; max-width: 116%; height: auto; margin-left: -6%; filter: drop-shadow(0 40px 80px rgba(0,0,0,.5)); }
 
   /* STATS */
-  .stats { max-width: 1080px; margin: 0 auto; padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem); display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-  .stat-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1.75rem 1.5rem; text-align: center; }
-  .stat-value { font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 700; color: var(--navy); margin: 0 0 0.5rem; letter-spacing: -0.02em; }
-  .stat-label { font-size: 0.9375rem; line-height: 1.4; color: var(--ink); margin: 0 0 0.35rem; }
-  .stat-source { font-size: 0.75rem; color: var(--muted); margin: 0; }
+  .stats { max-width: 1100px; margin: 0 auto; padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem); display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1.75rem 1.5rem; }
+  .stat-value { display: flex; align-items: baseline; gap: 0.5rem; font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 700; color: var(--navy); margin: 0 0 0.5rem; letter-spacing: -0.02em; }
+  .stat-tag { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--teal-deep); }
+  .stat-label { font-size: 0.9375rem; line-height: 1.45; color: var(--ink); margin: 0; }
+  .stat-src { color: var(--muted); }
 
-  /* THESIS */
-  .thesis { max-width: 820px; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 3rem); text-align: center; }
-  .thesis h2 { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 700; color: var(--navy); margin: 0; letter-spacing: -0.02em; line-height: 1.15; }
-  .thesis-sub { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 700; color: var(--teal-deep); margin: 0.25rem 0 0; letter-spacing: -0.02em; }
+  /* SECTION LABEL */
+  .sec-label { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-deep); margin: 0 0 0.75rem; }
+  .sec-label.center { justify-content: center; }
+  .sec-num { color: var(--teal); font-variant-numeric: tabular-nums; }
+  .sec-head { text-align: center; max-width: 640px; margin: 0 auto 2.25rem; }
+  .sec-head .sec-label { justify-content: center; }
+  .sec-head h2 { font-size: clamp(1.6rem, 3.6vw, 2.4rem); font-weight: 700; color: var(--navy); margin: 0; letter-spacing: -0.02em; }
 
-  /* SECTION HEAD */
-  .section-head { text-align: center; margin: 0 auto 2rem; max-width: 640px; }
-  .kicker { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal-deep); margin: 0 0 0.5rem; }
-  .section-head h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 700; color: var(--navy); margin: 0; letter-spacing: -0.02em; }
+  /* 01 PROBLEMA (navy) */
+  .problema { background: radial-gradient(120% 100% at 50% 0%, var(--navy-2) 0%, var(--navy) 70%, #001a33 100%); color: #fff; text-align: center; padding: clamp(3rem, 7vw, 5rem) clamp(1.25rem, 5vw, 3rem); }
+  .problema .sec-label { justify-content: center; color: var(--teal-2); }
+  .problema h2 { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 700; margin: 0 auto 1.25rem; max-width: 760px; letter-spacing: -0.02em; line-height: 1.15; }
+  .problema-body { font-size: clamp(1rem, 2.1vw, 1.1875rem); line-height: 1.6; color: rgba(255,255,255,.78); max-width: 680px; margin: 0 auto 1.5rem; }
+  .link-teal { color: var(--teal-2); font-weight: 600; text-decoration: none; font-size: 1rem; }
+  .link-teal:hover { color: var(--teal-3); }
 
-  /* INSIDE */
-  .inside { max-width: 720px; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 3rem); }
-  .inside-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
-  .inside-list li { display: flex; gap: 0.75rem; align-items: flex-start; font-size: 1.0625rem; line-height: 1.5; color: var(--ink); }
-  .tick { color: var(--teal); font-weight: 700; flex-shrink: 0; }
-  .inside-note { margin: 1.5rem 0 0; font-size: 0.9375rem; color: var(--muted); font-style: italic; }
+  /* 02 ACTOS */
+  .dentro { max-width: 1100px; margin: 0 auto; padding: clamp(3rem, 7vw, 5rem) clamp(1.25rem, 5vw, 3rem); }
+  .actos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+  .acto-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem 1.1rem; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+  .acto-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--teal) 45%, var(--line)); box-shadow: 0 18px 40px -26px color-mix(in srgb, var(--teal) 55%, transparent); }
+  .acto-n { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9px; background: color-mix(in srgb, var(--teal) 14%, #fff); color: var(--teal-deep); font-weight: 700; font-size: 0.9375rem; }
+  .acto-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0.9rem 0 0.35rem; }
+  .acto-title { font-size: 0.9375rem; font-weight: 600; color: var(--navy); margin: 0; line-height: 1.3; }
+  .checklist-chip { display: inline-flex; align-items: center; gap: 0.5rem; margin: 1.75rem auto 0; padding: 0.6rem 1.1rem; background: color-mix(in srgb, var(--teal) 12%, #fff); color: var(--teal-deep); border-radius: 999px; font-size: 0.875rem; font-weight: 600; }
+  .dentro > .checklist-chip { display: flex; width: fit-content; }
 
-  /* AUDIENCE */
-  .audience { max-width: 900px; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 3rem); display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  .audience-col { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1.75rem; }
-  .audience-col-no { background: #fff; }
-  .audience-col h3 { font-size: 1.1875rem; color: var(--navy); margin: 0 0 1rem; }
-  .audience-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
-  .audience-col li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.9875rem; line-height: 1.45; color: var(--ink); }
-  .tick-yes { color: var(--teal-deep); } .tick-no { color: var(--muted); }
+  /* 03 QUIÉN */
+  .quien { max-width: 900px; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 3rem); }
+  .quien-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+  .quien-card { border: 1px solid var(--line); border-radius: 16px; padding: 1.75rem; }
+  .quien-yes { border-top: 3px solid var(--teal); }
+  .quien-card h3 { display: flex; align-items: center; gap: 0.6rem; font-size: 1.125rem; color: var(--navy); margin: 0 0 1rem; }
+  .q-icon { width: 24px; height: 24px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+  .q-icon.yes { background: color-mix(in srgb, var(--teal) 16%, #fff); color: var(--teal-deep); }
+  .q-icon.no { background: var(--surface); color: var(--muted); }
+  .quien-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+  .quien-card li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.9875rem; line-height: 1.45; color: var(--ink); }
+  .quien-yes li > span { color: var(--teal-deep); font-weight: 700; } .quien-no li > span { color: var(--muted); }
 
-  /* FORM SECTION */
-  .form-section { position: relative; background: radial-gradient(120% 100% at 50% 0%, var(--navy-soft) 0%, var(--navy) 70%, #001a33 100%); padding: clamp(3rem, 7vw, 5rem) clamp(1.25rem, 5vw, 3rem); }
+  /* FORM BAND */
+  .form-band { position: relative; background: radial-gradient(120% 100% at 50% 0%, var(--navy-2) 0%, var(--navy) 72%, #001a33 100%); padding: clamp(3rem, 7vw, 5rem) clamp(1.25rem, 5vw, 3rem); }
+
+  /* AUTOR */
+  .autor { max-width: 820px; margin: 0 auto; padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem); display: flex; gap: 1.5rem; align-items: flex-start; }
+  .autor-mark { height: 34px; width: auto; filter: brightness(0) saturate(100%); opacity: .85; flex-shrink: 0; }
+  .autor-kicker { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal-deep); margin: 0 0 0.5rem; }
+  .autor-body { color: var(--muted); line-height: 1.6; margin: 0; font-size: 0.9875rem; }
 
   /* FAQ */
-  .faq { max-width: 760px; margin: 0 auto; padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem); }
+  .faq { max-width: 780px; margin: 0 auto; padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem); }
   .faq-list { display: grid; gap: 0.75rem; }
   .faq-item { border: 1px solid var(--line); border-radius: 12px; padding: 0 1.25rem; background: #fff; }
+  .faq-item[open] { border-color: color-mix(in srgb, var(--teal) 40%, var(--line)); }
   .faq-item summary { cursor: pointer; list-style: none; padding: 1.1rem 0; font-weight: 600; color: var(--navy); font-size: 1.0625rem; display: flex; justify-content: space-between; gap: 1rem; }
   .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: '+'; color: var(--teal-deep); font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
+  .faq-item summary::after { content: '+'; color: var(--teal-deep); font-size: 1.4rem; line-height: 1; }
   .faq-item[open] summary::after { content: '−'; }
   .faq-item p { margin: 0 0 1.1rem; color: var(--muted); line-height: 1.6; font-size: 0.9875rem; }
 
-  /* FOOTER */
-  .footer { text-align: center; padding: clamp(2.5rem, 6vw, 4rem) 1.5rem; border-top: 1px solid var(--line); }
-  .footer-mark { height: 24px; width: auto; filter: brightness(0) saturate(100%); opacity: 0.7; margin: 0 0 0.75rem; }
-  .footer p { color: var(--muted); font-size: 0.875rem; margin: 0; }
+  /* CIERRE */
+  .cierre { background: radial-gradient(120% 120% at 50% 0%, var(--navy-2) 0%, var(--navy) 65%, #001a33 100%); color: #fff; text-align: center; padding: clamp(3.5rem, 8vw, 6rem) clamp(1.25rem, 5vw, 3rem); }
+  .cierre h2 { font-size: clamp(1.6rem, 3.8vw, 2.5rem); font-weight: 700; max-width: 760px; margin: 0 auto 2rem; line-height: 1.2; letter-spacing: -0.02em; }
 
-  @media (max-width: 720px) {
-    .stats { grid-template-columns: 1fr; }
-    .audience { grid-template-columns: 1fr; }
+  /* FOOTER */
+  .footer { text-align: center; padding: clamp(2rem, 5vw, 3rem) 1.5rem; border-top: 1px solid var(--line); }
+  .footer-mark { height: 22px; width: auto; filter: brightness(0) saturate(100%); opacity: .6; margin: 0 0 0.6rem; }
+  .footer p { color: var(--muted); font-size: 0.8125rem; margin: 0; }
+  .footer a { color: var(--teal-deep); text-decoration: none; }
+
+  @media (prefers-reduced-motion: reduce) { .acto-card { transition: none; } }
+  @media (max-width: 920px) {
+    .hero-grid { grid-template-columns: 1fr; text-align: center; min-height: auto; padding-top: 1rem; }
+    .hero-copy { max-width: 640px; margin: 0 auto; }
+    .eyebrow { justify-content: center; }
+    .hero-visual img { width: 100%; max-width: 520px; margin: 1rem auto 0; display: block; }
+    .actos { grid-template-columns: repeat(2, 1fr); }
+    .quien-grid { grid-template-columns: 1fr; }
+    .autor { flex-direction: column; align-items: center; text-align: center; }
   }
+  @media (max-width: 560px) { .stats { grid-template-columns: 1fr; } .actos { grid-template-columns: 1fr; } }
 </style>
 
 <style is:global>
-  /* Form dock sobre fondo navy (form-section) */
-  .ebook-form-card {
-    max-width: 560px; margin: 0 auto; background: #fff; border-radius: 20px;
-    padding: clamp(1.5rem, 4vw, 2.5rem); box-shadow: 0 30px 80px -40px rgba(0,0,0,0.6);
-  }
-  .ebook-form-card .form-eyebrow { font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #1f9a92; margin: 0 0 0.35rem; }
-  .ebook-form-card .form-intro h2 { font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: #00284d; margin: 0 0 0.5rem; }
+  .ebook-form-card { max-width: 640px; margin: 0 auto; background: #fff; border-radius: 22px; padding: clamp(1.75rem, 4vw, 2.75rem); box-shadow: 0 40px 90px -50px rgba(0,0,0,.7); }
+  .ebook-form-card .form-eyebrow { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; padding: 0.45rem 0.9rem; background: color-mix(in srgb, #36c8bf 12%, #fff); color: #1f9a92; border-radius: 999px; margin: 0 0 1rem; }
+  .ebook-form-card .form-intro h2 { font-family: 'Poppins', sans-serif; font-size: clamp(1.5rem, 3vw, 1.9rem); color: #00284d; margin: 0 0 0.4rem; letter-spacing: -0.01em; }
   .ebook-form-card .form-intro .form-lead { color: #6d6777; line-height: 1.5; margin: 0 0 1.5rem; font-size: 0.9375rem; }
   .ebook-form-card .governed-fallback { display: grid; gap: 0.6rem; }
-  .ebook-form-card .fallback-line { height: 44px; border-radius: 10px; background: linear-gradient(90deg,#eee 25%,#f6f6f6 37%,#eee 63%); background-size: 400% 100%; animation: ghf-shimmer 1.4s infinite; }
+  .ebook-form-card .fallback-line { height: 46px; border-radius: 10px; background: linear-gradient(90deg,#eee 25%,#f6f6f6 37%,#eee 63%); background-size: 400% 100%; animation: ghf-sh 1.4s infinite; }
   .ebook-form-card .fallback-line.short { width: 60%; }
-  @keyframes ghf-shimmer { 0% { background-position: 100% 0 } 100% { background-position: 0 0 } }
+  @keyframes ghf-sh { 0% { background-position: 100% 0 } 100% { background-position: 0 0 } }
   @media (prefers-reduced-motion: reduce) { .ebook-form-card .fallback-line { animation: none; } }
 
   .form-state-success { text-align: center; color: #1a1a2e; }
   .form-state-success .success-mark { color: #36c8bf; display: flex; justify-content: center; margin: 0 0 1rem; }
-  .form-state-success h2 { font-family: 'Poppins', sans-serif; color: #00284d; margin: 0 0 0.5rem; font-size: 1.5rem; }
-  .form-state-success > p { color: #6d6777; line-height: 1.55; margin: 0 auto 1.25rem; max-width: 420px; font-size: 0.9375rem; }
+  .form-state-success h2 { font-family: 'Poppins', sans-serif; color: #00284d; margin: 0 0 0.5rem; font-size: 1.6rem; }
+  .form-state-success > p { color: #6d6777; line-height: 1.55; margin: 0 auto 1.25rem; max-width: 440px; font-size: 0.9375rem; }
   .redownload-cta { display: inline-block; color: #1f9a92; font-weight: 600; text-decoration: underline; margin: 0 0 1.5rem; font-size: 0.9375rem; }
   .form-state-success .bridge { border-top: 1px solid #eaeaec; padding-top: 1.5rem; margin-top: 0.5rem; }
-  .form-state-success .bridge-kicker { font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #1f9a92; margin: 0 0 0.35rem; }
-  .form-state-success .bridge-title { font-family: 'Poppins', sans-serif; font-size: 1.1875rem; font-weight: 700; color: #00284d; margin: 0 0 0.4rem; }
+  .form-state-success .bridge-kicker { font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #1f9a92; margin: 0 0 0.35rem; }
+  .form-state-success .bridge-title { font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 700; color: #00284d; margin: 0 0 0.4rem; }
   .form-state-success .bridge-body { color: #6d6777; line-height: 1.5; margin: 0 0 1.25rem; font-size: 0.9375rem; }
+  .form-state-success .bridge-cta { display: inline-flex; background: #36c8bf; color: #04222f; font-weight: 700; padding: 0.8rem 1.6rem; border-radius: 12px; text-decoration: none; font-family: 'Poppins', sans-serif; }
 </style>
