@@ -70,12 +70,24 @@
     border:none !important;
     box-shadow:none !important;
   }
+  .lp-form-grid input:-webkit-autofill,
+  .lp-form-grid input:-webkit-autofill:hover,
+  .lp-form-grid input:-webkit-autofill:focus,
+  .lp-form-grid input:autofill{
+    -webkit-text-fill-color:var(--field-text) !important;
+    -webkit-box-shadow:0 0 0 1000px var(--field-bg) inset !important;
+    box-shadow:0 0 0 1000px var(--field-bg) inset !important;
+    caret-color:var(--field-text);
+  }
   .lp-form-grid div:has(> input:focus){
     border-color:#ec661c !important;
     box-shadow:0 0 0 3px rgba(236,102,28,.35) !important;
   }
   .lp-role-select{position:relative;}
   .lp-role-trigger{
+    position:relative;
+    display:flex;
+    align-items:center;
     width:100%;
     height:var(--control-md);
     padding:0 54px 0 14px;
@@ -89,8 +101,7 @@
     cursor:pointer;
     transition:var(--transition-control);
   }
-  .lp-role-trigger::after{
-    content:"";
+  .lp-role-chevron{
     position:absolute;
     right:10px;
     top:50%;
@@ -98,23 +109,27 @@
     height:30px;
     border:1px solid rgba(236,102,28,.55);
     border-radius:50%;
-    background:
-      linear-gradient(45deg,transparent 47%,#ec661c 48% 55%,transparent 56%) 10px 11px/8px 8px no-repeat,
-      linear-gradient(-45deg,transparent 47%,#ec661c 48% 55%,transparent 56%) 15px 11px/8px 8px no-repeat,
-      var(--surface-card);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--surface-card);
+    color:#ec661c;
     transform:translateY(-50%);
-    transition:transform .2s ease,background-color .2s ease;
+    transition:transform .2s ease;
+    pointer-events:none;
+  }
+  .lp-role-chevron svg{
+    display:block;
+    width:16px;
+    height:16px;
   }
   .lp-role-select.is-open .lp-role-trigger{
     outline:none;
     border-color:#ec661c;
     box-shadow:0 0 0 3px rgba(236,102,28,.35);
   }
-  .lp-role-select.is-open .lp-role-trigger::after{
-    background:
-      linear-gradient(135deg,transparent 47%,#fff 48% 55%,transparent 56%) 10px 12px/8px 8px no-repeat,
-      linear-gradient(-135deg,transparent 47%,#fff 48% 55%,transparent 56%) 15px 12px/8px 8px no-repeat,
-      #ec661c;
+  .lp-role-select.is-open .lp-role-chevron{
+    transform:translateY(-50%) rotate(180deg);
   }
   .lp-role-options{
     position:absolute;
@@ -201,14 +216,22 @@
     mask-composite:exclude;
     transition:opacity .24s ease;
   }
-  .lp-hero-glow-cta:hover::before{animation:lp-orbit-glow 2.1s linear infinite;}
-  .lp-hero-glow-cta:hover::before{opacity:1;}
+  .lp-hero-glow-cta:not([aria-disabled="true"]):hover::before{animation:lp-orbit-glow 2.1s linear infinite;}
+  .lp-hero-glow-cta:not([aria-disabled="true"]):hover::before{opacity:1;}
   .lp-hero-cta-arrow{
     display:inline-block;
     transition:transform .22s cubic-bezier(.22,.61,.36,1);
   }
-  .lp-hero-glow-cta:hover .lp-hero-cta-arrow{transform:translateX(5px);}
-  .lp-hero-glow-cta:active .lp-hero-cta-arrow{transform:translateX(2px);}
+  .lp-hero-glow-cta:not([aria-disabled="true"]):hover .lp-hero-cta-arrow{transform:translateX(5px);}
+  .lp-hero-glow-cta:not([aria-disabled="true"]):active .lp-hero-cta-arrow{transform:translateX(2px);}
+  .lp-form-submit[aria-disabled="true"]{
+    opacity:1;
+    background:#e5e9ee !important;
+    color:#7a8796 !important;
+    cursor:not-allowed !important;
+    transform:none !important;
+    box-shadow:none !important;
+  }
   @keyframes lp-orbit-glow{to{--lp-glow-angle:360deg;}}
   @media (prefers-reduced-motion:reduce){
     .lp-hero-glow-cta::before{transition:none;animation:none;}
@@ -230,12 +253,8 @@
 <div style="font-family:var(--font-body);color:var(--text-body);background:var(--surface-page);overflow-x:hidden;">
 
   <!-- HEADER -->
-  <header style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;height:78px;padding:0 40px;background:transparent;border-bottom:1px solid transparent;" class="lp-pad">
+  <header style="position:absolute;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;height:78px;padding:0 40px;background:transparent;border-bottom:1px solid transparent;" class="lp-pad">
     <a href="#" style="display:flex;align-items:center;"><img src="assets/LogoEfeonce.svg" alt="efeonce — Empower your Growth" style="height:48px;width:auto;display:block;filter:brightness(0) invert(1);"></a>
-    <div style="display:flex;align-items:center;gap:26px;">
-      <span style="font-size:14px;font-weight:500;color:var(--text-muted);" class="lp-hide-sm">Ebook gratuito</span>
-      <button onClick="{{ scrollToForm }}" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:var(--control-sm);padding:0 16px;font-family:var(--font-title);font-weight:600;font-size:15px;letter-spacing:-0.02em;line-height:1;border-radius:var(--radius-md);border:2px solid transparent;background:var(--orange);color:#fff;cursor:pointer;transition:var(--transition-control);white-space:nowrap;" style-hover="background:#d95400;">Descargar gratis</button>
-    </div>
   </header>
 
   <!-- 1 · HERO -->
@@ -384,7 +403,7 @@
               <label style="font-family:var(--font-body);font-weight:500;font-size:14px;color:var(--text-strong);">Rol / cargo</label>
               <div class="lp-role-select">
                 <input type="hidden" name="rol" value="">
-                <button type="button" class="lp-role-trigger" aria-haspopup="listbox" aria-expanded="false">Selecciona (opcional)</button>
+                <button type="button" class="lp-role-trigger" aria-haspopup="listbox" aria-expanded="false"><span class="lp-role-trigger-label">Selecciona (opcional)</span><span class="lp-role-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
                 <div class="lp-role-options" role="listbox">
                   <div class="lp-role-option" role="option" data-value="" aria-selected="true">Selecciona (opcional)</div>
                   <div class="lp-role-option" role="option" data-value="Dirección / C-level" aria-selected="false">Dirección / C-level</div>
@@ -396,7 +415,7 @@
               </div>
             </div>
             <div class="lp-form-full" style="margin-top:4px;">
-              <button type="submit" class="lp-hero-glow-cta" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;height:var(--control-lg);padding:0 24px;font-family:var(--font-title);font-weight:600;font-size:17px;letter-spacing:-0.02em;line-height:1;border-radius:var(--radius-md);border:2px solid transparent;background:var(--orange);color:#fff;cursor:pointer;transition:var(--transition-control);white-space:nowrap;" style-hover="background:#d95400;">Enviarme el ebook <span class="lp-hero-cta-arrow" aria-hidden="true">→</span></button>
+              <button type="submit" class="lp-hero-glow-cta lp-form-submit" disabled aria-disabled="true" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;height:var(--control-lg);padding:0 24px;font-family:var(--font-title);font-weight:600;font-size:17px;letter-spacing:-0.02em;line-height:1;border-radius:var(--radius-md);border:2px solid transparent;background:var(--orange);color:#fff;cursor:pointer;transition:var(--transition-control);white-space:nowrap;" style-hover="background:#d95400;">Enviarme el ebook <span class="lp-hero-cta-arrow" aria-hidden="true">→</span></button>
             </div>
             <p class="lp-form-full" style="font-size:12.5px;line-height:1.5;color:var(--text-subtle);text-align:center;margin:0;">Al descargar aceptas recibir contenido de Efeonce. Baja cuando quieras.</p>
           </form>
@@ -574,6 +593,47 @@ class Component extends DCLogic {
   })();
 
   (() => {
+    const requiredNames = ['nombre', 'email', 'empresa'];
+
+    const syncSubmitState = (form = document.querySelector('.lp-form-grid')) => {
+      if (!form) return;
+
+      const submit = form.querySelector('.lp-form-submit');
+      if (!submit) return;
+
+      const complete = requiredNames.every((name) => {
+        const field = form.querySelector(`[name="${name}"]`);
+        return field && field.value.trim().length > 0;
+      });
+
+      submit.disabled = !complete;
+      submit.setAttribute('aria-disabled', String(!complete));
+    };
+
+    document.addEventListener('input', (event) => {
+      if (requiredNames.includes(event.target.name)) {
+        syncSubmitState(event.target.closest('.lp-form-grid'));
+      }
+    });
+
+    document.addEventListener('change', (event) => {
+      if (requiredNames.includes(event.target.name)) {
+        syncSubmitState(event.target.closest('.lp-form-grid'));
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      const submit = event.target.closest?.('.lp-form-submit[aria-disabled="true"]');
+      if (!submit) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }, true);
+
+    requestAnimationFrame(() => syncSubmitState());
+    window.addEventListener('load', () => syncSubmitState());
+  })();
+
+  (() => {
     const setOpen = (select, open) => {
       const trigger = select.querySelector('.lp-role-trigger');
       const options = [...select.querySelectorAll('.lp-role-option')];
@@ -588,11 +648,12 @@ class Component extends DCLogic {
 
     const choose = (select, option) => {
       const trigger = select.querySelector('.lp-role-trigger');
+      const label = select.querySelector('.lp-role-trigger-label');
       const input = select.querySelector('input[name="rol"]');
       const options = [...select.querySelectorAll('.lp-role-option')];
       options.forEach((item) => item.setAttribute('aria-selected', String(item === option)));
       input.value = option.dataset.value;
-      trigger.textContent = option.textContent;
+      label.textContent = option.textContent;
       setOpen(select, false);
       trigger.focus();
     };
