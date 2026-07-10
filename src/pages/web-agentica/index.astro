@@ -20,6 +20,11 @@ const pageDescription =
 
 const stats = [
   {
+    value: '01',
+    tag: 'cambio de modelo',
+    label: 'De páginas que se navegan a capacidades que un agente puede leer y llamar con precisión.',
+  },
+  {
     value: '02',
     tag: 'interfaces',
     label: 'Tu experiencia propia y la ventana de chat del agente: hoy necesitas existir en ambas.',
@@ -28,11 +33,6 @@ const stats = [
     value: '04',
     tag: 'niveles',
     label: 'Ser encontrado, legible, accionable e intrínseco: el marco completo de la web agéntica.',
-  },
-  {
-    value: '01',
-    tag: 'cambio de modelo',
-    label: 'De páginas que se navegan a capacidades que un agente puede leer y llamar con precisión.',
   },
 ]
 
@@ -45,18 +45,22 @@ const actos = [
 ]
 
 const forWho = [
-  'Lideras marketing, growth o digital.',
-  'Necesitas que tu negocio exista donde hoy se delegan decisiones.',
-  'Quieres entender cómo los agentes encuentran, leen y operan tu presencia digital.',
-  'Tu empresa produce datos o resultados que otros flujos necesitan consumir.',
+  'Lideras marketing, growth o digital y decides dónde poner la próxima inversión.',
+  'Necesitas que tu negocio exista donde las personas ya delegan decisiones.',
+  'Quieres entender qué ve un agente antes de recomendar, comparar o ejecutar.',
+  'Tu empresa produce datos, servicios o resultados que otros flujos necesitan consumir.',
 ]
-const notForWho = ['Buscas una táctica aislada sin cambiar el sistema.', 'No estás dispuesto a revisar cómo se entrega valor fuera de tu interfaz.']
+const notForWho = [
+  'Buscas una táctica aislada sin tocar el sistema.',
+  'Esperas un checklist técnico que reemplace una decisión de negocio.',
+  'Tu prioridad es solo atraer clics, no participar en los flujos que siguen.',
+]
 
 const faqs = [
   { q: '¿Qué es un agente de inteligencia artificial?', a: 'Un software que actúa por ti: navega, compara, decide y ejecuta tareas en la web sin que tengas que hacer clic. ChatGPT, Gemini o Claude ya operan así cuando les pides que investiguen o compren algo.' },
   { q: '¿Cuáles son los cuatro niveles de la web agéntica?', a: 'Ser encontrado, ser legible, ser accionable y ser intrínseco. El ebook explica qué exige cada nivel: desde aparecer en una respuesta hasta exponer capacidades y datos que un agente puede consumir en el flujo del cliente.' },
   { q: '¿Por qué no basta con optimizar para búsqueda?', a: 'Porque un agente no solo busca: lee, compara y actúa. La visibilidad es el primer nivel, pero la diferencia competitiva aparece cuando tu información se entiende, tus capacidades se pueden llamar y tu trabajo se integra al flujo del cliente.' },
-  { q: '¿Qué es llms.txt y cómo se implementa?', a: 'Un archivo en la raíz de tu sitio que le indica a los modelos de lenguaje qué contenido pueden usar y cómo. Se implementa como un simple archivo de texto, igual que robots.txt, con las secciones clave de tu sitio.' },
+  { q: '¿Qué es llms.txt y cómo se implementa?', a: 'Es un archivo auxiliar en la raíz de tu sitio que ordena contenido clave para los modelos de lenguaje. El ebook lo explica como parte de volver tu presencia legible: no reemplaza una decisión de producto, datos o capacidades por sí solo.' },
   { q: '¿Qué es zero-click commerce?', a: 'Compras que se completan sin que el usuario visite tu web: el agente encuentra, compara y ejecuta la transacción por él. Requiere integración agéntica para no quedar fuera del flujo de venta.' },
   { q: '¿Qué significa que más de la mitad de las solicitudes web sean automatizadas?', a: 'Cloudflare reporta que bots y agentes ya generan más de la mitad de las solicitudes web. No significa que la web humana desaparezca: significa que tu sitio debe poder ser encontrado, entendido y usado también por sistemas automatizados.' },
 ]
@@ -206,16 +210,42 @@ const jsonLd = [
 
     <!-- 03 · PARA QUIÉN -->
     <section class="quien" id="para-quien" data-capture="web-agentica-audience" data-reveal>
-      <p class="sec-label center"><span class="sec-num">03</span> Para quién es este ebook</p>
+      <div class="quien-head">
+        <p class="sec-label center"><span class="sec-num">03</span> Para quién es este ebook</p>
+        <h2>No necesitas otra táctica. Necesitas saber <span class="accent">qué parte del sistema revisar primero.</span></h2>
+        <p>Esta guía está hecha para equipos que prefieren entender el cambio antes de rediseñar su presencia, sus datos o su forma de entregar valor.</p>
+      </div>
       <div class="quien-grid">
-        <div class="quien-card quien-yes">
+        <article class="quien-card quien-yes" data-spotlight>
+          <div class="quien-card-meta">
+            <span class="quien-index" aria-hidden="true">01</span>
+            <p>Tu punto de partida</p>
+          </div>
           <h3><span class="q-icon yes" aria-hidden="true">✓</span> Es para ti si…</h3>
+          <p class="quien-summary">Reconoces que la decisión ya no termina cuando alguien llega a tu sitio.</p>
           <ul>{forWho.map(x => <li><span aria-hidden="true">✓</span>{x}</li>)}</ul>
-        </div>
-        <div class="quien-card quien-no">
-          <h3><span class="q-icon no" aria-hidden="true">✕</span> No es para ti si…</h3>
+          <p class="quien-card-note"><span aria-hidden="true">→</span> El ebook te entrega un marco para decidir qué revisar antes de elegir una herramienta.</p>
+        </article>
+        <article class="quien-card quien-no" data-spotlight>
+          <div class="quien-card-meta">
+            <span class="quien-index" aria-hidden="true">02</span>
+            <p>Una aclaración honesta</p>
+          </div>
+          <h3><span class="q-icon no" aria-hidden="true">✕</span> No es para ti todavía si…</h3>
+          <p class="quien-summary">No promete un atajo. Pide mirar cómo se entrega valor más allá de la interfaz humana.</p>
           <ul>{notForWho.map(x => <li><span aria-hidden="true">✕</span>{x}</li>)}</ul>
-        </div>
+          <p class="quien-card-note"><span aria-hidden="true">↘</span> Vuelve cuando quieras evaluar el sistema completo, no solo el siguiente ajuste.</p>
+        </article>
+      </div>
+      <p class="quien-transition"><span aria-hidden="true">↓</span> Si te reconoces aquí, los cinco actos te dan un mapa antes de decidir qué mover esta semana.</p>
+    </section>
+
+    <!-- Autor / credencial antes de la captura -->
+    <section class="autor" data-capture="web-agentica-author" data-reveal>
+      <img class="autor-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" />
+      <div>
+        <p class="autor-kicker">Efeonce Think · Research brief</p>
+        <p class="autor-body">Escrito por el equipo de Efeonce para ayudar a equipos de marketing, growth y digital a leer el cambio antes de decidir qué rediseñar.</p>
       </div>
     </section>
 
@@ -224,20 +254,11 @@ const jsonLd = [
       <WebAgenticaFormDock />
     </section>
 
-    <!-- Autor -->
-    <section class="autor" data-capture="web-agentica-author" data-reveal>
-      <img class="autor-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" />
-      <div>
-        <p class="autor-kicker">Escrito por el equipo de Efeonce</p>
-        <p class="autor-body">Una guía de Efeonce para pasar de visibilidad a legibilidad, acción e integración agéntica. Trabajamos donde tus clientes ya están preguntando: Google y los motores de respuesta.</p>
-      </div>
-    </section>
-
     <!-- 04 · FAQ -->
     <section class="faq" data-capture="web-agentica-faq" data-reveal>
       <div class="sec-head">
         <p class="sec-label"><span class="sec-num">04</span> Preguntas frecuentes</p>
-        <h2>Lo que la gente pregunta</h2>
+        <h2>Antes de actuar, aclaremos lo esencial.</h2>
       </div>
       <div class="faq-list">
         {faqs.map((f, i) => (
@@ -499,26 +520,49 @@ const jsonLd = [
   .dentro > .checklist-chip { display: flex; width: fit-content; }
 
   /* 03 QUIÉN */
-  .quien { max-width: 900px; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 3rem); }
-  .quien-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
-  .quien-card { border: 1px solid var(--line); border-radius: 16px; padding: 1.75rem; }
-  .quien-yes { border-top: 3px solid var(--teal); }
-  .quien-card h3 { display: flex; align-items: center; gap: 0.6rem; font-size: 1.125rem; color: var(--navy); margin: 0 0 1rem; }
-  .q-icon { width: 24px; height: 24px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+  .quien { position: relative; isolation: isolate; max-width: 1100px; margin: 0 auto; padding: clamp(3rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 3rem); }
+  .quien::before { content: ''; position: absolute; z-index: -1; inset: 12% 6% 7%; border-radius: 28px; pointer-events: none; background: radial-gradient(50% 58% at 50% 50%, color-mix(in srgb, var(--teal) 8%, transparent), transparent 76%); }
+  .quien-head { max-width: 760px; margin: 0 auto; text-align: center; }
+  .quien-head .sec-label { justify-content: center; }
+  .quien-head h2 { max-width: 710px; margin: 0 auto; color: var(--navy); font-size: clamp(1.65rem, 3.8vw, 2.45rem); font-weight: 700; letter-spacing: -.025em; line-height: 1.14; }
+  .quien-head > p:last-child { max-width: 610px; margin: 1rem auto 0; color: var(--muted); font-size: 1rem; line-height: 1.6; }
+  .quien-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: 1.25rem; margin-top: clamp(1.75rem, 4vw, 2.5rem); }
+  .quien-card { position: relative; isolation: isolate; display: flex; flex-direction: column; min-width: 0; min-height: 25.75rem; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; padding: clamp(1.35rem, 3vw, 2rem); background: linear-gradient(145deg, #fff 0%, color-mix(in srgb, var(--surface) 72%, #fff) 100%); box-shadow: 0 20px 38px -34px color-mix(in srgb, var(--navy) 78%, transparent); container-type: inline-size; transition: translate .22s cubic-bezier(.2,0,0,1), border-color .22s cubic-bezier(.2,0,0,1), box-shadow .22s cubic-bezier(.2,0,0,1), background .22s cubic-bezier(.2,0,0,1); }
+  .quien-card::before { content: ''; position: absolute; z-index: 2; top: 0; left: clamp(1.35rem, 3vw, 2rem); width: clamp(4rem, 16%, 6.5rem); height: 3px; border-radius: 0 0 999px 999px; background: var(--teal); transition: width .22s cubic-bezier(.2,0,0,1); }
+  .quien-card::after { content: ''; position: absolute; z-index: 0; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(280px circle at var(--spot-x, 45%) var(--spot-y, 12%), color-mix(in srgb, var(--teal) 17%, transparent), transparent 72%); transition: opacity .22s cubic-bezier(.2,0,0,1); }
+  .quien-card > * { position: relative; z-index: 1; }
+  .quien-yes { border-color: color-mix(in srgb, var(--teal) 52%, var(--line)); background: linear-gradient(145deg, color-mix(in srgb, var(--teal) 8%, #fff) 0%, #fff 58%, color-mix(in srgb, var(--surface) 76%, #fff) 100%); }
+  .quien-no::before { background: color-mix(in srgb, var(--muted) 42%, var(--line)); }
+  .quien-card-meta { display: flex; align-items: center; gap: .65rem; margin: 0 0 1.35rem; }
+  .quien-index { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border: 1px solid color-mix(in srgb, var(--teal) 35%, var(--line)); border-radius: 8px; color: var(--teal-deep); background: color-mix(in srgb, var(--teal) 11%, #fff); font-family: 'Poppins', sans-serif; font-size: .6875rem; font-weight: 700; letter-spacing: .06em; }
+  .quien-no .quien-index { border-color: var(--line); background: var(--surface); color: var(--muted); }
+  .quien-card-meta p { margin: 0; color: var(--teal-deep); font-family: 'Poppins', sans-serif; font-size: .6875rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+  .quien-no .quien-card-meta p { color: var(--muted); }
+  .quien-card h3 { display: flex; align-items: center; gap: 0.6rem; font-size: clamp(1.125rem, 2vw, 1.3rem); color: var(--navy); margin: 0; letter-spacing: -.015em; }
+  .q-icon { width: 24px; height: 24px; border-radius: 7px; display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; font-size: 0.8rem; }
   .q-icon.yes { background: color-mix(in srgb, var(--teal) 16%, #fff); color: var(--teal-deep); }
   .q-icon.no { background: var(--surface); color: var(--muted); }
-  .quien-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
-  .quien-card li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.9875rem; line-height: 1.45; color: var(--ink); }
-  .quien-yes li > span { color: var(--teal-deep); font-weight: 700; } .quien-no li > span { color: var(--muted); }
+  .quien-summary { max-width: 39ch; margin: .7rem 0 1.25rem; color: var(--muted); font-size: .9375rem; line-height: 1.5; }
+  .quien-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .82rem; }
+  .quien-card li { display: flex; gap: .65rem; align-items: flex-start; color: var(--ink); font-size: .9875rem; line-height: 1.45; }
+  .quien-card li > span { display: inline-flex; flex: 0 0 auto; width: 1rem; justify-content: center; margin-top: .1rem; font-weight: 700; }
+  .quien-yes li > span { color: var(--teal-deep); } .quien-no li > span { color: var(--muted); }
+  .quien-card-note { display: flex; gap: .55rem; align-items: flex-start; margin: auto 0 0; padding-top: 1.15rem; border-top: 1px solid color-mix(in srgb, var(--line) 82%, var(--teal)); color: var(--teal-deep); font-size: .8125rem; font-weight: 600; line-height: 1.45; }
+  .quien-card-note > span { color: var(--teal); font-size: 1rem; line-height: 1.1; }
+  .quien-no .quien-card-note { color: var(--muted); border-top-color: var(--line); }
+  .quien-no .quien-card-note > span { color: var(--muted); }
+  .quien-transition { display: flex; justify-content: center; gap: .5rem; max-width: 600px; margin: 1.5rem auto 0; color: var(--teal-deep); font-size: .875rem; font-weight: 600; line-height: 1.5; text-align: center; }
+  .quien-transition > span { color: var(--teal); }
+  @media (hover: hover) and (pointer: fine) { .quien-card:hover { translate: 0 -.35rem; border-color: color-mix(in srgb, var(--teal) 60%, var(--line)); box-shadow: 0 28px 46px -32px color-mix(in srgb, var(--navy) 80%, transparent); } .quien-card:hover::before { width: clamp(6rem, 28%, 9rem); } .quien-card:hover::after { opacity: 1; } }
 
   /* FORM BAND */
   .form-band { position: relative; background: radial-gradient(120% 100% at 50% 0%, var(--navy-2) 0%, var(--navy) 72%, #001a33 100%); padding: clamp(3rem, 7vw, 5rem) clamp(1.25rem, 5vw, 3rem); }
 
   /* AUTOR */
-  .autor { max-width: 820px; margin: 0 auto; padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem); display: flex; gap: 1.5rem; align-items: flex-start; }
-  .autor-mark { height: 34px; width: auto; filter: brightness(0) saturate(100%); opacity: .85; flex-shrink: 0; }
+  .autor { max-width: 1100px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 2.25rem) clamp(1.25rem, 5vw, 3rem); display: grid; grid-template-columns: minmax(118px, .38fr) minmax(0, 1fr); gap: clamp(1.25rem, 4vw, 3rem); align-items: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .autor-mark { height: 34px; width: auto; filter: brightness(0) saturate(100%); opacity: .85; }
   .autor-kicker { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal-deep); margin: 0 0 0.5rem; }
-  .autor-body { color: var(--muted); line-height: 1.6; margin: 0; font-size: 0.9875rem; }
+  .autor-body { max-width: 640px; color: var(--muted); line-height: 1.6; margin: 0; font-size: 0.9875rem; }
 
   /* FAQ */
   .faq { max-width: 780px; margin: 0 auto; padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem); }
@@ -577,6 +621,8 @@ const jsonLd = [
     .is-enhanced .problema .interface-lane { transition: opacity .36s cubic-bezier(.2,.7,0,1), transform .36s cubic-bezier(.2,.7,0,1); }
     .is-enhanced .problema.is-visible .interface-lane-agent { transition-delay: .1s; }
     .is-enhanced .problema.is-visible .interface-connector span { animation: web-agentica-signal 2.4s 280ms ease-in-out infinite; }
+    .is-enhanced .quien.is-visible .quien-card { animation: web-agentica-card-settle .46s cubic-bezier(.2,.7,0,1) both; }
+    .is-enhanced .quien.is-visible .quien-no { animation-delay: .09s; }
     .is-enhanced .footer.is-visible .footer-pulse { animation: web-agentica-pulse 2.4s ease-in-out infinite; }
     .is-enhanced .faq-item[open] p { animation: web-agentica-faq-answer .28s cubic-bezier(.2,.7,0,1) both; }
     @keyframes web-agentica-enter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -585,10 +631,11 @@ const jsonLd = [
     @keyframes web-agentica-signal { 0%, 100% { transform: translateX(-12px); opacity: .72; } 50% { transform: translateX(12px); opacity: 1; } }
     @keyframes web-agentica-pulse { 0%, 100% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--teal) 18%, transparent); } 50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--teal) 4%, transparent); } }
     @keyframes web-agentica-actos-progress { 0% { opacity: 0; scale: 0 1; } 16% { opacity: .95; } 100% { opacity: .66; scale: 1 1; } }
+    @keyframes web-agentica-card-settle { from { opacity: .01; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes web-agentica-faq-answer { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
   }
   @media (prefers-reduced-motion: reduce) {
-    .cta-primary, .cta-primary span, .brief-nav, .brief-nav a::after, .faq-item, .faq-item summary::after, .stat-card, .stat-card::after, .interface-lane, .footer-nav a::after, .acto-card, .acto-card::before, .acto-card::after, .acto-n { transition: none; }
+    .cta-primary, .cta-primary span, .brief-nav, .brief-nav a::after, .faq-item, .faq-item summary::after, .stat-card, .stat-card::after, .interface-lane, .footer-nav a::after, .acto-card, .acto-card::before, .acto-card::after, .acto-n, .quien-card, .quien-card::before, .quien-card::after { transition: none; }
     .cta-primary:hover, .cta-primary:active, .cta-primary:hover span, .acto-card:hover { transform: none; translate: 0; scale: 1; }
     .hero-cursor-layer { display: none; }
   }
@@ -608,7 +655,8 @@ const jsonLd = [
     .actos { grid-template-columns: repeat(2, 1fr); }
     .actos-rail { display: none; }
     .quien-grid { grid-template-columns: 1fr; }
-    .autor { flex-direction: column; align-items: center; text-align: center; }
+    .quien-card { min-height: 0; }
+    .autor { grid-template-columns: 1fr; justify-items: center; text-align: center; }
     .footer-main { grid-template-columns: 1fr 1fr; }
     .footer-brand { grid-column: 1 / -1; }
   }
