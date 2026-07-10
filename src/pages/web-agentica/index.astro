@@ -103,14 +103,31 @@ const jsonLd = [
         <div class="hero-visual" aria-hidden="true">
           <span class="hero-visual-label hero-visual-label-human"><i></i> Interfaz humana</span>
           <span class="hero-visual-label hero-visual-label-agent"><i></i> Lectura del agente</span>
-          <picture>
-            <source
-              type="image/webp"
-              srcset="/web-agentica/ebook-hero-640.webp 640w, /web-agentica/ebook-hero-960.webp 960w, /web-agentica/ebook-hero-1536.webp 1536w"
-              sizes="(max-width: 920px) 100vw, 58vw"
-            />
-            <img src="/web-agentica/ebook-hero.png" alt="" width="1536" height="1024" loading="eager" decoding="async" sizes="(max-width: 920px) 100vw, 58vw" />
-          </picture>
+          <div class="hero-visual-art">
+            <picture>
+              <source
+                type="image/webp"
+                srcset="/web-agentica/ebook-hero-motion-base-640.webp 640w, /web-agentica/ebook-hero-motion-base-960.webp 960w, /web-agentica/ebook-hero-motion-base-1536.webp 1536w"
+                sizes="(max-width: 920px) 100vw, 58vw"
+              />
+              <img src="/web-agentica/ebook-hero-motion-base.png" alt="" width="1536" height="1024" loading="eager" decoding="async" sizes="(max-width: 920px) 100vw, 58vw" />
+            </picture>
+            <svg class="hero-cursor-layer" viewBox="0 0 1536 1024" aria-hidden="true" focusable="false">
+              <g class="hero-cursor-pointer">
+                <g class="hero-cursor-press">
+                  <image href="/web-agentica/hero-cursor.png" x="-225" y="-125" width="260" height="260" />
+                  <animateTransform attributeName="transform" type="scale" values="1;1;1;.93;.93;1;1" keyTimes="0;.1;.5;.53;.58;.68;1" dur="8s" begin=".85s" repeatCount="indefinite" />
+                </g>
+                <animateTransform attributeName="transform" type="translate" values="225 775;225 775;1022 510;1022 510;1320 750;1320 750;225 775" keyTimes="0;.1;.5;.56;.68;.75;1" calcMode="spline" keySplines=".2 0 .2 1;.2 .72 0 1;0 0 .2 1;.2 .72 0 1;0 0 .2 1;.2 .72 0 1" dur="8s" begin=".85s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0;0;1;1;1;0;0" keyTimes="0;.06;.14;.5;.59;.7;1" dur="8s" begin=".85s" repeatCount="indefinite" />
+              </g>
+              <g class="hero-cursor-click">
+                <circle cx="1022" cy="510" r="12" />
+                <animate attributeName="opacity" values="0;0;0;.8;0;0" keyTimes="0;.48;.51;.55;.62;1" dur="8s" begin=".85s" repeatCount="indefinite" />
+                <animate attributeName="r" values="12;12;12;31;42;42" keyTimes="0;.48;.51;.55;.62;1" dur="8s" begin=".85s" repeatCount="indefinite" />
+              </g>
+            </svg>
+          </div>
         </div>
       </div>
       <nav class="brief-nav" data-brief-nav aria-label="Recorrido del ebook">
@@ -388,8 +405,12 @@ const jsonLd = [
   .hero-visual-label i { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 18%, transparent); }
   .hero-visual-label-human { top: 18%; left: 6%; }
   .hero-visual-label-agent { right: 7%; bottom: 15%; }
+  .hero-visual-art { position: relative; z-index: 1; width: 100%; max-width: 720px; margin: 0 0 0 auto; transform: translateX(-.75rem) scale(1.035); transform-origin: 45% 50%; filter: drop-shadow(0 40px 80px rgba(0,0,0,.5)); }
   .hero-visual picture, .hero-visual img { display: block; }
-  .hero-visual img { position: relative; z-index: 1; width: 100%; max-width: 720px; height: auto; margin: 0 0 0 auto; transform: translateX(-.75rem) scale(1.035); transform-origin: 45% 50%; filter: drop-shadow(0 40px 80px rgba(0,0,0,.5)); }
+  .hero-visual img { width: 100%; height: auto; }
+  .hero-cursor-layer { position: absolute; z-index: 2; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .hero-cursor-pointer { opacity: 0; }
+  .hero-cursor-click circle { fill: none; stroke: var(--teal-2); stroke-width: 4; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--teal) 65%, transparent)); }
   .brief-nav { position: relative; z-index: 1; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .35rem 1.1rem; max-width: 1240px; margin: 0 auto; padding-top: 1.1rem; border-top: 1px solid rgba(255,255,255,.14); }
   .brief-nav a { position: relative; color: rgba(255,255,255,.72); font-size: .8125rem; font-weight: 600; text-decoration: none; padding: .35rem 0; }
   .brief-nav a::after { content: ''; position: absolute; right: 0; bottom: 0; left: 0; height: 1px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform .2s cubic-bezier(.2,0,0,1); }
@@ -544,6 +565,7 @@ const jsonLd = [
   @media (prefers-reduced-motion: reduce) {
     .cta-primary, .cta-primary span, .brief-nav, .brief-nav a::after, .faq-item, .faq-item summary::after, .stat-card, .stat-card::after, .interface-lane, .footer-nav a::after { transition: none; }
     .cta-primary:hover, .cta-primary:active, .cta-primary:hover span { transform: none; }
+    .hero-cursor-layer { display: none; }
   }
   @media (max-width: 920px) {
     .hero-grid { grid-template-columns: 1fr; text-align: center; min-height: auto; padding-top: 1rem; }
@@ -555,7 +577,8 @@ const jsonLd = [
     .hero-proof { justify-content: center; }
     .hero-visual { margin: .5rem 0 0; }
     .hero-visual-label { display: none; }
-    .hero-visual img { max-width: 440px; margin: 1rem auto 0; transform: none; }
+    .hero-visual-art { max-width: 440px; margin: 1rem auto 0; transform: none; }
+    .hero-cursor-layer { display: none; }
     .brief-nav { justify-content: center; }
     .actos { grid-template-columns: repeat(2, 1fr); }
     .actos::before { display: none; }
