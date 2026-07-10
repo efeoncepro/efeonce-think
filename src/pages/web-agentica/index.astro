@@ -425,6 +425,8 @@ const jsonLd = [
 
 <style is:global>
   .ebook-form-card { max-width: 640px; margin: 0 auto; background: #fff; border-radius: 22px; padding: clamp(1.75rem, 4vw, 2.75rem); box-shadow: 0 40px 90px -50px rgba(0,0,0,.7); }
+  .ebook-form-card[data-submitted='true'] { max-width: 960px; }
+  .ebook-form-card[data-submitted='true'] .form-intro { display: none; }
   .ebook-form-card .form-eyebrow { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; padding: 0.45rem 0.9rem; background: color-mix(in srgb, #36c8bf 12%, #fff); color: #1f9a92; border-radius: 999px; margin: 0 0 1rem; }
   .ebook-form-card .form-intro h2 { font-family: 'Poppins', sans-serif; font-size: clamp(1.5rem, 3vw, 1.9rem); color: #00284d; margin: 0 0 0.4rem; letter-spacing: -0.01em; }
   .ebook-form-card .form-intro .form-lead { color: #6d6777; line-height: 1.5; margin: 0 0 1.5rem; font-size: 0.9375rem; }
@@ -434,14 +436,23 @@ const jsonLd = [
   @keyframes ghf-sh { 0% { background-position: 100% 0 } 100% { background-position: 0 0 } }
   @media (prefers-reduced-motion: reduce) { .ebook-form-card .fallback-line { animation: none; } }
 
-  .form-state-success { text-align: center; color: #1a1a2e; }
-  .form-state-success .success-mark { color: #36c8bf; display: flex; justify-content: center; margin: 0 0 1rem; }
-  .form-state-success h2 { font-family: 'Poppins', sans-serif; color: #00284d; margin: 0 0 0.5rem; font-size: 1.6rem; }
-  .form-state-success > p { color: #6d6777; line-height: 1.55; margin: 0 auto 1.25rem; max-width: 440px; font-size: 0.9375rem; }
-  .redownload-cta { display: inline-block; color: #1f9a92; font-weight: 600; text-decoration: underline; margin: 0 0 1.5rem; font-size: 0.9375rem; }
-  .form-state-success .bridge { border-top: 1px solid #eaeaec; padding-top: 1.5rem; margin-top: 0.5rem; }
+  .ebook-form-card[data-submitted='true'] .form-state-success { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(260px, .95fr); align-items: center; gap: clamp(1.5rem, 4vw, 3rem); color: #1a1a2e; text-align: left; }
+  .form-state-success .success-primary { min-width: 0; }
+  .form-state-success .success-eyebrow { display: inline-flex; align-items: center; gap: .45rem; margin: 0 0 1rem; color: #1f9a92; font-family: 'Poppins', sans-serif; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .form-state-success .success-mark { color: #36c8bf; display: flex; justify-content: flex-start; margin: 0 0 1rem; }
+  .form-state-success h2 { font-family: 'Poppins', sans-serif; color: #00284d; margin: 0 0 0.65rem; font-size: clamp(1.65rem, 3vw, 2.15rem); letter-spacing: -.02em; line-height: 1.12; }
+  .form-state-success h2:focus { outline: 3px solid #36c8bf; outline-offset: 6px; border-radius: 4px; }
+  .form-state-success .success-primary > p:not(.success-eyebrow) { color: #6d6777; line-height: 1.55; margin: 0 0 1.5rem; max-width: 430px; font-size: 1rem; }
+  .redownload-cta { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; box-sizing: border-box; border: 1px solid #00284d; border-radius: 10px; color: #00284d; font-family: 'Poppins', sans-serif; font-weight: 700; text-decoration: none; padding: .7rem 1rem; font-size: .875rem; }
+  .redownload-cta:hover { background: #00284d; color: #fff; }
+  .redownload-cta:focus-visible, .form-state-success .bridge-cta:focus-visible { outline: 3px solid #36c8bf; outline-offset: 4px; }
+  .form-state-success .bridge { border: 1px solid color-mix(in srgb, #36c8bf 28%, #eaeaec); border-radius: 16px; background: linear-gradient(145deg, color-mix(in srgb, #36c8bf 10%, #fff), #fff); padding: clamp(1.25rem, 3vw, 1.75rem); }
   .form-state-success .bridge-kicker { font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #1f9a92; margin: 0 0 0.35rem; }
   .form-state-success .bridge-title { font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 700; color: #00284d; margin: 0 0 0.4rem; }
   .form-state-success .bridge-body { color: #6d6777; line-height: 1.5; margin: 0 0 1.25rem; font-size: 0.9375rem; }
-  .form-state-success .bridge-cta { display: inline-flex; background: #36c8bf; color: #04222f; font-weight: 700; padding: 0.8rem 1.6rem; border-radius: 12px; text-decoration: none; font-family: 'Poppins', sans-serif; }
+  .form-state-success .bridge-cta { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; color: #087e78; font-weight: 700; text-decoration: underline; text-underline-offset: .2em; font-family: 'Poppins', sans-serif; }
+  @media (max-width: 720px) {
+    .ebook-form-card[data-submitted='true'] { max-width: 640px; }
+    .ebook-form-card[data-submitted='true'] .form-state-success { grid-template-columns: 1fr; gap: 1.5rem; }
+  }
 </style>

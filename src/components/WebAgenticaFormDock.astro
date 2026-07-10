@@ -61,31 +61,36 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   <div
     class="form-state form-state-success"
     data-form-state="success"
+    data-capture="web-agentica-form-success"
     role="status"
     aria-live="polite"
     tabindex="-1"
     hidden
   >
-    <div class="success-mark" aria-hidden="true">
-      <svg viewBox="0 0 48 48" width="48" height="48" fill="none"><circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2" opacity="0.35"/><path d="M15 24.5l6 6 12-13" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="success-primary">
+      <p class="success-eyebrow"><span aria-hidden="true">✓</span> Descarga confirmada</p>
+      <div class="success-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="48" height="48" fill="none"><circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2" opacity="0.35"/><path d="M15 24.5l6 6 12-13" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2 id="web-agentica-success-title" tabindex="-1">Tu descarga está lista</h2>
+      <p>El PDF ya se está descargando. Si necesitas abrirlo otra vez, usa el botón mientras esta página siga abierta.</p>
+      <a class="redownload-cta" data-redownload href="#" hidden>Descargar el ebook otra vez <span aria-hidden="true">↗</span></a>
     </div>
-    <h2>Tu ebook va en camino</h2>
-    <p>Te enviamos «El fin de la web» a tu correo y lo abrimos aquí mismo. ¿No ves el email? Revisa spam o promociones en unos minutos.</p>
-    <a class="redownload-cta" data-redownload href="#" hidden>Descargar de nuevo</a>
     <div class="bridge">
-      <p class="bridge-kicker">El siguiente paso</p>
-      <p class="bridge-title">¿Cómo te ve la IA hoy?</p>
-      <p class="bridge-body">Mide si ChatGPT, Perplexity y Google AI te encuentran, entienden y recomiendan.</p>
-      <a class="bridge-cta" href="/brand-visibility">Medir mi visibilidad</a>
+      <p class="bridge-kicker">Tu punto de partida</p>
+      <p class="bridge-title">Mide el nivel 1 de tu web agéntica</p>
+      <p class="bridge-body">Descubre si ChatGPT, Perplexity y Google AI encuentran y entienden tu marca. El ebook te ayuda a avanzar desde ahí hacia acciones y capacidades.</p>
+      <a class="bridge-cta" href="/brand-visibility">Medir mi visibilidad en IA <span aria-hidden="true">→</span></a>
     </div>
   </div>
 </div>
 
 <script>
-  const dock = document.querySelector('[data-web-agentica-form-dock]')
+  const dock = document.querySelector<HTMLElement>('[data-web-agentica-form-dock]')
   if (dock) {
     const ready = dock.querySelector('[data-form-state="ready"]') as HTMLElement | null
     const success = dock.querySelector('[data-form-state="success"]') as HTMLElement | null
+    const successTitle = dock.querySelector('#web-agentica-success-title') as HTMLElement | null
     const redownload = dock.querySelector('[data-redownload]') as HTMLAnchorElement | null
 
     const triggerDownload = (url: string) => {
@@ -102,11 +107,10 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       const detail = (event as CustomEvent).detail ?? {}
       const downloadUrl = typeof detail.download_url === 'string' ? detail.download_url : null
 
+      dock.dataset.submitted = 'true'
+      dock.setAttribute('aria-labelledby', 'web-agentica-success-title')
       if (ready) ready.hidden = true
-      if (success) {
-        success.hidden = false
-        success.focus()
-      }
+      if (success) success.hidden = false
       if (downloadUrl) {
         triggerDownload(downloadUrl)
         if (redownload) {
@@ -114,6 +118,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
           redownload.hidden = false
         }
       }
+      successTitle?.focus()
     })
   }
 </script>
