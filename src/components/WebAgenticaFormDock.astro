@@ -31,30 +31,54 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   role="region"
   aria-labelledby="web-agentica-form-title"
 >
-  <div class="form-intro">
-    <p class="form-eyebrow"><span aria-hidden="true">✓</span> Incluye checklist para aplicar esta semana</p>
-    <h2 id="web-agentica-form-title" tabindex="-1">Descarga el ebook gratis</h2>
-    <p class="form-lead">Cinco actos y un checklist para entender la web agéntica y actuar esta semana. Te lo enviamos a tu correo.</p>
-  </div>
+  <div class="form-workspace">
+    <aside class="form-value-rail" data-capture="web-agentica-form-value" aria-label="Qué incluye la descarga">
+      <p class="form-rail-kicker"><span class="form-rail-signal" aria-hidden="true"></span> Tu mapa de lectura</p>
+      <p class="form-rail-title">Una guía breve para una web que ya no tiene un solo visitante.</p>
+      <ol class="form-rail-list">
+        <li>
+          <span aria-hidden="true">01</span>
+          <div><strong>Dos interfaces</strong><p>Tu experiencia y la ventana que usa un agente.</p></div>
+        </li>
+        <li>
+          <span aria-hidden="true">02</span>
+          <div><strong>Cuatro niveles</strong><p>De ser encontrado a operar como capacidad.</p></div>
+        </li>
+        <li>
+          <span aria-hidden="true">03</span>
+          <div><strong>Checklist semanal</strong><p>Una lista para transformar lectura en acción.</p></div>
+        </li>
+      </ol>
+      <p class="form-rail-delivery"><span aria-hidden="true">↓</span> La descarga comienza al enviar.</p>
+    </aside>
 
-  <div class="form-state form-state-ready" data-form-state="ready">
-    <script is:inline defer src={rendererSrc}></script>
-    <greenhouse-form
-      form-key={formKey}
-      surface={surfaceId}
-      locale="es-CL"
-      color-scheme="light"
-      appearance="bare"
-      base-url={greenhouseBase}
-    >
-      <div class="governed-fallback" role="status" aria-live="polite">
-        <span class="fallback-line"></span>
-        <span class="fallback-line short"></span>
-        <span class="fallback-line"></span>
-        <p>Preparando el formulario.</p>
+    <div class="form-entry">
+      <div class="form-intro">
+        <p class="form-eyebrow"><span aria-hidden="true">✓</span> Incluye checklist para aplicar esta semana</p>
+        <h2 id="web-agentica-form-title" tabindex="-1">Descarga el ebook gratis</h2>
+        <p class="form-lead">Cinco actos y un checklist para entender la web agéntica y actuar esta semana. La descarga comienza al enviar.</p>
       </div>
-    </greenhouse-form>
-    <noscript>Activa JavaScript para cargar el formulario y descargar el ebook.</noscript>
+
+      <div class="form-state form-state-ready" data-form-state="ready">
+        <script is:inline defer src={rendererSrc}></script>
+        <greenhouse-form
+          form-key={formKey}
+          surface={surfaceId}
+          locale="es-CL"
+          color-scheme="light"
+          appearance="bare"
+          base-url={greenhouseBase}
+        >
+          <div class="governed-fallback" role="status" aria-live="polite">
+            <span class="fallback-line"></span>
+            <span class="fallback-line short"></span>
+            <span class="fallback-line"></span>
+            <p>Preparando el formulario.</p>
+          </div>
+        </greenhouse-form>
+        <noscript>Activa JavaScript para cargar el formulario y descargar el ebook.</noscript>
+      </div>
+    </div>
   </div>
 
   <!-- Tarjeta de agradecimiento inline (reemplaza el form post-submit; NO overlay) -->
