@@ -14,28 +14,25 @@ import { axis, teal } from '@lib/report-tokens'
  */
 const siteUrl = 'https://think.efeoncepro.com'
 const landingUrl = `${siteUrl}/web-agentica`
-const pageTitle = 'El fin de la web: marketing + IA | Efeonce Think'
+const pageTitle = 'El fin de la web agéntica | Efeonce Think'
 const pageDescription =
   'Descarga gratis una guía de cinco actos sobre la web agéntica: cómo pasar de ser encontrado a ser legible, accionable e intrínseco.'
 
 const stats = [
   {
-    value: '−27%',
-    tag: 'SEO',
-    label: 'Tráfico orgánico interanual en sitios de clientes HubSpot',
-    source: { label: 'HubSpot, 2026', href: 'https://www.hubspot.com/company-news/spring-2026-spotlight' },
+    value: '02',
+    tag: 'interfaces',
+    label: 'Tu experiencia propia y la ventana de chat del agente: hoy necesitas existir en ambas.',
   },
   {
-    value: '3×',
-    tag: 'IA',
-    label: 'Tráfico referido por inteligencia artificial en el mismo período',
-    source: { label: 'HubSpot, 2026', href: 'https://www.hubspot.com/company-news/spring-2026-spotlight' },
+    value: '04',
+    tag: 'niveles',
+    label: 'Ser encontrado, legible, accionable e intrínseco: el marco completo de la web agéntica.',
   },
   {
-    value: '+32%',
-    tag: 'retail',
-    label: 'Crecimiento de ventas más rápido en retailers con agentes',
-    source: { label: 'Salesforce, Cyber Week 2025', href: 'https://www.salesforce.com/news/press-releases/2025/12/05/cyber-week-ai-agents-sales/' },
+    value: '01',
+    tag: 'cambio de modelo',
+    label: 'De páginas que se navegan a capacidades que un agente puede leer y llamar con precisión.',
   },
 ]
 
@@ -49,15 +46,16 @@ const actos = [
 
 const forWho = [
   'Lideras marketing, growth o digital.',
-  'Sientes que el SEO «ya no rinde igual».',
-  'Quieres aparecer en ChatGPT, Perplexity y Claude.',
+  'Necesitas que tu negocio exista donde hoy se delegan decisiones.',
+  'Quieres entender cómo los agentes encuentran, leen y operan tu presencia digital.',
   'Tu empresa produce datos o resultados que otros flujos necesitan consumir.',
 ]
-const notForWho = ['Buscas trucos rápidos de SEO tradicional.', 'No estás dispuesto a cambiar la estrategia.']
+const notForWho = ['Buscas una táctica aislada sin cambiar el sistema.', 'No estás dispuesto a revisar cómo se entrega valor fuera de tu interfaz.']
 
 const faqs = [
   { q: '¿Qué es un agente de inteligencia artificial?', a: 'Un software que actúa por ti: navega, compara, decide y ejecuta tareas en la web sin que tengas que hacer clic. ChatGPT, Gemini o Claude ya operan así cuando les pides que investiguen o compren algo.' },
-  { q: '¿Qué es AEO y en qué se diferencia del SEO?', a: 'AEO (Answer Engine Optimization) optimiza tu contenido para que los motores de respuesta lo citen directamente. El SEO busca posiciones en resultados; el AEO busca ser la fuente de la respuesta que la IA entrega.' },
+  { q: '¿Cuáles son los cuatro niveles de la web agéntica?', a: 'Ser encontrado, ser legible, ser accionable y ser intrínseco. El ebook explica qué exige cada nivel: desde aparecer en una respuesta hasta exponer capacidades y datos que un agente puede consumir en el flujo del cliente.' },
+  { q: '¿Por qué no basta con optimizar para búsqueda?', a: 'Porque un agente no solo busca: lee, compara y actúa. La visibilidad es el primer nivel, pero la diferencia competitiva aparece cuando tu información se entiende, tus capacidades se pueden llamar y tu trabajo se integra al flujo del cliente.' },
   { q: '¿Qué es llms.txt y cómo se implementa?', a: 'Un archivo en la raíz de tu sitio que le indica a los modelos de lenguaje qué contenido pueden usar y cómo. Se implementa como un simple archivo de texto, igual que robots.txt, con las secciones clave de tu sitio.' },
   { q: '¿Qué es zero-click commerce?', a: 'Compras que se completan sin que el usuario visite tu web: el agente encuentra, compara y ejecuta la transacción por él. Requiere integración agéntica para no quedar fuera del flujo de venta.' },
   { q: '¿Qué significa que más de la mitad de las solicitudes web sean automatizadas?', a: 'Cloudflare reporta que bots y agentes ya generan más de la mitad de las solicitudes web. No significa que la web humana desaparezca: significa que tu sitio debe poder ser encontrado, entendido y usado también por sistemas automatizados.' },
@@ -83,7 +81,7 @@ const jsonLd = [
       </header>
       <div class="hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow"><span>Ebook gratuito</span><span class="dot" aria-hidden="true"></span><span>Marketing digital + IA</span></p>
+          <p class="eyebrow"><span>Ebook gratuito</span><span class="dot" aria-hidden="true"></span><span>Web agéntica</span></p>
           <h1 class="hero-title">El fin de la <span class="accent">web</span><br />solo para humanos</h1>
           <p class="hero-lead">Cloudflare reporta que bots y agentes ya generan más de la mitad de las solicitudes web. Cinco actos para entender qué cambió — y qué hacer esta semana.</p>
           <p class="stat-pill"><span class="stat-pill-strong">Más de la mitad de las solicitudes web son automatizadas</span><span class="stat-pill-source">— Cloudflare, 2026</span></p>
@@ -92,7 +90,7 @@ const jsonLd = [
           <ul class="hero-proof" aria-label="Incluye">
             <li><strong>05</strong> actos</li>
             <li><strong>01</strong> checklist</li>
-            <li><strong>IA + AEO</strong> aplicable</li>
+            <li><strong>04</strong> niveles</li>
           </ul>
         </div>
         <div class="hero-visual" aria-hidden="true">
@@ -123,10 +121,7 @@ const jsonLd = [
       {stats.map(s => (
         <article class="stat-card">
           <p class="stat-value">{s.value}<span class="stat-tag">{s.tag}</span></p>
-          <p class="stat-label">
-            {s.label}{' '}
-            <a class="stat-src" href={s.source.href} target="_blank" rel="noreferrer">({s.source.label})</a>
-          </p>
+          <p class="stat-label">{s.label}</p>
         </article>
       ))}
     </section>
