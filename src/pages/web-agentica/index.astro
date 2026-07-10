@@ -185,16 +185,22 @@ const jsonLd = [
         <p class="sec-label"><span class="sec-num">02</span> Qué vas a encontrar dentro</p>
         <h2>Cinco actos para leer la nueva web</h2>
       </div>
-      <ol class="actos">
-        {actos.map(a => (
-          <li class="acto-card">
-            <span class="acto-n">{a.n}</span>
-            <p class="acto-label">Acto {a.n}</p>
-            <p class="acto-title">{a.title}</p>
-            <p class="acto-description">{a.description}</p>
-          </li>
-        ))}
-      </ol>
+      <div class="actos-journey">
+        <span class="actos-rail" aria-hidden="true"><span class="actos-rail-pulse"></span></span>
+        <ol class="actos" role="list">
+          {actos.map((a, index) => (
+            <li class="acto-card" data-spotlight>
+              <div class="acto-topline">
+                <span class="acto-n">{a.n}</span>
+                <span class="acto-order" aria-hidden="true">{String(index + 1).padStart(2, '0')}<small>/05</small></span>
+              </div>
+              <p class="acto-label">Acto {a.n}</p>
+              <p class="acto-title">{a.title}</p>
+              <p class="acto-description">{a.description}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
       <p class="checklist-chip"><span aria-hidden="true">✓</span> Incluye checklist «Lo que haces esta semana»</p>
     </section>
 
@@ -464,14 +470,31 @@ const jsonLd = [
   .section-prompt { color: var(--teal-2); font-weight: 600; font-size: 1rem; margin: 0; }
 
   /* 02 ACTOS */
-  .dentro { max-width: 1100px; margin: 0 auto; padding: clamp(3rem, 7vw, 5rem) clamp(1.25rem, 5vw, 3rem); }
-  .actos { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; list-style: none; margin: 0; padding: 0; }
-  .actos::before { content: ''; position: absolute; top: 2.55rem; right: 9%; left: 9%; height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--teal) 50%, var(--line)) 12%, color-mix(in srgb, var(--teal) 50%, var(--line)) 88%, transparent); }
-  .acto-card { position: relative; z-index: 1; background: linear-gradient(165deg, #fff 0%, var(--surface) 100%); border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem 1.1rem; box-shadow: 0 18px 30px -32px color-mix(in srgb, var(--navy) 70%, transparent); }
-  .acto-n { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9px; background: color-mix(in srgb, var(--teal) 14%, #fff); color: var(--teal-deep); font-weight: 700; font-size: 0.9375rem; }
+  .dentro { position: relative; isolation: isolate; max-width: 1100px; margin: 0 auto; padding: clamp(3rem, 7vw, 5rem) clamp(1.25rem, 5vw, 3rem); }
+  .dentro::before { content: ''; position: absolute; z-index: -1; inset: 12% 0 6%; border-radius: 28px; pointer-events: none; background: radial-gradient(48% 48% at 50% 48%, color-mix(in srgb, var(--teal) 7%, transparent), transparent 74%); }
+  .dentro .sec-head { max-width: 760px; margin-bottom: clamp(1.65rem, 3vw, 2.25rem); }
+  .actos-journey { position: relative; }
+  .actos-rail { position: absolute; z-index: 0; top: 2.7rem; right: 8%; left: 8%; height: 2px; overflow: hidden; border-radius: 999px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--teal) 48%, var(--line)) 12%, color-mix(in srgb, var(--teal) 48%, var(--line)) 88%, transparent); }
+  .actos-rail-pulse { position: absolute; inset: 0; display: block; border-radius: inherit; background: linear-gradient(90deg, transparent, var(--teal-2) 16%, var(--teal) 50%, var(--teal-2) 84%, transparent); opacity: .72; scale: 0 1; transform-origin: left; }
+  .actos { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .9rem; list-style: none; margin: 0; padding: 0; }
+  .acto-card { position: relative; isolation: isolate; overflow: hidden; min-width: 0; min-height: 16.25rem; padding: 1.35rem 1.1rem 1.25rem; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(155deg, #fff 0%, color-mix(in srgb, var(--surface) 82%, #fff) 100%); box-shadow: 0 18px 32px -32px color-mix(in srgb, var(--navy) 72%, transparent); translate: 0; scale: 1; transition: translate .2s cubic-bezier(.2,0,0,1), scale .2s cubic-bezier(.2,0,0,1), border-color .2s cubic-bezier(.2,0,0,1), box-shadow .2s cubic-bezier(.2,0,0,1), background .2s cubic-bezier(.2,0,0,1); }
+  .acto-card::before { content: ''; position: absolute; z-index: 2; top: 0; right: 1.1rem; left: 1.1rem; height: 3px; border-radius: 0 0 999px 999px; background: linear-gradient(90deg, var(--teal), var(--teal-2)); scale: 0 1; transform-origin: left; transition: scale .28s cubic-bezier(.2,0,0,1); }
+  .acto-card::after { content: ''; position: absolute; z-index: 0; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(220px circle at var(--spot-x, 50%) var(--spot-y, 25%), color-mix(in srgb, var(--teal) 18%, transparent), transparent 72%); transition: opacity .2s cubic-bezier(.2,0,0,1); }
+  .acto-card > * { position: relative; z-index: 1; }
+  .acto-topline { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+  .acto-n { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid color-mix(in srgb, var(--teal) 24%, #fff); border-radius: 10px; background: color-mix(in srgb, var(--teal) 14%, #fff); color: var(--teal-deep); font-weight: 700; font-size: 0.9375rem; box-shadow: inset 0 1px 0 rgba(255,255,255,.72); transition: scale .2s cubic-bezier(.2,0,0,1), background .2s cubic-bezier(.2,0,0,1), color .2s cubic-bezier(.2,0,0,1); }
+  .acto-order { color: color-mix(in srgb, var(--navy) 48%, #fff); font-family: 'Poppins', 'Geist Variable', sans-serif; font-size: .6875rem; font-weight: 700; letter-spacing: .07em; }
+  .acto-order small { margin-left: .12rem; color: var(--muted); font-size: .625rem; font-weight: 600; }
   .acto-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0.9rem 0 0.35rem; }
   .acto-title { font-size: 0.9375rem; font-weight: 600; color: var(--navy); margin: 0; line-height: 1.3; }
   .acto-description { color: var(--muted); font-size: 0.8125rem; line-height: 1.45; margin: 0.65rem 0 0; }
+  @media (hover: hover) and (pointer: fine) {
+    .acto-card:hover { translate: 0 -.45rem; scale: 1.018; border-color: color-mix(in srgb, var(--teal) 50%, var(--line)); background: linear-gradient(155deg, #fff 0%, color-mix(in srgb, var(--teal) 7%, #fff) 100%); box-shadow: 0 28px 42px -30px color-mix(in srgb, var(--navy) 70%, transparent); }
+    .acto-card:hover::before { scale: 1; }
+    .acto-card:hover::after { opacity: 1; }
+    .acto-card:hover .acto-n { scale: 1.08; background: var(--teal); color: var(--navy); }
+    .acto-card:hover .acto-label { color: var(--teal-deep); }
+  }
   .checklist-chip { display: inline-flex; align-items: center; gap: 0.5rem; margin: 1.75rem auto 0; padding: 0.6rem 1.1rem; background: color-mix(in srgb, var(--teal) 12%, #fff); color: var(--teal-deep); border-radius: 999px; font-size: 0.875rem; font-weight: 600; }
   .dentro > .checklist-chip { display: flex; width: fit-content; }
 
@@ -545,6 +568,7 @@ const jsonLd = [
     .is-enhanced .dentro .acto-card:nth-child(3) { transition-delay: .16s; }
     .is-enhanced .dentro .acto-card:nth-child(4) { transition-delay: .22s; }
     .is-enhanced .dentro .acto-card:nth-child(5) { transition-delay: .28s; }
+    .is-enhanced .dentro.is-visible .actos-rail-pulse { animation: web-agentica-actos-progress 1.5s .34s cubic-bezier(.2,.7,0,1) both; }
     .is-enhanced .stats:not(.is-visible) .stat-card { opacity: 0; transform: translateY(16px); }
     .is-enhanced .stats .stat-card { transition-delay: var(--reveal-delay, 0ms); }
     .is-enhanced .problema:not(.is-visible) .interface-lane { opacity: 0; }
@@ -560,11 +584,12 @@ const jsonLd = [
     @keyframes web-agentica-visual-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     @keyframes web-agentica-signal { 0%, 100% { transform: translateX(-12px); opacity: .72; } 50% { transform: translateX(12px); opacity: 1; } }
     @keyframes web-agentica-pulse { 0%, 100% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--teal) 18%, transparent); } 50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--teal) 4%, transparent); } }
+    @keyframes web-agentica-actos-progress { 0% { opacity: 0; scale: 0 1; } 16% { opacity: .95; } 100% { opacity: .66; scale: 1 1; } }
     @keyframes web-agentica-faq-answer { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
   }
   @media (prefers-reduced-motion: reduce) {
-    .cta-primary, .cta-primary span, .brief-nav, .brief-nav a::after, .faq-item, .faq-item summary::after, .stat-card, .stat-card::after, .interface-lane, .footer-nav a::after { transition: none; }
-    .cta-primary:hover, .cta-primary:active, .cta-primary:hover span { transform: none; }
+    .cta-primary, .cta-primary span, .brief-nav, .brief-nav a::after, .faq-item, .faq-item summary::after, .stat-card, .stat-card::after, .interface-lane, .footer-nav a::after, .acto-card, .acto-card::before, .acto-card::after, .acto-n { transition: none; }
+    .cta-primary:hover, .cta-primary:active, .cta-primary:hover span, .acto-card:hover { transform: none; translate: 0; scale: 1; }
     .hero-cursor-layer { display: none; }
   }
   @media (max-width: 920px) {
@@ -581,7 +606,7 @@ const jsonLd = [
     .hero-cursor-layer { display: none; }
     .brief-nav { justify-content: center; }
     .actos { grid-template-columns: repeat(2, 1fr); }
-    .actos::before { display: none; }
+    .actos-rail { display: none; }
     .quien-grid { grid-template-columns: 1fr; }
     .autor { flex-direction: column; align-items: center; text-align: center; }
     .footer-main { grid-template-columns: 1fr 1fr; }
@@ -594,7 +619,8 @@ const jsonLd = [
     .stats { grid-template-columns: 1fr; }
     .stats-intro { display: block; }
     .stats-intro > p:last-child { margin-top: .45rem; text-align: left; }
-    .actos { grid-template-columns: 1fr; }
+    .actos { grid-template-columns: 1fr; gap: .75rem; }
+    .acto-card { min-height: 0; padding: 1.2rem; }
     .interface-lanes { grid-template-columns: 1fr; gap: .75rem; }
     .interface-connector { min-height: 26px; }
     .interface-connector::before { top: 50%; background: linear-gradient(90deg, transparent, var(--teal), transparent); }
