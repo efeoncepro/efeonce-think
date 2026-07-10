@@ -16,23 +16,43 @@ const siteUrl = 'https://think.efeoncepro.com'
 const landingUrl = `${siteUrl}/web-agentica`
 const pageTitle = 'El fin de la web: marketing + IA | Efeonce Think'
 const pageDescription =
-  'Descarga gratis el ebook sobre la web agéntica: cómo la IA cambia quién encuentra tu marca y qué hacer esta semana.'
+  'Descarga gratis una guía de cinco actos sobre la web agéntica: cómo pasar de ser encontrado a ser legible, accionable e intrínseco.'
 
 const stats = [
-  { value: '−27%', tag: 'YoY', label: 'Caída del tráfico orgánico interanual', source: 'HubSpot, 2026' },
-  { value: '3×', tag: 'IA', label: 'El tráfico referido por inteligencia artificial se triplicó', source: '' },
-  { value: '7×', tag: 'ventas', label: 'Más ventas con integración agéntica', source: 'Cyber Week 2025' },
+  {
+    value: '−27%',
+    tag: 'SEO',
+    label: 'Tráfico orgánico interanual en sitios de clientes HubSpot',
+    source: { label: 'HubSpot, 2026', href: 'https://www.hubspot.com/company-news/spring-2026-spotlight' },
+  },
+  {
+    value: '3×',
+    tag: 'IA',
+    label: 'Tráfico referido por inteligencia artificial en el mismo período',
+    source: { label: 'HubSpot, 2026', href: 'https://www.hubspot.com/company-news/spring-2026-spotlight' },
+  },
+  {
+    value: '+32%',
+    tag: 'retail',
+    label: 'Crecimiento de ventas más rápido en retailers con agentes',
+    source: { label: 'Salesforce, Cyber Week 2025', href: 'https://www.salesforce.com/news/press-releases/2025/12/05/cyber-week-ai-agents-sales/' },
+  },
 ]
 
 const actos = [
-  { n: 'I', title: 'El día que cruzamos la línea' },
-  { n: 'II', title: 'La infraestructura silenciosa' },
-  { n: 'III', title: 'La analogía que sí aplica' },
-  { n: 'IV', title: 'Los 4 niveles donde existir' },
-  { n: 'V', title: 'El modelo que se rompe' },
+  { n: 'I', title: 'El día que cruzamos la línea', description: 'Qué cambió en el tráfico y por qué ya afecta a tu presencia digital.' },
+  { n: 'II', title: 'La infraestructura silenciosa', description: 'Markdown, llms.txt, WebMCP y protocolos de comercio agéntico.' },
+  { n: 'III', title: 'La analogía que sí aplica', description: 'Lo que el salto a móvil enseña sobre esta nueva interfaz.' },
+  { n: 'IV', title: 'Los 4 niveles donde existir', description: 'Ser encontrado, legible, accionable e intrínseco.' },
+  { n: 'V', title: 'El modelo que se rompe', description: 'Zero-click commerce y el futuro de la publicidad digital.' },
 ]
 
-const forWho = ['Lideras marketing, growth o digital.', 'Sientes que el SEO «ya no rinde igual».', 'Quieres aparecer en ChatGPT, Perplexity y Claude.']
+const forWho = [
+  'Lideras marketing, growth o digital.',
+  'Sientes que el SEO «ya no rinde igual».',
+  'Quieres aparecer en ChatGPT, Perplexity y Claude.',
+  'Tu empresa produce datos o resultados que otros flujos necesitan consumir.',
+]
 const notForWho = ['Buscas trucos rápidos de SEO tradicional.', 'No estás dispuesto a cambiar la estrategia.']
 
 const faqs = [
@@ -40,7 +60,7 @@ const faqs = [
   { q: '¿Qué es AEO y en qué se diferencia del SEO?', a: 'AEO (Answer Engine Optimization) optimiza tu contenido para que los motores de respuesta lo citen directamente. El SEO busca posiciones en resultados; el AEO busca ser la fuente de la respuesta que la IA entrega.' },
   { q: '¿Qué es llms.txt y cómo se implementa?', a: 'Un archivo en la raíz de tu sitio que le indica a los modelos de lenguaje qué contenido pueden usar y cómo. Se implementa como un simple archivo de texto, igual que robots.txt, con las secciones clave de tu sitio.' },
   { q: '¿Qué es zero-click commerce?', a: 'Compras que se completan sin que el usuario visite tu web: el agente encuentra, compara y ejecuta la transacción por él. Requiere integración agéntica para no quedar fuera del flujo de venta.' },
-  { q: '¿Cuándo los bots superaron al tráfico humano?', a: 'El 3 de junio de 2026, según datos de Cloudflare: 57.5% del tráfico de internet fue automatizado frente a un 42.5% humano — la primera vez en la historia de la red.' },
+  { q: '¿Qué significa que más de la mitad de las solicitudes web sean automatizadas?', a: 'Cloudflare reporta que bots y agentes ya generan más de la mitad de las solicitudes web. No significa que la web humana desaparezca: significa que tu sitio debe poder ser encontrado, entendido y usado también por sistemas automatizados.' },
 ]
 
 const jsonLd = [
@@ -59,60 +79,87 @@ const jsonLd = [
     <section class="hero" data-capture="web-agentica-hero">
       <header class="topbar">
         <a class="brand-link" href="/" aria-label="Efeonce Think"><img class="efeonce-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" /></a>
+        <p class="research-label"><span class="research-signal" aria-hidden="true"></span> Efeonce Think · Research brief</p>
       </header>
       <div class="hero-grid">
         <div class="hero-copy">
           <p class="eyebrow"><span>Ebook gratuito</span><span class="dot" aria-hidden="true"></span><span>Marketing digital + IA</span></p>
           <h1 class="hero-title">El fin de la <span class="accent">web</span><br />solo para humanos</h1>
-          <p class="hero-lead">El 3 de junio de 2026 los bots superaron al tráfico humano por primera vez en la historia de internet. Cinco actos para entender qué cambió — y qué hacer esta semana.</p>
-          <p class="stat-pill"><span class="stat-pill-strong">57.5% bots · 42.5% humanos</span><span class="stat-pill-source">— Cloudflare, 2026</span></p>
+          <p class="hero-lead">Cloudflare reporta que bots y agentes ya generan más de la mitad de las solicitudes web. Cinco actos para entender qué cambió — y qué hacer esta semana.</p>
+          <p class="stat-pill"><span class="stat-pill-strong">Más de la mitad de las solicitudes web son automatizadas</span><span class="stat-pill-source">— Cloudflare, 2026</span></p>
           <a class="cta cta-primary" href="#web-agentica-form">Descargar el ebook gratis <span aria-hidden="true">→</span></a>
-          <p class="hero-reassurance">Sin spam. Solo el ebook y contenido que sí sirve.</p>
+          <p class="hero-reassurance">Recibirás el ebook y contenido relacionado. Puedes darte de baja cuando quieras.</p>
+          <ul class="hero-proof" aria-label="Incluye">
+            <li><strong>05</strong> actos</li>
+            <li><strong>01</strong> checklist</li>
+            <li><strong>IA + AEO</strong> aplicable</li>
+          </ul>
         </div>
         <div class="hero-visual" aria-hidden="true">
-          <img src="/web-agentica/ebook-hero.png" alt="" width="1536" height="1024" loading="eager" />
+          <picture>
+            <source
+              type="image/webp"
+              srcset="/web-agentica/ebook-hero-640.webp 640w, /web-agentica/ebook-hero-960.webp 960w, /web-agentica/ebook-hero-1536.webp 1536w"
+              sizes="(max-width: 920px) 100vw, 58vw"
+            />
+            <img src="/web-agentica/ebook-hero.png" alt="" width="1536" height="1024" loading="eager" decoding="async" sizes="(max-width: 920px) 100vw, 58vw" />
+          </picture>
         </div>
       </div>
+      <nav class="brief-nav" aria-label="Recorrido del ebook">
+        <a href="#el-cambio">El cambio</a>
+        <a href="#cinco-actos">Los 5 actos</a>
+        <a href="#para-quien">Para quién</a>
+        <a href="#web-agentica-form">Descargar <span aria-hidden="true">↘</span></a>
+      </nav>
     </section>
 
     <!-- STATS -->
-    <section class="stats" data-capture="web-agentica-stats" aria-label="Lo que ya está pasando">
+    <section class="stats" data-capture="web-agentica-stats" aria-label="Lo que ya está pasando" data-reveal>
+      <div class="stats-intro">
+        <p class="sec-label"><span class="sec-num">Señales</span> de la transición</p>
+        <p>La web agéntica ya está moviendo descubrimiento, tráfico y conversión.</p>
+      </div>
       {stats.map(s => (
-        <div class="stat-card">
+        <article class="stat-card">
           <p class="stat-value">{s.value}<span class="stat-tag">{s.tag}</span></p>
-          <p class="stat-label">{s.label}{s.source ? <span class="stat-src"> ({s.source})</span> : null}</p>
-        </div>
+          <p class="stat-label">
+            {s.label}{' '}
+            <a class="stat-src" href={s.source.href} target="_blank" rel="noreferrer">({s.source.label})</a>
+          </p>
+        </article>
       ))}
     </section>
 
     <!-- 01 · EL PROBLEMA -->
-    <section class="problema" data-capture="web-agentica-thesis">
+    <section class="problema" id="el-cambio" data-capture="web-agentica-thesis" data-reveal>
       <p class="sec-label"><span class="sec-num">01</span> El problema</p>
       <h2>Tu sitio web ya tiene dos tipos de visitantes. <span class="accent">Solo estás diseñado para uno.</span></h2>
       <p class="problema-body">Millones de personas le piden a ChatGPT, Gemini o Claude que hagan tareas por ellos. Esos agentes no hacen clic en anuncios, no ven banners y no perdonan HTML ruidoso. Si tu presencia digital está optimizada solo para humanos, eres invisible para la mitad del tráfico que crece.</p>
-      <a class="link-teal" href="/brand-visibility">¿En qué nivel está tu empresa hoy? →</a>
+      <p class="section-prompt">¿En qué nivel está tu empresa hoy?</p>
     </section>
 
     <!-- 02 · QUÉ VAS A ENCONTRAR -->
-    <section class="dentro" data-capture="web-agentica-inside">
+    <section class="dentro" id="cinco-actos" data-capture="web-agentica-inside" data-reveal>
       <div class="sec-head">
         <p class="sec-label"><span class="sec-num">02</span> Qué vas a encontrar dentro</p>
         <h2>Cinco actos para leer la nueva web</h2>
       </div>
-      <div class="actos">
+      <ol class="actos">
         {actos.map(a => (
-          <div class="acto-card">
+          <li class="acto-card">
             <span class="acto-n">{a.n}</span>
             <p class="acto-label">Acto {a.n}</p>
             <p class="acto-title">{a.title}</p>
-          </div>
+            <p class="acto-description">{a.description}</p>
+          </li>
         ))}
-      </div>
+      </ol>
       <p class="checklist-chip"><span aria-hidden="true">✓</span> Incluye checklist «Lo que haces esta semana»</p>
     </section>
 
     <!-- 03 · PARA QUIÉN -->
-    <section class="quien" data-capture="web-agentica-audience">
+    <section class="quien" id="para-quien" data-capture="web-agentica-audience" data-reveal>
       <p class="sec-label center"><span class="sec-num">03</span> Para quién es este ebook</p>
       <div class="quien-grid">
         <div class="quien-card quien-yes">
@@ -127,21 +174,21 @@ const jsonLd = [
     </section>
 
     <!-- FORM -->
-    <section class="form-band" data-capture="web-agentica-form-section">
+    <section class="form-band" data-capture="web-agentica-form-section" data-reveal>
       <WebAgenticaFormDock />
     </section>
 
     <!-- Autor -->
-    <section class="autor" data-capture="web-agentica-author">
+    <section class="autor" data-capture="web-agentica-author" data-reveal>
       <img class="autor-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" />
       <div>
         <p class="autor-kicker">Escrito por el equipo de Efeonce</p>
-        <p class="autor-body">Agencia especializada en SEO + AEO y estrategias de descubrimiento para la era agéntica. Trabajamos donde tus clientes ya están preguntando: Google y los motores de respuesta.</p>
+        <p class="autor-body">Una guía de Efeonce para pasar de visibilidad a legibilidad, acción e integración agéntica. Trabajamos donde tus clientes ya están preguntando: Google y los motores de respuesta.</p>
       </div>
     </section>
 
     <!-- 04 · FAQ -->
-    <section class="faq" data-capture="web-agentica-faq">
+    <section class="faq" data-capture="web-agentica-faq" data-reveal>
       <div class="sec-head">
         <p class="sec-label"><span class="sec-num">04</span> Preguntas frecuentes</p>
         <h2>Lo que la gente pregunta</h2>
@@ -157,7 +204,7 @@ const jsonLd = [
     </section>
 
     <!-- Cierre -->
-    <section class="cierre" data-capture="web-agentica-close">
+    <section class="cierre" data-capture="web-agentica-close" data-reveal>
       <h2>El cambio ya ocurrió. Lo que viene es la brecha entre los que lo <span class="accent">leyeron</span> y los que <span class="accent">actuaron</span>.</h2>
       <a class="cta cta-primary" href="#web-agentica-form">Descargar el ebook gratis <span aria-hidden="true">→</span></a>
     </section>
@@ -167,21 +214,72 @@ const jsonLd = [
       <p>Efeonce Group SpA · <a href="https://efeoncepro.com/politica-de-privacidad/">Privacidad</a></p>
     </footer>
   </main>
+
+  <script>
+    const focusFormHeading = () => {
+      const form = document.getElementById('web-agentica-form')
+      const heading = document.getElementById('web-agentica-form-title')
+
+      if (!form || !heading) return
+
+      heading.focus({ preventScroll: true })
+      form.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    }
+
+    document.querySelectorAll<HTMLAnchorElement>('a[href="#web-agentica-form"]').forEach(cta => {
+      cta.addEventListener('click', event => {
+        event.preventDefault()
+        window.history.replaceState(null, '', '#web-agentica-form')
+        focusFormHeading()
+      })
+    })
+
+    if (window.location.hash === '#web-agentica-form') window.requestAnimationFrame(focusFormHeading)
+
+    const landing = document.querySelector<HTMLElement>('.wa')
+    const canAnimate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (landing && canAnimate && 'IntersectionObserver' in window) {
+      landing.classList.add('is-enhanced')
+      const revealTargets = landing.querySelectorAll<HTMLElement>('[data-reveal]')
+      const revealObserver = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return
+            entry.target.classList.add('is-visible')
+            revealObserver.unobserve(entry.target)
+          })
+        },
+        { rootMargin: '0px 0px -8%', threshold: 0.08 },
+      )
+
+      revealTargets.forEach(target => revealObserver.observe(target))
+    }
+  </script>
 </BaseLayout>
 
 <style>
   .wa { font-family: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--ink); background: #fff; }
   .wa h1, .wa h2, .wa h3, .eyebrow, .sec-label, .stat-value, .cta, .acto-label, .acto-title, .autor-kicker, .checklist-chip { font-family: 'Poppins', 'Geist Variable', sans-serif; }
   .accent { color: var(--teal); }
-  .cta-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--teal); color: #04222f; font-weight: 700; font-size: 1.0625rem; padding: 0.95rem 1.9rem; border-radius: 12px; text-decoration: none; box-shadow: 0 14px 34px -14px color-mix(in srgb, var(--teal) 60%, transparent); transition: transform .15s ease, background .15s ease; }
+  .wa a:focus-visible, .wa summary:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; border-radius: 4px; }
+  .cta-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--teal); color: #04222f; font-weight: 700; font-size: 1.0625rem; padding: 0.95rem 1.9rem; border-radius: 12px; text-decoration: none; box-shadow: 0 14px 34px -14px color-mix(in srgb, var(--teal) 60%, transparent); transition: transform .15s cubic-bezier(.2,0,0,1), background .15s cubic-bezier(.2,0,0,1), box-shadow .15s cubic-bezier(.2,0,0,1); }
   .cta-primary:hover { transform: translateY(-2px); background: var(--teal-2); }
+  .cta-primary:hover span { transform: translateX(3px); }
+  .cta-primary:active { transform: translateY(0) scale(.985); box-shadow: 0 8px 20px -14px color-mix(in srgb, var(--teal) 70%, transparent); }
+  .cta-primary span { transition: transform .15s cubic-bezier(.2,0,0,1); }
 
   /* HERO */
   .hero { position: relative; background: radial-gradient(130% 100% at 70% -10%, var(--navy-2) 0%, var(--navy) 52%, #001a33 100%); color: #fff; overflow: hidden; padding: 0 clamp(1.25rem, 5vw, 4rem) clamp(3rem, 7vw, 5.5rem); }
   .hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(120,176,216,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(120,176,216,.10) 1px, transparent 1px); background-size: 44px 44px; -webkit-mask-image: radial-gradient(ellipse 80% 60% at 40% 30%, #000 20%, transparent 85%); mask-image: radial-gradient(ellipse 80% 60% at 40% 30%, #000 20%, transparent 85%); pointer-events: none; }
   .hero::after { content: ''; position: absolute; inset: -20% -20% auto 30%; height: 70%; background: radial-gradient(50% 55% at 60% 40%, color-mix(in srgb, var(--teal) 28%, transparent) 0%, transparent 72%); pointer-events: none; }
-  .topbar { position: relative; z-index: 1; padding: clamp(1.25rem, 4vw, 2rem) 0; }
+  .topbar { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 2rem) 0; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
   .efeonce-mark { height: 26px; width: auto; }
+  .research-label { display: inline-flex; align-items: center; gap: 0.45rem; margin: 0; color: rgba(255,255,255,.65); font-size: 0.75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .research-signal { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 16%, transparent); }
   .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.05fr 1.15fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: center; max-width: 1240px; margin: 0 auto; min-height: 60vh; }
   .hero-copy { max-width: 560px; }
   .eyebrow { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-2); margin: 0 0 1.1rem; }
@@ -191,16 +289,31 @@ const jsonLd = [
   .stat-pill { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: 0.5rem 1rem; font-size: 0.875rem; margin: 0 0 1.75rem; }
   .stat-pill-strong { color: #fff; font-weight: 600; } .stat-pill-source { color: rgba(255,255,255,.55); }
   .hero-reassurance { font-size: 0.9375rem; color: rgba(255,255,255,.55); margin: 1rem 0 0; }
-  .hero-visual { position: relative; }
-  .hero-visual img { width: 116%; max-width: 116%; height: auto; margin-left: -6%; filter: drop-shadow(0 40px 80px rgba(0,0,0,.5)); }
+  .hero-proof { display: flex; flex-wrap: wrap; gap: .65rem 1.15rem; list-style: none; margin: 1.15rem 0 0; padding: 1.1rem 0 0; border-top: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.65); font-size: .8125rem; }
+  .hero-proof li { display: inline-flex; align-items: baseline; gap: .35rem; }
+  .hero-proof strong { color: var(--teal-2); font-family: 'Poppins', 'Geist Variable', sans-serif; font-size: .75rem; letter-spacing: .06em; }
+  .hero-visual { position: relative; isolation: isolate; }
+  .hero-visual::before { content: ''; position: absolute; inset: 13% 4% 5%; border: 1px solid color-mix(in srgb, var(--teal) 35%, transparent); border-radius: 24px; transform: rotate(-4deg); opacity: .55; z-index: -1; }
+  .hero-visual::after { content: 'AGENTIC WEB / 2026'; position: absolute; right: 4%; bottom: 2%; padding: .38rem .55rem; background: rgba(0,32,58,.82); border: 1px solid rgba(255,255,255,.16); border-radius: 7px; color: var(--teal-2); font-family: 'Poppins', 'Geist Variable', sans-serif; font-size: .625rem; font-weight: 600; letter-spacing: .1em; z-index: 2; }
+  .hero-visual picture, .hero-visual img { display: block; }
+  .hero-visual img { position: relative; z-index: 1; width: 100%; max-width: 680px; height: auto; margin: 0 auto; filter: drop-shadow(0 40px 80px rgba(0,0,0,.5)); }
+  .brief-nav { position: relative; z-index: 1; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .35rem 1.1rem; max-width: 1240px; margin: 0 auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,.14); }
+  .brief-nav a { position: relative; color: rgba(255,255,255,.72); font-size: .8125rem; font-weight: 600; text-decoration: none; padding: .35rem 0; }
+  .brief-nav a::after { content: ''; position: absolute; right: 0; bottom: 0; left: 0; height: 1px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform .2s cubic-bezier(.2,0,0,1); }
+  .brief-nav a:hover { color: #fff; }
+  .brief-nav a:hover::after { transform: scaleX(1); }
 
   /* STATS */
   .stats { max-width: 1100px; margin: 0 auto; padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem); display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-  .stat-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1.75rem 1.5rem; }
+  .stats-intro { grid-column: 1 / -1; display: flex; align-items: end; justify-content: space-between; gap: 1.5rem; padding-bottom: .3rem; }
+  .stats-intro .sec-label { margin: 0; }
+  .stats-intro > p:last-child { max-width: 470px; margin: 0; color: var(--muted); font-size: .9375rem; line-height: 1.5; text-align: right; }
+  .stat-card { position: relative; overflow: hidden; background: linear-gradient(145deg, #fff 0%, var(--surface) 100%); border: 1px solid var(--line); border-radius: 16px; padding: 1.75rem 1.5rem; box-shadow: 0 16px 30px -30px color-mix(in srgb, var(--navy) 55%, transparent); }
+  .stat-card::before { content: ''; position: absolute; width: 62px; height: 3px; top: 0; left: 1.5rem; background: var(--teal); border-radius: 0 0 3px 3px; }
   .stat-value { display: flex; align-items: baseline; gap: 0.5rem; font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 700; color: var(--navy); margin: 0 0 0.5rem; letter-spacing: -0.02em; }
   .stat-tag { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--teal-deep); }
   .stat-label { font-size: 0.9375rem; line-height: 1.45; color: var(--ink); margin: 0; }
-  .stat-src { color: var(--muted); }
+  .stat-src { color: var(--muted); text-decoration: underline; text-underline-offset: 0.15em; }
 
   /* SECTION LABEL */
   .sec-label { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-deep); margin: 0 0 0.75rem; }
@@ -215,17 +328,17 @@ const jsonLd = [
   .problema .sec-label { justify-content: center; color: var(--teal-2); }
   .problema h2 { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 700; margin: 0 auto 1.25rem; max-width: 760px; letter-spacing: -0.02em; line-height: 1.15; }
   .problema-body { font-size: clamp(1rem, 2.1vw, 1.1875rem); line-height: 1.6; color: rgba(255,255,255,.78); max-width: 680px; margin: 0 auto 1.5rem; }
-  .link-teal { color: var(--teal-2); font-weight: 600; text-decoration: none; font-size: 1rem; }
-  .link-teal:hover { color: var(--teal-3); }
+  .section-prompt { color: var(--teal-2); font-weight: 600; font-size: 1rem; margin: 0; }
 
   /* 02 ACTOS */
   .dentro { max-width: 1100px; margin: 0 auto; padding: clamp(3rem, 7vw, 5rem) clamp(1.25rem, 5vw, 3rem); }
-  .actos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
-  .acto-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem 1.1rem; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
-  .acto-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--teal) 45%, var(--line)); box-shadow: 0 18px 40px -26px color-mix(in srgb, var(--teal) 55%, transparent); }
+  .actos { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; list-style: none; margin: 0; padding: 0; }
+  .actos::before { content: ''; position: absolute; top: 2.55rem; right: 9%; left: 9%; height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--teal) 50%, var(--line)) 12%, color-mix(in srgb, var(--teal) 50%, var(--line)) 88%, transparent); }
+  .acto-card { position: relative; z-index: 1; background: linear-gradient(165deg, #fff 0%, var(--surface) 100%); border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem 1.1rem; box-shadow: 0 18px 30px -32px color-mix(in srgb, var(--navy) 70%, transparent); }
   .acto-n { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9px; background: color-mix(in srgb, var(--teal) 14%, #fff); color: var(--teal-deep); font-weight: 700; font-size: 0.9375rem; }
   .acto-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0.9rem 0 0.35rem; }
   .acto-title { font-size: 0.9375rem; font-weight: 600; color: var(--navy); margin: 0; line-height: 1.3; }
+  .acto-description { color: var(--muted); font-size: 0.8125rem; line-height: 1.45; margin: 0.65rem 0 0; }
   .checklist-chip { display: inline-flex; align-items: center; gap: 0.5rem; margin: 1.75rem auto 0; padding: 0.6rem 1.1rem; background: color-mix(in srgb, var(--teal) 12%, #fff); color: var(--teal-deep); border-radius: 999px; font-size: 0.875rem; font-weight: 600; }
   .dentro > .checklist-chip { display: flex; width: fit-content; }
 
@@ -258,8 +371,8 @@ const jsonLd = [
   .faq-item[open] { border-color: color-mix(in srgb, var(--teal) 40%, var(--line)); }
   .faq-item summary { cursor: pointer; list-style: none; padding: 1.1rem 0; font-weight: 600; color: var(--navy); font-size: 1.0625rem; display: flex; justify-content: space-between; gap: 1rem; }
   .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: '+'; color: var(--teal-deep); font-size: 1.4rem; line-height: 1; }
-  .faq-item[open] summary::after { content: '−'; }
+  .faq-item summary::after { content: '+'; color: var(--teal-deep); font-size: 1.4rem; line-height: 1; transition: transform .18s cubic-bezier(.2,0,0,1); }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
   .faq-item p { margin: 0 0 1.1rem; color: var(--muted); line-height: 1.6; font-size: 0.9875rem; }
 
   /* CIERRE */
@@ -272,17 +385,47 @@ const jsonLd = [
   .footer p { color: var(--muted); font-size: 0.8125rem; margin: 0; }
   .footer a { color: var(--teal-deep); text-decoration: none; }
 
-  @media (prefers-reduced-motion: reduce) { .acto-card { transition: none; } }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-copy { animation: web-agentica-enter .62s cubic-bezier(.2,.7,0,1) both; }
+    .hero-visual { animation: web-agentica-visual-enter .76s .08s cubic-bezier(.2,.7,0,1) both, web-agentica-visual-float 7s 1.1s ease-in-out infinite; }
+    .is-enhanced [data-reveal] { opacity: 0; transform: translateY(20px); transition: opacity .55s cubic-bezier(.2,.7,0,1), transform .55s cubic-bezier(.2,.7,0,1); }
+    .is-enhanced [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
+    .is-enhanced .dentro .acto-card { opacity: 0; transform: translateY(14px); transition: opacity .42s cubic-bezier(.2,.7,0,1), transform .42s cubic-bezier(.2,.7,0,1); transition-delay: .04s; }
+    .is-enhanced .dentro.is-visible .acto-card { opacity: 1; transform: translateY(0); }
+    .is-enhanced .dentro .acto-card:nth-child(2) { transition-delay: .1s; }
+    .is-enhanced .dentro .acto-card:nth-child(3) { transition-delay: .16s; }
+    .is-enhanced .dentro .acto-card:nth-child(4) { transition-delay: .22s; }
+    .is-enhanced .dentro .acto-card:nth-child(5) { transition-delay: .28s; }
+    @keyframes web-agentica-enter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes web-agentica-visual-enter { from { opacity: 0; transform: translateY(22px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes web-agentica-visual-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cta-primary, .cta-primary span, .brief-nav a::after, .faq-item summary::after { transition: none; }
+    .cta-primary:hover, .cta-primary:active, .cta-primary:hover span { transform: none; }
+  }
   @media (max-width: 920px) {
     .hero-grid { grid-template-columns: 1fr; text-align: center; min-height: auto; padding-top: 1rem; }
     .hero-copy { max-width: 640px; margin: 0 auto; }
+    .topbar { padding-bottom: .75rem; }
     .eyebrow { justify-content: center; }
-    .hero-visual img { width: 100%; max-width: 520px; margin: 1rem auto 0; display: block; }
+    .hero-proof { justify-content: center; }
+    .hero-visual img { max-width: 440px; margin: 1rem auto 0; }
+    .brief-nav { justify-content: center; }
     .actos { grid-template-columns: repeat(2, 1fr); }
+    .actos::before { display: none; }
     .quien-grid { grid-template-columns: 1fr; }
     .autor { flex-direction: column; align-items: center; text-align: center; }
   }
-  @media (max-width: 560px) { .stats { grid-template-columns: 1fr; } .actos { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) {
+    .research-label { font-size: .625rem; letter-spacing: .06em; }
+    .hero-visual::after { right: 0; }
+    .brief-nav { justify-content: flex-start; gap: .25rem .85rem; }
+    .stats { grid-template-columns: 1fr; }
+    .stats-intro { display: block; }
+    .stats-intro > p:last-child { margin-top: .45rem; text-align: left; }
+    .actos { grid-template-columns: 1fr; }
+  }
 </style>
 
 <style is:global>
