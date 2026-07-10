@@ -8,6 +8,11 @@
 
 ## Public Pages
 
+- https://think.efeoncepro.com/web-agentica
+  - Spanish-language research brief and free ebook: "El fin de la web solo para humanos".
+  - Explains how agents find, understand, and use a digital presence through five acts: the traffic shift, supporting infrastructure, the mobile analogy, four levels of existence, and zero-click commerce.
+  - Includes a checklist for marketing, growth, and digital teams deciding what to review first. The download is requested through a public form; the page content is public and citable.
+
 - https://think.efeoncepro.com/brand-visibility
   - Brand Visibility Grader landing.
   - Explains how the private report evaluates presence, citability, exactness, operability, and brand preference.

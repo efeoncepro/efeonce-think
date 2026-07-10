@@ -9,10 +9,23 @@ interface Props {
   noindex?: boolean
   canonical?: string
   ogImage?: string
+  ogTitle?: string
+  ogDescription?: string
+  ogImageAlt?: string
   jsonLd?: Record<string, unknown> | Record<string, unknown>[]
 }
 
-const { title, description, noindex = false, canonical, ogImage, jsonLd } = Astro.props
+const {
+  title,
+  description,
+  noindex = false,
+  canonical,
+  ogImage,
+  ogTitle = title,
+  ogDescription = description,
+  ogImageAlt = ogTitle,
+  jsonLd,
+} = Astro.props
 const site = Astro.site ?? new URL('https://think.efeoncepro.com')
 const canonicalUrl = new URL(canonical ?? Astro.url.pathname, site).toString()
 const absoluteOgImage = ogImage ? new URL(ogImage, site).toString() : undefined
@@ -44,18 +57,19 @@ const safeJsonLd = (value: Record<string, unknown>) => JSON.stringify(value).rep
     <meta name="theme-color" content="#138760" />
 
     {/* Open Graph / Twitter — para unfurl bonito al compartir el link (NO afecta noindex) */}
-    <meta property="og:title" content={title} />
-    {description && <meta property="og:description" content={description} />}
+    <meta property="og:title" content={ogTitle} />
+    {ogDescription && <meta property="og:description" content={ogDescription} />}
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="Efeonce Think" />
     <meta property="og:locale" content="es_CL" />
     {absoluteOgImage && <meta property="og:image" content={absoluteOgImage} />}
-    {absoluteOgImage && <meta property="og:image:alt" content={title} />}
+    {absoluteOgImage && <meta property="og:image:alt" content={ogImageAlt} />}
     <meta name="twitter:card" content={absoluteOgImage ? 'summary_large_image' : 'summary'} />
-    <meta name="twitter:title" content={title} />
-    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:title" content={ogTitle} />
+    {ogDescription && <meta name="twitter:description" content={ogDescription} />}
     {absoluteOgImage && <meta name="twitter:image" content={absoluteOgImage} />}
+    {absoluteOgImage && <meta name="twitter:image:alt" content={ogImageAlt} />}
     {jsonLdItems.map((item) => <script type="application/ld+json" set:html={safeJsonLd(item)} is:inline />)}
     <slot name="head" />
   </head>

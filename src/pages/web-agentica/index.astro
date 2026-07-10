@@ -13,10 +13,23 @@ import { axis, teal } from '@lib/report-tokens'
  * Geist/Poppins, BaseLayout (SEO+GTM+JSON-LD), form gobernado + descarga gated tokenizada.
  */
 const siteUrl = 'https://think.efeoncepro.com'
+const organizationUrl = 'https://efeoncepro.com'
 const landingUrl = `${siteUrl}/web-agentica`
-const pageTitle = 'El fin de la web agéntica | Efeonce Think'
+const organizationId = `${organizationUrl}/#organization`
+const websiteId = `${siteUrl}/#website`
+const webpageId = `${landingUrl}#webpage`
+const ebookId = `${landingUrl}#ebook`
+const primaryImageId = `${landingUrl}#primaryimage`
+const faqId = `${landingUrl}#faq`
+const pageTitle = 'Web agéntica: guía gratuita en 5 actos | Efeonce Think'
 const pageDescription =
-  'Descarga gratis una guía de cinco actos sobre la web agéntica: cómo pasar de ser encontrado a ser legible, accionable e intrínseco.'
+  'Descarga una guía gratuita para entender cómo los agentes encuentran, leen y usan tu presencia digital. Incluye cinco actos y un checklist para decidir qué revisar esta semana.'
+const socialTitle = 'El fin de la web solo para humanos — guía de web agéntica'
+const socialDescription =
+  'Cinco actos para entender cómo los agentes encuentran, leen y usan tu presencia digital. Incluye un checklist para decidir qué revisar esta semana.'
+const socialImageAlt =
+  'Portada azul de un ebook de Efeonce, rodeada de tarjetas de interfaz y herramientas de diseño.'
+const ebookImageUrl = `${landingUrl}/ebook-hero.png`
 
 const stats = [
   {
@@ -65,13 +78,95 @@ const faqs = [
   { q: '¿Qué significa que más de la mitad de las solicitudes web sean automatizadas?', a: 'Cloudflare reporta que bots y agentes ya generan más de la mitad de las solicitudes web. No significa que la web humana desaparezca: significa que tu sitio debe poder ser encontrado, entendido y usado también por sistemas automatizados.' },
 ]
 
-const jsonLd = [
-  { '@context': 'https://schema.org', '@type': 'WebPage', '@id': `${landingUrl}#webpage`, url: landingUrl, name: pageTitle, description: pageDescription, inLanguage: 'es-CL', isPartOf: { '@type': 'WebSite', url: siteUrl, name: 'Efeonce Think' } },
-  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
-]
+const webAgenticaJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': organizationId,
+      name: 'Efeonce Group SpA',
+      alternateName: 'Efeonce',
+      url: organizationUrl,
+      logo: `${siteUrl}/branding/efeonce-logo.svg`,
+    },
+    {
+      '@type': 'WebSite',
+      '@id': websiteId,
+      name: 'Efeonce Think',
+      url: siteUrl,
+      inLanguage: 'es-CL',
+      publisher: { '@id': organizationId },
+    },
+    {
+      '@type': 'ImageObject',
+      '@id': primaryImageId,
+      url: ebookImageUrl,
+      contentUrl: ebookImageUrl,
+      width: 1536,
+      height: 1024,
+      caption: socialImageAlt,
+    },
+    {
+      '@type': 'WebPage',
+      '@id': webpageId,
+      url: landingUrl,
+      name: pageTitle,
+      headline: 'El fin de la web solo para humanos',
+      description: pageDescription,
+      inLanguage: 'es-CL',
+      isPartOf: { '@id': websiteId },
+      publisher: { '@id': organizationId },
+      primaryImageOfPage: { '@id': primaryImageId },
+      about: { '@id': ebookId },
+      mainEntity: { '@id': ebookId },
+    },
+    {
+      '@type': 'Book',
+      '@id': ebookId,
+      name: 'El fin de la web solo para humanos',
+      alternateName: 'Guía de web agéntica en cinco actos',
+      description:
+        'Guía gratuita de Efeonce Think para equipos de marketing, growth y digital sobre cómo una presencia digital puede ser encontrada, entendida y usada por agentes.',
+      bookFormat: 'https://schema.org/EBook',
+      genre: 'Research brief',
+      inLanguage: 'es-CL',
+      image: { '@id': primaryImageId },
+      url: landingUrl,
+      author: { '@id': organizationId },
+      publisher: { '@id': organizationId },
+      copyrightHolder: { '@id': organizationId },
+      isAccessibleForFree: true,
+      audience: {
+        '@type': 'BusinessAudience',
+        audienceType: 'Equipos de marketing, growth y digital',
+      },
+      mainEntityOfPage: { '@id': webpageId },
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': faqId,
+      url: `${landingUrl}#preguntas-frecuentes`,
+      isPartOf: { '@id': webpageId },
+      mainEntity: faqs.map(f => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+  ],
+} as const
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} canonical="/web-agentica" ogImage="/web-agentica/ebook-hero.png" jsonLd={jsonLd}>
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/web-agentica"
+  ogImage="/web-agentica/ebook-hero.png"
+  ogTitle={socialTitle}
+  ogDescription={socialDescription}
+  ogImageAlt={socialImageAlt}
+  jsonLd={webAgenticaJsonLd}
+>
   <main
     class="wa"
     data-capture="web-agentica-landing"
@@ -151,7 +246,7 @@ const jsonLd = [
     <section class="stats" data-capture="web-agentica-stats" aria-label="Lo que ya está pasando" data-reveal>
       <div class="stats-intro">
         <p class="sec-label"><span class="sec-num">Señales</span> de la transición</p>
-        <p>La web agéntica ya está moviendo descubrimiento, tráfico y conversión.</p>
+        <p><strong>La web agéntica</strong> es una presencia que un agente puede encontrar, entender y usar. Ya está moviendo descubrimiento, tráfico y conversión.</p>
       </div>
       {stats.map((s, index) => (
         <article class="stat-card" data-spotlight style={`--reveal-delay:${index * 70}ms`}>
@@ -260,7 +355,7 @@ const jsonLd = [
     </section>
 
     <!-- 04 · FAQ -->
-    <section class="faq" data-capture="web-agentica-faq" data-reveal>
+    <section class="faq" id="preguntas-frecuentes" data-capture="web-agentica-faq" data-reveal>
       <div class="sec-head">
         <p class="sec-label"><span class="sec-num">04</span> Preguntas frecuentes</p>
         <h2>Antes de actuar, aclaremos lo esencial.</h2>
