@@ -27,6 +27,7 @@ const markers = [
   'surround-discovery-landing',
   'surround-discovery-hero',
   'surround-discovery-fragmentation',
+  'surround-discovery-answer-capsule',
   'surround-discovery-surfaces',
   'surround-discovery-cycle',
   'surround-discovery-relationships',
@@ -218,6 +219,8 @@ try {
           return Boolean(target && target.top < window.innerHeight && target.bottom > 0)
         })(),
         heroCtaTarget: document.querySelector('[data-capture="surround-discovery-hero"] a[href="#form"]')?.getAttribute('href') ?? null,
+        answerCapsule: document.querySelector('[data-capture="surround-discovery-answer-capsule"]')?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+        ctaEvents: Array.from(window.dataLayer ?? []).filter((entry) => entry?.event === 'gh_surround_discovery_cta_click'),
         reducedOpacity: getComputedStyle(document.querySelector('.reveal') ?? document.body).opacity,
         expected: { formKey, surfaceId },
       }
@@ -277,7 +280,8 @@ try {
     if (metrics.localInputCount) errors.push(`local inputs outside renderer: ${metrics.localInputCount}`)
     if (!metrics.canonical.endsWith('/seo-surround-discovery')) errors.push(`wrong canonical: ${metrics.canonical}`)
     if (/noindex/i.test(metrics.robots)) errors.push('landing has noindex')
-    if (!metrics.jsonLdTypes.includes('Book') || !metrics.jsonLdTypes.includes('FAQPage') || !metrics.jsonLdTypes.includes('WebPage')) errors.push(`incomplete JSON-LD: ${metrics.jsonLdTypes.join(', ')}`)
+    if (!metrics.jsonLdTypes.includes('Book') || !metrics.jsonLdTypes.includes('FAQPage') || !metrics.jsonLdTypes.includes('WebPage') || !metrics.jsonLdTypes.includes('DefinedTerm')) errors.push(`incomplete JSON-LD: ${metrics.jsonLdTypes.join(', ')}`)
+    if (!/Surround Discovery™ es el sistema de Efeonce/i.test(metrics.answerCapsule) || !/SENSE, SHAPE, SURFACE y SOLVE/i.test(metrics.answerCapsule)) errors.push('answer capsule is missing or not self-contained')
     if (metrics.faqCount !== 6) errors.push(`expected 6 FAQs, got ${metrics.faqCount}`)
     if (metrics.fiveSurfaces !== 5) errors.push(`expected 5 surfaces, got ${metrics.fiveSurfaces}`)
     if (metrics.heroNodeIconCount !== 5 || metrics.surfaceMapIconCount !== 5 || metrics.surfaceCardIconCount !== 5) errors.push(`approved source icons missing: hero=${metrics.heroNodeIconCount} map=${metrics.surfaceMapIconCount} cards=${metrics.surfaceCardIconCount}`)
@@ -289,6 +293,7 @@ try {
     if (metrics.cycleStages !== 4) errors.push(`expected 4 S4 stages, got ${metrics.cycleStages}`)
     if (metrics.supportRuntimeLoaded) errors.push('approved source support.js was copied into Think')
     if (metrics.heroCtaTarget !== '#form') errors.push(`wrong hero CTA target: ${metrics.heroCtaTarget}`)
+    if (!metrics.ctaEvents.some((entry) => entry.location === 'hero-primary' && entry.href === '#form')) errors.push(`CTA telemetry missing hero-primary event: ${JSON.stringify(metrics.ctaEvents)}`)
     if (!metrics.formTargetInViewport) errors.push('hero CTA did not reach form dock')
     if (!firstFaqOpen) errors.push('FAQ does not open with keyboard')
     if (!acceptedMetrics.readyVisible || !acceptedMetrics.recoveryVisible || !acceptedMetrics.rendererCardVisible || !acceptedMetrics.recoveryHref.endsWith('/asset/fsub-probe') || acceptedMetrics.activeId !== 'surround-renderer-success-probe') errors.push('accepted download does not preserve the governed success card and recovery link')
