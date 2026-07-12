@@ -1,0 +1,51 @@
+---
+import { Ear, Gauge, Info, LayoutDashboard, MessagesSquare, Play, Radio, RefreshCw, ShoppingCart } from '@lucide/astro'
+
+type Props = {
+  kind: 'seo' | 'aeo' | 'video' | 'social' | 'market' | 'grader' | 'sense' | 'shape' | 'surface' | 'solve' | 'info'
+  size?: number
+}
+
+const { kind, size = 24 } = Astro.props
+const svgSize = `${size}`
+---
+
+{kind === 'seo' && <span class="sd-glyph sd-glyph--google" style={`--glyph-size:${svgSize}px`} aria-hidden="true">G</span>}
+{kind === 'aeo' && (
+  <svg class="sd-glyph sd-glyph--aeo" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 1.6 Q12.9 11.1 22.4 12 Q12.9 12.9 12 22.4 Q11.1 12.9 1.6 12 Q11.1 11.1 12 1.6 Z"></path>
+  </svg>
+)}
+{kind === 'video' && <Play size={size} stroke-width={2.15} aria-hidden="true" />}
+{kind === 'social' && <MessagesSquare size={size} stroke-width={2.1} aria-hidden="true" />}
+{kind === 'market' && <ShoppingCart size={size} stroke-width={2.1} aria-hidden="true" />}
+{kind === 'grader' && <Gauge size={size} stroke-width={2.1} aria-hidden="true" />}
+{kind === 'sense' && <Ear size={size} stroke-width={2.1} aria-hidden="true" />}
+{kind === 'shape' && <LayoutDashboard size={size} stroke-width={2.05} aria-hidden="true" />}
+{kind === 'surface' && <Radio size={size} stroke-width={2.05} aria-hidden="true" />}
+{kind === 'solve' && <RefreshCw size={size} stroke-width={2.05} aria-hidden="true" />}
+{kind === 'info' && <Info size={size} stroke-width={2.1} aria-hidden="true" />}
+
+<style>
+  .sd-glyph {
+    display: inline-grid;
+    width: var(--glyph-size, 24px);
+    height: var(--glyph-size, 24px);
+    place-items: center;
+    flex: 0 0 auto;
+    color: currentColor;
+  }
+
+  .sd-glyph--google {
+    font-family: 'Poppins', 'Geist Variable', sans-serif;
+    font-size: calc(var(--glyph-size, 24px) * .88);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.05em;
+  }
+
+  .sd-glyph--aeo {
+    display: block;
+    fill: currentColor;
+  }
+</style>

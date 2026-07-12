@@ -1,11 +1,22 @@
 ---
+import '@fontsource/poppins/400.css'
 import '@fontsource/poppins/600.css'
 import '@fontsource/poppins/700.css'
 import '@fontsource/poppins/800.css'
 import BaseLayout from '@layouts/BaseLayout.astro'
 import SurroundDiscoveryFormDock from '@/components/SurroundDiscoveryFormDock.astro'
-import Icon from '@/components/TablerIcon.astro'
-import { ArrowRight, ArrowUpRight, Check, Download, FileText, Sparkles, Zap } from '@lucide/astro'
+import SurroundGlyph from '@/components/SurroundGlyph.astro'
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  Download,
+  FileText,
+  Map,
+  Sparkles,
+  Zap,
+} from '@lucide/astro'
 
 export const prerender = true
 
@@ -26,24 +37,24 @@ const socialImageAlt = 'Portada del ebook Surround Discovery™ de Efeonce sobre
 const ebookImageUrl = `${landingUrl}/surround-discovery/ebook-cover.jpeg`
 
 const surfaces = [
-  { key: 'seo', title: 'SEO', question: '“¿Te encuentran cuando buscan activamente?”', description: 'La base del descubrimiento por intención: aparecer con claridad cuando alguien ya busca lo que ofreces.', cta: 'Ver enfoque SEO', icon: 'ti-brand-google-filled' },
-  { key: 'aeo', title: 'AEO', question: '“¿Los motores de IA te entienden y te citan bien?”', description: 'Presencia en motores de respuesta: que la IA explique tu propuesta con precisión, no de memoria.', cta: 'Ver enfoque AEO', icon: null },
-  { key: 'video', title: 'Video Discovery', question: '“¿Apareces cuando tu audiencia aprende mirando?”', description: 'El video como superficie de descubrimiento, no como un formato más de campaña.', cta: undefined, icon: 'ti-player-play' },
-  { key: 'social', title: 'Social Discovery', question: '“¿Entras en las conversaciones que forman preferencia?”', description: 'Lo social y las comunidades como lugar de descubrimiento, no como métrica de vanidad.', cta: undefined, icon: 'ti-messages' },
-  { key: 'market', title: 'Marketplace Optimization', question: '“¿Eres visible donde comparan y compran?”', description: 'La superficie donde la demanda se captura: visibilidad en el momento exacto de decidir.', cta: undefined, icon: 'ti-shopping-cart' },
+  { key: 'seo', title: 'SEO', question: '“¿Te encuentran cuando buscan activamente?”', description: 'La base del descubrimiento por intención: aparecer con claridad cuando alguien ya busca lo que ofreces.', cta: 'Ver enfoque SEO' },
+  { key: 'aeo', title: 'AEO', question: '“¿Los motores de IA te entienden y te citan bien?”', description: 'Presencia en motores de respuesta: que la IA explique tu propuesta con precisión, no de memoria.', cta: 'Ver enfoque AEO' },
+  { key: 'video', title: 'Video Discovery', question: '“¿Apareces cuando tu audiencia aprende mirando?”', description: 'El video como superficie de descubrimiento, no como un formato más de campaña.', cta: undefined },
+  { key: 'social', title: 'Social Discovery', question: '“¿Entras en las conversaciones que forman preferencia?”', description: 'Lo social y las comunidades como lugar de descubrimiento, no como métrica de vanidad.', cta: undefined },
+  { key: 'market', title: 'Marketplace Optimization', question: '“¿Eres visible donde comparan y compran?”', description: 'La superficie donde la demanda se captura: visibilidad en el momento exacto de decidir.', cta: undefined },
 ] as const
 
 const cycle = [
-  { number: '01', name: 'SENSE', action: 'Escuchar la intención', description: 'Leer las señales reales de búsqueda y las preguntas detrás de cada canal.', icon: 'ti-ear' },
-  { number: '02', name: 'SHAPE', action: 'Construir los activos', description: 'Calibrar contenido y marca para que cada superficie tenga qué mostrar.', icon: 'ti-adjustments' },
-  { number: '03', name: 'SURFACE', action: 'Distribuir en el mapa', description: 'Publicar y conectar la presencia a través de las cinco superficies.', icon: 'ti-broadcast' },
-  { number: '04', name: 'SOLVE', action: 'Cerrar el ciclo', description: 'SOLVE conecta el impacto de negocio con la siguiente vuelta del sistema.', icon: 'ti-refresh' },
+  { key: 'sense', number: '01', name: 'SENSE', action: 'Escuchar la intención', description: 'Leer las señales reales de búsqueda y las preguntas detrás de cada canal.' },
+  { key: 'shape', number: '02', name: 'SHAPE', action: 'Construir los activos', description: 'Calibrar contenido y marca para que cada superficie tenga qué mostrar.' },
+  { key: 'surface', number: '03', name: 'SURFACE', action: 'Distribuir en el mapa', description: 'Publicar y conectar la presencia a través de las cinco superficies.' },
+  { key: 'solve', number: '04', name: 'SOLVE', action: 'Cerrar el ciclo', description: 'SOLVE conecta el impacto de negocio con la siguiente vuelta del sistema.' },
 ] as const
 
 const relationships = [
-  { key: 'grader', title: 'AI Visibility Grader', description: 'Mide cómo te ven hoy los motores de respuesta. Es una lectura puntual de una parte del sistema (AEO), no una evaluación de las cinco superficies.', cta: 'Abrir el grader', href: '/brand-visibility', icon: 'ti-gauge' },
-  { key: 'seo', title: 'Enfoque SEO', description: 'La puerta del descubrimiento por intención: cómo trabajamos la búsqueda activa dentro del sistema.', cta: 'Ver enfoque SEO', href: 'https://efeoncepro.com/loop-marketing/seo-aeo-optimizacion-ia-2025/', icon: 'ti-brand-google-filled' },
-  { key: 'aeo', title: 'Enfoque AEO', description: 'La puerta de los motores de respuesta: cómo logramos que la IA te entienda y te cite con precisión.', cta: 'Ver enfoque AEO', href: 'https://efeoncepro.com/aeo-2/', icon: null },
+  { key: 'grader', title: 'AI Visibility Grader', description: 'Mide cómo te ven hoy los motores de respuesta. Es una lectura puntual de una parte del sistema (AEO), no una evaluación de las cinco superficies.', cta: 'Abrir el grader', href: '/brand-visibility' },
+  { key: 'seo', title: 'Enfoque SEO', description: 'La puerta del descubrimiento por intención: cómo trabajamos la búsqueda activa dentro del sistema.', cta: 'Ver enfoque SEO', href: 'https://efeoncepro.com/loop-marketing/seo-aeo-optimizacion-ia-2025/' },
+  { key: 'aeo', title: 'Enfoque AEO', description: 'La puerta de los motores de respuesta: cómo logramos que la IA te entienda y te cite con precisión.', cta: 'Ver enfoque AEO', href: 'https://efeoncepro.com/aeo-2/' },
 ] as const
 
 const faq = [
@@ -69,26 +80,20 @@ const jsonLd = {
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} canonical="/seo-surround-discovery" ogImage="/surround-discovery/ebook-cover.jpeg" ogTitle={socialTitle} ogDescription={socialDescription} ogImageAlt={socialImageAlt} jsonLd={jsonLd}>
-  <Fragment slot="head">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&family=Geist:wght@400;500;600;700;800&display=swap" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css" />
-  </Fragment>
   <a class="sd-skip" href="#main">Saltar al contenido</a>
   <div class="sd" data-capture="surround-discovery-landing" style="--sd-navy:#0b1f3a;--sd-navy-2:#07132e;--sd-blue:#14315e;--sd-teal:#2dd4bf;--sd-teal-light:#5eead4;--sd-teal-deep:#0f766e;--sd-teal-cta:#0f766e;--sd-teal-soft:#ccfbf1;--sd-white:#fff;--sd-ink:#2f2b3d;--sd-muted:#6b6876;--sd-mist:#c3dcf3;--sd-line:#dbdbdb;--sd-surface:#f8f7fa;--sd-display:'Poppins','Geist Variable',sans-serif;--neutral:#f8f7fa;--surface:#fff;--text-primary:#2f2b3d;--text-secondary:#6b6876;--text-disabled:#a7a5ae;--border-subtle:#dbdbdb;--primary:#0f766e;--primary-light:#0d9488;--primary-dark:#115e59;--primary-tonal:#ccfbf1;--brand-navy:#0b1f3a;">
-    <header class="sd-header"><div class="sd-container sd-header__content"><a href="#main" aria-label="Efeonce, inicio"><img src="/branding/efeonce-logo.svg" alt="Efeonce" /></a><nav aria-label="Secciones"><a href="#surfaces">El sistema</a><a href="#s4">Método S⁴</a><a href="#ebook">El ebook</a><a href="#faq">Preguntas</a></nav><a class="sd-header__cta" href="#form" data-cta data-ripple><Icon name="download" size={16} /> Descargar el ebook</a></div></header>
+    <header class="sd-header"><div class="sd-container sd-header__content"><a href="#main" aria-label="Efeonce, inicio"><img src="/branding/efeonce-logo.svg" alt="Efeonce" /></a><nav aria-label="Secciones"><a href="#surfaces" data-nav-link>El sistema</a><a href="#s4" data-nav-link>Método S⁴</a><a href="#ebook" data-nav-link>El ebook</a><a href="#faq" data-nav-link>Preguntas</a></nav><a class="sd-header__cta" href="#form" data-cta data-ripple><Download size={16} aria-hidden="true" /> Descargar el ebook</a></div></header>
 
     <main id="main">
-      <section class="sd-hero" data-capture="surround-discovery-hero" aria-labelledby="surround-title"><div class="sd-hero__aura" aria-hidden="true"></div><div class="sd-container sd-hero__grid"><div><p class="sd-pill reveal" data-reveal><Icon name="map-2" size={15} /> El mapa de la búsqueda fragmentada</p><h1 id="surround-title" class="reveal" data-reveal data-reveal-delay="60" data-reveal-duration="750">No compites por una posición.<br /><span>Compites por ser descubierto.</span></h1><p class="sd-hero__lead reveal" data-reveal data-reveal-delay="120" data-reveal-duration="750">Tu próxima oportunidad puede empezar en Google, un motor de IA, un video, una conversación social o un marketplace. <strong>Surround Discovery™</strong> te ayuda a leer esas rutas como un sistema, no como tácticas sueltas.</p><div class="sd-hero__actions reveal" data-reveal data-reveal-delay="180" data-reveal-duration="750"><a class="sd-button sd-button--primary" href="#form" data-cta data-ripple><Icon name="download" size={18} />Descargar el ebook</a><a class="sd-button sd-button--outline" href="#surfaces" data-cta2 data-ripple>Ver el mapa <Icon name="arrow-down" size={18} /></a></div><p class="sd-hero__meta reveal" data-reveal data-reveal-delay="280" data-reveal-duration="800"><Icon name="file-text" size={16} />Guía de 61 páginas <i aria-hidden="true"></i><Icon name="bolt" size={16} />Descarga inmediata tras registro</p></div><figure class="sd-hero-map reveal" data-reveal data-parallax data-parallax-y="0.12" aria-label="Cinco superficies de descubrimiento conectadas"><div class="sd-map-ring sd-map-ring--outer"></div><div class="sd-map-ring sd-map-ring--inner"></div><div class="sd-map-wave"></div><div class="sd-map-wave sd-map-wave--late"></div><svg viewBox="0 0 100 100" aria-hidden="true"><g><line x1="50" y1="50" x2="50" y2="9" /><line x1="50" y1="50" x2="88" y2="33" /><line x1="50" y1="50" x2="79" y2="82" /><line x1="50" y1="50" x2="21" y2="82" /><line x1="50" y1="50" x2="12" y2="33" /></g></svg><div class="sd-map-core-wrap"><div class="sd-map-halo" data-halo aria-hidden="true"></div><div class="sd-map-core"><img src="/branding/efeonce-logo-negative.svg" alt="" /><span>Discovery</span></div></div>{surfaces.map((surface, index) => (<div class={`sd-hero-node sd-hero-node--${index + 1}`} data-float aria-hidden="true"><div>{surface.key === 'aeo' ? <svg class="sd-source-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6 Q12.9 11.1 22.4 12 Q12.9 12.9 12 22.4 Q11.1 12.9 1.6 12 Q11.1 11.1 12 1.6 Z" /></svg> : <Icon name={surface.icon ?? 'info'} size={24} />}</div><span>{surface.key === 'market' ? 'Market' : surface.title === 'Video Discovery' ? 'Video' : surface.title === 'Social Discovery' ? 'Social' : surface.title}</span></div>))}</figure></div><div class="sd-hero__wave" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,60 L0,28 C240,54 480,4 720,10 C960,16 1200,52 1440,26 L1440,60 Z" /></svg></div></section>
+      <section class="sd-hero" data-capture="surround-discovery-hero" aria-labelledby="surround-title"><div class="sd-hero__aura" aria-hidden="true"></div><div class="sd-container sd-hero__grid"><div><p class="sd-pill reveal" data-reveal><Map size={15} aria-hidden="true" /> El mapa de la búsqueda fragmentada</p><h1 id="surround-title" class="reveal" data-reveal data-reveal-delay="60" data-reveal-duration="750">No compites por una posición.<br /><span>Compites por ser descubierto.</span></h1><p class="sd-hero__lead reveal" data-reveal data-reveal-delay="120" data-reveal-duration="750">Tu próxima oportunidad puede empezar en Google, un motor de IA, un video, una conversación social o un marketplace. <strong>Surround Discovery™</strong> te ayuda a leer esas rutas como un sistema, no como tácticas sueltas.</p><div class="sd-hero__actions reveal" data-reveal data-reveal-delay="180" data-reveal-duration="750"><a class="sd-button sd-button--primary" href="#form" data-cta data-ripple><Download size={18} aria-hidden="true" />Descargar el ebook</a><a class="sd-button sd-button--outline" href="#surfaces" data-cta2 data-ripple>Ver el mapa <ArrowDown size={18} aria-hidden="true" /></a></div><p class="sd-hero__meta reveal" data-reveal data-reveal-delay="280" data-reveal-duration="800"><FileText size={16} aria-hidden="true" />Guía de 61 páginas <i aria-hidden="true"></i><Zap size={16} aria-hidden="true" />Descarga inmediata tras registro</p></div><figure class="sd-hero-map reveal" data-reveal data-parallax data-parallax-y="0.12" aria-label="Cinco superficies de descubrimiento conectadas"><div class="sd-map-ring sd-map-ring--outer"></div><div class="sd-map-ring sd-map-ring--inner"></div><div class="sd-map-wave"></div><div class="sd-map-wave sd-map-wave--late"></div><svg viewBox="0 0 100 100" aria-hidden="true"><g><line x1="50" y1="50" x2="50" y2="9" /><line x1="50" y1="50" x2="88" y2="33" /><line x1="50" y1="50" x2="79" y2="82" /><line x1="50" y1="50" x2="21" y2="82" /><line x1="50" y1="50" x2="12" y2="33" /></g></svg><div class="sd-map-core-wrap"><div class="sd-map-halo" data-halo aria-hidden="true"></div><div class="sd-map-core"><img src="/branding/efeonce-logo-negative.svg" alt="" /><span>Discovery</span></div></div>{surfaces.map((surface, index) => (<div class={`sd-hero-node sd-hero-node--${index + 1}`} data-float aria-hidden="true"><div><SurroundGlyph kind={surface.key} size={24} /></div><span>{surface.key === 'market' ? 'Market' : surface.title === 'Video Discovery' ? 'Video' : surface.title === 'Social Discovery' ? 'Social' : surface.title}</span></div>))}</figure></div><div class="sd-hero__wave" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,60 L0,28 C240,54 480,4 720,10 C960,16 1200,52 1440,26 L1440,60 Z" /></svg></div></section>
 
       <section class="sd-fragment section" data-capture="surround-discovery-fragmentation" aria-labelledby="frag-title"><div class="sd-container"><div class="sd-copy reveal" data-reveal><p class="sd-eyebrow"><span></span>El problema</p><h2 id="frag-title">SEO y AEO no compiten. Se quedan cortos cuando trabajan solos.</h2><p>El descubrimiento dejó de vivir en una sola caja de búsqueda. Cuando optimizas un canal aislado, resuelves una parte del recorrido y pierdes de vista el resto.</p></div><div class="sd-before-grid">{[['Optimizabas una página para un buscador.','Tu comprador pregunta en cinco lugares distintos.'],['Medías tu éxito como una posición.','El descubrimiento ya no cabe en un ranking.'],['Elegías un canal y lo trabajabas.','La intención se reparte entre todos a la vez.']].map((item, index) => (<article class="reveal" data-reveal style={`--delay:${index * 80}ms`}><span>Antes</span><p class="sd-strike">{item[0]}</p><strong>Ahora</strong><h3>{item[1]}</h3></article>))}</div></div></section>
 
-      <section id="surfaces" class="section sd-surfaces" data-capture="surround-discovery-surfaces" aria-labelledby="surfaces-title"><div class="sd-container"><div class="sd-copy reveal" data-reveal><p class="sd-eyebrow"><span></span>El sistema</p><h2 id="surfaces-title">Cinco superficies. Una sola decisión: dónde te descubre tu mercado.</h2><p>El descubrimiento ocurre en cinco superficies conectadas. Surround Discovery las trata como un mismo sistema: cada una responde a una pregunta distinta de tu comprador, y ninguna reemplaza a las demás.</p></div><div class="sd-surface-map reveal" data-reveal aria-hidden="true"><div class="sd-surface-map__ring sd-surface-map__ring--outer"></div><div class="sd-surface-map__ring sd-surface-map__ring--inner"></div><div class="sd-surface-map__wave"></div><svg viewBox="0 0 100 100"><g><line x1="50" y1="50" x2="50" y2="10"/><line x1="50" y1="50" x2="88" y2="35"/><line x1="50" y1="50" x2="74" y2="86"/><line x1="50" y1="50" x2="26" y2="86"/><line x1="50" y1="50" x2="12" y2="35"/></g></svg><div class="sd-surface-map__core"><img src="/branding/efeonce-logo-negative.svg" alt=""/><span>Discovery</span></div>{surfaces.map((surface, index) => (<div class={`sd-surface-map__node sd-surface-map__node--${index + 1}`} data-surface-node={surface.key}><div>{surface.key === 'aeo' ? <svg class="sd-source-icon" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6 Q12.9 11.1 22.4 12 Q12.9 12.9 12 22.4 Q11.1 12.9 1.6 12 Q11.1 11.1 12 1.6 Z" /></svg> : <Icon name={surface.icon ?? 'info'} size={26} />}</div><span>{surface.key === 'market' ? 'Market' : surface.title === 'Video Discovery' ? 'Video' : surface.title === 'Social Discovery' ? 'Social' : surface.title}</span></div>))}</div><div class="sd-surface-cards">{surfaces.map((surface, index) => (<article class="reveal" data-reveal data-surface-card={surface.key} style={`--delay:${(index % 3) * 70}ms`}><div><span>{surface.key === 'aeo' ? <svg class="sd-source-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6 Q12.9 11.1 22.4 12 Q12.9 12.9 12 22.4 Q11.1 12.9 1.6 12 Q11.1 11.1 12 1.6 Z" /></svg> : <Icon name={surface.icon ?? 'info'} size={22} />}</span><h3>{surface.title}</h3></div><strong>{surface.question}</strong><p>{surface.description}</p>{surface.cta && <a href="#relationship" data-cta3>{surface.cta}<ArrowRight size={16} aria-hidden="true" /></a>}</article>))}</div></div></section>
+      <section id="surfaces" class="section sd-surfaces" data-capture="surround-discovery-surfaces" aria-labelledby="surfaces-title"><div class="sd-container"><div class="sd-copy reveal" data-reveal><p class="sd-eyebrow"><span></span>El sistema</p><h2 id="surfaces-title">Cinco superficies. Una sola decisión: dónde te descubre tu mercado.</h2><p>El descubrimiento ocurre en cinco superficies conectadas. Surround Discovery las trata como un mismo sistema: cada una responde a una pregunta distinta de tu comprador, y ninguna reemplaza a las demás.</p></div><div class="sd-surface-map reveal" data-reveal aria-hidden="true"><div class="sd-surface-map__ring sd-surface-map__ring--outer"></div><div class="sd-surface-map__ring sd-surface-map__ring--inner"></div><div class="sd-surface-map__wave"></div><svg viewBox="0 0 100 100"><g><line x1="50" y1="50" x2="50" y2="10"/><line x1="50" y1="50" x2="88" y2="35"/><line x1="50" y1="50" x2="74" y2="86"/><line x1="50" y1="50" x2="26" y2="86"/><line x1="50" y1="50" x2="12" y2="35"/></g></svg><div class="sd-surface-map__core"><img src="/branding/efeonce-logo-negative.svg" alt=""/><span>Discovery</span></div>{surfaces.map((surface, index) => (<div class={`sd-surface-map__node sd-surface-map__node--${index + 1}`} data-surface-node={surface.key}><div><SurroundGlyph kind={surface.key} size={26} /></div><span>{surface.key === 'market' ? 'Market' : surface.title === 'Video Discovery' ? 'Video' : surface.title === 'Social Discovery' ? 'Social' : surface.title}</span></div>))}</div><div class="sd-surface-cards">{surfaces.map((surface, index) => (<article class="reveal" data-reveal data-surface-card={surface.key} style={`--delay:${(index % 3) * 70}ms`}><div><span><SurroundGlyph kind={surface.key} size={22} /></span><h3>{surface.title}</h3></div><strong>{surface.question}</strong><p>{surface.description}</p>{surface.cta && <a href="#relationship" data-cta3>{surface.cta}<ArrowRight size={16} aria-hidden="true" /></a>}</article>))}</div></div></section>
 
-      <section id="s4" class="sd-cycle section" data-capture="surround-discovery-cycle" aria-labelledby="cycle-title"><div class="sd-cycle__aura" data-parallax-y="-0.1" aria-hidden="true"></div><div class="sd-container"><div class="sd-copy sd-copy--dark reveal" data-reveal><p class="sd-eyebrow"><span></span>El ciclo operativo</p><h2 id="cycle-title">Un sistema no publica y espera. Escucha, construye, distribuye y aprende.</h2><p>S⁴ es el ciclo operativo de Surround Discovery™ —no una metodología aparte—. Cuatro etapas que se retroalimentan en cada vuelta.</p></div><ol class="sd-cycle__grid">{cycle.map((step, index) => (<li class:list={['reveal', index === 3 && 'sd-cycle__solve']} data-reveal style={`--delay:${index * 90}ms;--step:${index};`}><div><span>{step.number}</span><Icon name={step.icon} size={26} /></div><h3>{step.name}</h3><strong>{step.action}</strong><p>{step.description}</p><i aria-hidden="true"></i></li>))}</ol><p class="sd-cycle__note reveal" data-reveal><Icon name="info" size={16} />Es un loop: como afinar el sistema, cada vuelta de SOLVE alimenta el siguiente SENSE.</p></div></section>
+      <section id="s4" class="sd-cycle section" data-capture="surround-discovery-cycle" aria-labelledby="cycle-title"><div class="sd-cycle__aura" data-parallax-y="-0.1" aria-hidden="true"></div><div class="sd-container"><div class="sd-copy sd-copy--dark reveal" data-reveal><p class="sd-eyebrow"><span></span>El ciclo operativo</p><h2 id="cycle-title">Un sistema no publica y espera. Escucha, construye, distribuye y aprende.</h2><p>S⁴ es el ciclo operativo de Surround Discovery™ —no una metodología aparte—. Cuatro etapas que se retroalimentan en cada vuelta.</p></div><ol class="sd-cycle__grid">{cycle.map((step, index) => (<li class:list={['reveal', index === 3 && 'sd-cycle__solve']} data-reveal style={`--delay:${index * 90}ms;--step:${index};`}><div><span>{step.number}</span><SurroundGlyph kind={step.key} size={26} /></div><h3>{step.name}</h3><strong>{step.action}</strong><p>{step.description}</p><i aria-hidden="true"></i></li>))}</ol><p class="sd-cycle__note reveal" data-reveal><SurroundGlyph kind="info" size={16} />Es un loop: como afinar el sistema, cada vuelta de SOLVE alimenta el siguiente SENSE.</p></div></section>
 
-      <section id="relationship" class="section sd-relationship" data-capture="surround-discovery-relationships" aria-labelledby="relationship-title"><div class="sd-container"><div class="sd-copy reveal" data-reveal><p class="sd-eyebrow"><span></span>Cómo encaja lo que ya tienes</p><h2 id="relationship-title">Las herramientas ya existen. El mapa explica cómo se conectan.</h2><p>El grader y las landings de SEO y AEO son puertas especializadas dentro del mismo sistema. No son ofertas sueltas ni sustituyen al mapa completo.</p></div><div class="sd-relationship__grid">{relationships.map((item, index) => (<a class="reveal" data-reveal data-card-hover href={item.href} style={`--delay:${index * 80}ms`}><span>{item.key === 'aeo' ? <svg class="sd-source-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6 Q12.9 11.1 22.4 12 Q12.9 12.9 12 22.4 Q11.1 12.9 1.6 12 Q11.1 11.1 12 1.6 Z" /></svg> : <Icon name={item.icon ?? 'info'} size={24} />}</span><h3>{item.title}</h3><p>{item.description}</p><strong>{item.cta}<ArrowUpRight size={16} aria-hidden="true" /></strong></a>))}</div></div></section>
+      <section id="relationship" class="section sd-relationship" data-capture="surround-discovery-relationships" aria-labelledby="relationship-title"><div class="sd-container"><div class="sd-copy reveal" data-reveal><p class="sd-eyebrow"><span></span>Cómo encaja lo que ya tienes</p><h2 id="relationship-title">Las herramientas ya existen. El mapa explica cómo se conectan.</h2><p>El grader y las landings de SEO y AEO son puertas especializadas dentro del mismo sistema. No son ofertas sueltas ni sustituyen al mapa completo.</p></div><div class="sd-relationship__grid">{relationships.map((item, index) => (<a class="reveal" data-reveal data-card-hover href={item.href} style={`--delay:${index * 80}ms`}><span><SurroundGlyph kind={item.key} size={24} /></span><h3>{item.title}</h3><p>{item.description}</p><strong>{item.cta}<ArrowUpRight size={16} aria-hidden="true" /></strong></a>))}</div></div></section>
 
       <section id="ebook" class="sd-ebook section" data-capture="surround-discovery-ebook" aria-labelledby="ebook-title">
         <div class="sd-ebook__aura" data-parallax-y="-0.12" aria-hidden="true"></div>
@@ -139,25 +144,37 @@ const jsonLd = {
             <h2 id="form-title">Descarga tu copia ahora</h2>
             <p>Te pedimos lo mínimo para entregar el PDF y dejarte un siguiente paso claro si quieres medir tu visibilidad después.</p>
 
-            <div class="sd-form-rail__panel" aria-label="Cómo funciona la descarga">
-              <strong>Qué pasa al enviar</strong>
-              <ol class="sd-form-steps">
-                <li><b>1</b><span><em>Validas el destino</em>Nombre, correo corporativo y contexto mínimo.</span></li>
-                <li><b>2</b><span><em>Recibes el PDF</em>La descarga se abre al instante y queda un respaldo por correo.</span></li>
-                <li><b>3</b><span><em>Sigues sólo si quieres</em>Desde la success card puedes medir tu visibilidad en IA.</span></li>
-              </ol>
+            <div class="sd-form-rail__default" data-form-rail-state="default">
+              <div class="sd-form-rail__panel" aria-label="Cómo funciona la descarga">
+                <strong>Qué pasa al enviar</strong>
+                <ol class="sd-form-steps">
+                  <li><b>1</b><span><em>Validas el destino</em>Nombre, correo corporativo y contexto mínimo.</span></li>
+                  <li><b>2</b><span><em>Recibes el PDF</em>La descarga se abre al instante y queda un respaldo por correo.</span></li>
+                  <li><b>3</b><span><em>Sigues sólo si quieres</em>Desde la success card puedes medir tu visibilidad en IA.</span></li>
+                </ol>
+              </div>
+
+              <div class="sd-form-proof" aria-label="Señales de entrega">
+                <span><Download size={15} aria-hidden="true" />PDF inmediato</span>
+                <span><FileText size={15} aria-hidden="true" />Respaldo por email</span>
+                <span><Zap size={15} aria-hidden="true" />Sin spam</span>
+              </div>
+
+              <aside class="sd-form-note">
+                <Check size={17} aria-hidden="true"/>
+                <p>Consentimiento, protección anti-spam y entrega tokenizada quedan gobernados por <strong>Greenhouse Growth Forms</strong>.</p>
+              </aside>
             </div>
 
-            <div class="sd-form-proof" aria-label="Señales de entrega">
-              <span><Download size={15} aria-hidden="true" />PDF inmediato</span>
-              <span><FileText size={15} aria-hidden="true" />Respaldo por email</span>
-              <span><Zap size={15} aria-hidden="true" />Sin spam</span>
+            <div class="sd-form-rail__complete" data-form-rail-state="complete" hidden>
+              <div class="sd-form-complete-card">
+                <span aria-hidden="true"><Check size={20} /></span>
+                <h3>Entrega completada.</h3>
+                <p>Ya tienes el mapa. Si quieres convertirlo en una medición concreta, el siguiente paso natural es revisar cómo te entienden hoy los motores de IA.</p>
+                <a href="/brand-visibility" data-ripple data-cta3>Medir mi visibilidad en IA <ArrowRight size={16} aria-hidden="true" /></a>
+              </div>
+              <p class="sd-form-complete-note"><FileText size={15} aria-hidden="true" /> El PDF queda disponible desde la success card mientras esta página siga abierta.</p>
             </div>
-
-            <aside class="sd-form-note">
-              <Check size={17} aria-hidden="true"/>
-              <p>Consentimiento, protección anti-spam y entrega tokenizada quedan gobernados por <strong>Greenhouse Growth Forms</strong>.</p>
-            </aside>
           </div>
           <div class="sd-form-dock-wrap reveal" data-reveal data-reveal-delay="120"><SurroundDiscoveryFormDock /></div>
         </div>
@@ -165,7 +182,7 @@ const jsonLd = {
 
       <section id="faq" class="sd-faq section" data-capture="surround-discovery-faq" aria-labelledby="faq-title"><div class="sd-faq__wrap"><div class="reveal" data-reveal><p>Preguntas frecuentes</p><h2 id="faq-title">Antes de elegir una táctica, aclaremos el sistema.</h2></div><div class="sd-faq__items">{faq.map((item) => (<details class="reveal" data-reveal><summary>{item.q}<span aria-hidden="true">+</span></summary><p>{item.a}</p></details>))}</div></div></section>
 
-      <section class="sd-closing" data-capture="surround-discovery-final" aria-labelledby="closing-title"><div class="sd-closing__aura" aria-hidden="true"></div><div class="sd-closing__content reveal" data-reveal><span class="sd-closing__icon" aria-hidden="true"><Icon name="map-2" size={34} /></span><h2 id="closing-title">El descubrimiento no ocurre en un solo lugar. Tu estrategia tampoco debería.</h2><p>Empieza con el mapa completo. El ebook te da el marco; tú decides desde dónde ordenar tu presencia.</p><a class="sd-button sd-button--primary" href="#form" data-cta data-ripple><Download size={18} aria-hidden="true"/>Descargar el ebook</a></div></section>
+      <section class="sd-closing" data-capture="surround-discovery-final" aria-labelledby="closing-title"><div class="sd-closing__aura" aria-hidden="true"></div><div class="sd-closing__content reveal" data-reveal><span class="sd-closing__icon" aria-hidden="true"><Map size={34} /></span><h2 id="closing-title">El descubrimiento no ocurre en un solo lugar. Tu estrategia tampoco debería.</h2><p>Empieza con el mapa completo. El ebook te da el marco; tú decides desde dónde ordenar tu presencia.</p><div class="sd-closing__actions"><a class="sd-button sd-button--primary" href="#form" data-cta data-ripple><Download size={18} aria-hidden="true"/>Descargar el ebook</a><a class="sd-button sd-button--outline" href="/brand-visibility" data-cta2 data-ripple>Medir visibilidad en IA <ArrowRight size={18} aria-hidden="true" /></a></div></div></section>
     </main>
 
     <footer class="sd-footer"><div class="sd-container"><div class="sd-footer__top"><img src="/branding/efeonce-logo-negative.svg" alt="Efeonce"/><nav aria-label="Enlaces de pie"><a href="https://efeoncepro.com/politica-de-privacidad/">Aviso de privacidad</a><a href="#form">Descargar</a></nav></div><div class="sd-footer__bottom"><p><Check size={15} aria-hidden="true"/><span><strong>Surround Discovery™</strong> y el método <strong>S⁴</strong> son marca y metodología propietarias de Efeonce. Su uso, adaptación o reproducción requiere autorización expresa.</span></p><p>© 2026 Efeonce · Todos los derechos reservados</p></div></div></footer>
@@ -248,6 +265,37 @@ const jsonLd = {
         item.addEventListener('mouseleave', () => setHighlight(key, false))
       })
     }
+
+    const navLinks = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-nav-link]'))
+    if (navLinks.length && 'IntersectionObserver' in window) {
+      const sections = navLinks
+        .map((link) => ({ link, section: document.querySelector<HTMLElement>(link.hash) }))
+        .filter((entry): entry is { link: HTMLAnchorElement; section: HTMLElement } => Boolean(entry.section))
+      const setCurrent = (id: string) => {
+        sections.forEach(({ link, section }) => {
+          if (section.id === id) link.setAttribute('aria-current', 'true')
+          else link.removeAttribute('aria-current')
+        })
+      }
+      const navObserver = new IntersectionObserver((entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (visible?.target instanceof HTMLElement) setCurrent(visible.target.id)
+      }, { rootMargin: '-24% 0px -56% 0px', threshold: [.18, .36, .52] })
+      sections.forEach(({ section }) => navObserver.observe(section))
+    }
+
+    const formSection = root.querySelector<HTMLElement>('[data-capture="surround-discovery-form-section"]')
+    const railDefault = formSection?.querySelector<HTMLElement>('[data-form-rail-state="default"]')
+    const railComplete = formSection?.querySelector<HTMLElement>('[data-form-rail-state="complete"]')
+    formSection?.addEventListener('gh_form_submission_accepted', (event) => {
+      const detail = event instanceof CustomEvent ? event.detail : null
+      if (!detail?.download_url) return
+      formSection.dataset.formComplete = 'true'
+      if (railDefault) railDefault.hidden = true
+      if (railComplete) railComplete.hidden = false
+    })
 
     document.addEventListener('pointerdown', (event) => {
       if (reducedMotion.matches) return
@@ -486,6 +534,202 @@ const jsonLd = {
     }
     .sd-form-rail__panel {
       padding: 1rem;
+    }
+  }
+  /* Auditoría full-landing: accesibilidad táctil, jerarquía tipográfica,
+     estado post-submit y compacidad mobile sin romper el motion aprobado. */
+  .sd :global(.lucide),
+  .sd :global(.sd-glyph) {
+    display: block;
+  }
+  .sd-header nav a {
+    position: relative;
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+  }
+  .sd-header nav a::after {
+    position: absolute;
+    right: 0;
+    bottom: .35rem;
+    left: 0;
+    height: 2px;
+    content: '';
+    border-radius: 99rem;
+    background: var(--sd-teal-deep);
+    opacity: 0;
+    transform: scaleX(.45);
+    transition: opacity .24s ease, transform .24s cubic-bezier(.2,.8,.2,1);
+  }
+  .sd-header nav a[aria-current='true'] {
+    color: var(--sd-teal-deep);
+  }
+  .sd-header nav a[aria-current='true']::after,
+  .sd-header nav a:hover::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  .sd-header__cta {
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+  }
+  .sd-before-grid article {
+    position: relative;
+    overflow: hidden;
+    border-color: color-mix(in srgb,var(--sd-teal-deep) 14%,var(--sd-line));
+    box-shadow: 0 .875rem 2rem -1.75rem color-mix(in srgb,var(--sd-navy) 24%,transparent);
+  }
+  .sd-before-grid article::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    content: '';
+    background: linear-gradient(180deg,var(--sd-teal-light),var(--sd-teal-deep));
+    opacity: .82;
+  }
+  .sd-before-grid .sd-strike {
+    color: color-mix(in srgb,var(--sd-muted) 86%,var(--sd-ink));
+    text-decoration-thickness: 2px;
+  }
+  .sd-before-grid h3,
+  .sd-surface-cards h3,
+  .sd-relationship__grid h3 {
+    font-weight: 700;
+  }
+  .sd-cycle__grid h3 {
+    font-weight: 800;
+  }
+  .sd-surface-cards article a,
+  .sd-relationship__grid strong,
+  .sd-footer a {
+    min-height: 2.75rem;
+    align-items: center;
+  }
+  .sd-footer a {
+    display: inline-flex;
+    padding-block: .45rem;
+  }
+  .sd-form-rail__default[hidden],
+  .sd-form-rail__complete[hidden] {
+    display: none !important;
+  }
+  .sd-form-rail__default,
+  .sd-form-rail__complete {
+    margin-top: 1.75rem;
+  }
+  .sd-form-complete-card {
+    position: relative;
+    overflow: hidden;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in srgb,var(--sd-teal-deep) 18%,var(--sd-line));
+    border-radius: 1rem;
+    background:
+      radial-gradient(120% 120% at 0% 0%, color-mix(in srgb,var(--sd-teal-soft) 58%, transparent), transparent 56%),
+      var(--sd-white);
+    box-shadow: 0 1px 2px color-mix(in srgb,var(--sd-navy) 7%,transparent), 0 1.25rem 2.75rem -2rem color-mix(in srgb,var(--sd-navy) 24%,transparent);
+  }
+  .sd-form-complete-card::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    content: '';
+    background: linear-gradient(180deg,var(--sd-teal-light),var(--sd-teal-deep));
+  }
+  .sd-form-complete-card > span {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border-radius: .8rem;
+    color: var(--sd-teal-deep);
+    background: var(--sd-teal-soft);
+  }
+  .sd-form-complete-card h3 {
+    margin: 1rem 0 0;
+    color: var(--sd-ink);
+    font-family: var(--sd-display);
+    font-size: clamp(1.35rem,2.5vw,1.75rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -.035em;
+  }
+  .sd-form-complete-card p {
+    margin: .65rem 0 0;
+    color: var(--sd-muted);
+    font-size: .94rem;
+    line-height: 1.58;
+  }
+  .sd-form-complete-card a {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: .45rem;
+    margin-top: 1rem;
+    color: var(--sd-teal-deep);
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .sd-form-complete-note {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    margin: .8rem 0 0;
+    color: var(--sd-muted);
+    font-size: .82rem;
+    line-height: 1.45;
+  }
+  .sd-form-complete-note svg {
+    color: var(--sd-teal-deep);
+    flex: 0 0 auto;
+  }
+  .sd-closing__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .85rem;
+    margin-top: 1.85rem;
+  }
+  .sd-closing .sd-closing__actions .sd-button {
+    margin-top: 0;
+  }
+  @media (max-width:560px) {
+    .section {
+      padding-block: clamp(2.65rem,10vw,4rem);
+    }
+    .sd-header__content {
+      min-height: 4rem;
+    }
+    .sd-header__cta {
+      min-height: 2.75rem;
+      padding-inline: .88rem;
+      font-size: .78rem;
+    }
+    .sd-surfaces .sd-surface-map {
+      display: none;
+    }
+    .sd-surfaces.section {
+      padding-block: clamp(2.75rem,11vw,4.35rem);
+    }
+    .sd-surface-cards {
+      margin-top: 1.25rem;
+      gap: .72rem;
+    }
+    .sd-surface-cards article,
+    .sd-before-grid article,
+    .sd-relationship__grid a {
+      padding: 1.12rem;
+    }
+    .sd-cycle__grid,
+    .sd-before-grid,
+    .sd-relationship__grid {
+      gap: .72rem;
+    }
+    .sd-closing__actions,
+    .sd-closing__actions .sd-button {
+      width: 100%;
+    }
+    .sd-footer__top nav {
+      gap: .75rem;
     }
   }
 </style>

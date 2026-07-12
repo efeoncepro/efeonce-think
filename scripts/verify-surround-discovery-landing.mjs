@@ -127,11 +127,11 @@ try {
       }))
       primaryHoverScreenshot = resolve(OUT_DIR, `${label}-${viewport.name}-hero-primary-hover.png`)
       await page.screenshot({ path: primaryHoverScreenshot })
-      await page.locator('[data-cta2]').hover()
+      await page.locator('[data-capture="surround-discovery-hero"] [data-cta2]').hover()
       await page.waitForTimeout(100)
       const secondaryCta = await page.evaluate(() => ({
-        shadow: getComputedStyle(document.querySelector('[data-cta2]')).boxShadow,
-        arrowTransform: getComputedStyle(document.querySelector('[data-cta2] svg')).transform,
+        shadow: getComputedStyle(document.querySelector('[data-capture="surround-discovery-hero"] [data-cta2]')).boxShadow,
+        arrowTransform: getComputedStyle(document.querySelector('[data-capture="surround-discovery-hero"] [data-cta2] svg')).transform,
       }))
       secondaryHoverScreenshot = resolve(OUT_DIR, `${label}-${viewport.name}-hero-secondary-hover.png`)
       await page.screenshot({ path: secondaryHoverScreenshot })
@@ -189,7 +189,7 @@ try {
         faqCount: document.querySelectorAll('details').length,
         fiveSurfaces: document.querySelectorAll('[data-surface-card]').length,
         cycleStages: document.querySelectorAll('.sd-cycle__grid > li').length,
-        heroNodeIconCount: Array.from(document.querySelectorAll('.sd-hero-node')).filter((node) => Boolean(node.querySelector('svg, i.ti'))).length,
+        heroNodeIconCount: Array.from(document.querySelectorAll('.sd-hero-node')).filter((node) => Boolean(node.querySelector('svg, .sd-glyph'))).length,
         heroCore: (() => {
           const wrap = document.querySelector('.sd-map-core-wrap')
           const core = document.querySelector('.sd-map-core')
@@ -203,11 +203,16 @@ try {
             labelOffset: core?.querySelector('span') ? getComputedStyle(core.querySelector('span')).marginTop : null,
           }
         })(),
-        surfaceMapIconCount: Array.from(document.querySelectorAll('.sd-surface-map__node')).filter((node) => Boolean(node.querySelector('svg, i.ti'))).length,
-        surfaceCardIconCount: Array.from(document.querySelectorAll('.sd-surface-cards article')).filter((node) => Boolean(node.querySelector('svg, i.ti'))).length,
+        surfaceMapIconCount: Array.from(document.querySelectorAll('.sd-surface-map__node')).filter((node) => Boolean(node.querySelector('svg, .sd-glyph'))).length,
+        surfaceCardIconCount: Array.from(document.querySelectorAll('.sd-surface-cards article')).filter((node) => Boolean(node.querySelector('svg, .sd-glyph'))).length,
         unresolvedComponentCount: document.querySelectorAll('component').length,
-        tablerIconStylesheet: Boolean(document.querySelector('link[href*="@tabler/icons-webfont"]')),
+        externalFontOrIconStylesheet: Boolean(document.querySelector('link[href*="fonts.googleapis"], link[href*="fonts.gstatic"], link[href*="@tabler/icons-webfont"], link[href*="cdn.jsdelivr.net/npm/@tabler"]')),
         supportRuntimeLoaded: Array.from(document.scripts).some((script) => script.src.includes('support.js')),
+        closingSecondaryCta: document.querySelector('[data-capture="surround-discovery-final"] a[href="/brand-visibility"]')?.textContent?.trim() ?? '',
+        smallTouchTargets: Array.from(document.querySelectorAll('.sd-header__cta, .sd-surface-cards article a, .sd-footer a')).flatMap((node) => {
+          const rect = node.getBoundingClientRect()
+          return rect.height < 44 ? [`${node.textContent?.trim() || node.getAttribute('href')}:${Math.round(rect.height)}`] : []
+        }),
         formTargetInViewport: (() => {
           const target = document.querySelector('#form')?.getBoundingClientRect()
           return Boolean(target && target.top < window.innerHeight && target.bottom > 0)
@@ -244,6 +249,8 @@ try {
         recoveryVisible: !document.querySelector('[data-form-state="recovery"]')?.hidden,
         recoveryHref: document.querySelector('[data-redownload]')?.href ?? '',
         rendererCardVisible: Boolean(document.querySelector('.ghf-success-card')),
+        sectionComplete: document.querySelector('[data-capture="surround-discovery-form-section"]')?.getAttribute('data-form-complete') ?? '',
+        railCompleteVisible: !document.querySelector('[data-form-rail-state="complete"]')?.hidden,
         activeId: document.activeElement?.id ?? null,
       }
     })
@@ -276,13 +283,16 @@ try {
     if (metrics.heroNodeIconCount !== 5 || metrics.surfaceMapIconCount !== 5 || metrics.surfaceCardIconCount !== 5) errors.push(`approved source icons missing: hero=${metrics.heroNodeIconCount} map=${metrics.surfaceMapIconCount} cards=${metrics.surfaceCardIconCount}`)
     if (!metrics.heroCore.hasWrap || !metrics.heroCore.hasHalo || metrics.heroCore.coreDisplay !== 'flex' || metrics.heroCore.coreDirection !== 'column' || metrics.heroCore.coreGap !== '2px' || metrics.heroCore.labelOffset !== '0px') errors.push(`approved Discovery core mapping mismatch: ${JSON.stringify(metrics.heroCore)}`)
     if (metrics.unresolvedComponentCount) errors.push(`Astro rendered ${metrics.unresolvedComponentCount} unresolved component tag(s)`)
-    if (!metrics.tablerIconStylesheet) errors.push('approved Tabler icon source is not loaded')
+    if (metrics.externalFontOrIconStylesheet) errors.push('landing still loads external Google/Tabler font or icon stylesheet')
+    if (!/Medir visibilidad en IA/i.test(metrics.closingSecondaryCta)) errors.push('closing section does not expose the secondary AI visibility path')
+    if (metrics.smallTouchTargets.length) errors.push(`touch targets under 44px: ${metrics.smallTouchTargets.join(', ')}`)
     if (metrics.cycleStages !== 4) errors.push(`expected 4 S4 stages, got ${metrics.cycleStages}`)
     if (metrics.supportRuntimeLoaded) errors.push('approved source support.js was copied into Think')
     if (metrics.heroCtaTarget !== '#form') errors.push(`wrong hero CTA target: ${metrics.heroCtaTarget}`)
     if (!metrics.formTargetInViewport) errors.push('hero CTA did not reach form dock')
     if (!firstFaqOpen) errors.push('FAQ does not open with keyboard')
     if (!acceptedMetrics.readyVisible || !acceptedMetrics.recoveryVisible || !acceptedMetrics.rendererCardVisible || !acceptedMetrics.recoveryHref.endsWith('/asset/fsub-probe') || acceptedMetrics.activeId !== 'surround-renderer-success-probe') errors.push('accepted download does not preserve the governed success card and recovery link')
+    if (acceptedMetrics.sectionComplete !== 'true' || !acceptedMetrics.railCompleteVisible) errors.push('accepted download does not switch the form rail to the completed state')
     if (!degradedMetrics.readyHidden || !degradedMetrics.degradedVisible || degradedMetrics.activeId !== 'surround-discovery-degraded-title') errors.push('degraded recovery state is not focus-safe')
     if (viewport.reducedMotion === 'reduce' && metrics.reducedOpacity !== '1') errors.push(`reduced-motion content not visible (${metrics.reducedOpacity})`)
     if (viewport.reducedMotion === 'reduce') {
