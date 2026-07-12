@@ -68,6 +68,17 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     const redownload = dock.querySelector<HTMLAnchorElement>('[data-redownload]')
     const redownloadCopy = dock.querySelector<HTMLElement>('[data-redownload-copy]')
     const retry = dock.querySelector<HTMLButtonElement>('[data-retry-form]')
+    const greenhouseForm = dock.querySelector('greenhouse-form')
+
+    const polishRendererChrome = () => {
+      const privacyLink = Array.from(dock.querySelectorAll<HTMLAnchorElement>('greenhouse-form .ghf-help a'))
+        .find((link) => /politica-de-privacidad/i.test(link.href))
+
+      if (privacyLink && /^https?:\/\//i.test(privacyLink.textContent?.trim() ?? '')) {
+        privacyLink.textContent = 'aviso de privacidad'
+        privacyLink.setAttribute('aria-label', 'Abrir aviso de privacidad de Efeonce')
+      }
+    }
 
     const triggerDownload = (url: string) => {
       const link = document.createElement('a')
@@ -100,6 +111,10 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       degradedTitle?.focus()
     })
     retry?.addEventListener('click', () => window.location.reload())
+    if (greenhouseForm) {
+      new MutationObserver(polishRendererChrome).observe(greenhouseForm, { childList: true, subtree: true })
+      polishRendererChrome()
+    }
   }
 </script>
 
@@ -159,6 +174,12 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   :global([data-surround-form-dock] greenhouse-form .ghf-input:focus-visible),
   :global([data-surround-form-dock] greenhouse-form .ghf-select:focus-visible),
   :global([data-surround-form-dock] greenhouse-form .ghf-textarea:focus-visible) { outline: 2px solid var(--primary-light) !important; outline-offset: 2px !important; box-shadow: 0 0 0 4px rgba(13,148,136,.16), 0 10px 24px rgba(20,44,80,.08) !important; }
+  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([name="fullName"]) .ghf-input),
+  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([name="email"]) .ghf-input) { padding-left: 40px !important; }
+  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([name="fullName"]) .ghf-control::before),
+  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([name="email"]) .ghf-control::before) { position: absolute; z-index: 1; top: 50%; left: 12px; width: 17px; height: 17px; content: ''; pointer-events: none; background: var(--text-secondary); opacity: .68; transform: translateY(-50%); }
+  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([name="fullName"]) .ghf-control::before) { mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0'/%3E%3Cpath d='M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2'/%3E%3C/svg%3E") center / contain no-repeat; }
+  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([name="email"]) .ghf-control::before) { mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='m3 7 9 6 9-6'/%3E%3C/svg%3E") center / contain no-repeat; }
   :global([data-surround-form-dock] greenhouse-form .ghf-control--select .ghf-select-icon) { inset-inline-end: 14px; border-color: var(--text-secondary); }
   :global([data-surround-form-dock] greenhouse-form .ghf-field:has([data-ghf-consent])) { display: grid !important; gap: 10px !important; margin-top: 2px; }
   :global([data-surround-form-dock] greenhouse-form .ghf-field:has([data-ghf-consent]) > .ghf-help:first-child) { display: flex; align-items: center; gap: 10px; padding: 11px 13px; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--neutral); color: var(--text-secondary) !important; font-size: 12.5px !important; }
