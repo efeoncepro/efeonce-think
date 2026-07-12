@@ -301,7 +301,7 @@ try {
     if (metrics.schemaSurfaceItems !== 5) errors.push(`expected 5 schema surface items, got ${metrics.schemaSurfaceItems}`)
     if (metrics.schemaBreadcrumbItems !== 2) errors.push(`expected 2 breadcrumb schema items, got ${metrics.schemaBreadcrumbItems}`)
     if (!/Surround Discovery™ es el sistema de Efeonce/i.test(metrics.answerCapsule) || !/SENSE, SHAPE, SURFACE y SOLVE/i.test(metrics.answerCapsule)) errors.push('answer capsule is missing or not self-contained')
-    if (metrics.faqCount !== 6) errors.push(`expected 6 FAQs, got ${metrics.faqCount}`)
+    if (metrics.faqCount !== 9) errors.push(`expected 9 FAQs, got ${metrics.faqCount}`)
     if (metrics.fiveSurfaces !== 5) errors.push(`expected 5 surfaces, got ${metrics.fiveSurfaces}`)
     if (metrics.ebookMetaItems !== 3 || metrics.ebookMetaSvgCount !== 3 || !/61 páginas\s*PDF\s*Español/i.test(metrics.ebookMetaText)) errors.push(`ebook metadata chips mismatch: ${metrics.ebookMetaItems}/${metrics.ebookMetaSvgCount}/${metrics.ebookMetaText}`)
     if (metrics.heroNodeIconCount !== 5 || metrics.surfaceMapIconCount !== 5 || metrics.surfaceCardIconCount !== 5) errors.push(`approved source icons missing: hero=${metrics.heroNodeIconCount} map=${metrics.surfaceMapIconCount} cards=${metrics.surfaceCardIconCount}`)
