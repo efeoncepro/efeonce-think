@@ -75,21 +75,38 @@ try {
         allRevealed: Array.from(document.querySelectorAll('[data-reveal]')).every((item) => item.getAttribute('data-revealed') === 'true'),
         motionMode: document.querySelector('[data-capture="surround-discovery-landing"]')?.getAttribute('data-motion') ?? null,
         heroNodeAnimation: getComputedStyle(document.querySelector('.sd-hero-node--1')).animationName,
-        ebookRaysAnimation: getComputedStyle(document.querySelector('.sd-book-art__rays')).animationName,
+        ebookLightCount: document.querySelectorAll('#ebook [data-ebook-light]').length,
+        ebookLightAnimations: Array.from(document.querySelectorAll('#ebook [data-ebook-light]')).flatMap((node) => {
+          const child = node.firstElementChild
+          return [getComputedStyle(node).animationName, child ? getComputedStyle(child).animationName : 'none']
+        }),
         cycleBeatAnimation: getComputedStyle(document.querySelector('.sd-cycle__grid li > i')).animationName,
         heroTransform: getComputedStyle(document.querySelector('.sd-hero-map')).transform,
       }))
     } else {
-      const motionInitial = await page.evaluate(() => ({
-        heroNodeAnimation: getComputedStyle(document.querySelector('.sd-hero-node--1')).animationName,
-        haloAnimation: getComputedStyle(document.querySelector('.sd-map-halo')).animationName,
-        heroWaveAnimation: getComputedStyle(document.querySelector('.sd-map-wave--late'), '::before').animationName,
-        ebookRaysAnimation: getComputedStyle(document.querySelector('.sd-book-art__rays')).animationName,
-        reverseRaysAnimation: getComputedStyle(document.querySelector('.sd-book-art__rays'), '::after').animationName,
-        auraHueAnimation: getComputedStyle(document.querySelector('.sd-book-art__aura')).animationName,
-        auraBreathAnimation: getComputedStyle(document.querySelector('.sd-book-art__aura'), '::before').animationName,
-        cycleBeatAnimation: getComputedStyle(document.querySelector('.sd-cycle__grid li > i')).animationName,
-      }))
+      const motionInitial = await page.evaluate(() => {
+        const animation = (selector, pseudo = undefined) => {
+          const node = document.querySelector(selector)
+          return node ? getComputedStyle(node, pseudo).animationName : null
+        }
+        const childAnimation = (selector) => {
+          const node = document.querySelector(selector)?.firstElementChild
+          return node ? getComputedStyle(node).animationName : null
+        }
+
+        return {
+          heroNodeAnimation: animation('.sd-hero-node--1'),
+          haloAnimation: animation('.sd-map-halo'),
+          heroWaveAnimation: animation('.sd-map-wave--late', '::before'),
+          ebookLightCount: document.querySelectorAll('#ebook [data-ebook-light]').length,
+          ebookRaysAnimation: childAnimation('.sd-book-art__light--rays'),
+          ebookSpectrumAnimation: childAnimation('.sd-book-art__light--spectrum'),
+          auraHueAnimation: animation('.sd-book-art__light--aura'),
+          auraBreathAnimation: childAnimation('.sd-book-art__light--aura'),
+          shaftAnimation: animation('.sd-book-art__shaft'),
+          cycleBeatAnimation: animation('.sd-cycle__grid li > i'),
+        }
+      })
       await page.mouse.move(Math.max(8, viewport.width - 20), Math.min(500, viewport.height - 20))
       await page.waitForTimeout(20)
       const pointer = await page.evaluate(() => ({
@@ -270,12 +287,14 @@ try {
     if (viewport.reducedMotion === 'reduce' && metrics.reducedOpacity !== '1') errors.push(`reduced-motion content not visible (${metrics.reducedOpacity})`)
     if (viewport.reducedMotion === 'reduce') {
       if (!motionMetrics.allRevealed || motionMetrics.motionMode !== null) errors.push('reduced-motion reveal mode is not static')
-      if ([motionMetrics.heroNodeAnimation, motionMetrics.ebookRaysAnimation, motionMetrics.cycleBeatAnimation].some((animation) => animation !== 'none')) errors.push('reduced-motion leaves decorative animation active')
+      if (motionMetrics.ebookLightCount !== 4) errors.push(`ebook light layer count mismatch in reduced-motion: ${motionMetrics.ebookLightCount}`)
+      if ([motionMetrics.heroNodeAnimation, motionMetrics.cycleBeatAnimation, ...motionMetrics.ebookLightAnimations].some((animation) => animation !== 'none')) errors.push('reduced-motion leaves decorative animation active')
       if (motionMetrics.heroTransform !== 'none') errors.push(`reduced-motion leaves hero parallax active (${motionMetrics.heroTransform})`)
     } else {
       const richMotionMetrics = /** @type {Record<string, any>} */ (motionMetrics)
-      const expectedAnimations = ['sd-float-a', 'sd-halo-pulse', 'sd-wave', 'sd-spin', 'sd-spin', 'sd-aura-hue', 'sd-aura', 'sd-beat']
-      const actualAnimations = [richMotionMetrics.heroNodeAnimation, richMotionMetrics.haloAnimation, richMotionMetrics.heroWaveAnimation, richMotionMetrics.ebookRaysAnimation, richMotionMetrics.reverseRaysAnimation, richMotionMetrics.auraHueAnimation, richMotionMetrics.auraBreathAnimation, richMotionMetrics.cycleBeatAnimation]
+      if (richMotionMetrics.ebookLightCount !== 4) errors.push(`ebook light layer count mismatch: ${richMotionMetrics.ebookLightCount}`)
+      const expectedAnimations = ['sd-float-a', 'sd-halo-pulse', 'sd-wave', 'sd-spin', 'sd-spin', 'sd-aura-hue', 'sd-aura', 'sd-shaft-breath', 'sd-beat']
+      const actualAnimations = [richMotionMetrics.heroNodeAnimation, richMotionMetrics.haloAnimation, richMotionMetrics.heroWaveAnimation, richMotionMetrics.ebookRaysAnimation, richMotionMetrics.ebookSpectrumAnimation, richMotionMetrics.auraHueAnimation, richMotionMetrics.auraBreathAnimation, richMotionMetrics.shaftAnimation, richMotionMetrics.cycleBeatAnimation]
       if (expectedAnimations.some((animation, index) => actualAnimations[index] !== animation)) errors.push(`motion animation mapping mismatch: ${actualAnimations.join(', ')}`)
       if (viewport.width > 560 && (!richMotionMetrics.pointer.x || !richMotionMetrics.pointer.y)) errors.push('hero constellation does not respond to pointer movement')
       if (!/scale\(1\.14\)/.test(richMotionMetrics.highlight.nodeTransform) || richMotionMetrics.highlight.cardBorder !== 'var(--sd-teal)' || !richMotionMetrics.highlight.cardShadow) errors.push('surface-to-card hover cross-highlight is incomplete')
