@@ -174,11 +174,17 @@ try {
       const jsonLd = Array.from(document.querySelectorAll('script[type="application/ld+json"]')).flatMap((node) => {
         try { return [JSON.parse(node.textContent ?? '')] } catch { return [] }
       })
-      const entities = jsonLd.flatMap((entry) => entry['@graph'] ?? [entry]).map((entry) => entry['@type'])
+      const graph = jsonLd.flatMap((entry) => entry['@graph'] ?? [entry])
+      const entities = graph.flatMap((entry) => Array.isArray(entry['@type']) ? entry['@type'] : [entry['@type']]).filter(Boolean)
+      const schemaOffer = graph.find((entry) => entry['@type'] === 'Offer')
+      const schemaSurfaceList = graph.find((entry) => entry['@type'] === 'ItemList' && /Cinco superficies/i.test(entry.name ?? ''))
+      const schemaBreadcrumb = graph.find((entry) => entry['@type'] === 'BreadcrumbList')
 
       return {
         scrollWidth: document.documentElement.scrollWidth,
         clientWidth: document.documentElement.clientWidth,
+        title: document.title,
+        metaDescription: document.querySelector('meta[name="description"]')?.getAttribute('content') ?? '',
         h1Count: document.querySelectorAll('h1').length,
         missingMarkers,
         formKey: form?.getAttribute('form-key') ?? null,
@@ -187,9 +193,15 @@ try {
         canonical,
         robots,
         jsonLdTypes: entities,
+        schemaOffer: schemaOffer ? { price: schemaOffer.price ?? null, priceCurrency: schemaOffer.priceCurrency ?? null, url: schemaOffer.url ?? null } : null,
+        schemaSurfaceItems: Array.isArray(schemaSurfaceList?.itemListElement) ? schemaSurfaceList.itemListElement.length : 0,
+        schemaBreadcrumbItems: Array.isArray(schemaBreadcrumb?.itemListElement) ? schemaBreadcrumb.itemListElement.length : 0,
         faqCount: document.querySelectorAll('details').length,
         fiveSurfaces: document.querySelectorAll('[data-surface-card]').length,
         cycleStages: document.querySelectorAll('.sd-cycle__grid > li').length,
+        ebookMetaItems: document.querySelectorAll('.sd-book-meta li').length,
+        ebookMetaSvgCount: document.querySelectorAll('.sd-book-meta svg').length,
+        ebookMetaText: document.querySelector('.sd-book-meta')?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
         heroNodeIconCount: Array.from(document.querySelectorAll('.sd-hero-node')).filter((node) => Boolean(node.querySelector('svg, .sd-glyph'))).length,
         heroCore: (() => {
           const wrap = document.querySelector('.sd-map-core-wrap')
@@ -282,10 +294,16 @@ try {
     if (metrics.localInputCount) errors.push(`local inputs outside renderer: ${metrics.localInputCount}`)
     if (!metrics.canonical.endsWith('/seo-surround-discovery')) errors.push(`wrong canonical: ${metrics.canonical}`)
     if (/noindex/i.test(metrics.robots)) errors.push('landing has noindex')
-    if (!metrics.jsonLdTypes.includes('Book') || !metrics.jsonLdTypes.includes('FAQPage') || !metrics.jsonLdTypes.includes('WebPage') || !metrics.jsonLdTypes.includes('DefinedTerm')) errors.push(`incomplete JSON-LD: ${metrics.jsonLdTypes.join(', ')}`)
+    if (!/^Surround Discovery™: ebook SEO y AEO gratis \| Efeonce Think$/.test(metrics.title)) errors.push(`SEO title mismatch: ${metrics.title}`)
+    if (!/61 páginas para ordenar SEO, AEO, video, social y marketplaces/i.test(metrics.metaDescription) || !/descubrimiento orgánico/i.test(metrics.metaDescription)) errors.push(`SEO description mismatch: ${metrics.metaDescription}`)
+    if (!metrics.jsonLdTypes.includes('Book') || !metrics.jsonLdTypes.includes('FAQPage') || !metrics.jsonLdTypes.includes('WebPage') || !metrics.jsonLdTypes.includes('DefinedTerm') || !metrics.jsonLdTypes.includes('BreadcrumbList') || !metrics.jsonLdTypes.includes('ItemList') || !metrics.jsonLdTypes.includes('Offer')) errors.push(`incomplete JSON-LD: ${metrics.jsonLdTypes.join(', ')}`)
+    if (!metrics.schemaOffer || metrics.schemaOffer.price !== '0' || metrics.schemaOffer.priceCurrency !== 'CLP' || !String(metrics.schemaOffer.url).endsWith('/seo-surround-discovery#form')) errors.push(`ebook Offer schema mismatch: ${JSON.stringify(metrics.schemaOffer)}`)
+    if (metrics.schemaSurfaceItems !== 5) errors.push(`expected 5 schema surface items, got ${metrics.schemaSurfaceItems}`)
+    if (metrics.schemaBreadcrumbItems !== 2) errors.push(`expected 2 breadcrumb schema items, got ${metrics.schemaBreadcrumbItems}`)
     if (!/Surround Discovery™ es el sistema de Efeonce/i.test(metrics.answerCapsule) || !/SENSE, SHAPE, SURFACE y SOLVE/i.test(metrics.answerCapsule)) errors.push('answer capsule is missing or not self-contained')
     if (metrics.faqCount !== 6) errors.push(`expected 6 FAQs, got ${metrics.faqCount}`)
     if (metrics.fiveSurfaces !== 5) errors.push(`expected 5 surfaces, got ${metrics.fiveSurfaces}`)
+    if (metrics.ebookMetaItems !== 3 || metrics.ebookMetaSvgCount !== 3 || !/61 páginas\s*PDF\s*Español/i.test(metrics.ebookMetaText)) errors.push(`ebook metadata chips mismatch: ${metrics.ebookMetaItems}/${metrics.ebookMetaSvgCount}/${metrics.ebookMetaText}`)
     if (metrics.heroNodeIconCount !== 5 || metrics.surfaceMapIconCount !== 5 || metrics.surfaceCardIconCount !== 5) errors.push(`approved source icons missing: hero=${metrics.heroNodeIconCount} map=${metrics.surfaceMapIconCount} cards=${metrics.surfaceCardIconCount}`)
     if (!metrics.googleGlyphPathCounts.length || metrics.googleGlyphPathCounts.some((count) => count !== 4)) errors.push(`SEO Google glyph is not the 4-path Google G: ${metrics.googleGlyphPathCounts.join(', ')}`)
     if (!metrics.heroCore.hasWrap || !metrics.heroCore.hasHalo || metrics.heroCore.coreDisplay !== 'flex' || metrics.heroCore.coreDirection !== 'column' || metrics.heroCore.coreGap !== '2px' || metrics.heroCore.labelOffset !== '0px') errors.push(`approved Discovery core mapping mismatch: ${JSON.stringify(metrics.heroCore)}`)
