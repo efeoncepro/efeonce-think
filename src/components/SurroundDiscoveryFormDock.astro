@@ -1,0 +1,117 @@
+---
+import { GREENHOUSE_API_BASE } from 'astro:env/server'
+
+/**
+ * TASK-1387 — adaptación del dock aprobado al renderer real.
+ * Mantiene la tarjeta, portada y estados inline del HTML aprobado; Growth Forms
+ * conserva campos, consentimiento, Turnstile, submit, success card y URL tokenizada.
+ * El host sólo abre el handoff y ofrece un reintento transitorio de descarga.
+ */
+interface Props {
+  formKey?: string
+  surfaceId?: string
+}
+
+const {
+  formKey = 'e8d2bfcc-c4fe-4396-8f3b-08f5ac190409',
+  surfaceId = 'fhsf-surround-discovery-ebook',
+} = Astro.props
+const greenhouseBase = GREENHOUSE_API_BASE.replace(/\/$/, '')
+const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
+---
+
+<div id="surround-discovery-form" class="sd-form-card" data-surround-form-dock data-capture="surround-discovery-form" aria-live="polite" role="region" aria-labelledby="surround-form-card-title">
+  <div class="sd-form-card__line" aria-hidden="true"></div>
+  <header class="sd-form-card__header">
+    <span class="sd-form-card__cover" aria-hidden="true"><img src="/surround-discovery/ebook-cover.jpeg" alt="" width="3840" height="2160" /></span>
+    <div>
+      <p id="surround-form-card-title">Surround Discovery™ · PDF</p>
+      <span>Formulario de descarga</span>
+    </div>
+  </header>
+
+  <div class="sd-form-card__body">
+    <div data-form-state="ready">
+      <script is:inline defer src={rendererSrc}></script>
+      <greenhouse-form form-key={formKey} surface={surfaceId} locale="es-CL" color-scheme="light" appearance="bare" base-url={greenhouseBase}>
+        <div class="sd-form-fallback" role="status" aria-live="polite">
+          <p>Preparando el formulario</p>
+          <span>Estamos cargando los campos y protecciones de Greenhouse.</span>
+          <i></i><i></i><i></i><b></b>
+        </div>
+      </greenhouse-form>
+      <noscript>Activa JavaScript para cargar el formulario y descargar el ebook.</noscript>
+    </div>
+
+    <div class="sd-form-recovery" data-form-state="recovery" hidden role="status" aria-live="polite">
+      <p>La descarga se está abriendo. Si no inicia, vuelve a intentarlo desde aquí mientras esta página siga abierta.</p>
+      <a class="sd-form-download" data-redownload href="#" hidden>↓ Descargar PDF (61 págs)</a>
+      <p class="sd-form-retry" data-redownload-copy hidden>↻ ¿No se descargó? Vuelve a intentarlo desde el botón.</p>
+    </div>
+
+    <div class="sd-form-degraded" data-form-state="degraded" hidden role="status" aria-live="polite">
+      <div class="sd-form-status-mark sd-form-status-mark--degraded" aria-hidden="true">!</div>
+      <h3 id="surround-discovery-degraded-title" tabindex="-1">Tu solicitud fue recibida</h3>
+      <p>La descarga automática no se pudo iniciar en este momento. Puedes recargar el formulario; no expondremos un enlace público al PDF.</p>
+      <button type="button" data-retry-form>↻ Recargar el formulario</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const dock = document.querySelector<HTMLElement>('[data-surround-form-dock]')
+  if (dock) {
+    const ready = dock.querySelector<HTMLElement>('[data-form-state="ready"]')
+    const recovery = dock.querySelector<HTMLElement>('[data-form-state="recovery"]')
+    const degraded = dock.querySelector<HTMLElement>('[data-form-state="degraded"]')
+    const degradedTitle = dock.querySelector<HTMLElement>('#surround-discovery-degraded-title')
+    const redownload = dock.querySelector<HTMLAnchorElement>('[data-redownload]')
+    const redownloadCopy = dock.querySelector<HTMLElement>('[data-redownload-copy]')
+    const retry = dock.querySelector<HTMLButtonElement>('[data-retry-form]')
+
+    const triggerDownload = (url: string) => {
+      const link = document.createElement('a')
+      link.href = url
+      link.rel = 'noopener'
+      link.setAttribute('download', '')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    }
+
+    dock.addEventListener('gh_form_submission_accepted', (event: Event) => {
+      const detail = (event as CustomEvent<Record<string, unknown>>).detail ?? {}
+      const downloadUrl = typeof detail.download_url === 'string' && detail.download_url.length > 0 ? detail.download_url : null
+      dock.dataset.submitted = 'true'
+
+      if (downloadUrl) {
+        if (recovery) recovery.hidden = false
+        triggerDownload(downloadUrl)
+        if (redownload) { redownload.href = downloadUrl; redownload.hidden = false }
+        if (redownloadCopy) redownloadCopy.hidden = false
+        window.requestAnimationFrame(() => dock.querySelector<HTMLElement>('.ghf-success-card')?.focus())
+        return
+      }
+
+      if (ready) ready.hidden = true
+      if (recovery) recovery.hidden = true
+      if (degraded) degraded.hidden = false
+      dock.setAttribute('aria-labelledby', 'surround-discovery-degraded-title')
+      degradedTitle?.focus()
+    })
+    retry?.addEventListener('click', () => window.location.reload())
+  }
+</script>
+
+<style>
+  .sd-form-card { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, var(--sd-line) 78%, var(--sd-white)); border-radius: 1rem; background: var(--sd-white); box-shadow: 0 1px 2px color-mix(in srgb, var(--sd-navy) 9%, transparent), 0 .75rem 1.75rem -.5rem color-mix(in srgb, var(--sd-navy) 20%, transparent), 0 2.5rem 3.75rem -2rem color-mix(in srgb, var(--sd-navy) 22%, transparent); }
+  .sd-form-card__line { position: absolute; inset: 0 0 auto; z-index: 1; height: 3px; background: linear-gradient(90deg, var(--sd-teal) 0%, var(--sd-blue) 55%, var(--sd-navy-2) 100%); }
+  .sd-form-card__header { display: flex; align-items: center; gap: .875rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--sd-line); background: linear-gradient(180deg, color-mix(in srgb, var(--sd-white) 96%, var(--sd-surface)), var(--sd-white)); }
+  .sd-form-card__cover { display: block; flex: 0 0 auto; width: 6.5rem; aspect-ratio: 16 / 9; overflow: hidden; border-radius: .5rem; outline: 1px solid color-mix(in srgb, var(--sd-white) 65%, transparent); outline-offset: -1px; box-shadow: 0 .25rem .75rem -.15rem color-mix(in srgb, var(--sd-navy) 32%, transparent); }
+  .sd-form-card__cover img { display: block; width: 100%; height: 100%; object-fit: cover; }.sd-form-card__header p { margin: 0; color: var(--sd-ink); font-family: var(--sd-display); font-size: 1rem; font-weight: 600; line-height: 1.2; }.sd-form-card__header span { display: block; margin-top: .12rem; color: var(--sd-muted); font-size: .78rem; }.sd-form-card__body { padding: 1.375rem; }
+  .sd-form-fallback { display: flex; flex-direction: column; gap: .875rem; }.sd-form-fallback p { margin: 0; color: var(--sd-ink); font-family: var(--sd-display); font-size: 1.125rem; font-weight: 600; }.sd-form-fallback > span { margin-top: -.35rem; color: var(--sd-muted); font-size: .88rem; line-height: 1.5; }.sd-form-fallback i, .sd-form-fallback b { display: block; height: 2.75rem; border-radius: .5rem; background: linear-gradient(90deg, var(--sd-surface) 25%, var(--sd-line) 37%, var(--sd-surface) 63%); background-size: 25rem 100%; animation: sd-skeleton 1.4s ease infinite; }.sd-form-fallback i:first-of-type { width: 38%; height: .85rem; margin-top: .35rem; }.sd-form-fallback i:nth-of-type(2) { width: 100%; }.sd-form-fallback i:nth-of-type(3) { width: 32%; height: .85rem; }.sd-form-fallback b { margin-top: .25rem; background: linear-gradient(90deg, color-mix(in srgb, var(--sd-blue) 15%, var(--sd-white)) 25%, color-mix(in srgb, var(--sd-blue) 25%, var(--sd-white)) 37%, color-mix(in srgb, var(--sd-blue) 15%, var(--sd-white)) 63%); background-size: 25rem 100%; }
+  .sd-form-recovery, .sd-form-degraded { padding: 1rem 0 .25rem; text-align: center; }.sd-form-status-mark { display: inline-grid; width: 4rem; height: 4rem; place-items: center; border-radius: 50%; color: var(--sd-white); background: var(--sd-teal-deep); font-size: 2rem; font-weight: 800; animation: sd-pop .45s cubic-bezier(.2,.8,.2,1.05) both; }.sd-form-status-mark--degraded { color: var(--sd-teal-deep); background: var(--sd-teal-soft); }.sd-form-degraded h3 { margin: 1rem 0 0; color: var(--sd-ink); font-family: var(--sd-display); font-size: 1.45rem; line-height: 1.18; }.sd-form-recovery > p, .sd-form-degraded > p { max-width: 31rem; margin: .55rem auto 0; color: var(--sd-muted); font-size: .88rem; line-height: 1.55; }.sd-form-download, .sd-form-degraded button { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 3.25rem; margin-top: 1rem; padding: .78rem 1.5rem; border: 0; border-radius: .5rem; color: var(--sd-white); background: var(--sd-teal-deep); box-shadow: 0 .25rem .875rem color-mix(in srgb, var(--sd-teal-deep) 24%, transparent); font-size: 1rem; font-weight: 700; text-decoration: none; cursor: pointer; }.sd-form-retry { display: flex; justify-content: center; gap: .4rem; color: var(--sd-muted); font-size: .8rem; }
+  @keyframes sd-skeleton { to { background-position: -25rem 0; } } @keyframes sd-pop { 0% { opacity: 0; transform: scale(.8); } 60% { transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } }
+  @media (max-width: 560px) { .sd-form-card__cover { width: 5.25rem; }.sd-form-card__body { padding: 1.1rem; } }
+  @media (prefers-reduced-motion: reduce) { .sd-form-fallback i, .sd-form-fallback b, .sd-form-status-mark { animation: none; } }
+</style>
