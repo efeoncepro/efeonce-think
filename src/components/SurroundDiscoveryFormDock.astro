@@ -75,7 +75,12 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
         .find((link) => /politica-de-privacidad/i.test(link.href))
 
       if (privacyLink && /^https?:\/\//i.test(privacyLink.textContent?.trim() ?? '')) {
-        privacyLink.textContent = 'aviso de privacidad'
+        privacyLink.textContent = 'Leer aviso de privacidad'
+        privacyLink.setAttribute('aria-label', 'Abrir aviso de privacidad de Efeonce')
+      }
+
+      if (privacyLink && privacyLink.textContent?.trim().toLowerCase() === 'aviso de privacidad') {
+        privacyLink.textContent = 'Leer aviso de privacidad'
         privacyLink.setAttribute('aria-label', 'Abrir aviso de privacidad de Efeonce')
       }
     }
@@ -189,8 +194,26 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   :global([data-surround-form-dock] greenhouse-form .ghf-check span::before) { width: 18px !important; height: 18px !important; border-color: #9fb4c8 !important; border-radius: 5px !important; }
   :global([data-surround-form-dock] greenhouse-form .ghf-check input:checked + span::before) { border-color: var(--primary) !important; background: var(--primary) !important; box-shadow: 0 6px 14px rgba(13,148,136,.24) !important; }
   :global([data-surround-form-dock] greenhouse-form .ghf-check span::after) { inset-block-start: 2px !important; inset-inline-start: 7px !important; }
-  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([data-ghf-consent]) > .ghf-help:last-child) { margin-top: -2px; text-align: center; }
-  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([data-ghf-consent]) > .ghf-help:last-child a) { display: inline-flex; min-height: 44px; align-items: center; color: var(--primary) !important; font-weight: 600 !important; text-decoration: underline; text-underline-offset: 3px; }
+  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([data-ghf-consent]) > .ghf-help:last-child) {
+    display: flex !important;
+    justify-content: flex-start !important;
+    margin: -4px 0 0 !important;
+    padding-left: 31px !important;
+    text-align: left !important;
+  }
+  :global([data-surround-form-dock] greenhouse-form .ghf-field:has([data-ghf-consent]) > .ghf-help:last-child a) {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: flex-start;
+    color: var(--primary) !important;
+    font-size: .8125rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -.005em;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+  }
   :global([data-surround-form-dock] greenhouse-form .ghf-actions-wrap) { display: grid !important; gap: 10px !important; }
   :global([data-surround-form-dock] greenhouse-form .ghf-actions) { display: grid !important; width: 100% !important; gap: 10px !important; }
   :global([data-surround-form-dock] greenhouse-form .ghf-btn) {

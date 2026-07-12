@@ -170,7 +170,7 @@ const jsonLd = {
 
               <aside class="sd-form-note">
                 <Check size={17} aria-hidden="true"/>
-                <p>Consentimiento, protección anti-spam y entrega tokenizada quedan gobernados por <strong>Greenhouse Growth Forms</strong>.</p>
+                <p>Tus datos se usan para enviarte el ebook y respetar lo que aceptes recibir. Puedes darte de baja cuando quieras.</p>
               </aside>
             </div>
 
@@ -514,26 +514,31 @@ const jsonLd = {
     color: var(--sd-teal-deep);
   }
   .sd-form-rail .sd-form-note {
-    display: flex;
-    gap: .68rem;
-    align-items: flex-start;
-    margin-top: .95rem;
-    padding: .85rem .95rem;
-    border: 1px solid color-mix(in srgb,var(--sd-blue) 13%,var(--sd-white));
-    border-radius: .78rem;
-    background: color-mix(in srgb,var(--sd-white) 78%,var(--sd-surface));
-    box-shadow: 0 1px 2px color-mix(in srgb,var(--sd-navy) 6%,transparent);
+    display: grid;
+    grid-template-columns: 1.35rem minmax(0,1fr);
+    gap: .64rem;
+    align-items: start;
+    margin-top: .72rem;
+    padding: .72rem 0 0;
+    border: 0;
+    border-top: 1px solid color-mix(in srgb,var(--sd-teal-deep) 13%,var(--sd-line));
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    text-align: left;
   }
   .sd-form-rail .sd-form-note svg {
-    flex: 0 0 auto;
-    margin-top: .05rem;
+    width: 1rem;
+    height: 1rem;
+    margin-top: .12rem;
     color: var(--sd-teal-deep);
   }
   .sd-form-rail .sd-form-note p {
     margin: 0;
-    color: var(--sd-muted);
-    font-size: .79rem;
-    line-height: 1.5;
+    color: color-mix(in srgb,var(--sd-muted) 88%,var(--sd-ink));
+    font-size: .76rem;
+    line-height: 1.42;
+    text-align: left;
   }
   .sd-form-rail .sd-form-note strong {
     color: var(--sd-ink);
