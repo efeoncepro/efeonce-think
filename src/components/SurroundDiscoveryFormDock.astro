@@ -44,9 +44,9 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     </div>
 
     <div class="sd-form-recovery" data-form-state="recovery" hidden role="status" aria-live="polite">
-      <p>La descarga se está abriendo. Si no inicia, vuelve a intentarlo desde aquí mientras esta página siga abierta.</p>
-      <a class="sd-form-download" data-redownload href="#" hidden>↓ Descargar PDF (61 págs)</a>
-      <p class="sd-form-retry" data-redownload-copy hidden>↻ ¿No se descargó? Vuelve a intentarlo desde el botón.</p>
+      <p><strong>Descarga automática iniciada.</strong><span>Si el navegador la bloqueó, usa el respaldo mientras esta página siga abierta.</span></p>
+      <a class="sd-form-download" data-redownload href="#" hidden>↓ Descargar de nuevo</a>
+      <p class="sd-form-retry" data-redownload-copy hidden>El enlace de respaldo queda activo en esta sesión.</p>
     </div>
 
     <div class="sd-form-degraded" data-form-state="degraded" hidden role="status" aria-live="polite">
@@ -219,6 +219,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   :global([data-surround-form-dock] greenhouse-form .ghf-readiness) { justify-content: center; width: 100%; margin: 0; color: var(--text-secondary) !important; font-size: 12px !important; }
   :global([data-surround-form-dock] greenhouse-form .ghf-summary:empty) { display: none; }
   :global([data-surround-form-dock] greenhouse-form .ghf-success-card) { max-width: none !important; padding: 6px 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+  :global([data-surround-form-dock] greenhouse-form .ghf-success-card:focus-visible) { outline: none !important; }
   :global([data-surround-form-dock] greenhouse-form .ghf-success-card::before) { display: none !important; }
   :global([data-surround-form-dock] greenhouse-form .ghf-success-card__mark) { width: 64px !important; height: 64px !important; color: var(--primary) !important; background: var(--primary-tonal) !important; animation: sd-pop .45s cubic-bezier(.2,.8,.2,1.05) both; }
   :global([data-surround-form-dock] greenhouse-form .ghf-success-card__title) { color: var(--text-primary) !important; font-family: var(--sd-display) !important; font-size: 23px !important; font-weight: 700 !important; line-height: 1.18 !important; }
@@ -226,9 +227,111 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   :global([data-surround-form-dock] greenhouse-form .ghf-success-card__support),
   :global([data-surround-form-dock] greenhouse-form .ghf-success-card__reward-body) { color: var(--text-secondary) !important; font-family: var(--ghf-font) !important; font-size: 15px !important; line-height: 1.55 !important; }
   :global([data-surround-form-dock] greenhouse-form .ghf-success-card__reward) { border-color: var(--border-subtle) !important; background: var(--neutral) !important; }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card) {
+    display: grid !important;
+    grid-template-columns: 3.35rem minmax(0,1fr) !important;
+    align-items: start !important;
+    justify-items: stretch !important;
+    gap: .78rem .95rem !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 1.05rem !important;
+    border: 1px solid #dce6f0 !important;
+    border-radius: .875rem !important;
+    background:
+      radial-gradient(140% 120% at 0% 0%, color-mix(in srgb, var(--primary-tonal) 78%, transparent), transparent 56%),
+      linear-gradient(180deg, #fff, #fbfcfe) !important;
+    box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 .75rem 1.75rem -.75rem rgba(20,44,80,.2) !important;
+    text-align: left !important;
+    animation: sd-success-card-in .44s cubic-bezier(.2,.8,.2,1) both !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__mark) {
+    grid-column: 1 !important;
+    width: 3.35rem !important;
+    height: 3.35rem !important;
+    margin: 0 !important;
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent) !important;
+    border-radius: .875rem !important;
+    background: color-mix(in srgb, var(--primary-tonal) 84%, #fff) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 .75rem 1.35rem -.9rem rgba(13,148,136,.45) !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__mark-glyph) {
+    width: 2.35rem !important;
+    height: 2.35rem !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__content) {
+    grid-column: 2 !important;
+    display: grid !important;
+    justify-items: stretch !important;
+    gap: .55rem !important;
+    min-width: 0 !important;
+    text-align: left !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__title) {
+    max-width: none !important;
+    font-size: 1.22rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -.025em !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__body),
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__support),
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__reward-body) {
+    max-width: none !important;
+    font-size: .86rem !important;
+    line-height: 1.45 !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__steps) {
+    display: grid !important;
+    gap: .36rem !important;
+    max-width: none !important;
+    margin: .1rem 0 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__step) {
+    position: relative !important;
+    max-width: none !important;
+    padding-left: 1.35rem !important;
+    color: var(--text-secondary) !important;
+    font-size: .82rem !important;
+    line-height: 1.35 !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__step::before) {
+    position: absolute;
+    top: .02rem;
+    left: 0;
+    color: var(--primary);
+    content: '✓';
+    font-weight: 800;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__reward) {
+    gap: .38rem !important;
+    margin-top: .15rem !important;
+    padding: .78rem .86rem !important;
+    border-color: color-mix(in srgb, var(--primary) 22%, var(--border-subtle)) !important;
+    border-left: 3px solid var(--primary) !important;
+    border-radius: .7rem !important;
+    background: color-mix(in srgb, var(--neutral) 76%, #fff) !important;
+    text-align: left !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__reward-title) {
+    color: var(--text-primary) !important;
+    font-family: var(--sd-display) !important;
+    font-size: .94rem !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__actions),
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__reward-action) {
+    margin-top: .2rem !important;
+  }
+  :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__support) {
+    padding-top: .1rem !important;
+    font-size: .78rem !important;
+  }
   .sd-form-fallback { display: flex; flex-direction: column; gap: .875rem; }.sd-form-fallback p { margin: 0; color: var(--sd-ink); font-family: var(--sd-display); font-size: 1.125rem; font-weight: 600; }.sd-form-fallback > span { margin-top: -.35rem; color: var(--sd-muted); font-size: .88rem; line-height: 1.5; }.sd-form-fallback i, .sd-form-fallback b { display: block; height: 2.75rem; border-radius: .5rem; background: linear-gradient(90deg, var(--sd-surface) 25%, var(--sd-line) 37%, var(--sd-surface) 63%); background-size: 25rem 100%; animation: sd-skeleton 1.4s ease infinite; }.sd-form-fallback i:first-of-type { width: 38%; height: .85rem; margin-top: .35rem; }.sd-form-fallback i:nth-of-type(2) { width: 100%; }.sd-form-fallback i:nth-of-type(3) { width: 32%; height: .85rem; }.sd-form-fallback b { margin-top: .25rem; background: linear-gradient(90deg, color-mix(in srgb, var(--sd-blue) 15%, var(--sd-white)) 25%, color-mix(in srgb, var(--sd-blue) 25%, var(--sd-white)) 37%, color-mix(in srgb, var(--sd-blue) 15%, var(--sd-white)) 63%); background-size: 25rem 100%; }
-  .sd-form-recovery, .sd-form-degraded { padding: 1rem 0 .25rem; text-align: center; }.sd-form-status-mark { display: inline-grid; width: 4rem; height: 4rem; place-items: center; border-radius: 50%; color: var(--sd-white); background: var(--sd-teal-deep); font-size: 2rem; font-weight: 800; animation: sd-pop .45s cubic-bezier(.2,.8,.2,1.05) both; }.sd-form-status-mark--degraded { color: var(--sd-teal-deep); background: var(--sd-teal-soft); }.sd-form-degraded h3 { margin: 1rem 0 0; color: var(--sd-ink); font-family: var(--sd-display); font-size: 1.45rem; line-height: 1.18; }.sd-form-recovery > p, .sd-form-degraded > p { max-width: 31rem; margin: .55rem auto 0; color: var(--sd-muted); font-size: .88rem; line-height: 1.55; }.sd-form-download, .sd-form-degraded button { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 3.25rem; margin-top: 1rem; padding: .78rem 1.5rem; border: 0; border-radius: .5rem; color: var(--sd-white); background: var(--sd-teal-deep); box-shadow: 0 .25rem .875rem color-mix(in srgb, var(--sd-teal-deep) 24%, transparent); font-size: 1rem; font-weight: 700; text-decoration: none; cursor: pointer; }.sd-form-retry { display: flex; justify-content: center; gap: .4rem; color: var(--sd-muted); font-size: .8rem; }
-  @keyframes sd-skeleton { to { background-position: -25rem 0; } } @keyframes sd-pop { 0% { opacity: 0; transform: scale(.8); } 60% { transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } } @keyframes sd-form-cta-shine { to { transform: translateX(255%) skewX(-16deg); } }
-  @media (max-width: 560px) { .sd-form-card__cover { width: 5.25rem; }.sd-form-card__body { padding: 1.1rem; } :global([data-surround-form-dock] greenhouse-form .ghf-fields) { grid-template-columns: 1fr !important; } }
-  @media (prefers-reduced-motion: reduce) { .sd-form-fallback i, .sd-form-fallback b, .sd-form-status-mark, :global([data-surround-form-dock] greenhouse-form .ghf-success-card__mark), :global([data-surround-form-dock] greenhouse-form .ghf-btn::before) { animation: none !important; transition: none !important; } :global([data-surround-form-dock] greenhouse-form .ghf-btn:hover:not(:disabled)) { transform: none !important; } }
+  .sd-form-recovery, .sd-form-degraded { padding: 1rem 0 .25rem; text-align: center; }.sd-form-recovery[hidden], .sd-form-degraded[hidden] { display: none !important; }.sd-form-recovery { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: .72rem .85rem; margin-top: .85rem; padding: .8rem .9rem; border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border-subtle)); border-radius: .75rem; background: color-mix(in srgb, var(--primary-tonal) 28%, #fff); text-align: left; }.sd-form-recovery > p:first-child { display: grid; gap: .12rem; max-width: none; margin: 0; color: var(--sd-ink); font-size: .83rem; line-height: 1.42; }.sd-form-recovery > p:first-child strong { font-family: var(--sd-display); font-weight: 800; }.sd-form-recovery > p:first-child span { color: var(--sd-muted); }.sd-form-status-mark { display: inline-grid; width: 4rem; height: 4rem; place-items: center; border-radius: 50%; color: var(--sd-white); background: var(--sd-teal-deep); font-size: 2rem; font-weight: 800; animation: sd-pop .45s cubic-bezier(.2,.8,.2,1.05) both; }.sd-form-status-mark--degraded { color: var(--sd-teal-deep); background: var(--sd-teal-soft); }.sd-form-degraded h3 { margin: 1rem 0 0; color: var(--sd-ink); font-family: var(--sd-display); font-size: 1.45rem; line-height: 1.18; }.sd-form-degraded > p { max-width: 31rem; margin: .55rem auto 0; color: var(--sd-muted); font-size: .88rem; line-height: 1.55; }.sd-form-download, .sd-form-degraded button { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 3.25rem; margin-top: 1rem; padding: .78rem 1.5rem; border: 0; border-radius: .5rem; color: var(--sd-white); background: var(--sd-teal-deep); box-shadow: 0 .25rem .875rem color-mix(in srgb, var(--sd-teal-deep) 24%, transparent); font-size: 1rem; font-weight: 700; text-decoration: none; cursor: pointer; }.sd-form-recovery .sd-form-download { min-height: 2.55rem; margin: 0; padding: .56rem .85rem; border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent); color: var(--sd-teal-deep); background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.04); font-size: .82rem; white-space: nowrap; }.sd-form-retry { grid-column: 1 / -1; display: flex; justify-content: flex-start; gap: .4rem; margin: -.25rem 0 0; color: var(--sd-muted); font-size: .74rem; }
+  @keyframes sd-skeleton { to { background-position: -25rem 0; } } @keyframes sd-pop { 0% { opacity: 0; transform: scale(.8); } 60% { transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } } @keyframes sd-success-card-in { 0% { opacity: 0; transform: translateY(.65rem) scale(.985); } 100% { opacity: 1; transform: none; } } @keyframes sd-form-cta-shine { to { transform: translateX(255%) skewX(-16deg); } }
+  @media (max-width: 560px) { .sd-form-card__cover { width: 5.25rem; }.sd-form-card__body { padding: 1.1rem; } :global([data-surround-form-dock] greenhouse-form .ghf-fields) { grid-template-columns: 1fr !important; } :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card) { grid-template-columns: 1fr !important; gap: .85rem !important; padding: .95rem !important; } :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__mark), :global([data-surround-form-dock][data-submitted='true'] greenhouse-form .ghf-success-card__content) { grid-column: 1 !important; } .sd-form-recovery { grid-template-columns: 1fr; } .sd-form-recovery .sd-form-download { width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .sd-form-fallback i, .sd-form-fallback b, .sd-form-status-mark, :global([data-surround-form-dock] greenhouse-form .ghf-success-card), :global([data-surround-form-dock] greenhouse-form .ghf-success-card__mark), :global([data-surround-form-dock] greenhouse-form .ghf-btn::before) { animation: none !important; transition: none !important; } :global([data-surround-form-dock] greenhouse-form .ghf-btn:hover:not(:disabled)) { transform: none !important; } }
 </style>

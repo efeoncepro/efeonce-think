@@ -130,7 +130,38 @@ const jsonLd = {
         </div>
       </section>
 
-      <section id="form" class="sd-form-section section" data-capture="surround-discovery-form-section" aria-labelledby="form-title"><div class="sd-form-section__aura sd-form-section__aura--right" data-parallax data-parallax-y="-0.06" aria-hidden="true"></div><div class="sd-form-section__aura sd-form-section__aura--left" data-parallax data-parallax-y="0.05" aria-hidden="true"></div><div class="sd-container sd-form-section__grid"><div class="sd-form-rail reveal" data-reveal><p class="sd-eyebrow"><span></span>PDF · 61 páginas · Acceso inmediato</p><h2 id="form-title">Descarga tu copia ahora</h2><p>Ya viste qué hay dentro. Dinos a dónde enviarlo y obtén acceso inmediato al PDF completo.</p><div><strong>Qué pasa al enviar</strong><ol><li><b>1</b><span><em>Completas y aceptas</em>Cuatro campos. Menos de un minuto.</span></li><li><b>2</b><span><em>Descarga inmediata</em>El PDF se abre al instante, sin esperar a un correo.</span></li><li><b>3</b><span><em>Tú controlas el resto</em>Solo recibes lo que marcaste. Sin spam.</span></li></ol></div><aside><Check size={17} aria-hidden="true"/><p>Los campos, el consentimiento y la entrega los gobierna <strong>Greenhouse Growth Forms</strong>.</p></aside></div><div class="reveal" data-reveal data-reveal-delay="120"><SurroundDiscoveryFormDock /></div></div></section>
+      <section id="form" class="sd-form-section section" data-capture="surround-discovery-form-section" aria-labelledby="form-title">
+        <div class="sd-form-section__aura sd-form-section__aura--right" data-parallax data-parallax-y="-0.06" aria-hidden="true"></div>
+        <div class="sd-form-section__aura sd-form-section__aura--left" data-parallax data-parallax-y="0.05" aria-hidden="true"></div>
+        <div class="sd-container sd-form-section__grid">
+          <div class="sd-form-rail reveal" data-reveal>
+            <p class="sd-eyebrow"><span></span>PDF · 61 páginas · Acceso inmediato</p>
+            <h2 id="form-title">Descarga tu copia ahora</h2>
+            <p>Te pedimos lo mínimo para entregar el PDF y dejarte un siguiente paso claro si quieres medir tu visibilidad después.</p>
+
+            <div class="sd-form-rail__panel" aria-label="Cómo funciona la descarga">
+              <strong>Qué pasa al enviar</strong>
+              <ol class="sd-form-steps">
+                <li><b>1</b><span><em>Validas el destino</em>Nombre, correo corporativo y contexto mínimo.</span></li>
+                <li><b>2</b><span><em>Recibes el PDF</em>La descarga se abre al instante y queda un respaldo por correo.</span></li>
+                <li><b>3</b><span><em>Sigues sólo si quieres</em>Desde la success card puedes medir tu visibilidad en IA.</span></li>
+              </ol>
+            </div>
+
+            <div class="sd-form-proof" aria-label="Señales de entrega">
+              <span><Download size={15} aria-hidden="true" />PDF inmediato</span>
+              <span><FileText size={15} aria-hidden="true" />Respaldo por email</span>
+              <span><Zap size={15} aria-hidden="true" />Sin spam</span>
+            </div>
+
+            <aside class="sd-form-note">
+              <Check size={17} aria-hidden="true"/>
+              <p>Consentimiento, protección anti-spam y entrega tokenizada quedan gobernados por <strong>Greenhouse Growth Forms</strong>.</p>
+            </aside>
+          </div>
+          <div class="sd-form-dock-wrap reveal" data-reveal data-reveal-delay="120"><SurroundDiscoveryFormDock /></div>
+        </div>
+      </section>
 
       <section id="faq" class="sd-faq section" data-capture="surround-discovery-faq" aria-labelledby="faq-title"><div class="sd-faq__wrap"><div class="reveal" data-reveal><p>Preguntas frecuentes</p><h2 id="faq-title">Antes de elegir una táctica, aclaremos el sistema.</h2></div><div class="sd-faq__items">{faq.map((item) => (<details class="reveal" data-reveal><summary>{item.q}<span aria-hidden="true">+</span></summary><p>{item.a}</p></details>))}</div></div></section>
 
@@ -298,4 +329,163 @@ const jsonLd = {
   :global(.sd [data-cta2]:hover svg) { transform:translateY(4px); }
   :global(.sd [data-cta3] svg) { transition:transform .26s cubic-bezier(.2,.8,.2,1); }
   :global(.sd [data-cta3]:hover svg) { transform:translateX(5px); }
+  /* TASK-1387 live polish: la sección de captura se comporta como un handoff
+     claro — contexto a la izquierda, entrega y siguiente acción a la derecha. */
+  .sd-form-section__grid {
+    grid-template-columns: minmax(0,.92fr) minmax(22rem,1fr);
+    align-items: center;
+    gap: clamp(2.5rem,6vw,5.25rem);
+  }
+  .sd-form-rail {
+    max-width: 39rem;
+  }
+  .sd-form-rail h2 {
+    font-weight: 800;
+    letter-spacing: -.045em;
+  }
+  .sd-form-rail > p {
+    max-width: 35rem;
+  }
+  .sd-form-rail__panel {
+    position: relative;
+    overflow: hidden;
+    margin-top: 1.65rem;
+    padding: 1.12rem 1.18rem;
+    border: 1px solid color-mix(in srgb,var(--sd-blue) 13%,var(--sd-white));
+    border-radius: .9rem;
+    background:
+      radial-gradient(110% 130% at 0% 0%, color-mix(in srgb,var(--sd-teal-soft) 42%, transparent), transparent 52%),
+      var(--sd-white);
+    box-shadow: 0 1px 2px color-mix(in srgb,var(--sd-navy) 6%,transparent), 0 1rem 2rem -1.35rem color-mix(in srgb,var(--sd-navy) 18%,transparent);
+  }
+  .sd-form-rail__panel::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    content: '';
+    background: linear-gradient(180deg,var(--sd-teal-light),var(--sd-teal-deep));
+  }
+  .sd-form-rail__panel > strong {
+    display: block;
+    margin-bottom: .35rem;
+    color: color-mix(in srgb,var(--sd-muted) 72%,transparent);
+    font-size: .68rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+  }
+  .sd-form-steps {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .sd-form-steps li {
+    display: grid;
+    grid-template-columns: 2.05rem minmax(0,1fr);
+    gap: .82rem;
+    align-items: start;
+    padding: .82rem 0;
+    border-top: 1px solid var(--sd-line);
+  }
+  .sd-form-steps li:last-child {
+    padding-bottom: .25rem;
+  }
+  .sd-form-steps li > b {
+    display: grid;
+    width: 2.05rem;
+    height: 2.05rem;
+    place-items: center;
+    border: 1px solid color-mix(in srgb,var(--sd-teal-deep) 14%,transparent);
+    border-radius: 999rem;
+    color: var(--sd-teal-deep);
+    background: color-mix(in srgb,var(--sd-teal-soft) 92%,var(--sd-white));
+    font-family: var(--sd-display);
+    font-size: .82rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  .sd-form-steps li span {
+    color: var(--sd-muted);
+    font-size: .86rem;
+    line-height: 1.45;
+  }
+  .sd-form-steps li em {
+    display: block;
+    margin-bottom: .08rem;
+    color: var(--sd-ink);
+    font-size: .96rem;
+    font-style: normal;
+    font-weight: 800;
+    letter-spacing: -.01em;
+  }
+  .sd-form-proof {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: .58rem;
+    margin-top: .85rem;
+  }
+  .sd-form-proof span {
+    display: flex;
+    min-width: 0;
+    min-height: 2.55rem;
+    align-items: center;
+    justify-content: center;
+    gap: .42rem;
+    padding: .58rem .62rem;
+    border: 1px solid color-mix(in srgb,var(--sd-teal-deep) 12%,var(--sd-line));
+    border-radius: .7rem;
+    color: var(--sd-ink);
+    background: color-mix(in srgb,var(--sd-white) 88%,var(--sd-teal-soft));
+    font-size: .76rem;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+  }
+  .sd-form-proof svg {
+    flex: 0 0 auto;
+    color: var(--sd-teal-deep);
+  }
+  .sd-form-rail .sd-form-note {
+    display: flex;
+    gap: .68rem;
+    align-items: flex-start;
+    margin-top: .95rem;
+    padding: .85rem .95rem;
+    border: 1px solid color-mix(in srgb,var(--sd-blue) 13%,var(--sd-white));
+    border-radius: .78rem;
+    background: color-mix(in srgb,var(--sd-white) 78%,var(--sd-surface));
+    box-shadow: 0 1px 2px color-mix(in srgb,var(--sd-navy) 6%,transparent);
+  }
+  .sd-form-rail .sd-form-note svg {
+    flex: 0 0 auto;
+    margin-top: .05rem;
+    color: var(--sd-teal-deep);
+  }
+  .sd-form-rail .sd-form-note p {
+    margin: 0;
+    color: var(--sd-muted);
+    font-size: .79rem;
+    line-height: 1.5;
+  }
+  .sd-form-rail .sd-form-note strong {
+    color: var(--sd-ink);
+  }
+  .sd-form-dock-wrap {
+    min-width: 0;
+  }
+  @media (max-width:900px) {
+    .sd-form-section__grid {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+    .sd-form-rail {
+      max-width: 42rem;
+    }
+  }
+  @media (max-width:560px) {
+    .sd-form-proof {
+      grid-template-columns: 1fr;
+    }
+    .sd-form-rail__panel {
+      padding: 1rem;
+    }
+  }
 </style>
