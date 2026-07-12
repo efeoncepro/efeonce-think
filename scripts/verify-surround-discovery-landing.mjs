@@ -82,7 +82,7 @@ try {
     } else {
       const motionInitial = await page.evaluate(() => ({
         heroNodeAnimation: getComputedStyle(document.querySelector('.sd-hero-node--1')).animationName,
-        haloAnimation: getComputedStyle(document.querySelector('.sd-map-core'), '::before').animationName,
+        haloAnimation: getComputedStyle(document.querySelector('.sd-map-halo')).animationName,
         heroWaveAnimation: getComputedStyle(document.querySelector('.sd-map-wave--late'), '::before').animationName,
         ebookRaysAnimation: getComputedStyle(document.querySelector('.sd-book-art__rays')).animationName,
         reverseRaysAnimation: getComputedStyle(document.querySelector('.sd-book-art__rays'), '::after').animationName,
@@ -173,6 +173,19 @@ try {
         fiveSurfaces: document.querySelectorAll('[data-surface-card]').length,
         cycleStages: document.querySelectorAll('.sd-cycle__grid > li').length,
         heroNodeIconCount: Array.from(document.querySelectorAll('.sd-hero-node')).filter((node) => Boolean(node.querySelector('svg, i.ti'))).length,
+        heroCore: (() => {
+          const wrap = document.querySelector('.sd-map-core-wrap')
+          const core = document.querySelector('.sd-map-core')
+          const halo = document.querySelector('.sd-map-halo')
+          return {
+            hasWrap: Boolean(wrap),
+            hasHalo: Boolean(halo),
+            coreDisplay: core ? getComputedStyle(core).display : null,
+            coreDirection: core ? getComputedStyle(core).flexDirection : null,
+            coreGap: core ? getComputedStyle(core).gap : null,
+            labelOffset: core?.querySelector('span') ? getComputedStyle(core.querySelector('span')).marginTop : null,
+          }
+        })(),
         surfaceMapIconCount: Array.from(document.querySelectorAll('.sd-surface-map__node')).filter((node) => Boolean(node.querySelector('svg, i.ti'))).length,
         surfaceCardIconCount: Array.from(document.querySelectorAll('.sd-surface-cards article')).filter((node) => Boolean(node.querySelector('svg, i.ti'))).length,
         unresolvedComponentCount: document.querySelectorAll('component').length,
@@ -244,6 +257,7 @@ try {
     if (metrics.faqCount !== 6) errors.push(`expected 6 FAQs, got ${metrics.faqCount}`)
     if (metrics.fiveSurfaces !== 5) errors.push(`expected 5 surfaces, got ${metrics.fiveSurfaces}`)
     if (metrics.heroNodeIconCount !== 5 || metrics.surfaceMapIconCount !== 5 || metrics.surfaceCardIconCount !== 5) errors.push(`approved source icons missing: hero=${metrics.heroNodeIconCount} map=${metrics.surfaceMapIconCount} cards=${metrics.surfaceCardIconCount}`)
+    if (!metrics.heroCore.hasWrap || !metrics.heroCore.hasHalo || metrics.heroCore.coreDisplay !== 'flex' || metrics.heroCore.coreDirection !== 'column' || metrics.heroCore.coreGap !== '2px' || metrics.heroCore.labelOffset !== '0px') errors.push(`approved Discovery core mapping mismatch: ${JSON.stringify(metrics.heroCore)}`)
     if (metrics.unresolvedComponentCount) errors.push(`Astro rendered ${metrics.unresolvedComponentCount} unresolved component tag(s)`)
     if (!metrics.tablerIconStylesheet) errors.push('approved Tabler icon source is not loaded')
     if (metrics.cycleStages !== 4) errors.push(`expected 4 S4 stages, got ${metrics.cycleStages}`)
