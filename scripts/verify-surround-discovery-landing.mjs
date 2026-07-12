@@ -206,6 +206,7 @@ try {
         })(),
         surfaceMapIconCount: Array.from(document.querySelectorAll('.sd-surface-map__node')).filter((node) => Boolean(node.querySelector('svg, .sd-glyph'))).length,
         surfaceCardIconCount: Array.from(document.querySelectorAll('.sd-surface-cards article')).filter((node) => Boolean(node.querySelector('svg, .sd-glyph'))).length,
+        googleGlyphPathCounts: Array.from(document.querySelectorAll('.sd-glyph--google')).map((node) => node.querySelectorAll('path').length),
         unresolvedComponentCount: document.querySelectorAll('component').length,
         externalFontOrIconStylesheet: Boolean(document.querySelector('link[href*="fonts.googleapis"], link[href*="fonts.gstatic"], link[href*="@tabler/icons-webfont"], link[href*="cdn.jsdelivr.net/npm/@tabler"]')),
         supportRuntimeLoaded: Array.from(document.scripts).some((script) => script.src.includes('support.js')),
@@ -285,6 +286,7 @@ try {
     if (metrics.faqCount !== 6) errors.push(`expected 6 FAQs, got ${metrics.faqCount}`)
     if (metrics.fiveSurfaces !== 5) errors.push(`expected 5 surfaces, got ${metrics.fiveSurfaces}`)
     if (metrics.heroNodeIconCount !== 5 || metrics.surfaceMapIconCount !== 5 || metrics.surfaceCardIconCount !== 5) errors.push(`approved source icons missing: hero=${metrics.heroNodeIconCount} map=${metrics.surfaceMapIconCount} cards=${metrics.surfaceCardIconCount}`)
+    if (!metrics.googleGlyphPathCounts.length || metrics.googleGlyphPathCounts.some((count) => count !== 4)) errors.push(`SEO Google glyph is not the 4-path Google G: ${metrics.googleGlyphPathCounts.join(', ')}`)
     if (!metrics.heroCore.hasWrap || !metrics.heroCore.hasHalo || metrics.heroCore.coreDisplay !== 'flex' || metrics.heroCore.coreDirection !== 'column' || metrics.heroCore.coreGap !== '2px' || metrics.heroCore.labelOffset !== '0px') errors.push(`approved Discovery core mapping mismatch: ${JSON.stringify(metrics.heroCore)}`)
     if (metrics.unresolvedComponentCount) errors.push(`Astro rendered ${metrics.unresolvedComponentCount} unresolved component tag(s)`)
     if (metrics.externalFontOrIconStylesheet) errors.push('landing still loads external Google/Tabler font or icon stylesheet')
