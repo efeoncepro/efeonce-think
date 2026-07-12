@@ -90,7 +90,45 @@ const jsonLd = {
 
       <section id="relationship" class="section sd-relationship" data-capture="surround-discovery-relationships" aria-labelledby="relationship-title"><div class="sd-container"><div class="sd-copy reveal" data-reveal><p class="sd-eyebrow"><span></span>Cómo encaja lo que ya tienes</p><h2 id="relationship-title">Las herramientas ya existen. El mapa explica cómo se conectan.</h2><p>El grader y las landings de SEO y AEO son puertas especializadas dentro del mismo sistema. No son ofertas sueltas ni sustituyen al mapa completo.</p></div><div class="sd-relationship__grid">{relationships.map((item, index) => (<a class="reveal" data-reveal data-card-hover href={item.href} style={`--delay:${index * 80}ms`}><span>{item.key === 'aeo' ? <svg class="sd-source-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6 Q12.9 11.1 22.4 12 Q12.9 12.9 12 22.4 Q11.1 12.9 1.6 12 Q11.1 11.1 12 1.6 Z" /></svg> : <Icon name={item.icon ?? 'info'} size={24} />}</span><h3>{item.title}</h3><p>{item.description}</p><strong>{item.cta}<ArrowUpRight size={16} aria-hidden="true" /></strong></a>))}</div></div></section>
 
-      <section id="ebook" class="sd-ebook section" data-capture="surround-discovery-ebook" aria-labelledby="ebook-title"><div class="sd-ebook__aura" data-parallax-y="-0.12" aria-hidden="true"></div><div class="sd-container sd-ebook__grid"><div class="sd-copy sd-copy--dark reveal" data-reveal><p class="sd-eyebrow"><span></span>El ebook</p><h2 id="ebook-title">El mapa completo,<br />en una sola guía.</h2><p>61 páginas que ordenan el sistema de descubrimiento: el problema, las cinco superficies y el ciclo S⁴, explicados para decidir dónde empieza tu presencia.</p><ol class="sd-ebook__list"><li><b>01</b>El problema del descubrimiento fragmentado</li><li><b>02</b>Las cinco superficies, una por una</li><li><b>03</b>El ciclo S⁴: SENSE, SHAPE, SURFACE y SOLVE</li><li><b>04</b>Cómo gobernar el sistema</li><li><b>05</b>Dónde se define tu posición competitiva</li></ol><div class="sd-ebook__actions"><a class="sd-button sd-button--primary" href="#form" data-cta data-ripple><Download size={18} aria-hidden="true" />Descargar el ebook</a><span><Zap size={16} aria-hidden="true" />Descarga inmediata · sin spam</span></div></div><div class="sd-book-art reveal" data-reveal data-reveal-delay="140" data-reveal-duration="850"><div class="sd-book-art__rays" aria-hidden="true"></div><div class="sd-book-art__aura" aria-hidden="true"></div><div class="sd-book-art__parallax" data-parallax-y="-0.18" aria-hidden="true"></div><div class="sd-book-art__shadow" aria-hidden="true"></div><div class="sd-book" data-parallax-y="0.16"><i></i><b></b><span></span><div><img src="/surround-discovery/ebook-cover.jpeg" alt="Portada del ebook Surround Discovery de Efeonce" width="3840" height="2160" loading="lazy" decoding="async"/></div></div><p><FileText size={16} aria-hidden="true"/>61 páginas <i></i><FileText size={16} aria-hidden="true"/>PDF <i></i><Sparkles size={16} aria-hidden="true"/>Español</p></div></div></section>
+      <section id="ebook" class="sd-ebook section" data-capture="surround-discovery-ebook" aria-labelledby="ebook-title">
+        <div class="sd-ebook__aura" data-parallax-y="-0.12" aria-hidden="true"></div>
+        <div class="sd-container sd-ebook__grid">
+          <div class="sd-copy sd-copy--dark reveal" data-reveal>
+            <p class="sd-eyebrow"><span></span>El ebook</p>
+            <h2 id="ebook-title">El mapa completo,<br />en una sola guía.</h2>
+            <p>61 páginas que ordenan el sistema de descubrimiento: el problema, las cinco superficies y el ciclo S⁴, explicados para decidir dónde empieza tu presencia.</p>
+            <ol class="sd-ebook__list">
+              <li><b>01</b>El problema del descubrimiento fragmentado</li>
+              <li><b>02</b>Las cinco superficies, una por una</li>
+              <li><b>03</b>El ciclo S⁴: SENSE, SHAPE, SURFACE y SOLVE</li>
+              <li><b>04</b>Cómo gobernar el sistema</li>
+              <li><b>05</b>Dónde se define tu posición competitiva</li>
+            </ol>
+            <div class="sd-ebook__actions">
+              <a class="sd-button sd-button--primary" href="#form" data-cta data-ripple><Download size={18} aria-hidden="true" />Descargar el ebook</a>
+              <span><Zap size={16} aria-hidden="true" />Descarga inmediata · sin spam</span>
+            </div>
+          </div>
+
+          <div class="sd-book-art reveal" data-reveal data-reveal-delay="140" data-reveal-duration="850">
+            <div class="sd-book-art__light sd-book-art__light--rays" data-ebook-light aria-hidden="true"><div></div></div>
+            <div class="sd-book-art__light sd-book-art__light--spectrum" data-ebook-light aria-hidden="true"><div></div></div>
+            <div class="sd-book-art__light sd-book-art__light--aura" data-ebook-light aria-hidden="true"><div></div></div>
+            <div class="sd-book-art__shaft" data-ebook-light aria-hidden="true"></div>
+            <div class="sd-book-art__parallax" data-parallax-y="-0.18" aria-hidden="true"></div>
+            <div class="sd-book-art__shadow" aria-hidden="true"></div>
+            <div class="sd-book" data-parallax-y="0.16">
+              <i></i>
+              <b></b>
+              <span></span>
+              <div>
+                <img src="/surround-discovery/ebook-cover.jpeg" alt="Portada del ebook Surround Discovery de Efeonce" width="3840" height="2160" loading="lazy" decoding="async" />
+              </div>
+            </div>
+            <p><FileText size={16} aria-hidden="true" />61 páginas <i></i><FileText size={16} aria-hidden="true" />PDF <i></i><Sparkles size={16} aria-hidden="true" />Español</p>
+          </div>
+        </div>
+      </section>
 
       <section id="form" class="sd-form-section section" data-capture="surround-discovery-form-section" aria-labelledby="form-title"><div class="sd-form-section__aura sd-form-section__aura--right" data-parallax data-parallax-y="-0.06" aria-hidden="true"></div><div class="sd-form-section__aura sd-form-section__aura--left" data-parallax data-parallax-y="0.05" aria-hidden="true"></div><div class="sd-container sd-form-section__grid"><div class="sd-form-rail reveal" data-reveal><p class="sd-eyebrow"><span></span>PDF · 61 páginas · Acceso inmediato</p><h2 id="form-title">Descarga tu copia ahora</h2><p>Ya viste qué hay dentro. Dinos a dónde enviarlo y obtén acceso inmediato al PDF completo.</p><div><strong>Qué pasa al enviar</strong><ol><li><b>1</b><span><em>Completas y aceptas</em>Cuatro campos. Menos de un minuto.</span></li><li><b>2</b><span><em>Descarga inmediata</em>El PDF se abre al instante, sin esperar a un correo.</span></li><li><b>3</b><span><em>Tú controlas el resto</em>Solo recibes lo que marcaste. Sin spam.</span></li></ol></div><aside><Check size={17} aria-hidden="true"/><p>Los campos, el consentimiento y la entrega los gobierna <strong>Greenhouse Growth Forms</strong>.</p></aside></div><div class="reveal" data-reveal data-reveal-delay="120"><SurroundDiscoveryFormDock /></div></div></section>
 
@@ -234,12 +272,28 @@ const jsonLd = {
   .sd .ti { display:block; width:1em; height:1em; line-height:1; }
   .sd-surface-map__core { background:linear-gradient(150deg,var(--sd-teal-deep),var(--primary-dark)); box-shadow:0 1rem 2.4rem rgba(13,148,136,.32); }
   .sd-cycle__grid li { min-height:0; }
+  .sd-ebook.section { padding-block:clamp(4rem,9vw,7.75rem); }
+  .sd-ebook .sd-copy h2 { letter-spacing:-.025em; }
   .sd-ebook .sd-copy > p { margin:1rem 0 0; color:color-mix(in srgb,var(--sd-mist) 78%,var(--sd-blue)); font-size:clamp(1rem,1.8vw,1.12rem); line-height:1.6; }
+  .sd-book-art { display:block; }
+  .sd-book-art__light { position:absolute; left:50%; pointer-events:none; }
+  .sd-book-art__light > div { position:absolute; inset:0; }
+  .sd-book-art__light--rays { top:52%; width:132%; aspect-ratio:1; transform:translate(-50%,-50%); }
+  .sd-book-art__light--rays > div { background:repeating-conic-gradient(from 0deg at 50% 50%, color-mix(in srgb,var(--sd-teal-light) 0%,transparent) 0deg, color-mix(in srgb,var(--sd-teal-light) 28%,transparent) 3.4deg, color-mix(in srgb,var(--sd-teal-light) 0%,transparent) 7deg, color-mix(in srgb,var(--sd-teal-light) 0%,transparent) 14deg); mask:radial-gradient(circle at 50% 50%,#000 4%,rgba(0,0,0,.55) 28%,transparent 68%); -webkit-mask:radial-gradient(circle at 50% 50%,#000 4%,rgba(0,0,0,.55) 28%,transparent 68%); mix-blend-mode:screen; opacity:.72; filter:blur(.5625rem); animation:sd-spin 74s linear infinite; }
+  .sd-book-art__light--spectrum { top:54%; width:118%; aspect-ratio:1; transform:translate(-50%,-50%); }
+  .sd-book-art__light--spectrum > div { background:conic-gradient(from 0deg at 50% 50%, color-mix(in srgb,var(--sd-teal) 22%,transparent), color-mix(in srgb,var(--sd-blue) 20%,transparent), color-mix(in srgb,var(--sd-teal-light) 22%,transparent), color-mix(in srgb,var(--sd-teal) 20%,transparent), color-mix(in srgb,var(--sd-teal) 22%,transparent)); mask:radial-gradient(circle at 50% 50%,transparent 15%,#000 42%,transparent 70%); -webkit-mask:radial-gradient(circle at 50% 50%,transparent 15%,#000 42%,transparent 70%); mix-blend-mode:screen; opacity:.5; filter:blur(.6875rem); animation:sd-spin 96s linear infinite reverse; }
+  .sd-book-art__light--aura { top:56%; width:110%; height:120%; transform:translate(-50%,-50%); animation:sd-aura-hue 12s ease-in-out infinite; }
+  .sd-book-art__light--aura > div { background:radial-gradient(ellipse 48% 46% at 50% 49%, color-mix(in srgb,var(--sd-teal-light) 50%,transparent), color-mix(in srgb,var(--sd-teal) 44%,transparent) 26%, color-mix(in srgb,var(--sd-blue) 24%,transparent) 52%, transparent 74%); mix-blend-mode:screen; animation:sd-aura 9s ease-in-out infinite; }
+  .sd-book-art__shaft { position:absolute; top:-8%; left:50%; width:42%; height:80%; pointer-events:none; border-radius:50% 50% 46% 46% / 64% 64% 36% 36%; background:linear-gradient(180deg, color-mix(in srgb,var(--sd-teal-light) 36%,transparent), color-mix(in srgb,var(--sd-teal) 12%,transparent) 44%, transparent 82%); filter:blur(.9375rem); mix-blend-mode:screen; transform:translateX(-50%); animation:sd-shaft-breath 6.5s ease-in-out infinite; }
+  .sd-book-art__parallax { position:absolute; z-index:0; top:-26%; left:-16%; width:132%; height:168%; pointer-events:none; background:radial-gradient(ellipse 56% 52% at 50% 60%, color-mix(in srgb,var(--sd-teal) 34%,transparent), transparent 72%); filter:blur(2.125rem); transform:translateY(var(--sy,0px)); }
+  .sd-book-art__shadow { position:absolute; bottom:2%; left:14%; width:72%; height:2.625rem; background:radial-gradient(ellipse, rgba(0,15,32,.65), rgba(0,15,32,0) 72%); filter:blur(.5rem); }
+  .sd-book > div::before { position:absolute; top:0; bottom:0; left:0; width:1.125rem; content:''; background:linear-gradient(90deg,rgba(0,0,0,.42),rgba(0,0,0,0)); box-shadow:1.125rem 0 0 rgba(255,255,255,.2); pointer-events:none; }
   .sd .sd-button--primary { color:var(--sd-navy); background:var(--sd-teal-light); box-shadow:0 .75rem 2rem rgba(45,212,191,.3); }
   .sd .sd-button--primary:hover { color:var(--sd-navy); background:var(--sd-teal-light); }
   .sd-hero h1 { font-size:clamp(34px,5.2vw,60px); }
   .sd[data-capture="surround-discovery-landing"] { background:var(--neutral); }
   @media (prefers-reduced-motion:reduce) { .sd .ti { animation:none !important; } }
+  @media (prefers-reduced-motion:reduce) { .sd [data-ebook-light], .sd [data-ebook-light] * { animation:none !important; transition:none !important; } }
   :global(.sd [data-cta2] svg) { transition:transform .32s cubic-bezier(.2,.8,.2,1); }
   :global(.sd [data-cta2]:hover svg) { transform:translateY(4px); }
   :global(.sd [data-cta3] svg) { transition:transform .26s cubic-bezier(.2,.8,.2,1); }
