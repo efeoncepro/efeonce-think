@@ -65,7 +65,11 @@ try {
 
     const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 })
     await page.waitForTimeout(2100)
+    const heroScreenshot = resolve(OUT_DIR, `${label}-${viewport.name}-hero.png`)
+    await page.screenshot({ path: heroScreenshot })
     let motionMetrics
+    let primaryHoverScreenshot = null
+    let secondaryHoverScreenshot = null
     if (viewport.reducedMotion === 'reduce') {
       motionMetrics = await page.evaluate(() => ({
         allRevealed: Array.from(document.querySelectorAll('[data-reveal]')).every((item) => item.getAttribute('data-revealed') === 'true'),
@@ -104,6 +108,22 @@ try {
         transform: getComputedStyle(document.querySelector('[data-capture="surround-discovery-hero"] .sd-button--primary')).transform,
         shineAnimation: getComputedStyle(document.querySelector('[data-capture="surround-discovery-hero"] .sd-button--primary'), '::before').animationName,
       }))
+      primaryHoverScreenshot = resolve(OUT_DIR, `${label}-${viewport.name}-hero-primary-hover.png`)
+      await page.screenshot({ path: primaryHoverScreenshot })
+      await page.locator('[data-cta2]').hover()
+      await page.waitForTimeout(100)
+      const secondaryCta = await page.evaluate(() => ({
+        shadow: getComputedStyle(document.querySelector('[data-cta2]')).boxShadow,
+        arrowTransform: getComputedStyle(document.querySelector('[data-cta2] svg')).transform,
+      }))
+      secondaryHoverScreenshot = resolve(OUT_DIR, `${label}-${viewport.name}-hero-secondary-hover.png`)
+      await page.screenshot({ path: secondaryHoverScreenshot })
+      await page.locator('[data-card-hover]').first().hover()
+      await page.waitForTimeout(100)
+      const relationshipCard = await page.evaluate(() => ({
+        border: getComputedStyle(document.querySelector('[data-card-hover]')).borderColor,
+        shadow: getComputedStyle(document.querySelector('[data-card-hover]')).boxShadow,
+      }))
       const rippleCount = await page.evaluate(() => {
         const target = document.querySelector('.sd-header__cta')
         target?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: 22, clientY: 22 }))
@@ -119,7 +139,7 @@ try {
         book: document.querySelector('.sd-book')?.style.getPropertyValue('--sy') ?? '',
         form: document.querySelector('.sd-form-section__aura--right')?.style.getPropertyValue('--sy') ?? '',
       }))
-      motionMetrics = { ...motionInitial, pointer, highlight, cta, rippleCount, parallax }
+      motionMetrics = { ...motionInitial, pointer, highlight, cta, secondaryCta, relationshipCard, rippleCount, parallax }
     }
     await page.locator('details summary').first().focus()
     await page.keyboard.press('Enter')
@@ -152,6 +172,11 @@ try {
         faqCount: document.querySelectorAll('details').length,
         fiveSurfaces: document.querySelectorAll('[data-surface-card]').length,
         cycleStages: document.querySelectorAll('.sd-cycle__grid > li').length,
+        heroNodeIconCount: Array.from(document.querySelectorAll('.sd-hero-node')).filter((node) => Boolean(node.querySelector('svg, i.ti'))).length,
+        surfaceMapIconCount: Array.from(document.querySelectorAll('.sd-surface-map__node')).filter((node) => Boolean(node.querySelector('svg, i.ti'))).length,
+        surfaceCardIconCount: Array.from(document.querySelectorAll('.sd-surface-cards article')).filter((node) => Boolean(node.querySelector('svg, i.ti'))).length,
+        unresolvedComponentCount: document.querySelectorAll('component').length,
+        tablerIconStylesheet: Boolean(document.querySelector('link[href*="@tabler/icons-webfont"]')),
         supportRuntimeLoaded: Array.from(document.scripts).some((script) => script.src.includes('support.js')),
         formTargetInViewport: (() => {
           const target = document.querySelector('#form')?.getBoundingClientRect()
@@ -218,6 +243,9 @@ try {
     if (!metrics.jsonLdTypes.includes('Book') || !metrics.jsonLdTypes.includes('FAQPage') || !metrics.jsonLdTypes.includes('WebPage')) errors.push(`incomplete JSON-LD: ${metrics.jsonLdTypes.join(', ')}`)
     if (metrics.faqCount !== 6) errors.push(`expected 6 FAQs, got ${metrics.faqCount}`)
     if (metrics.fiveSurfaces !== 5) errors.push(`expected 5 surfaces, got ${metrics.fiveSurfaces}`)
+    if (metrics.heroNodeIconCount !== 5 || metrics.surfaceMapIconCount !== 5 || metrics.surfaceCardIconCount !== 5) errors.push(`approved source icons missing: hero=${metrics.heroNodeIconCount} map=${metrics.surfaceMapIconCount} cards=${metrics.surfaceCardIconCount}`)
+    if (metrics.unresolvedComponentCount) errors.push(`Astro rendered ${metrics.unresolvedComponentCount} unresolved component tag(s)`)
+    if (!metrics.tablerIconStylesheet) errors.push('approved Tabler icon source is not loaded')
     if (metrics.cycleStages !== 4) errors.push(`expected 4 S4 stages, got ${metrics.cycleStages}`)
     if (metrics.supportRuntimeLoaded) errors.push('approved source support.js was copied into Think')
     if (metrics.heroCtaTarget !== '#form') errors.push(`wrong hero CTA target: ${metrics.heroCtaTarget}`)
@@ -238,6 +266,8 @@ try {
       if (viewport.width > 560 && (!richMotionMetrics.pointer.x || !richMotionMetrics.pointer.y)) errors.push('hero constellation does not respond to pointer movement')
       if (!/scale\(1\.14\)/.test(richMotionMetrics.highlight.nodeTransform) || richMotionMetrics.highlight.cardBorder !== 'var(--sd-teal)' || !richMotionMetrics.highlight.cardShadow) errors.push('surface-to-card hover cross-highlight is incomplete')
       if (richMotionMetrics.cta.transform === 'none' || richMotionMetrics.cta.shineAnimation !== 'sd-cta-shine') errors.push('primary CTA luminous hover is incomplete')
+      if (richMotionMetrics.secondaryCta.shadow === 'none' || richMotionMetrics.secondaryCta.arrowTransform === 'none') errors.push('secondary CTA lift, glow, and arrow response are incomplete')
+      if (!richMotionMetrics.relationshipCard.shadow || !/var\(--sd-teal\)|rgb/.test(richMotionMetrics.relationshipCard.border)) errors.push('relationship card hover is incomplete')
       if (richMotionMetrics.rippleCount !== 1) errors.push('pointer ripple did not render')
       if (Object.values(richMotionMetrics.parallax).some((value) => !value)) errors.push('scroll parallax did not set all approved layers')
     }
@@ -249,7 +279,7 @@ try {
     if (unexpectedConsoleErrors.length) errors.push(...unexpectedConsoleErrors)
     if (errors.length) failed = true
 
-    results.push({ viewport: viewport.name, httpStatus: response?.status() ?? null, readyScreenshot, degradedScreenshot, metrics, motionMetrics, acceptedMetrics, degradedMetrics, consoleErrors, failedRequests, errors })
+    results.push({ viewport: viewport.name, httpStatus: response?.status() ?? null, heroScreenshot, primaryHoverScreenshot, secondaryHoverScreenshot, readyScreenshot, degradedScreenshot, metrics, motionMetrics, acceptedMetrics, degradedMetrics, consoleErrors, failedRequests, errors })
     console.log(`[verify-surround] ${viewport.name} HTTP ${response?.status()} overflow=${metrics.scrollWidth}/${metrics.clientWidth} ready=${readyScreenshot}`)
     if (errors.length) console.error(`[verify-surround] ${viewport.name} FAIL ${errors.join('; ')}`)
     await context.close()
