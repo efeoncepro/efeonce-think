@@ -67,6 +67,9 @@ machine.craft.forEach(x => bump(x.coupleId))
 machine.jsonld.forEach(x => bump(x.coupleId))
 machine.alts.forEach(x => bump(x.coupleId))
 machine.headings.tree.forEach(x => bump(x.coupleId))
+// El contenedor del árbol de encabezados TAMBIÉN es un destino (se enciende entero).
+// Sin contarlo, el chip decía 9 y el lector de pantalla anunciaba 10.
+bump(machine.headings.coupleId)
 // La evidencia y el fan-out también son destinos: si se encienden, se cuentan.
 // Contarlos de menos hace que el chip prometa menos de lo que entrega.
 evidence.facts.forEach(x => bump(x.coupleId))
@@ -417,7 +420,14 @@ const asText = (code: unknown) =>
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let pinned: string | null = null
 
+    const inst = root.querySelector<HTMLElement>('.inst')
+
     const paint = (id: string | null) => {
+      // Con un solo destino basta el resaltado. Pero el H1 enciende NUEVE nodos repartidos por
+      // todo el panel: ves uno y los otros ocho quedan fuera de vista. Atenuar lo no-acoplado
+      // hace que lo encendido resalte aunque esté disperso — y le dice al ojo cuántos hay.
+      if (inst) inst.dataset.focus = id ? 'true' : ''
+
       root.querySelectorAll<HTMLElement>('[data-couple],[data-couple-target]').forEach(el => {
         const mine = el.dataset.couple ?? el.dataset.coupleTarget
         if (id && mine === id) {
@@ -441,15 +451,33 @@ const asText = (code: unknown) =>
        */
       const pane = target.closest<HTMLElement>('.inst')
       if (pane && pane.scrollHeight > pane.clientHeight) {
+        /**
+         * El encabezado del instrumento es `position: sticky`. Si scrolleamos el nodo al
+         * borde del panel, el header lo TAPA — y el usuario ve medio número cortado sin
+         * entender qué se le está señalando. Es WCAG 2.2 AA 2.4.11 (Focus Not Obscured),
+         * el fallo más común de los dashboards modernos.
+         * El tope real no es el borde del panel: es el borde de abajo del header pegajoso.
+         */
+        const head = pane.querySelector<HTMLElement>('.in-head')
+        const safeTop = (head?.offsetHeight ?? 0) + 12
         const t = target.getBoundingClientRect()
         const p = pane.getBoundingClientRect()
-        if (t.top < p.top + 8 || t.bottom > p.bottom - 8) {
-          pane.scrollTo({ top: pane.scrollTop + (t.top - p.top) - 16, behavior: reduce ? 'auto' : 'smooth' })
+        const top = t.top - p.top
+        const bottom = t.bottom - p.top
+
+        if (top < safeTop || bottom > pane.clientHeight - 12) {
+          pane.scrollTo({
+            top: pane.scrollTop + top - safeTop,
+            behavior: reduce ? 'auto' : 'smooth',
+          })
         }
       }
       if (live) {
+        const all = root.querySelectorAll(`[data-couple-target="${id}"]`).length
         const name = target.querySelector('.nd-l,.sch-t,.kpi-u')?.textContent?.trim()
-        live.textContent = name ? `Resaltado: ${name}` : ''
+        live.textContent = name
+          ? `${all} ${all === 1 ? 'dato resaltado' : 'datos resaltados'}. Primero: ${name}`
+          : ''
       }
     }
 
@@ -813,6 +841,8 @@ const asText = (code: unknown) =>
     transition: outline-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
   }
   .nd:focus-visible { outline: 2px solid var(--blue-up); }
+  /* Focus Not Obscured (2.4.11): ningún nodo enfocado puede quedar bajo el header pegajoso. */
+  .nd, .kpi, .hn, .fan li { scroll-margin-top: 4rem; }
   .t1 { border-color: color-mix(in srgb, var(--blue-up) 35%, var(--line-d)); background: var(--navy-3); }
   .t3 { padding: 0.4rem 0.6rem; background: transparent; border-color: transparent; margin-bottom: 0.1rem; }
   .t3wrap { padding: 0.3rem 0 0.6rem; border-left: 2px solid var(--line-d); margin-left: 0.2rem; }
@@ -875,6 +905,14 @@ const asText = (code: unknown) =>
     margin-top: 0.8rem; padding: 0.7rem 0.8rem; font-size: var(--t-meta); line-height: 1.55;
     color: var(--dim-d); background: var(--navy-2); border-radius: 8px; border: 1px dashed var(--line-d);
   }
+
+  /* Con un acoplamiento activo, lo NO acoplado se atenúa. Es lo que hace legibles los nueve
+     destinos del H1 sin que el ojo tenga que cazarlos uno por uno. */
+  .inst[data-focus='true'] .nd:not([data-on]),
+  .inst[data-focus='true'] .kpi:not([data-on]),
+  .inst[data-focus='true'] .grp,
+  .inst[data-focus='true'] .warn { opacity: 0.35; transition: opacity var(--dur) var(--ease); }
+  .inst .nd, .inst .kpi { transition: outline-color var(--dur) var(--ease), background-color var(--dur) var(--ease), opacity var(--dur) var(--ease); }
 
   /* ══ EL DESTINO GRITA: outline + pulso + marca de origen. La fuente solo susurra. ══ */
   [data-couple-target][data-on] {

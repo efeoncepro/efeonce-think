@@ -177,6 +177,41 @@ try {
   //     (Wikipedia · Instagram · TripAdvisor). Cero aerolíneas.
   await slide('h2-como-llegar', 1180, 'slide-competencia')
 
+  /* El chip y el lector de pantalla tienen que decir EL MISMO número. Si el chip promete 9
+     y el anuncio dice 10, uno de los dos miente — y el que ve el número es el evaluador. */
+  await page.keyboard.press('Escape')
+  await page.evaluate(() => {
+    document.querySelector('[data-couple="h1"]')?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+  })
+  await page.waitForTimeout(400)
+  const counts = await page.evaluate(() => {
+    const src = document.querySelector('[data-couple="h1"]')
+    const dom = document.querySelectorAll('[data-couple-target="h1"]').length
+    const chip = (src?.getAttribute('data-n') ?? '').match(/\d+/)?.[0]
+
+    return { dom, chip: Number(chip) }
+  })
+  check(
+    '18. El chip y el DOM cuentan lo mismo (el chip no puede mentir)',
+    counts.dom === counts.chip,
+    `chip=${counts.chip} dom=${counts.dom}`,
+  )
+
+  /* Focus Not Obscured (WCAG 2.2 AA · 2.4.11): el header pegajoso del instrumento NO puede
+     tapar el nodo al que saltamos. Es el fallo que el operador vio: medio número cortado. */
+  await page.waitForTimeout(900) // el scroll suave del panel tiene que TERMINAR antes de medir
+  const obscured = await page.evaluate(() => {
+    const pane = document.querySelector('.inst')
+    const head = pane?.querySelector('.in-head')
+    const node = pane?.querySelector('[data-couple-target][data-on]')
+    if (!pane || !head || !node) return null
+    const h = head.getBoundingClientRect()
+    const n = node.getBoundingClientRect()
+
+    return n.top >= h.bottom - 1
+  })
+  check('19. WCAG 2.4.11 — el header pegajoso no tapa el nodo acoplado', obscured === true, `top del nodo bajo el header: ${obscured}`)
+
   await page.close()
 
   // Reduced motion
