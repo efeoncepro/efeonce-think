@@ -82,12 +82,23 @@ check('7. Toda cifra de evidencia lleva <cite> con fuente y as-of', cites >= 5, 
 /* 20. 🔴 HONESTIDAD DE LAS CIFRAS. La pieza entera vale por NO exagerar.
    El «+41%» (Quotation Addition, KDD 2024) mide citas de FUENTES entre comillas, no una frase
    propia destacada. Reclamarlo sobre la cita destacada era atribuirle un lift medido a una
-   táctica que no aplicamos — y es exactamente lo que un evaluador técnico caza. */
-const claims41 = /\+41%[\s\S]{0,200}?Cita destacada|Cita destacada[\s\S]{0,200}?\+41%/i.test(html)
+   táctica que no aplicamos — y es lo primero que un evaluador técnico caza.
+
+   El assert NO puede ser "que la cadena +41% no exista": la muestra la NOMBRA a propósito,
+   dentro de la frase que declara que la táctica no aplica. Eso es honestidad, no un bug.
+   Lo que no puede existir es un STAT —el número grande— que la reclame como propia. */
+const stats = [...html.matchAll(/<p class="stat[^"]*"[^>]*>([\s\S]*?)<\/p>/g)].map(m => m[1])
+const claims41 = stats.some(x => x.includes('41%'))
 check(
-  '20. La cita destacada NO reclama el +41% (esa táctica exige citar fuentes, no destacarse a uno mismo)',
+  '20. Ningún stat reclama el +41% (esa táctica exige citar fuentes, no destacarse a uno mismo)',
   !claims41,
-  'la muestra atribuye un lift medido a una táctica que no aplica',
+  'un stat atribuye un lift medido a una táctica que la muestra no aplica',
+)
+const claimsReal = stats.some(x => x.includes('30%')) && stats.some(x => x.includes('32%'))
+check(
+  '20b. Sí se declaran las tácticas que la muestra SÍ aplica (+30% fuentes · +32% estadísticas)',
+  claimsReal,
+  `stats: ${stats.map(x => x.replace(/<[^>]+>/g, '').trim().slice(0, 12)).join(' | ')}`,
 )
 
 // 21. El chip direccional es `content` de CSS: invisible para lectores de pantalla.
