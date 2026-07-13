@@ -34,7 +34,20 @@ export default defineConfig({
     },
   },
 
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      // `/muestras/*` = Radiografía AEO (TASK-1410): muestras de trabajo con la marca de un
+      // cliente. Son `noindex` por diseño y NO deben entrar al sitemap: son piezas comerciales
+      // que se entregan por enlace, no contenido del hub. Una versión genérica sin marca de
+      // cliente sí podría indexarse, pero sería otra ruta.
+      filter: (page) => {
+        const { pathname } = new URL(page)
+
+        return !pathname.startsWith('/preview/') && !pathname.startsWith('/muestras/')
+      },
+    }),
+  ],
 
   vite: {
     plugins: [tailwindcss()],

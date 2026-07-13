@@ -1,0 +1,585 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@layouts/BaseLayout.astro'
+
+/**
+ * Radiografía AEO — muestra de trabajo "artículo + su capa de máquina".
+ * TASK-1410 (greenhouse-eo). Ver docs/ui/wireframes/TASK-1410-aeo-article-xray.md
+ *
+ * ⚠️ INVARIANTE #1 — El JSON-LD del artículo se renderiza como TEXTO ESCAPADO.
+ * NUNCA se emite dentro de un <script type="application/ld+json">, y esta página
+ * NO le pasa `jsonLd` a BaseLayout. Emitir aquí un schema con author/publisher del
+ * cliente declararía, en NUESTRO dominio, que Efeonce publicó un artículo suyo:
+ * sería un dato estructurado falso, ingerible por crawlers y motores de respuesta,
+ * justo en la pieza cuya tesis es el rigor técnico. `scripts/verify-aeo-xray.mjs`
+ * falla si aparece un solo `application/ld+json` en el HTML servido.
+ *
+ * Invariante #2 — noindex + fuera del sitemap (el filter vive en astro.config.mjs).
+ * Invariante #8 — el motor NUNCA conoce a un cliente: todo sale del payload.
+ */
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const samples = await getCollection('aeoXray')
+
+  return samples.map(sample => ({ params: { slug: sample.id }, props: { sample } }))
+}
+
+const { sample } = Astro.props
+const d = sample.data
+const { ui, machine, evidence, article } = d
+
+/**
+ * El acoplamiento que viene pintado desde el HTML. ES el frame que va a la lámina.
+ *
+ * Tiene que ser un par que se vea COMPLETO en el pliegue inicial, a los dos lados.
+ * La primera versión usaba el FAQ (el argumento más fuerte: ataca el 37/100), pero el
+ * bloque vive muy abajo del artículo: la captura salía sin una sola correspondencia
+ * encendida, y un acoplamiento que no se ve no argumenta nada.
+ * La cápsula de respuesta está arriba, y su contraparte —el dato de que ese patrón
+ * aparece en el 72,4% de las páginas que ChatGPT cita— también. Se ven las dos.
+ */
+const HERO_COUPLE = 'capsule-main'
+
+type Block = (typeof article.blocks)[number]
+type ImageBlock = Extract<Block, { type: 'image' | 'hero-image' }>
+
+const isImage = (b: Block): b is ImageBlock => b.type === 'image' || b.type === 'hero-image'
+
+const images = article.blocks.filter(isImage)
+const altFor = (coupleId: string) => machine.alts.find(a => a.coupleId === coupleId)
+
+/** Escapa el JSON-LD para mostrarlo como TEXTO. Jamás `set:html`. */
+const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
+---
+
+<BaseLayout
+  title={`${d.meta.sampleTitle} — muestra de Efeonce`}
+  description="Muestra de trabajo de Efeonce: un artículo y su capa de máquina, lado a lado."
+  noindex={true}
+>
+  <div class="xray" data-testid="xray-root" style={`--accent:${d.client.accent}`}>
+    <!-- Región 0 — Rótulo persistente. Niega autoría Y alojamiento. No se puede cerrar. -->
+    <div class="bar" data-testid="disclaimer" role="note">
+      <strong>{ui.disclaimerLabel}</strong>
+      <span>{ui.disclaimerBody}</span>
+    </div>
+
+    <!-- Región 1 — Encabezado + la línea que justifica el artículo -->
+    <header class="head">
+      <p class="kick">{d.meta.kicker}</p>
+      <h1>{d.meta.sampleTitle}</h1>
+      <div class="thesis">
+        <p class="thesis-label">{ui.thesisLabel}</p>
+        <p class="thesis-body">{d.thesis}</p>
+      </div>
+      <p class="hint hint-d" data-testid="hint">{ui.hintDesktop}</p>
+      <p class="hint hint-m">{ui.hintMobile}</p>
+    </header>
+
+    <div class="split">
+      <!-- ══ Panel A — El artículo ══ -->
+      <section class="pane pane-a" aria-labelledby="pane-a-title">
+        <div class="pane-head">
+          <h2 id="pane-a-title">{ui.paneArticleTitle}</h2>
+          <p>{ui.paneArticleSubtitle}</p>
+        </div>
+
+        <article class="post">
+          {article.blocks.map(b => {
+            const on = 'coupleId' in b && b.coupleId === HERO_COUPLE ? true : undefined
+
+            if (b.type === 'hero-image' || b.type === 'image') {
+              return (
+                <figure class="blk" data-couple={b.coupleId} data-on={on} tabindex="0">
+                  <img src={b.src} alt={b.alt} loading={b.type === 'hero-image' ? 'eager' : 'lazy'} />
+                  {b.caption && <figcaption>{b.caption}</figcaption>}
+                  <p class="credit">
+                    Foto: {b.credit.author} · <a href={b.credit.url} rel="nofollow noopener">{b.credit.license}</a>
+                  </p>
+                </figure>
+              )
+            }
+            if (b.type === 'h1') return <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0"><h3 class="post-h1">{b.text}</h3></div>
+            if (b.type === 'h2') return <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0"><h4 class="post-h2">{b.text}</h4></div>
+            if (b.type === 'answer-capsule')
+              return (
+                <div class="blk capsule" data-couple={b.coupleId} data-on={on} tabindex="0">
+                  <span class="tag">Respuesta directa</span>
+                  <p>{b.text}</p>
+                </div>
+              )
+            if (b.type === 'paragraph') return <p class="para">{b.text}</p>
+            if (b.type === 'table')
+              return (
+                <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0">
+                  {/* La tabla scrollea DENTRO de su contenedor. La página nunca. */}
+                  <div class="twrap">
+                    <table>
+                      <caption>{b.caption}</caption>
+                      <thead><tr>{b.headers.map(h => <th scope="col">{h}</th>)}</tr></thead>
+                      <tbody>{b.rows.map(r => <tr>{r.map(c => <td>{c}</td>)}</tr>)}</tbody>
+                    </table>
+                  </div>
+                </div>
+              )
+            if (b.type === 'ordered-list')
+              return (
+                <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0">
+                  <p class="blk-title">{b.title}</p>
+                  <ol>{b.items.map(i => <li>{i}</li>)}</ol>
+                </div>
+              )
+            if (b.type === 'faq')
+              return (
+                <div class="blk faq" data-couple={b.coupleId} data-on={on} tabindex="0">
+                  <p class="blk-title">{b.title}</p>
+                  {b.items.map(i => (
+                    <div class="qa">
+                      <p class="q">{i.q}</p>
+                      <p class="a">{i.a}</p>
+                    </div>
+                  ))}
+                </div>
+              )
+            if (b.type === 'internal-links')
+              return (
+                <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0">
+                  <p class="blk-title">{b.title}</p>
+                  <ul class="links">
+                    {b.items.map(i => (
+                      <li>
+                        <a href={i.href} rel="nofollow noopener">{i.text}</a>
+                        {i.note && <em> — {i.note}</em>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            if (b.type === 'sources')
+              return (
+                <div class="blk sources">
+                  <p class="blk-title">{b.title}</p>
+                  <ul>{b.items.map(i => <li><a href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
+                </div>
+              )
+            return null
+          })}
+        </article>
+      </section>
+
+      <!-- ══ Panel B — La capa de máquina + la evidencia ══ -->
+      <section class="pane pane-b" aria-labelledby="pane-b-title">
+        <div class="pane-head">
+          <h2 id="pane-b-title">{ui.paneMachineTab}</h2>
+          <p class="sr-status" role="status" aria-live="polite" data-testid="live"></p>
+        </div>
+
+        <div class="mach">
+          <!-- Metadatos + previsualización de resultado -->
+          <div class="grp">
+            <p class="grp-t">Metadatos</p>
+            {machine.seo.map(s => (
+              <div class="node" data-couple-target={s.coupleId} data-on={s.coupleId === HERO_COUPLE ? true : undefined} tabindex="0">
+                <p class="n-label">{s.label} {s.detail && <em>· {s.detail}</em>}</p>
+                <p class="n-value">{s.value}</p>
+                <p class="n-why"><b>{ui.whyLabel}:</b> {s.why}</p>
+              </div>
+            ))}
+            {machine.og.map(o => (
+              <div class="node slim" data-couple-target={o.coupleId} tabindex="0">
+                <p class="n-label">{o.label}</p>
+                <p class="n-value mono">{o.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <!-- Oficio medido. Va arriba a propósito: es el bloque más argumentativo,
+               y es la contraparte del acoplamiento héroe que se captura para la lámina. -->
+          <div class="grp">
+            <p class="grp-t">Cómo está escrito</p>
+            {machine.craft.map(c => (
+              <div class="node" data-couple-target={c.coupleId} data-on={c.coupleId === HERO_COUPLE ? true : undefined} tabindex="0">
+                <p class="n-label">{c.label} <em>· {c.detail}</em></p>
+                <p class="n-why"><b>{ui.whyLabel}:</b> {c.why}</p>
+              </div>
+            ))}
+          </div>
+
+          <!-- Jerarquía de encabezados -->
+          <div class="grp">
+            <p class="grp-t">Jerarquía de encabezados</p>
+            <div class="node" data-couple-target={machine.headings.coupleId} tabindex="0">
+              {machine.headings.tree.map(h => (
+                <p class={`hnode l${h.level}`} data-couple-target={h.coupleId} tabindex="0">
+                  <span class="lv">H{h.level}</span> {h.text}
+                </p>
+              ))}
+              <p class="n-why"><b>{ui.whyLabel}:</b> {machine.headings.why}</p>
+            </div>
+          </div>
+
+          <!-- Los ALT -->
+          <div class="grp">
+            <p class="grp-t">Texto alternativo de las imágenes</p>
+            {machine.alts.map(a => (
+              <div class="node" data-couple-target={a.coupleId} tabindex="0">
+                <p class="n-value">“{a.alt}”</p>
+                <p class="n-why"><b>{ui.whyLabel}:</b> {a.why}</p>
+              </div>
+            ))}
+          </div>
+
+          <!-- Datos estructurados — COMO TEXTO, nunca como marcado activo -->
+          <div class="grp">
+            <p class="grp-t">Datos estructurados (JSON-LD)</p>
+            <p class="note" data-testid="schema-note">⚠️ {ui.schemaNote}</p>
+            {machine.jsonld.map(n => (
+              <details class="node schema" data-couple-target={n.coupleId} open={n.coupleId === HERO_COUPLE} data-on={n.coupleId === HERO_COUPLE ? true : undefined}>
+                <summary>
+                  <span class="stype">{n.type}</span>
+                  <span class="smetric">{n.metric}</span>
+                </summary>
+                <p class="n-why"><b>{ui.whyLabel}:</b> {n.why}</p>
+                <pre role="region" aria-label={`Datos estructurados: ${n.type}`}><code>{asText(n.code)}</code></pre>
+              </details>
+            ))}
+          </div>
+
+          <!-- ══ La evidencia ══ -->
+          <div class="grp ev" data-testid="evidence">
+            <p class="grp-t big">{ui.paneEvidenceTab}</p>
+            <p class="ev-intro">{evidence.intro}</p>
+
+            {evidence.facts.map(f => (
+              <div class="node fact" data-couple-target={f.coupleId} tabindex="0">
+                <p class="n-label">{f.label}</p>
+                <p class="f-value">{f.value}</p>
+                <p class="n-why">{f.note}</p>
+                <p class="src"><cite>{ui.sourceLabel}: {f.source} · {f.asOf}</cite></p>
+              </div>
+            ))}
+
+            <div class="node">
+              <p class="n-label">{evidence.fanOut.title}</p>
+              <p class="n-why">{evidence.fanOut.note}</p>
+              <ul class="fan">
+                {evidence.fanOut.items.map(i => (
+                  <li data-couple-target={i.coveredBy} tabindex="0">
+                    <span class="chk" aria-hidden="true">{i.covered ? '✓' : '—'}</span>
+                    <span>{i.q}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <p class="honesty">{evidence.honesty}</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Región 5 — Licencias. Es la demostración del requisito, no un pie de página. -->
+    <footer class="lic" data-testid="licenses">
+      <p class="grp-t">{ui.licenseTitle}</p>
+      <ul>
+        {images.map(i => (
+          <li>
+            <strong>{altFor(i.coupleId)?.alt.slice(0, 58) ?? i.alt.slice(0, 58)}…</strong>
+            <span>{i.credit.author} · <a href={i.credit.url} rel="nofollow noopener">{i.credit.license}</a></span>
+          </li>
+        ))}
+      </ul>
+      <p class="lic-note">
+        Todas las imágenes tienen licencia verificable y crédito visible. Ninguna fue generada con IA.
+      </p>
+    </footer>
+  </div>
+</BaseLayout>
+
+<script>
+  /**
+   * Acoplamiento artículo ↔ capa de máquina.
+   * Cero React: el contenido es estático, hidratarlo sería over-hydration.
+   * Esto solo conmuta `data-on`; el CSS hace el resaltado. Sin JS, el estado
+   * héroe ya viene pintado desde el HTML y la pieza sigue argumentando.
+   */
+  const root = document.querySelector<HTMLElement>('[data-testid="xray-root"]')
+  const live = document.querySelector<HTMLElement>('[data-testid="live"]')
+  if (root) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let pinned: string | null = null
+
+    const all = () => root.querySelectorAll<HTMLElement>('[data-couple],[data-couple-target]')
+
+    const paint = (id: string | null) => {
+      all().forEach(el => {
+        const mine = el.dataset.couple ?? el.dataset.coupleTarget
+        if (id && mine === id) {
+          el.dataset.on = 'true'
+          el.setAttribute('aria-current', 'true')
+        } else {
+          delete el.dataset.on
+          el.removeAttribute('aria-current')
+        }
+      })
+      if (id) {
+        const target = root.querySelector<HTMLElement>(`[data-couple-target="${id}"]`)
+        if (target) {
+          const det = target.closest('details')
+          if (det) det.open = true
+
+          /**
+           * Scrollea SOLO el panel, nunca la página.
+           * `scrollIntoView` no sirve acá: scrollea todos los ancestros scrolleables,
+           * incluido el documento — y arrastrar la página bajo el cursor mientras el
+           * usuario lee el artículo es desorientador. Movemos el scrollTop del panel a mano.
+           */
+          const pane = target.closest<HTMLElement>('.pane-b')
+          if (pane && pane.scrollHeight > pane.clientHeight) {
+            const t = target.getBoundingClientRect()
+            const p = pane.getBoundingClientRect()
+            if (t.top < p.top + 8 || t.bottom > p.bottom - 8) {
+              const delta = t.top - p.top - 12
+              pane.scrollTo({ top: pane.scrollTop + delta, behavior: reduce ? 'auto' : 'smooth' })
+            }
+          }
+          if (live) live.textContent = `Resaltado: ${target.querySelector('.n-label,.stype')?.textContent ?? id}`
+        }
+      }
+    }
+
+    const enter = (e: Event) => {
+      const el = (e.target as HTMLElement).closest<HTMLElement>('[data-couple],[data-couple-target]')
+      if (!el || pinned) return
+      paint(el.dataset.couple ?? el.dataset.coupleTarget ?? null)
+    }
+
+    root.addEventListener('mouseover', enter)
+    root.addEventListener('focusin', enter)
+    root.addEventListener('click', e => {
+      const el = (e.target as HTMLElement).closest<HTMLElement>('[data-couple],[data-couple-target]')
+      if (!el) return
+      const id = el.dataset.couple ?? el.dataset.coupleTarget ?? null
+      pinned = pinned === id ? null : id
+      paint(pinned ?? id)
+    })
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return
+      pinned = null
+      paint('capsule-main') // vuelve al héroe
+    })
+  }
+</script>
+
+<style>
+  .xray {
+    --ink: #0f172a;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --tint: color-mix(in srgb, var(--accent) 8%, white);
+    --dur: 120ms;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem;
+    color: var(--ink);
+  }
+
+  /* ── Rótulo persistente ── */
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    flex-wrap: wrap;
+    margin: 0 -1rem 1.5rem;
+    padding: 0.6rem 1.25rem;
+    background: #1e293b;
+    color: #f1f5f9;
+    font-size: 0.8125rem;
+  }
+  .bar strong { color: #fff; }
+  .bar span { color: #cbd5e1; }
+
+  /* ── Encabezado ── */
+  .head { max-width: 78ch; margin-bottom: 1.1rem; }
+  .kick {
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .head h1 { margin-top: 0.3rem; font-size: 1.65rem; font-weight: 650; line-height: 1.2; }
+  .thesis {
+    margin-top: 0.7rem; padding: 0.75rem 1rem;
+    border-left: 3px solid var(--accent); background: var(--tint); border-radius: 0 6px 6px 0;
+  }
+  .thesis-label {
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .thesis-body { margin-top: 0.35rem; font-size: 0.9375rem; line-height: 1.6; }
+  .hint { margin-top: 0.6rem; font-size: 0.8125rem; color: var(--muted); }
+  /* En un teléfono no hay cursor: el copy cambia con el gesto, no solo el layout. */
+  .hint-d { display: none; }
+  .hint-m { display: block; }
+  @media (hover: hover) and (pointer: fine) {
+    .hint-d { display: block; }
+    .hint-m { display: none; }
+  }
+
+  /* ── Split ──
+     `min-width: 0` en TODO lo que vive dentro del grid. Sin esto, los hijos heredan
+     `min-width: auto` y se niegan a encogerse: el <pre> del JSON y la tabla empujan
+     la página entera y aparecen ~890px de scroll horizontal en móvil. Es el bug
+     clásico de CSS Grid, y lo cazó el assert 15 del verify. */
+  .split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-width: 0; }
+  @media (min-width: 1024px) {
+    .split { grid-template-columns: 1.15fr 1fr; align-items: start; }
+    .pane-b { position: sticky; top: 3.25rem; max-height: calc(100vh - 4.5rem); overflow-y: auto; }
+  }
+  .pane { border: 1px solid var(--line); border-radius: 10px; background: #fff; min-width: 0; }
+  .post, .mach, .grp, .node, .blk { min-width: 0; }
+  .pane-head {
+    padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--line); background: #f8fafc;
+    border-radius: 10px 10px 0 0;
+  }
+  .pane-head h2 { font-size: 0.9375rem; font-weight: 650; }
+  .pane-head p { font-size: 0.8125rem; color: var(--muted); }
+
+  /* ── El artículo ── */
+  .post { padding: 0.9rem 1.1rem; }
+  .blk {
+    position: relative; margin: 0.5rem -0.5rem; padding: 0.5rem;
+    border-radius: 7px; outline: 2px solid transparent; outline-offset: 1px;
+    transition: outline-color var(--dur) ease-out, background-color var(--dur) ease-out;
+    cursor: pointer;
+  }
+  .blk:focus-visible { outline: 2px solid var(--ink); }
+  .post-h1 { font-size: 1.55rem; font-weight: 650; line-height: 1.22; }
+  .post-h2 { margin-top: 0.5rem; font-size: 1.1rem; font-weight: 640; }
+  .para { margin: 0.7rem 0; font-size: 0.9375rem; line-height: 1.7; color: #334155; }
+  .capsule { background: #f8fafc; border-left: 3px solid var(--accent); }
+  .capsule p { font-size: 0.9375rem; line-height: 1.65; font-weight: 500; }
+  .tag {
+    display: inline-block; margin-bottom: 0.3rem; font-size: 0.625rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
+  }
+  /* El hero se recorta: a altura completa empujaba el artículo fuera del pliegue y la
+     captura para la lámina salía sin una sola correspondencia visible. */
+  .blk img { width: 100%; height: auto; border-radius: 6px; display: block; }
+  .blk:first-child img { max-height: 150px; object-fit: cover; }
+  figcaption { margin-top: 0.4rem; font-size: 0.8125rem; color: var(--muted); }
+  .credit { margin-top: 0.15rem; font-size: 0.6875rem; color: #94a3b8; }
+  .credit a { color: inherit; text-decoration: underline; }
+  .blk-title { font-weight: 640; font-size: 0.9375rem; margin-bottom: 0.45rem; }
+
+  .twrap { overflow-x: auto; max-width: 100%; }
+  table { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: 0.8125rem; }
+  caption { text-align: left; font-weight: 640; font-size: 0.875rem; padding-bottom: 0.4rem; }
+  th, td { border: 1px solid var(--line); padding: 0.45rem 0.55rem; text-align: left; vertical-align: top; }
+  th { background: #f8fafc; font-weight: 640; }
+
+  ol { padding-left: 1.15rem; }
+  ol li { font-size: 0.875rem; line-height: 1.6; margin: 0.3rem 0; }
+  .faq .qa { padding: 0.5rem 0; border-top: 1px solid var(--line); }
+  .faq .q { font-weight: 640; font-size: 0.875rem; }
+  .faq .a { font-size: 0.875rem; line-height: 1.6; color: #475569; margin-top: 0.15rem; }
+  .links li, .sources li { font-size: 0.8125rem; margin: 0.3rem 0; }
+  .links a, .sources a { color: var(--accent); text-decoration: underline; }
+  .links em, .sources em { color: var(--muted); font-style: normal; font-size: 0.75rem; }
+  .sources { border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 0.8rem; }
+  .sources ul { padding-left: 1rem; list-style: disc; }
+
+  /* ── Panel de máquina ── */
+  .mach { padding: 0.9rem; }
+  .grp { margin-bottom: 1.4rem; }
+  .grp-t {
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem;
+  }
+  .grp-t.big { font-size: 0.8125rem; color: var(--accent); }
+  .ev { border-top: 2px solid var(--line); padding-top: 1.1rem; }
+  .ev-intro { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.7rem; }
+
+  .node {
+    margin-bottom: 0.5rem; padding: 0.55rem 0.7rem;
+    border: 1px solid var(--line); border-radius: 7px; background: #fff;
+    outline: 2px solid transparent; outline-offset: 1px;
+    transition: outline-color var(--dur) ease-out, background-color var(--dur) ease-out;
+  }
+  .node:focus-visible { outline: 2px solid var(--ink); }
+  .n-label { font-size: 0.75rem; font-weight: 700; color: #334155; }
+  .n-label em { font-weight: 400; color: var(--muted); font-style: normal; }
+  .n-value { font-size: 0.8125rem; margin-top: 0.15rem; color: #0f172a; word-break: break-word; }
+  .n-value.mono { font-family: ui-monospace, monospace; font-size: 0.6875rem; color: var(--muted); }
+  .n-why { font-size: 0.75rem; line-height: 1.55; color: #475569; margin-top: 0.35rem; }
+  .n-why b { color: var(--accent); }
+  .slim { padding: 0.35rem 0.7rem; }
+
+  .hnode { font-size: 0.75rem; padding: 0.2rem 0.3rem; border-radius: 4px; outline: 2px solid transparent;
+           transition: outline-color var(--dur) ease-out, background-color var(--dur) ease-out; }
+  .hnode.l2 { padding-left: 1.1rem; }
+  .lv { display: inline-block; min-width: 1.6rem; font-weight: 700; color: var(--accent); font-size: 0.625rem; }
+
+  .note {
+    font-size: 0.75rem; line-height: 1.5; color: #92400e;
+    background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;
+    padding: 0.5rem 0.6rem; margin-bottom: 0.6rem;
+  }
+  .schema summary { cursor: pointer; display: flex; justify-content: space-between; gap: 0.5rem; align-items: center; }
+  .stype { font-size: 0.75rem; font-weight: 700; font-family: ui-monospace, monospace; }
+  .smetric {
+    font-size: 0.625rem; font-weight: 700; color: #fff; background: var(--accent);
+    padding: 0.1rem 0.4rem; border-radius: 999px; white-space: nowrap;
+  }
+  pre {
+    margin-top: 0.5rem; padding: 0.6rem; background: #0f172a; color: #e2e8f0;
+    border-radius: 6px; font-size: 0.6875rem; line-height: 1.5;
+    overflow-x: auto; max-height: 20rem; max-width: 100%;
+  }
+  .schema { min-width: 0; }
+
+  .fact .f-value { font-size: 1.05rem; font-weight: 700; color: var(--accent); margin: 0.15rem 0; }
+  .src { margin-top: 0.35rem; font-size: 0.6875rem; color: #94a3b8; }
+  .src cite { font-style: normal; }
+  .fan { margin-top: 0.5rem; }
+  .fan li {
+    display: flex; gap: 0.45rem; font-size: 0.75rem; padding: 0.25rem 0.3rem;
+    border-radius: 4px; outline: 2px solid transparent; align-items: baseline;
+    transition: outline-color var(--dur) ease-out, background-color var(--dur) ease-out;
+  }
+  .chk { color: #16a34a; font-weight: 700; }
+  .honesty {
+    margin-top: 0.7rem; padding: 0.6rem 0.7rem; font-size: 0.75rem; line-height: 1.55;
+    color: #475569; background: #f8fafc; border-radius: 6px; border: 1px dashed var(--line);
+  }
+
+  /* ── Licencias ── */
+  .lic { margin-top: 1.5rem; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 10px; background: #f8fafc; }
+  .lic ul { margin-top: 0.4rem; }
+  .lic li { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; font-size: 0.75rem; padding: 0.3rem 0; border-top: 1px solid var(--line); }
+  .lic strong { font-weight: 500; color: #334155; }
+  .lic span { color: var(--muted); }
+  .lic a { color: var(--accent); text-decoration: underline; }
+  .lic-note { margin-top: 0.6rem; font-size: 0.75rem; font-weight: 600; color: #334155; }
+
+  .sr-status { font-size: 0.6875rem; color: var(--muted); }
+
+  /* ── EL ACOPLAMIENTO ── el estado se distingue por MÁS que color (outline + fondo). */
+  [data-on] { outline-color: var(--accent) !important; background-color: var(--tint) !important; }
+
+  /* ── Reduced motion: el significado nunca estuvo en el movimiento. ── */
+  @media (prefers-reduced-motion: reduce) {
+    .blk, .node, .hnode, .fan li { transition-duration: 0ms !important; }
+  }
+
+  /* ── Impresión: apila y expande. No es un entregable diseñado, solo no sale roto. ── */
+  @media print {
+    .split { grid-template-columns: 1fr; }
+    .pane-b { position: static; max-height: none; overflow: visible; }
+    .bar { position: static; }
+    pre { max-height: none; }
+  }
+</style>

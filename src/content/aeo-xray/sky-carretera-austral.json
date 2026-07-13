@@ -1,0 +1,513 @@
+{
+  "client": {
+    "name": "SKY",
+    "legalName": "SKY Airline",
+    "site": "blog.skyairline.com",
+    "accent": "#E6007E"
+  },
+  "meta": {
+    "sampleTitle": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas",
+    "kicker": "Muestra de trabajo · Producción de contenido con capa AEO",
+    "preparedAt": "2026-07-13",
+    "preparedBy": "Efeonce"
+  },
+  "thesis": "«carretera austral» mueve 18.100 búsquedas al mes en Chile. SKY tiene una página del tema y no aparece en las primeras cien posiciones: el espacio lo ocupan Wikipedia, Instagram y TripAdvisor. Y SKY es la aerolínea que vuela a Balmaceda, el aeropuerto de entrada. Nadie en ese resultado de búsqueda puede resolver la logística de llegada. Este artículo es esa pieza.",
+
+  "article": {
+    "proposedUrl": "https://blog.skyairline.com/carretera-austral-como-llegar/",
+    "category": "Datos útiles para viajeros",
+    "author": "Equipo editorial SKY",
+    "publishedAt": "2026-07-15",
+    "blocks": [
+      {
+        "type": "hero-image",
+        "coupleId": "img-hero",
+        "src": "/muestras/sky-carretera-austral/carretera-austral-ruta7.jpg",
+        "alt": "Camino de ripio de la Carretera Austral entre bosque nativo y montañas, en la Región de Aysén",
+        "caption": "La Ruta 7 atraviesa 1.247 km de la Patagonia chilena.",
+        "credit": {
+          "author": "Jason Hollinger",
+          "license": "CC BY 2.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Carretera_Austral_(3184411267).jpg"
+        }
+      },
+      {
+        "type": "h1",
+        "coupleId": "h1",
+        "text": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas"
+      },
+      {
+        "type": "answer-capsule",
+        "coupleId": "capsule-main",
+        "text": "La Carretera Austral (Ruta 7) recorre 1.247 km entre Puerto Montt y Villa O'Higgins. La forma más rápida de empezar es volar a Balmaceda, el aeropuerto de Coyhaique, y arrendar un auto ahí mismo: te saltas los tramos más largos y los tres transbordadores del norte. Recorrerla con calma toma entre 10 y 14 días."
+      },
+      {
+        "type": "h2",
+        "coupleId": "h2-como-llegar",
+        "text": "¿Cómo se llega a la Carretera Austral?"
+      },
+      {
+        "type": "answer-capsule",
+        "coupleId": "capsule-como-llegar",
+        "text": "Hay tres puertas de entrada. La más rápida es volar a Balmaceda (BBA) y arrendar un auto en el mismo terminal: el aeropuerto queda a 56 km de Coyhaique, una hora por la ruta CH-245, y te deja en el centro de la ruta. Las otras dos parten en Puerto Montt, el kilómetro 0."
+      },
+      {
+        "type": "paragraph",
+        "text": "La diferencia no es menor. Entrar por Balmaceda te deja parado en la mitad de la Carretera Austral, con Cerro Castillo a dos horas y las Capillas de Mármol a media jornada. Entrar por Puerto Montt significa hacer la ruta completa, con los tres transbordadores del tramo norte por delante."
+      },
+      {
+        "type": "table",
+        "coupleId": "table-entradas",
+        "caption": "Las tres puertas de entrada a la Carretera Austral",
+        "headers": ["Por dónde entras", "Cómo llegas", "Dónde empiezas a manejar", "Qué te saltas"],
+        "rows": [
+          ["Balmaceda (BBA)", "Vuelo directo a Balmaceda + 56 km hasta Coyhaique (≈1 h, ruta CH-245)", "Coyhaique, en el centro de la ruta", "Los tres transbordadores del tramo norte"],
+          ["Puerto Montt", "Vuelo a Puerto Montt, y de ahí al kilómetro 0", "Puerto Montt", "Nada: haces los 1.247 km completos"],
+          ["Manejando desde Santiago", "Ruta 5 al sur hasta Puerto Montt", "Puerto Montt", "Nada, y sumas dos días de ruta por lado"]
+        ]
+      },
+      {
+        "type": "h2",
+        "coupleId": "h2-cuantos-dias",
+        "text": "¿Cuántos días necesitas para recorrerla?"
+      },
+      {
+        "type": "answer-capsule",
+        "coupleId": "capsule-dias",
+        "text": "La Carretera Austral completa —los 1.247 km entre Puerto Montt y Villa O'Higgins— toma entre 10 y 14 días si quieres bajarte del auto. Si vuelas a Balmaceda y haces solo el tramo sur, con 5 a 7 días alcanzas para Cerro Castillo, las Capillas de Mármol y el río Baker."
+      },
+      {
+        "type": "ordered-list",
+        "coupleId": "list-itinerario",
+        "title": "Siete días desde Balmaceda, sin apuro",
+        "items": [
+          "Día 1 — Vuelas a Balmaceda, retiras el auto en el terminal y duermes en Coyhaique (56 km).",
+          "Día 2 — Coyhaique a Villa Cerro Castillo. Es corto: te queda la tarde para el mirador.",
+          "Día 3 — Cerro Castillo a Puerto Río Tranquilo, a orillas del lago General Carrera.",
+          "Día 4 — Capillas de Mármol en bote por la mañana. Tarde libre.",
+          "Día 5 — Bajas al sur hasta la confluencia del río Baker, el más caudaloso de Chile.",
+          "Día 6 — Cochrane y vuelta hacia el norte con calma.",
+          "Día 7 — Regreso a Coyhaique y vuelo desde Balmaceda."
+        ]
+      },
+      {
+        "type": "image",
+        "coupleId": "img-castillo",
+        "src": "/muestras/sky-carretera-austral/cerro-castillo.jpg",
+        "alt": "Las agujas de roca del Cerro Castillo nevadas sobre un lago, en el Parque Nacional Cerro Castillo",
+        "caption": "Cerro Castillo queda a dos horas de Coyhaique. Es la primera parada si entras por Balmaceda.",
+        "credit": {
+          "author": "Natalia Reyes Escobar",
+          "license": "CC BY-SA 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Cerro_Castillo_Parque_Nacional_Cerro_Castillo_14.jpg"
+        }
+      },
+      {
+        "type": "h2",
+        "coupleId": "h2-epoca",
+        "text": "¿Cuál es la mejor época para recorrer la Carretera Austral?"
+      },
+      {
+        "type": "answer-capsule",
+        "coupleId": "capsule-epoca",
+        "text": "El verano austral —de diciembre a marzo— es la ventana más segura: días largos, caminos abiertos y todos los transbordadores operando. Noviembre y abril son más baratos y con menos gente, pero el clima de Aysén cambia rápido en cualquier mes. Lleva capas, siempre."
+      },
+      {
+        "type": "paragraph",
+        "text": "En invierno varios tramos y servicios reducen su frecuencia. Si vas fuera de temporada, confirma los horarios de los transbordadores antes de comprometer un itinerario: son ellos, y no el camino, los que mandan."
+      },
+      {
+        "type": "h2",
+        "coupleId": "h2-ripio",
+        "text": "¿Está pavimentada? ¿Necesitas un 4x4?"
+      },
+      {
+        "type": "answer-capsule",
+        "coupleId": "capsule-ripio",
+        "text": "La Carretera Austral está pavimentada por tramos y sigue teniendo sectores de ripio, sobre todo al sur de Cerro Castillo. No necesitas un 4x4 para hacerla en verano, pero sí un auto con buena altura, la rueda de repuesto revisada y paciencia con el ripio suelto."
+      },
+      {
+        "type": "image",
+        "coupleId": "img-senaletica",
+        "src": "/muestras/sky-carretera-austral/senaletica-ruta7.jpg",
+        "alt": "Señalética de la Ruta 7 al costado de un tramo de ripio de la Carretera Austral",
+        "caption": "La Ruta 7 alterna pavimento y ripio. El sur es el tramo más exigente.",
+        "credit": {
+          "author": "Ivotoledo45",
+          "license": "CC BY-SA 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Carretera_Austral_2010s_sign_style.jpg"
+        }
+      },
+      {
+        "type": "h2",
+        "coupleId": "h2-ferries",
+        "text": "Los transbordadores: la parte que no puedes improvisar"
+      },
+      {
+        "type": "answer-capsule",
+        "coupleId": "capsule-ferries",
+        "text": "La Carretera Austral no es continua: tiene cruces en transbordador que hay que reservar. Los dos del tramo norte salen de Caleta La Arena (unos 40 minutos) y de Hornopirén (unas cinco horas). En el extremo sur, el cruce de Puerto Yungay a Río Bravo dura cerca de una hora y es gratuito."
+      },
+      {
+        "type": "paragraph",
+        "text": "Si entras por Balmaceda no tocas ninguno de los dos primeros. Es, en la práctica, la razón más concreta para volar: no te ahorras solo kilómetros, te ahorras los dos cuellos de botella que pueden desarmarte el itinerario completo."
+      },
+      {
+        "type": "image",
+        "coupleId": "img-baker",
+        "src": "/muestras/sky-carretera-austral/rio-baker.jpg",
+        "alt": "Aguas turquesas del río Baker entre laderas de vegetación patagónica, en la Región de Aysén",
+        "caption": "El río Baker, el más caudaloso de Chile, corre junto a la Ruta 7 en el tramo sur.",
+        "credit": {
+          "author": "Germán Póo-Caamaño",
+          "license": "CC BY 2.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Baker_River_delta.jpg"
+        }
+      },
+      {
+        "type": "faq",
+        "coupleId": "faq",
+        "title": "Preguntas frecuentes",
+        "items": [
+          {
+            "q": "¿Cuánto mide la Carretera Austral?",
+            "a": "La Ruta 7 recorre 1.247 km entre Puerto Montt y Villa O'Higgins, atravesando la Región de Los Lagos y la Región de Aysén."
+          },
+          {
+            "q": "¿A qué aeropuerto tengo que llegar para la Carretera Austral?",
+            "a": "A Balmaceda (BBA), el aeropuerto de Coyhaique. Queda a 56 km de la ciudad, cerca de una hora por la ruta CH-245, y es la entrada más directa al centro de la ruta."
+          },
+          {
+            "q": "¿Se puede arrendar un auto en el aeropuerto de Balmaceda?",
+            "a": "Sí. Hay empresas de arriendo operando en el mismo terminal, así que puedes empezar a manejar apenas aterrizas."
+          },
+          {
+            "q": "¿Necesito reservar los transbordadores?",
+            "a": "Sí, sobre todo en verano. Los cruces del tramo norte se llenan y son el punto más frágil del itinerario. Si entras por Balmaceda, no los necesitas."
+          },
+          {
+            "q": "¿Cuántos días mínimo hay que dedicarle?",
+            "a": "Entrando por Balmaceda, con 5 a 7 días haces el tramo sur sin apuro. La ruta completa desde Puerto Montt pide entre 10 y 14 días."
+          }
+        ]
+      },
+      {
+        "type": "internal-links",
+        "coupleId": "internal-links",
+        "title": "Sigue planificando",
+        "items": [
+          { "text": "Aeropuerto de Balmaceda: cómo llegar a Coyhaique", "href": "https://blog.skyairline.com/aeropuerto-de-balmaceda/", "note": "Página existente del blog" },
+          { "text": "Viajar a Coyhaique: qué ver y cómo llegar", "href": "https://blog.skyairline.com/viajar-a-coyhaique/", "note": "Página existente del blog" },
+          { "text": "Carretera Austral (guía madre)", "href": "https://blog.skyairline.com/carretera-austral/", "note": "Página madre del cluster" },
+          { "text": "Vuelos a Balmaceda / Coyhaique", "href": "https://www.skyairline.com/flights/es-cl/vuelos-a-balmaceda-coyhaique", "note": "Ruta comercial" }
+        ]
+      },
+      {
+        "type": "sources",
+        "title": "Fuentes",
+        "items": [
+          { "text": "Longitud de la Ruta 7 (1.247 km) — Carretera Austral, Wikipedia", "href": "https://en.wikipedia.org/wiki/Carretera_Austral" },
+          { "text": "Distancia Balmaceda–Coyhaique (56 km, ruta CH-245) — Aeropuerto de Balmaceda", "href": "https://aeropuertodebalmaceda.cl/" },
+          { "text": "Cruces en transbordador y duraciones — GoChile, guía de la Carretera Austral", "href": "https://www.gochile.cl/en/articles/guide-to-traveling-the-carretera-austral.htm" }
+        ]
+      }
+    ]
+  },
+
+  "machine": {
+    "seo": [
+      {
+        "id": "meta-title",
+        "coupleId": "h1",
+        "label": "Meta title",
+        "value": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas | SKY",
+        "detail": "62 caracteres",
+        "why": "Lleva el término principal al frente («carretera austral», 18.100 búsquedas/mes) y promete las tres respuestas que la gente busca. No es el H1 por casualidad: es la misma promesa, dicha para el resultado de búsqueda."
+      },
+      {
+        "id": "meta-description",
+        "coupleId": "capsule-main",
+        "label": "Meta description",
+        "value": "Vuela a Balmaceda y arrienda ahí: te saltas los tres transbordadores del norte. Cuántos días necesitas, cuándo ir y si hace falta un 4x4.",
+        "detail": "137 caracteres",
+        "why": "Es la cápsula de respuesta comprimida. Adelanta el dato accionable en vez de describir el artículo."
+      },
+      {
+        "id": "canonical",
+        "coupleId": "h1",
+        "label": "URL canónica",
+        "value": "https://blog.skyairline.com/carretera-austral-como-llegar/",
+        "detail": "slug de intención, no de tema",
+        "why": "El slug dice «cómo llegar», no «carretera austral» a secas. Evita canibalizar la página madre del cluster, que ya existe y ocupa el tema general."
+      }
+    ],
+    "og": [
+      { "id": "og-title", "coupleId": "h1", "label": "og:title", "value": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas" },
+      { "id": "og-image", "coupleId": "img-hero", "label": "og:image", "value": "/muestras/sky-carretera-austral/carretera-austral-ruta7.jpg" },
+      { "id": "og-type", "coupleId": "h1", "label": "og:type", "value": "article" }
+    ],
+    "headings": {
+      "coupleId": "h1",
+      "why": "Cada H2 es una sub-pregunta del fan-out, escrita como pregunta y autocontenida. Un motor de respuesta recupera pasajes, no páginas: el pasaje tiene que entenderse solo, sin el resto del artículo.",
+      "tree": [
+        { "level": 1, "text": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas", "coupleId": "h1" },
+        { "level": 2, "text": "¿Cómo se llega a la Carretera Austral?", "coupleId": "h2-como-llegar" },
+        { "level": 2, "text": "¿Cuántos días necesitas para recorrerla?", "coupleId": "h2-cuantos-dias" },
+        { "level": 2, "text": "¿Cuál es la mejor época para recorrer la Carretera Austral?", "coupleId": "h2-epoca" },
+        { "level": 2, "text": "¿Está pavimentada? ¿Necesitas un 4x4?", "coupleId": "h2-ripio" },
+        { "level": 2, "text": "Los transbordadores: la parte que no puedes improvisar", "coupleId": "h2-ferries" },
+        { "level": 2, "text": "Preguntas frecuentes", "coupleId": "faq" }
+      ]
+    },
+    "alts": [
+      { "coupleId": "img-hero", "alt": "Camino de ripio de la Carretera Austral entre bosque nativo y montañas, en la Región de Aysén", "why": "Describe lo que se ve y nombra la entidad geográfica. Un alt como «paisaje» o «foto 1» no le sirve ni a un lector de pantalla ni a la búsqueda de imágenes." },
+      { "coupleId": "img-castillo", "alt": "Las agujas de roca del Cerro Castillo nevadas sobre un lago, en el Parque Nacional Cerro Castillo", "why": "Nombra el hito exacto. Es lo que permite que la imagen se recupere por «Cerro Castillo» y no solo por «montaña»." },
+      { "coupleId": "img-senaletica", "alt": "Señalética de la Ruta 7 al costado de un tramo de ripio de la Carretera Austral", "why": "Refuerza la entidad «Ruta 7» y aporta el dato visual del ripio, que es una de las preguntas del artículo." },
+      { "coupleId": "img-baker", "alt": "Aguas turquesas del río Baker entre laderas de vegetación patagónica, en la Región de Aysén", "why": "Nombra el río y la región. El alt es contenido, no un trámite de accesibilidad." }
+    ],
+    "jsonld": [
+      {
+        "id": "node-website",
+        "coupleId": "internal-links",
+        "type": "WebSite + SearchAction",
+        "metric": "Ser accionable — 8/100",
+        "why": "Este es el nodo que ataca el 8 sobre 100 del diagnóstico. El «potentialAction» le dice a una máquina que el sitio se puede OPERAR, no solo leer: que hay una acción de búsqueda que un agente puede ejecutar. Hoy el blog de SKY no declara ninguna.",
+        "code": {
+          "@type": "WebSite",
+          "@id": "https://blog.skyairline.com/#website",
+          "url": "https://blog.skyairline.com/",
+          "name": "Blog SKY",
+          "publisher": { "@id": "https://www.skyairline.com/#organization" },
+          "inLanguage": "es-CL",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://blog.skyairline.com/?s={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        }
+      },
+      {
+        "id": "node-organization",
+        "coupleId": "h1",
+        "type": "Organization",
+        "metric": "Claridad de marca — 100/100 (sostener)",
+        "why": "El «sameAs» es lo que permite que una cita se atribuya a SKY como entidad, y no a «un blog de viajes». Sin él, el motor puede usar tu contenido y acreditárselo a otro.",
+        "code": {
+          "@type": "Organization",
+          "@id": "https://www.skyairline.com/#organization",
+          "name": "SKY Airline",
+          "url": "https://www.skyairline.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.skyairline.com/logo.png"
+          },
+          "sameAs": [
+            "https://es.wikipedia.org/wiki/SKY_Airline",
+            "https://www.instagram.com/skyairline/",
+            "https://www.linkedin.com/company/sky-airline/"
+          ]
+        }
+      },
+      {
+        "id": "node-blogposting",
+        "coupleId": "h1",
+        "type": "BlogPosting",
+        "metric": "Ser legible — 70/100",
+        "why": "Declara autor, fecha y sección en un formato que una máquina no tiene que adivinar. La frescura es señal de citabilidad: el contenido actualizado hace menos de dos meses recibe cerca de un 28% más de citas.",
+        "code": {
+          "@type": "BlogPosting",
+          "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#article",
+          "isPartOf": { "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#webpage" },
+          "headline": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas",
+          "description": "Vuela a Balmaceda y arrienda ahí: te saltas los tres transbordadores del norte. Cuántos días necesitas, cuándo ir y si hace falta un 4x4.",
+          "datePublished": "2026-07-15",
+          "dateModified": "2026-07-15",
+          "inLanguage": "es-CL",
+          "articleSection": "Datos útiles para viajeros",
+          "author": { "@id": "https://www.skyairline.com/#organization" },
+          "publisher": { "@id": "https://www.skyairline.com/#organization" },
+          "image": { "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#primaryimage" },
+          "mainEntityOfPage": { "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#webpage" }
+        }
+      },
+      {
+        "id": "node-imageobject",
+        "coupleId": "img-hero",
+        "type": "ImageObject",
+        "metric": "Ser encontrada — 40/100",
+        "why": "El «alt» vive en el HTML; el ImageObject vive en la capa de datos. Son cosas distintas y hacen falta las dos: una la lee un lector de pantalla, la otra la lee un motor que indexa imágenes.",
+        "code": {
+          "@type": "ImageObject",
+          "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#primaryimage",
+          "url": "https://blog.skyairline.com/wp-content/uploads/carretera-austral-ruta7.jpg",
+          "contentUrl": "https://blog.skyairline.com/wp-content/uploads/carretera-austral-ruta7.jpg",
+          "caption": "La Ruta 7 atraviesa 1.247 km de la Patagonia chilena.",
+          "creditText": "Jason Hollinger",
+          "license": "https://creativecommons.org/licenses/by/2.0/"
+        }
+      },
+      {
+        "id": "node-breadcrumb",
+        "coupleId": "internal-links",
+        "type": "BreadcrumbList",
+        "metric": "Ser encontrada — 40/100",
+        "why": "Le declara a la máquina que este artículo es un satélite dentro de un cluster, no una página suelta. Es la estructura que construye autoridad temática por destino.",
+        "code": {
+          "@type": "BreadcrumbList",
+          "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Blog SKY", "item": "https://blog.skyairline.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Carretera Austral", "item": "https://blog.skyairline.com/carretera-austral/" },
+            { "@type": "ListItem", "position": 3, "name": "Cómo llegar a la Carretera Austral" }
+          ]
+        }
+      },
+      {
+        "id": "node-faqpage",
+        "coupleId": "faq",
+        "type": "FAQPage",
+        "metric": "Ser correcta — 37/100",
+        "why": "Este es el nodo que ataca el 37 sobre 100. Convierte cada respuesta en un hecho que una máquina puede extraer y citar textualmente. ⚠️ No promete el resultado enriquecido de FAQ en Google: Google lo restringió en 2023 a sitios de gobierno y salud. Se marca por la capa de máquina, no por la cajita.",
+        "code": {
+          "@type": "FAQPage",
+          "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "¿Cuánto mide la Carretera Austral?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "La Ruta 7 recorre 1.247 km entre Puerto Montt y Villa O'Higgins, atravesando la Región de Los Lagos y la Región de Aysén."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿A qué aeropuerto tengo que llegar para la Carretera Austral?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A Balmaceda (BBA), el aeropuerto de Coyhaique. Queda a 56 km de la ciudad, cerca de una hora por la ruta CH-245, y es la entrada más directa al centro de la ruta."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Necesito reservar los transbordadores?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, sobre todo en verano. Los cruces del tramo norte se llenan y son el punto más frágil del itinerario. Si entras por Balmaceda, no los necesitas."
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "craft": [
+      {
+        "coupleId": "capsule-main",
+        "label": "Cápsula de respuesta",
+        "detail": "55 palabras",
+        "why": "Respuesta directa en 40–60 palabras bajo el título. Es el patrón presente en el 72,4% de las páginas que ChatGPT cita. Sin ella, el motor tiene que inferir la respuesta del cuerpo del texto — y muchas veces prefiere citar a otro."
+      },
+      {
+        "coupleId": "table-entradas",
+        "label": "Tabla",
+        "detail": "3 filas × 4 columnas",
+        "why": "Las páginas con al menos una tabla y una lista numerada reciben cerca de 2,3× más citas en ChatGPT. Un dato tabulado es un dato que la máquina puede extraer sin ambigüedad."
+      },
+      {
+        "coupleId": "list-itinerario",
+        "label": "Lista numerada",
+        "detail": "7 pasos",
+        "why": "El otro formato de alta citabilidad. Además responde una sub-pregunta del fan-out («cuántos días») en un formato que se cita entero."
+      },
+      {
+        "coupleId": "internal-links",
+        "label": "Enlaces internos del cluster",
+        "detail": "4 enlaces · 3 a páginas que ya existen",
+        "why": "No inventamos la arquitectura: el artículo se enlaza con la página madre y con las páginas de Balmaceda y Coyhaique que el blog de SKY ya tiene publicadas. Eso es lo que construye autoridad temática por destino en vez de artículos sueltos."
+      }
+    ]
+  },
+
+  "evidence": {
+    "intro": "Este artículo no se eligió por intuición. Se eligió porque el dato dijo dónde estaba el hueco.",
+    "facts": [
+      {
+        "coupleId": "h1",
+        "label": "Volumen del término principal",
+        "value": "18.100 búsquedas/mes",
+        "note": "«carretera austral», Google Chile",
+        "source": "Semrush, base de datos cl",
+        "asOf": "2026-07-13"
+      },
+      {
+        "coupleId": "h1",
+        "label": "Posición actual de SKY",
+        "value": "Fuera del top 100",
+        "note": "SKY tiene una página del tema publicada y no aparece en las primeras cien posiciones",
+        "source": "Semrush, base de datos cl",
+        "asOf": "2026-07-13"
+      },
+      {
+        "coupleId": "h2-como-llegar",
+        "label": "Quién ocupa hoy ese espacio",
+        "value": "Wikipedia · Instagram · TripAdvisor",
+        "note": "Top 12 real: Wikipedia (1), Instagram (2), gochile (3), carretera-austral.cl (4), chile.travel (5), chileestuyo (6), tur.com (7), autofact (8), wikiexplora (9), TripAdvisor (10). Cero aerolíneas.",
+        "source": "Semrush SERP, base de datos cl",
+        "asOf": "2026-07-13"
+      },
+      {
+        "coupleId": "h2-como-llegar",
+        "label": "El ángulo que solo SKY tiene",
+        "value": "Vuela a Balmaceda (BBA)",
+        "note": "Rutas verificadas desde Santiago, Concepción, Puerto Montt, Castro, Valdivia, Temuco, Calama e Iquique. «aeropuerto balmaceda» mueve 6.600/mes y SKY rankea 11º. Nadie en ese top 12 puede resolver la logística de llegada.",
+        "source": "Semrush, base de datos cl",
+        "asOf": "2026-07-13"
+      },
+      {
+        "coupleId": "faq",
+        "label": "Citas del blog de SKY en motores de IA",
+        "value": "0 en 35 respuestas",
+        "note": "Las fuentes citadas son terceros: BioBioChile, YouTube, Instagram, Despegar, Trustpilot. Escalera Be X: Ser encontrada 40 · legible 70 · correcta 37 · accionable 8 · intrínseca 76.",
+        "source": "AI Visibility Grader de Efeonce (5 motores)",
+        "asOf": "2026-07"
+      }
+    ],
+    "fanOut": {
+      "title": "El espacio de sub-preguntas (query fan-out)",
+      "note": "Un motor de respuesta descompone una consulta en 8–12 sub-preguntas y recupera pasajes para cada una. Escribir solo para el término principal te deja fuera de casi todas. Estas son las que este artículo cubre, y con qué sección.",
+      "items": [
+        { "q": "¿Cómo llego a la Carretera Austral?", "coveredBy": "h2-como-llegar", "covered": true },
+        { "q": "¿A qué aeropuerto tengo que volar?", "coveredBy": "faq", "covered": true },
+        { "q": "¿Cuántos días necesito?", "coveredBy": "h2-cuantos-dias", "covered": true },
+        { "q": "¿Cuál es la mejor época del año?", "coveredBy": "h2-epoca", "covered": true },
+        { "q": "¿Está pavimentada?", "coveredBy": "h2-ripio", "covered": true },
+        { "q": "¿Necesito un 4x4?", "coveredBy": "h2-ripio", "covered": true },
+        { "q": "¿Hay que reservar los transbordadores?", "coveredBy": "h2-ferries", "covered": true },
+        { "q": "¿Se puede arrendar auto en Balmaceda?", "coveredBy": "faq", "covered": true },
+        { "q": "¿Cuánto mide la ruta?", "coveredBy": "capsule-main", "covered": true },
+        { "q": "¿Qué ver en el tramo sur?", "coveredBy": "list-itinerario", "covered": true }
+      ]
+    },
+    "honesty": "Semrush mide el volumen de búsqueda de Google, no el espacio de preguntas que la gente le hace a un asistente con IA. Varias de las sub-preguntas de arriba tienen volumen casi nulo en Google y son exactamente lo que se le pregunta a un modelo. Por eso el artículo se ancla en el término con volumen y se estructura para el fan-out: son dos capas, no una."
+  },
+
+  "ui": {
+    "disclaimerLabel": "Ejemplo ilustrativo de Efeonce",
+    "disclaimerBody": "Esta página es una muestra de trabajo elaborada por Efeonce. No es una publicación de SKY ni está alojada en sus canales.",
+    "paneArticleTitle": "El artículo",
+    "paneArticleSubtitle": "Lo que ve el lector",
+    "paneMachineTab": "Lo que lee una máquina",
+    "paneEvidenceTab": "La evidencia",
+    "hintDesktop": "Pasa el cursor por el artículo y verás qué produce en la capa de máquina.",
+    "hintMobile": "Toca un elemento del artículo para ver qué produce.",
+    "whyLabel": "Para qué sirve",
+    "schemaNote": "Este bloque se muestra como texto. No está activo en esta página: emitirlo aquí declararía que Efeonce publicó un artículo de SKY.",
+    "sourceLabel": "Fuente",
+    "thesisLabel": "Por qué existe este artículo",
+    "licenseTitle": "Imágenes: autoría y licencia",
+    "backToArticle": "Volver al artículo"
+  }
+}

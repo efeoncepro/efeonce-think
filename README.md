@@ -47,6 +47,24 @@ Un primitive = **una fuente de verdad, muchos consumers**. Ver `src/components/p
   (estilos + motion propios), desacoplada del modelo del grader vía adapter. Contrato:
   `@lib/primitives/ladder` (`LadderRung`).
 
+### Conversion primitives — Growth CTA seed
+
+- **`EfeonceMeetingEmbed`** (`src/components/EfeonceMeetingEmbed.astro`) — seed Think del patrón portable `book_meeting`.
+  La ruta noindex `/preview/meeting-embed` permite revisar estética antes de insertarlo en informes o landings.
+  Default `mode="overlay"`: renderiza un CTA medible que abre HubSpot Meetings en un booking room fijo,
+  amplio y con scroll del documento bloqueado. Esto evita que el paso de datos/privacidad de HubSpot quede
+  desalineado dentro de una card angosta. En mobile, el overlay es dueño del scroll y el iframe se mantiene
+  alto para evitar scroll interno de HubSpot; los mensajes de altura del iframe resetean el overlay al inicio
+  de cada paso, así los campos quedan visibles antes del aviso de privacidad incluso tras elegir horarios bajos.
+  `mode="inline"` queda reservado para superficies dedicadas y sólo
+  después de QA de flujo completo; `mode="handoff"` abre HubSpot en pestaña nueva como fallback CRO-safe.
+  La primitiva carga `MeetingsEmbedCode.js` una sola vez, conserva fallback directo, respeta
+  `prefers-reduced-motion` y emite `dataLayer` sin PII:
+  `gh_cta_clicked`, `gh_meeting_embed_viewed`, `gh_meeting_embed_loaded`, `gh_meeting_embed_failed`.
+  Cuando se inserte en reportes tokenizados, debe redactar `page_uri` como `/brand-visibility/r/[token]`;
+  no enviar tokens reales al tracking plan. La arquitectura destino vive en Greenhouse como `growth.cta` y HubSpot Meetings es sólo la
+  acción/destino `book_meeting`, no el source of truth.
+
 ## Marca
 
 Los tokens AXIS se **copian** al hub en `src/lib/report-tokens.ts` (`axis` + `severityMeta`) —
@@ -86,3 +104,37 @@ para converger sin fricción.
 Auto-deploy en cada push a `main` (Vercel, team `efeonce-7670142f` — **NUNCA** scope personal).
 Proyecto `efeonce-think` (`prj_F4gvS8jmWjvdJ8cTwM6k60R1XydV`). Gobernable desde Greenhouse vía
 `greenhouse.repo.json` (cableado del control plane multi-repo = TASK-1326).
+
+## Radiografía AEO — muestras de trabajo (`/muestras/<slug>`)
+
+Un artículo real con **su capa de máquina visible y acoplada** al lado (JSON-LD, metadatos,
+`alt`, encabezados, enlaces de cluster) más **un tercer panel con la evidencia** de por qué
+ese artículo existe. Se usa como muestra en propuestas comerciales. Owner: `TASK-1410`
+(greenhouse-eo).
+
+**El cliente es un payload, no código.** Para hacer la muestra del siguiente cliente:
+
+1. Escribe `src/content/aeo-xray/<cliente>-<slug>.json`. Copia
+   `sky-carretera-austral.json` como referencia.
+2. Deja las imágenes en `public/muestras/<cliente>-<slug>/`.
+3. `pnpm build && pnpm verify:aeo-xray` (usa `XRAY_SLUG=<cliente>-<slug>`).
+
+No se toca ni un componente. Si terminas escribiendo un `if (cliente === '...')` en algún
+componente, la frontera se rompió.
+
+El schema Zod (`src/content.config.ts`) es el gate de calidad: **obliga** `alt` + autoría +
+licencia en cada imagen y `source` + `asOf` en cada cifra. Un payload incompleto **rompe el
+build** en vez de publicar una muestra que promete rigor y no lo tiene.
+
+### ⚠️ Invariantes (romper uno vuelve la pieza en contra)
+
+1. **El JSON-LD se renderiza como TEXTO ESCAPADO.** Jamás dentro de un
+   `<script type="application/ld+json">`, y la página **no** le pasa `jsonLd` a `BaseLayout`.
+   Emitirlo aquí declararía, en *nuestro* dominio, que Efeonce publicó un artículo del cliente:
+   un dato estructurado falso, ingerible por crawlers y motores de respuesta, justo en la pieza
+   cuya tesis es el rigor técnico. El assert 1 del verify **falla el gate** si aparece uno solo.
+2. **`noindex` + fuera del sitemap** (el `filter` vive en `astro.config.mjs`).
+3. **Rótulo persistente** "Ejemplo ilustrativo de Efeonce": niega autoría **y** alojamiento.
+4. **Cero imágenes generadas con IA.** Licencia verificable + crédito visible.
+5. **Nunca prometer el rich snippet de FAQ de Google** (restringido desde 2023 a gov/salud).
+6. **Cero cifras sin fuente y sin `as-of`.**
