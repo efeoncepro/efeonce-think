@@ -77,6 +77,25 @@ const aeoXray = defineCollection({
       site: z.string(),
       accent: z.string().regex(/^#[0-9a-fA-F]{6}$/),
     }),
+    /**
+     * Token de la URL: `/muestras/<slug>-<token>`.
+     *
+     * La muestra lleva la marca de un cliente y se entrega por enlace. Sin token, la URL
+     * es ADIVINABLE: quien recibe `/muestras/sky-…` puede probar `/muestras/jetsmart-…`.
+     * Hoy no encontraría nada; el día que le hagamos una muestra a un competidor directo
+     * de un cliente vigente, sí — y esa es una conversación que no queremos tener.
+     *
+     * 🔴 Se DECLARA acá, nunca se genera en el build: un token aleatorio por build
+     * cambiaría la URL en cada deploy, y esta URL va a una lámina y a una propuesta.
+     * Generar uno nuevo: `openssl rand -hex 6`.
+     *
+     * ⚠️ Es oscuridad, no seguridad: no hay auth. Quien tenga el enlace, entra.
+     * Para una muestra de trabajo eso es exactamente lo que queremos.
+     */
+    token: z
+      .string()
+      .regex(/^[a-f0-9]{12}$/, 'Token de 12 hex. Genéralo con `openssl rand -hex 6`; nunca a mano.'),
+
     meta: z.object({
       sampleTitle: z.string(),
       kicker: z.string(),

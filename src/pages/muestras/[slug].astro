@@ -23,7 +23,19 @@ export const prerender = true
 export async function getStaticPaths() {
   const samples = await getCollection('aeoXray')
 
-  return samples.map(sample => ({ params: { slug: sample.id }, props: { sample } }))
+  /**
+   * La URL es `<slug legible>-<token>`, no un token opaco.
+   *
+   * El slug se conserva porque el evaluador LEE la URL antes que el H1:
+   * `sky-carretera-austral` dice "esto lo hicieron para nosotros", no "plantilla con el
+   * logo cambiado". El token la vuelve inadivinable, que es lo que impide que un cliente
+   * pruebe la URL de su competidor. Un token opaco no aportaría nada más: la página
+   * revela el cliente apenas carga.
+   */
+  return samples.map(sample => ({
+    params: { slug: `${sample.id}-${sample.data.token}` },
+    props: { sample },
+  }))
 }
 
 const { sample } = Astro.props

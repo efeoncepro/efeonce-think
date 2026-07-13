@@ -116,6 +116,7 @@ ese artículo existe. Se usa como muestra en propuestas comerciales. Owner: `TAS
 
 1. Escribe `src/content/aeo-xray/<cliente>-<slug>.json`. Copia
    `sky-carretera-austral.json` como referencia.
+   **Genera su token con `openssl rand -hex 6`** y decláralo en el campo `token`.
 2. Deja las imágenes en `public/muestras/<cliente>-<slug>/`.
 3. `pnpm build && pnpm verify:aeo-xray` (usa `XRAY_SLUG=<cliente>-<slug>`).
 
@@ -138,3 +139,8 @@ build** en vez de publicar una muestra que promete rigor y no lo tiene.
 4. **Cero imágenes generadas con IA.** Licencia verificable + crédito visible.
 5. **Nunca prometer el rich snippet de FAQ de Google** (restringido desde 2023 a gov/salud).
 6. **Cero cifras sin fuente y sin `as-of`.**
+7. **La URL lleva token: `/muestras/<slug>-<token>`.** Sin él es adivinable — quien recibe
+   `/muestras/sky-…` puede probar `/muestras/<competidor>-…`. El token **se declara en el
+   payload, jamás se genera en el build**: uno aleatorio por build cambiaría la URL en cada
+   deploy, y esa URL va a una lámina y a una propuesta. Es oscuridad, no seguridad (no hay
+   auth): quien tenga el enlace, entra. Para una muestra de trabajo, es justo lo que queremos.

@@ -15,7 +15,11 @@ import { readFileSync, existsSync, mkdirSync } from 'node:fs'
 import { spawn } from 'node:child_process'
 import { setTimeout as sleep } from 'node:timers/promises'
 
-const SLUG = process.env.XRAY_SLUG ?? 'sky-carretera-austral'
+const SAMPLE = process.env.XRAY_SAMPLE ?? 'sky-carretera-austral'
+// El token vive en el payload (declarado, estable, versionado). El verify lo LEE de ahí:
+// hardcodearlo acá haría que el gate y la URL real se separen en silencio.
+const { token } = JSON.parse(readFileSync(`src/content/aeo-xray/${SAMPLE}.json`, 'utf8'))
+const SLUG = `${SAMPLE}-${token}`
 const ROUTE = `/muestras/${SLUG}/`
 const PORT = 4321
 const BASE = `http://localhost:${PORT}`
