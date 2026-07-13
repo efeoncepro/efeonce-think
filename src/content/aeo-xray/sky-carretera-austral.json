@@ -55,7 +55,7 @@
       },
       {
         "type": "paragraph",
-        "text": "La diferencia no es menor. Entrar por Balmaceda te deja parado en la mitad de la Carretera Austral, con Cerro Castillo a dos horas y las Capillas de Mármol a media jornada. Entrar por Puerto Montt significa hacer la ruta completa, con los tres transbordadores del tramo norte por delante."
+        "text": "Entrar por Balmaceda te deja parado en la mitad de la ruta: Cerro Castillo a dos horas, las Capillas de Mármol a media jornada. Entrar por Puerto Montt significa hacer los 1.247 km completos, con los tres transbordadores del tramo norte por delante."
       },
       {
         "type": "table",
@@ -261,7 +261,8 @@
             "text": "Cruces en transbordador y duraciones — GoChile, guía de la Carretera Austral",
             "href": "https://www.gochile.cl/en/articles/guide-to-traveling-the-carretera-austral.htm"
           }
-        ]
+        ],
+        "coupleId": "sources"
       }
     ]
   },
@@ -553,6 +554,28 @@
         "tier": 1,
         "stat": "37/100",
         "statNote": "Ser correcta"
+      },
+      {
+        "id": "node-author-gap",
+        "coupleId": "h1",
+        "type": "author → Person (recomendación)",
+        "metric": "Ser correcta — 37/100",
+        "tier": 1,
+        "stat": "37/100",
+        "statNote": "Ser correcta — el eje donde un autor con nombre y credencial mueve la aguja",
+        "why": "⚠️ Esta muestra firma «Equipo editorial SKY» porque es la práctica actual del blog, y el schema solo puede declarar lo que es cierto. Pero es la versión más débil posible de E-E-A-T: el estándar es un `author` de tipo `Person`, con nombre, credencial y `sameAs`. Un autor humano identificable es señal directa de citabilidad — y este es el primer cambio que propondríamos. Lo declaramos acá en vez de escondernos: la muestra dice también lo que le falta.",
+        "code": {
+          "@type": "Person",
+          "@id": "https://blog.skyairline.com/#autor-ejemplo",
+          "name": "— nombre del autor —",
+          "jobTitle": "Editor de contenidos de viaje",
+          "worksFor": {
+            "@id": "https://www.skyairline.com/#organization"
+          },
+          "sameAs": [
+            "https://www.linkedin.com/in/…"
+          ]
+        }
       }
     ],
     "craft": [
@@ -578,10 +601,8 @@
         "coupleId": "pull-balmaceda",
         "label": "Cita destacada",
         "detail": "1 · el ángulo propio de SKY",
-        "tier": 1,
-        "stat": "+41%",
-        "statNote": "de visibilidad con citas textuales — la táctica GEO de mayor lift medido",
-        "why": "No es una frase decorativa: es el pasaje que un motor de respuesta puede extraer entero y atribuir a SKY. Y dice lo único que ninguna otra fuente del SERP puede decir, porque ninguna es la aerolínea que vuela ahí."
+        "tier": 2,
+        "why": "Es el pasaje que un motor de respuesta puede extraer entero y atribuir a SKY, y dice lo único que ninguna otra fuente de ese resultado de búsqueda puede decir: ninguna es la aerolínea que vuela ahí. ⚠️ Ojo con la honestidad: NO es la táctica «Quotation Addition» (+41%) que mide la investigación GEO — esa exige citas de fuentes o expertos entre comillas, no una frase propia destacada. Es un pasaje citable, y eso es lo que declaramos."
       },
       {
         "coupleId": "list-itinerario",
@@ -596,6 +617,24 @@
         "detail": "4 enlaces · 3 a páginas que ya existen",
         "why": "No inventamos la arquitectura: el artículo se enlaza con la página madre y con las páginas de Balmaceda y Coyhaique que el blog de SKY ya tiene publicadas. Eso es lo que construye autoridad temática por destino en vez de artículos sueltos.",
         "tier": 2
+      },
+      {
+        "coupleId": "sources",
+        "label": "Fuentes enlazadas",
+        "detail": "3 · verificables",
+        "tier": 1,
+        "stat": "+30%",
+        "statNote": "de visibilidad al citar fuentes — táctica GEO medida (Princeton/Georgia Tech, KDD 2024)",
+        "why": "Cada dato del artículo se puede rastrear hasta su fuente y el lector puede comprobarlo. Es una de las tres tácticas con lift medido, y es la que un comité puede verificar en el acto: si un enlace no sostiene el dato, se cae toda la pieza."
+      },
+      {
+        "coupleId": "capsule-como-llegar",
+        "label": "Datos con unidad y fuente",
+        "detail": "1.247 km · 56 km · 40 min · 5 h",
+        "tier": 1,
+        "stat": "+32%",
+        "statNote": "de visibilidad con estadísticas — la segunda táctica GEO de mayor lift",
+        "why": "Un motor de respuesta extrae cifras, no adjetivos. «Queda cerca» no se cita; «56 km, una hora por la ruta CH-245» sí. Cada dato del artículo lleva su unidad, y su fuente está enlazada abajo."
       }
     ]
   },
@@ -732,6 +771,8 @@
     "producesLabel": "datos",
     "bylineBy": "Por",
     "readTime": "min de lectura",
-    "producesLabelOne": "dato"
+    "producesLabelOne": "dato",
+    "srProduces": "Produce {n} datos en la capa de máquina.",
+    "closing": "Así se produce cada una de las 8 piezas mensuales del plan."
   }
 }

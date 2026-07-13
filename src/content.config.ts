@@ -69,6 +69,7 @@ const block = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('sources'),
+    coupleId: z.string(),
     title: z.string(),
     items: z.array(z.object({ text: z.string(), href: z.string().url() })),
   }),
@@ -232,6 +233,8 @@ const aeoXray = defineCollection({
       specimenChip: z.string(),
       producesLabel: z.string(),
       producesLabelOne: z.string(),
+      srProduces: z.string(),
+      closing: z.string(),
     }),
   }),
 })

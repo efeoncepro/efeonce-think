@@ -79,6 +79,29 @@ check('6. Cada imagen tiene autoría + licencia enlazada', credits >= imgs.lengt
 const cites = (html.match(/<cite[\s>]/gi) ?? []).length
 check('7. Toda cifra de evidencia lleva <cite> con fuente y as-of', cites >= 5, `${cites} cites`)
 
+/* 20. 🔴 HONESTIDAD DE LAS CIFRAS. La pieza entera vale por NO exagerar.
+   El «+41%» (Quotation Addition, KDD 2024) mide citas de FUENTES entre comillas, no una frase
+   propia destacada. Reclamarlo sobre la cita destacada era atribuirle un lift medido a una
+   táctica que no aplicamos — y es exactamente lo que un evaluador técnico caza. */
+const claims41 = /\+41%[\s\S]{0,200}?Cita destacada|Cita destacada[\s\S]{0,200}?\+41%/i.test(html)
+check(
+  '20. La cita destacada NO reclama el +41% (esa táctica exige citar fuentes, no destacarse a uno mismo)',
+  !claims41,
+  'la muestra atribuye un lift medido a una táctica que no aplica',
+)
+
+// 21. El chip direccional es `content` de CSS: invisible para lectores de pantalla.
+const srCount = (html.match(/class="[^"]*\bsr\b[^"]*"[^>]*>Produce \d+ datos/g) ?? []).length
+check('21. Cada bloque acoplable anuncia cuántos datos produce (el chip solo existe para quien ve)', srCount >= 6, `${srCount} bloques con voz`)
+
+// 22. Una región con scroll tiene que ser alcanzable por teclado (WCAG 2.1.1).
+const preTab = (html.match(/<pre[^>]*tabindex="0"/g) ?? []).length
+const preAll = (html.match(/<pre/g) ?? []).length
+check('22. WCAG 2.1.1 — el <pre> scrolleable es enfocable por teclado', preAll > 0 && preTab === preAll, `${preTab}/${preAll}`)
+
+// 23. Sin JS el hover no produce nada: el copy no puede prometerlo.
+check('23. Sin JS, el hint NO promete interactividad (viene hidden)', /class="hint[^"]*"[^>]*hidden|hidden[^>]*class="hint/.test(html))
+
 // 8. Sin JS: el contenido sigue ahí (es HTML estático — se verifica sobre el mismo string)
 const degrada =
   html.includes('Carretera Austral') && html.includes('FAQPage') && html.includes('Semrush')
@@ -211,6 +234,16 @@ try {
     return n.top >= h.bottom - 1
   })
   check('19. WCAG 2.4.11 — el header pegajoso no tapa el nodo acoplado', obscured === true, `top del nodo bajo el header: ${obscured}`)
+
+  /* El texto para lectores de pantalla NO puede verse. Si se ve, no es accesibilidad: es un
+     bug visual. (Pasó: el reemplazo de CSS apuntaba a una clase que ya no existía = no-op.) */
+  const srVisible = await page.locator('.sr').first().isVisible()
+  const srBox = await page.locator('.sr').first().boundingBox()
+  check(
+    '24. El texto para lectores de pantalla es invisible (pero está en el DOM)',
+    !srVisible || (srBox !== null && srBox.width <= 2 && srBox.height <= 2),
+    `visible=${srVisible} box=${JSON.stringify(srBox)}`,
+  )
 
   await page.close()
 

@@ -138,8 +138,8 @@ const asText = (code: unknown) =>
         <p class="thesis-l">{ui.thesisLabel}</p>
         <p class="thesis-b">{d.thesis}</p>
       </div>
-      <p class="hint hint-d">{ui.hintDesktop}</p>
-      <p class="hint hint-m" data-testid="hint-m">{ui.hintMobile}</p>
+      <p class="hint hint-d" hidden data-hint>{ui.hintDesktop}</p>
+      <p class="hint hint-m" hidden data-hint data-testid="hint-m">{ui.hintMobile}</p>
     </section>
 
     <div class="split">
@@ -162,13 +162,6 @@ const asText = (code: unknown) =>
           {article.blocks.map(b => {
             if (!('coupleId' in b)) {
               if (b.type === 'paragraph') return <p class="para">{b.text}</p>
-              if (b.type === 'sources')
-                return (
-                  <div class="srcs">
-                    <p class="blk-t">{b.title}</p>
-                    <ul>{b.items.map(i => <li><a href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
-                  </div>
-                )
 
               return null
             }
@@ -185,6 +178,7 @@ const asText = (code: unknown) =>
             if (isImage(b))
               return (
                 <figure class={`blk fig ${b.type === 'hero-image' ? 'hero' : ''}`} {...attrs}>
+                  <span class="sr">{ui.srProduces.replace('{n}', String(n))}</span>
                   <img src={b.src} alt={b.alt} loading={b.type === 'hero-image' ? 'eager' : 'lazy'} />
                   <div class="fig-m">
                     {b.caption && <figcaption>{b.caption}</figcaption>}
@@ -202,6 +196,7 @@ const asText = (code: unknown) =>
             if (b.type === 'h1')
               return (
                 <div class="blk head-blk" {...attrs}>
+                  <span class="sr">{ui.srProduces.replace('{n}', String(n))}</span>
                   <p class="cat">{article.category}</p>
                   <h3 class="p-h1">{b.text}</h3>
                   <p class="byline">
@@ -213,23 +208,40 @@ const asText = (code: unknown) =>
                   </p>
                 </div>
               )
-            if (b.type === 'h2') return <div class="blk" {...attrs}><h4 class="p-h2">{b.text}</h4></div>
+            if (b.type === 'h2')
+              return (
+                <div class="blk" {...attrs}>
+                  <h4 class="p-h2">{b.text}</h4>
+                  <span class="sr">{ui.srProduces.replace('{n}', String(n))}</span>
+                </div>
+              )
             if (b.type === 'answer-capsule')
               return (
                 <div class="blk cap" {...attrs}>
                   <span class="cap-t">Respuesta directa</span>
                   <p>{b.text}</p>
+                  <span class="sr">{ui.srProduces.replace('{n}', String(n))}</span>
                 </div>
               )
             if (b.type === 'pull-quote')
               return (
                 <blockquote class="blk pull" {...attrs}>
                   <p>{b.text}</p>
+                  <span class="sr">{ui.srProduces.replace('{n}', String(n))}</span>
                 </blockquote>
+              )
+            if (b.type === 'sources')
+              return (
+                <div class="blk srcs" {...attrs}>
+                  <p class="blk-t">{b.title}</p>
+                  <ul>{b.items.map(i => <li><a href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
+                  <span class="sr">{ui.srProduces.replace('{n}', String(n))}</span>
+                </div>
               )
             if (b.type === 'table')
               return (
                 <div class="blk" {...attrs}>
+                  <span class="sr">{ui.srProduces.replace('{n}', String(n))}</span>
                   <div class="tw">
                     <table>
                       <caption>{b.caption}</caption>
@@ -244,6 +256,7 @@ const asText = (code: unknown) =>
                 <div class="blk" {...attrs}>
                   <p class="blk-t">{b.title}</p>
                   <ol>{b.items.map(i => <li>{i}</li>)}</ol>
+                  <span class="sr">{ui.srProduces.replace('{n}', String(n))}</span>
                 </div>
               )
             if (b.type === 'faq')
@@ -326,7 +339,7 @@ const asText = (code: unknown) =>
               {n.tier < 3 && <p class="why"><b>{ui.whyLabel}:</b> {n.why}</p>}
               <details>
                 <summary>Ver el código</summary>
-                <pre role="region" aria-label={`Datos estructurados: ${n.type}`}><code>{asText(n.code)}</code></pre>
+                <pre role="region" tabindex="0" aria-label={`Datos estructurados: ${n.type}`}><code>{asText(n.code)}</code></pre>
               </details>
             </div>
           ))}
@@ -401,6 +414,7 @@ const asText = (code: unknown) =>
         ))}
       </ul>
       <p class="lic-n">Todas las imágenes tienen licencia verificable y crédito visible. Ninguna fue generada con IA.</p>
+      <p class="closing">{ui.closing}</p>
       <div class="slogan"><EfeonceSlogan /></div>
     </footer>
   </div>
@@ -414,6 +428,10 @@ const asText = (code: unknown) =>
    * over-hydration. Esto solo mueve `data-on`; el CSS hace todo lo demás. Sin JS, el par
    * héroe ya viene pintado desde el HTML y la pieza sigue argumentando.
    */
+  // El hint promete que el hover produce algo. Sin JS no produce nada: solo se muestra
+  // cuando el JS realmente cargó. El copy no puede prometer lo que la página no va a cumplir.
+  document.querySelectorAll<HTMLElement>('[data-hint]').forEach(el => el.removeAttribute('hidden'))
+
   const root = document.querySelector<HTMLElement>('[data-testid="xray-root"]')
   const live = document.querySelector<HTMLElement>('[data-testid="live"]')
   if (root) {
@@ -696,7 +714,7 @@ const asText = (code: unknown) =>
   .fig:not(.hero) img { aspect-ratio: 16 / 9; object-fit: cover; }
   .fig-m { padding: 0.55rem 1.75rem 0; }
   figcaption { font-size: 0.9375rem; line-height: 1.5; color: #4a5c6e; }
-  .credit { margin-top: 0.2rem; font-size: var(--t-over); color: #94a3b8; }
+  .credit { margin-top: 0.25rem; font-size: 0.75rem; color: #7c8fa3; }
   .credit a { color: inherit; text-decoration: underline; }
 
   /* La FIRMA: categoría, autor, fecha, lectura. Es lo que el BlogPosting declara — y el
@@ -803,6 +821,20 @@ const asText = (code: unknown) =>
   }
   .in-head h2 { font-size: var(--t-body); font-weight: 600; }
   .in-live { font-size: var(--t-over); color: var(--dim-d); text-align: right; }
+
+  /* Visible SOLO para lectores de pantalla. Le da voz al chip direccional, que es `content`
+     de CSS y por lo tanto no existe para nadie que no vea: la afordancia central de la pieza
+     era sighted-only. */
+  .sr {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
+
+  /* El cierre: conecta la muestra con la oferta. Factual, no un pitch. */
+  .closing {
+    margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line);
+    font-size: var(--t-body); font-weight: 500; color: var(--ink);
+  }
   .in-body { padding: 1rem 1rem 1rem 1.3rem; }
 
   /* KPIs: la evidencia ABRE el instrumento. Tabular-nums, nunca monoespaciada. */
@@ -817,7 +849,7 @@ const asText = (code: unknown) =>
     font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
   }
   .kpi-u { margin-top: 0.3rem; font-size: var(--t-meta); color: var(--ink-d); line-height: 1.35; }
-  .kpi-s { display: block; margin-top: 0.4rem; font-size: 0.625rem; color: var(--dim-d); font-style: normal; }
+  .kpi-s { display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--dim-d); font-style: normal; }
   @media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
 
   .grp {
@@ -894,7 +926,7 @@ const asText = (code: unknown) =>
   .lv { display: inline-block; min-width: 1.7rem; font-weight: 700; color: var(--blue-up); font-size: 0.625rem; }
 
   .fct-v { font-size: var(--t-node); font-weight: 700; color: var(--blue-up); margin: 0.15rem 0; font-variant-numeric: tabular-nums; }
-  .fct cite { display: block; margin-top: 0.4rem; font-size: 0.625rem; color: var(--dim-d); font-style: normal; }
+  .fct cite { display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--dim-d); font-style: normal; }
   .fan li {
     display: flex; gap: 0.45rem; font-size: var(--t-meta); padding: 0.28rem 0.3rem; border-radius: 4px;
     outline: 2px solid transparent; align-items: baseline; color: var(--ink-d);
