@@ -7,13 +7,14 @@
   },
   "token": "861c18cc0e37",
   "meta": {
+    "instrument": "Radiografía AEO",
+    "sampleFor": "SKY",
     "sampleTitle": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas",
     "kicker": "Muestra de trabajo · Producción de contenido con capa AEO",
     "preparedAt": "2026-07-13",
     "preparedBy": "Efeonce"
   },
   "thesis": "«carretera austral» mueve 18.100 búsquedas al mes en Chile. SKY tiene una página del tema y no aparece en las primeras cien posiciones: el espacio lo ocupan Wikipedia, Instagram y TripAdvisor. Y SKY es la aerolínea que vuela a Balmaceda, el aeropuerto de entrada. Nadie en ese resultado de búsqueda puede resolver la logística de llegada. Este artículo es esa pieza.",
-
   "article": {
     "proposedUrl": "https://blog.skyairline.com/carretera-austral-como-llegar/",
     "category": "Datos útiles para viajeros",
@@ -60,11 +61,31 @@
         "type": "table",
         "coupleId": "table-entradas",
         "caption": "Las tres puertas de entrada a la Carretera Austral",
-        "headers": ["Por dónde entras", "Cómo llegas", "Dónde empiezas a manejar", "Qué te saltas"],
+        "headers": [
+          "Por dónde entras",
+          "Cómo llegas",
+          "Dónde empiezas a manejar",
+          "Qué te saltas"
+        ],
         "rows": [
-          ["Balmaceda (BBA)", "Vuelo directo a Balmaceda + 56 km hasta Coyhaique (≈1 h, ruta CH-245)", "Coyhaique, en el centro de la ruta", "Los tres transbordadores del tramo norte"],
-          ["Puerto Montt", "Vuelo a Puerto Montt, y de ahí al kilómetro 0", "Puerto Montt", "Nada: haces los 1.247 km completos"],
-          ["Manejando desde Santiago", "Ruta 5 al sur hasta Puerto Montt", "Puerto Montt", "Nada, y sumas dos días de ruta por lado"]
+          [
+            "Balmaceda (BBA)",
+            "Vuelo directo a Balmaceda + 56 km hasta Coyhaique (≈1 h, ruta CH-245)",
+            "Coyhaique, en el centro de la ruta",
+            "Los tres transbordadores del tramo norte"
+          ],
+          [
+            "Puerto Montt",
+            "Vuelo a Puerto Montt, y de ahí al kilómetro 0",
+            "Puerto Montt",
+            "Nada: haces los 1.247 km completos"
+          ],
+          [
+            "Manejando desde Santiago",
+            "Ruta 5 al sur hasta Puerto Montt",
+            "Puerto Montt",
+            "Nada, y sumas dos días de ruta por lado"
+          ]
         ]
       },
       {
@@ -197,24 +218,48 @@
         "coupleId": "internal-links",
         "title": "Sigue planificando",
         "items": [
-          { "text": "Aeropuerto de Balmaceda: cómo llegar a Coyhaique", "href": "https://blog.skyairline.com/aeropuerto-de-balmaceda/", "note": "Página existente del blog" },
-          { "text": "Viajar a Coyhaique: qué ver y cómo llegar", "href": "https://blog.skyairline.com/viajar-a-coyhaique/", "note": "Página existente del blog" },
-          { "text": "Carretera Austral (guía madre)", "href": "https://blog.skyairline.com/carretera-austral/", "note": "Página madre del cluster" },
-          { "text": "Vuelos a Balmaceda / Coyhaique", "href": "https://www.skyairline.com/flights/es-cl/vuelos-a-balmaceda-coyhaique", "note": "Ruta comercial" }
+          {
+            "text": "Aeropuerto de Balmaceda: cómo llegar a Coyhaique",
+            "href": "https://blog.skyairline.com/aeropuerto-de-balmaceda/",
+            "note": "Página existente del blog"
+          },
+          {
+            "text": "Viajar a Coyhaique: qué ver y cómo llegar",
+            "href": "https://blog.skyairline.com/viajar-a-coyhaique/",
+            "note": "Página existente del blog"
+          },
+          {
+            "text": "Carretera Austral (guía madre)",
+            "href": "https://blog.skyairline.com/carretera-austral/",
+            "note": "Página madre del cluster"
+          },
+          {
+            "text": "Vuelos a Balmaceda / Coyhaique",
+            "href": "https://www.skyairline.com/flights/es-cl/vuelos-a-balmaceda-coyhaique",
+            "note": "Ruta comercial"
+          }
         ]
       },
       {
         "type": "sources",
         "title": "Fuentes",
         "items": [
-          { "text": "Longitud de la Ruta 7 (1.247 km) — Carretera Austral, Wikipedia", "href": "https://en.wikipedia.org/wiki/Carretera_Austral" },
-          { "text": "Distancia Balmaceda–Coyhaique (56 km, ruta CH-245) — Aeropuerto de Balmaceda", "href": "https://aeropuertodebalmaceda.cl/" },
-          { "text": "Cruces en transbordador y duraciones — GoChile, guía de la Carretera Austral", "href": "https://www.gochile.cl/en/articles/guide-to-traveling-the-carretera-austral.htm" }
+          {
+            "text": "Longitud de la Ruta 7 (1.247 km) — Carretera Austral, Wikipedia",
+            "href": "https://en.wikipedia.org/wiki/Carretera_Austral"
+          },
+          {
+            "text": "Distancia Balmaceda–Coyhaique (56 km, ruta CH-245) — Aeropuerto de Balmaceda",
+            "href": "https://aeropuertodebalmaceda.cl/"
+          },
+          {
+            "text": "Cruces en transbordador y duraciones — GoChile, guía de la Carretera Austral",
+            "href": "https://www.gochile.cl/en/articles/guide-to-traveling-the-carretera-austral.htm"
+          }
         ]
       }
     ]
   },
-
   "machine": {
     "seo": [
       {
@@ -223,7 +268,8 @@
         "label": "Meta title",
         "value": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas | SKY",
         "detail": "62 caracteres",
-        "why": "Lleva el término principal al frente («carretera austral», 18.100 búsquedas/mes) y promete las tres respuestas que la gente busca. No es el H1 por casualidad: es la misma promesa, dicha para el resultado de búsqueda."
+        "why": "Lleva el término principal al frente («carretera austral», 18.100 búsquedas/mes) y promete las tres respuestas que la gente busca. No es el H1 por casualidad: es la misma promesa, dicha para el resultado de búsqueda.",
+        "tier": 2
       },
       {
         "id": "meta-description",
@@ -231,7 +277,8 @@
         "label": "Meta description",
         "value": "Vuela a Balmaceda y arrienda ahí: te saltas los tres transbordadores del norte. Cuántos días necesitas, cuándo ir y si hace falta un 4x4.",
         "detail": "137 caracteres",
-        "why": "Es la cápsula de respuesta comprimida. Adelanta el dato accionable en vez de describir el artículo."
+        "why": "Es la cápsula de respuesta comprimida. Adelanta el dato accionable en vez de describir el artículo.",
+        "tier": 2
       },
       {
         "id": "canonical",
@@ -239,32 +286,95 @@
         "label": "URL canónica",
         "value": "https://blog.skyairline.com/carretera-austral-como-llegar/",
         "detail": "slug de intención, no de tema",
-        "why": "El slug dice «cómo llegar», no «carretera austral» a secas. Evita canibalizar la página madre del cluster, que ya existe y ocupa el tema general."
+        "why": "El slug dice «cómo llegar», no «carretera austral» a secas. Evita canibalizar la página madre del cluster, que ya existe y ocupa el tema general.",
+        "tier": 3
       }
     ],
     "og": [
-      { "id": "og-title", "coupleId": "h1", "label": "og:title", "value": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas" },
-      { "id": "og-image", "coupleId": "img-hero", "label": "og:image", "value": "/muestras/sky-carretera-austral/carretera-austral-ruta7.jpg" },
-      { "id": "og-type", "coupleId": "h1", "label": "og:type", "value": "article" }
+      {
+        "id": "og-title",
+        "coupleId": "h1",
+        "label": "og:title",
+        "value": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas",
+        "tier": 3
+      },
+      {
+        "id": "og-image",
+        "coupleId": "img-hero",
+        "label": "og:image",
+        "value": "/muestras/sky-carretera-austral/carretera-austral-ruta7.jpg",
+        "tier": 3
+      },
+      {
+        "id": "og-type",
+        "coupleId": "h1",
+        "label": "og:type",
+        "value": "article",
+        "tier": 3
+      }
     ],
     "headings": {
       "coupleId": "h1",
       "why": "Cada H2 es una sub-pregunta del fan-out, escrita como pregunta y autocontenida. Un motor de respuesta recupera pasajes, no páginas: el pasaje tiene que entenderse solo, sin el resto del artículo.",
       "tree": [
-        { "level": 1, "text": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas", "coupleId": "h1" },
-        { "level": 2, "text": "¿Cómo se llega a la Carretera Austral?", "coupleId": "h2-como-llegar" },
-        { "level": 2, "text": "¿Cuántos días necesitas para recorrerla?", "coupleId": "h2-cuantos-dias" },
-        { "level": 2, "text": "¿Cuál es la mejor época para recorrer la Carretera Austral?", "coupleId": "h2-epoca" },
-        { "level": 2, "text": "¿Está pavimentada? ¿Necesitas un 4x4?", "coupleId": "h2-ripio" },
-        { "level": 2, "text": "Los transbordadores: la parte que no puedes improvisar", "coupleId": "h2-ferries" },
-        { "level": 2, "text": "Preguntas frecuentes", "coupleId": "faq" }
+        {
+          "level": 1,
+          "text": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas",
+          "coupleId": "h1"
+        },
+        {
+          "level": 2,
+          "text": "¿Cómo se llega a la Carretera Austral?",
+          "coupleId": "h2-como-llegar"
+        },
+        {
+          "level": 2,
+          "text": "¿Cuántos días necesitas para recorrerla?",
+          "coupleId": "h2-cuantos-dias"
+        },
+        {
+          "level": 2,
+          "text": "¿Cuál es la mejor época para recorrer la Carretera Austral?",
+          "coupleId": "h2-epoca"
+        },
+        {
+          "level": 2,
+          "text": "¿Está pavimentada? ¿Necesitas un 4x4?",
+          "coupleId": "h2-ripio"
+        },
+        {
+          "level": 2,
+          "text": "Los transbordadores: la parte que no puedes improvisar",
+          "coupleId": "h2-ferries"
+        },
+        {
+          "level": 2,
+          "text": "Preguntas frecuentes",
+          "coupleId": "faq"
+        }
       ]
     },
     "alts": [
-      { "coupleId": "img-hero", "alt": "Camino de ripio de la Carretera Austral entre bosque nativo y montañas, en la Región de Aysén", "why": "Describe lo que se ve y nombra la entidad geográfica. Un alt como «paisaje» o «foto 1» no le sirve ni a un lector de pantalla ni a la búsqueda de imágenes." },
-      { "coupleId": "img-castillo", "alt": "Las agujas de roca del Cerro Castillo nevadas sobre un lago, en el Parque Nacional Cerro Castillo", "why": "Nombra el hito exacto. Es lo que permite que la imagen se recupere por «Cerro Castillo» y no solo por «montaña»." },
-      { "coupleId": "img-senaletica", "alt": "Señalética de la Ruta 7 al costado de un tramo de ripio de la Carretera Austral", "why": "Refuerza la entidad «Ruta 7» y aporta el dato visual del ripio, que es una de las preguntas del artículo." },
-      { "coupleId": "img-baker", "alt": "Aguas turquesas del río Baker entre laderas de vegetación patagónica, en la Región de Aysén", "why": "Nombra el río y la región. El alt es contenido, no un trámite de accesibilidad." }
+      {
+        "coupleId": "img-hero",
+        "alt": "Camino de ripio de la Carretera Austral entre bosque nativo y montañas, en la Región de Aysén",
+        "why": "Describe lo que se ve y nombra la entidad geográfica. Un alt como «paisaje» o «foto 1» no le sirve ni a un lector de pantalla ni a la búsqueda de imágenes."
+      },
+      {
+        "coupleId": "img-castillo",
+        "alt": "Las agujas de roca del Cerro Castillo nevadas sobre un lago, en el Parque Nacional Cerro Castillo",
+        "why": "Nombra el hito exacto. Es lo que permite que la imagen se recupere por «Cerro Castillo» y no solo por «montaña»."
+      },
+      {
+        "coupleId": "img-senaletica",
+        "alt": "Señalética de la Ruta 7 al costado de un tramo de ripio de la Carretera Austral",
+        "why": "Refuerza la entidad «Ruta 7» y aporta el dato visual del ripio, que es una de las preguntas del artículo."
+      },
+      {
+        "coupleId": "img-baker",
+        "alt": "Aguas turquesas del río Baker entre laderas de vegetación patagónica, en la Región de Aysén",
+        "why": "Nombra el río y la región. El alt es contenido, no un trámite de accesibilidad."
+      }
     ],
     "jsonld": [
       {
@@ -278,7 +388,9 @@
           "@id": "https://blog.skyairline.com/#website",
           "url": "https://blog.skyairline.com/",
           "name": "Blog SKY",
-          "publisher": { "@id": "https://www.skyairline.com/#organization" },
+          "publisher": {
+            "@id": "https://www.skyairline.com/#organization"
+          },
           "inLanguage": "es-CL",
           "potentialAction": {
             "@type": "SearchAction",
@@ -288,7 +400,10 @@
             },
             "query-input": "required name=search_term_string"
           }
-        }
+        },
+        "tier": 1,
+        "stat": "8/100",
+        "statNote": "Ser accionable — el número más bajo del diagnóstico"
       },
       {
         "id": "node-organization",
@@ -310,7 +425,8 @@
             "https://www.instagram.com/skyairline/",
             "https://www.linkedin.com/company/sky-airline/"
           ]
-        }
+        },
+        "tier": 2
       },
       {
         "id": "node-blogposting",
@@ -321,18 +437,29 @@
         "code": {
           "@type": "BlogPosting",
           "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#article",
-          "isPartOf": { "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#webpage" },
+          "isPartOf": {
+            "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#webpage"
+          },
           "headline": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas",
           "description": "Vuela a Balmaceda y arrienda ahí: te saltas los tres transbordadores del norte. Cuántos días necesitas, cuándo ir y si hace falta un 4x4.",
           "datePublished": "2026-07-15",
           "dateModified": "2026-07-15",
           "inLanguage": "es-CL",
           "articleSection": "Datos útiles para viajeros",
-          "author": { "@id": "https://www.skyairline.com/#organization" },
-          "publisher": { "@id": "https://www.skyairline.com/#organization" },
-          "image": { "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#primaryimage" },
-          "mainEntityOfPage": { "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#webpage" }
-        }
+          "author": {
+            "@id": "https://www.skyairline.com/#organization"
+          },
+          "publisher": {
+            "@id": "https://www.skyairline.com/#organization"
+          },
+          "image": {
+            "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#primaryimage"
+          },
+          "mainEntityOfPage": {
+            "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#webpage"
+          }
+        },
+        "tier": 2
       },
       {
         "id": "node-imageobject",
@@ -348,7 +475,8 @@
           "caption": "La Ruta 7 atraviesa 1.247 km de la Patagonia chilena.",
           "creditText": "Jason Hollinger",
           "license": "https://creativecommons.org/licenses/by/2.0/"
-        }
+        },
+        "tier": 3
       },
       {
         "id": "node-breadcrumb",
@@ -360,11 +488,26 @@
           "@type": "BreadcrumbList",
           "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#breadcrumb",
           "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Blog SKY", "item": "https://blog.skyairline.com/" },
-            { "@type": "ListItem", "position": 2, "name": "Carretera Austral", "item": "https://blog.skyairline.com/carretera-austral/" },
-            { "@type": "ListItem", "position": 3, "name": "Cómo llegar a la Carretera Austral" }
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Blog SKY",
+              "item": "https://blog.skyairline.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Carretera Austral",
+              "item": "https://blog.skyairline.com/carretera-austral/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Cómo llegar a la Carretera Austral"
+            }
           ]
-        }
+        },
+        "tier": 3
       },
       {
         "id": "node-faqpage",
@@ -401,7 +544,10 @@
               }
             }
           ]
-        }
+        },
+        "tier": 1,
+        "stat": "37/100",
+        "statNote": "Ser correcta"
       }
     ],
     "craft": [
@@ -409,29 +555,36 @@
         "coupleId": "capsule-main",
         "label": "Cápsula de respuesta",
         "detail": "55 palabras",
-        "why": "Respuesta directa en 40–60 palabras bajo el título. Es el patrón presente en el 72,4% de las páginas que ChatGPT cita. Sin ella, el motor tiene que inferir la respuesta del cuerpo del texto — y muchas veces prefiere citar a otro."
+        "why": "Respuesta directa en 40–60 palabras bajo el título. Es el patrón presente en el 72,4% de las páginas que ChatGPT cita. Sin ella, el motor tiene que inferir la respuesta del cuerpo del texto — y muchas veces prefiere citar a otro.",
+        "tier": 1,
+        "stat": "72,4%",
+        "statNote": "de las páginas que ChatGPT cita abren con este patrón"
       },
       {
         "coupleId": "table-entradas",
         "label": "Tabla",
         "detail": "3 filas × 4 columnas",
-        "why": "Las páginas con al menos una tabla y una lista numerada reciben cerca de 2,3× más citas en ChatGPT. Un dato tabulado es un dato que la máquina puede extraer sin ambigüedad."
+        "why": "Las páginas con al menos una tabla y una lista numerada reciben cerca de 2,3× más citas en ChatGPT. Un dato tabulado es un dato que la máquina puede extraer sin ambigüedad.",
+        "tier": 1,
+        "stat": "2,3×",
+        "statNote": "más citas con al menos una tabla y una lista numerada"
       },
       {
         "coupleId": "list-itinerario",
         "label": "Lista numerada",
         "detail": "7 pasos",
-        "why": "El otro formato de alta citabilidad. Además responde una sub-pregunta del fan-out («cuántos días») en un formato que se cita entero."
+        "why": "El otro formato de alta citabilidad. Además responde una sub-pregunta del fan-out («cuántos días») en un formato que se cita entero.",
+        "tier": 2
       },
       {
         "coupleId": "internal-links",
         "label": "Enlaces internos del cluster",
         "detail": "4 enlaces · 3 a páginas que ya existen",
-        "why": "No inventamos la arquitectura: el artículo se enlaza con la página madre y con las páginas de Balmaceda y Coyhaique que el blog de SKY ya tiene publicadas. Eso es lo que construye autoridad temática por destino en vez de artículos sueltos."
+        "why": "No inventamos la arquitectura: el artículo se enlaza con la página madre y con las páginas de Balmaceda y Coyhaique que el blog de SKY ya tiene publicadas. Eso es lo que construye autoridad temática por destino en vez de artículos sueltos.",
+        "tier": 2
       }
     ]
   },
-
   "evidence": {
     "intro": "Este artículo no se eligió por intuición. Se eligió porque el dato dijo dónde estaba el hueco.",
     "facts": [
@@ -441,7 +594,10 @@
         "value": "18.100 búsquedas/mes",
         "note": "«carretera austral», Google Chile",
         "source": "Semrush, base de datos cl",
-        "asOf": "2026-07-13"
+        "asOf": "2026-07-13",
+        "headline": true,
+        "big": "18.100",
+        "bigUnit": "búsquedas/mes"
       },
       {
         "coupleId": "h1",
@@ -449,7 +605,10 @@
         "value": "Fuera del top 100",
         "note": "SKY tiene una página del tema publicada y no aparece en las primeras cien posiciones",
         "source": "Semrush, base de datos cl",
-        "asOf": "2026-07-13"
+        "asOf": "2026-07-13",
+        "headline": true,
+        "big": "+100",
+        "bigUnit": "fuera del top 100"
       },
       {
         "coupleId": "h2-como-llegar",
@@ -457,7 +616,8 @@
         "value": "Wikipedia · Instagram · TripAdvisor",
         "note": "Top 12 real: Wikipedia (1), Instagram (2), gochile (3), carretera-austral.cl (4), chile.travel (5), chileestuyo (6), tur.com (7), autofact (8), wikiexplora (9), TripAdvisor (10). Cero aerolíneas.",
         "source": "Semrush SERP, base de datos cl",
-        "asOf": "2026-07-13"
+        "asOf": "2026-07-13",
+        "headline": false
       },
       {
         "coupleId": "h2-como-llegar",
@@ -465,7 +625,8 @@
         "value": "Vuela a Balmaceda (BBA)",
         "note": "Rutas verificadas desde Santiago, Concepción, Puerto Montt, Castro, Valdivia, Temuco, Calama e Iquique. «aeropuerto balmaceda» mueve 6.600/mes y SKY rankea 11º. Nadie en ese top 12 puede resolver la logística de llegada.",
         "source": "Semrush, base de datos cl",
-        "asOf": "2026-07-13"
+        "asOf": "2026-07-13",
+        "headline": false
       },
       {
         "coupleId": "faq",
@@ -473,28 +634,70 @@
         "value": "0 en 35 respuestas",
         "note": "Las fuentes citadas son terceros: BioBioChile, YouTube, Instagram, Despegar, Trustpilot. Escalera Be X: Ser encontrada 40 · legible 70 · correcta 37 · accionable 8 · intrínseca 76.",
         "source": "AI Visibility Grader de Efeonce (5 motores)",
-        "asOf": "2026-07"
+        "asOf": "2026-07",
+        "headline": true,
+        "big": "0",
+        "bigUnit": "citas en 35 respuestas"
       }
     ],
     "fanOut": {
       "title": "El espacio de sub-preguntas (query fan-out)",
       "note": "Un motor de respuesta descompone una consulta en 8–12 sub-preguntas y recupera pasajes para cada una. Escribir solo para el término principal te deja fuera de casi todas. Estas son las que este artículo cubre, y con qué sección.",
       "items": [
-        { "q": "¿Cómo llego a la Carretera Austral?", "coveredBy": "h2-como-llegar", "covered": true },
-        { "q": "¿A qué aeropuerto tengo que volar?", "coveredBy": "faq", "covered": true },
-        { "q": "¿Cuántos días necesito?", "coveredBy": "h2-cuantos-dias", "covered": true },
-        { "q": "¿Cuál es la mejor época del año?", "coveredBy": "h2-epoca", "covered": true },
-        { "q": "¿Está pavimentada?", "coveredBy": "h2-ripio", "covered": true },
-        { "q": "¿Necesito un 4x4?", "coveredBy": "h2-ripio", "covered": true },
-        { "q": "¿Hay que reservar los transbordadores?", "coveredBy": "h2-ferries", "covered": true },
-        { "q": "¿Se puede arrendar auto en Balmaceda?", "coveredBy": "faq", "covered": true },
-        { "q": "¿Cuánto mide la ruta?", "coveredBy": "capsule-main", "covered": true },
-        { "q": "¿Qué ver en el tramo sur?", "coveredBy": "list-itinerario", "covered": true }
+        {
+          "q": "¿Cómo llego a la Carretera Austral?",
+          "coveredBy": "h2-como-llegar",
+          "covered": true
+        },
+        {
+          "q": "¿A qué aeropuerto tengo que volar?",
+          "coveredBy": "faq",
+          "covered": true
+        },
+        {
+          "q": "¿Cuántos días necesito?",
+          "coveredBy": "h2-cuantos-dias",
+          "covered": true
+        },
+        {
+          "q": "¿Cuál es la mejor época del año?",
+          "coveredBy": "h2-epoca",
+          "covered": true
+        },
+        {
+          "q": "¿Está pavimentada?",
+          "coveredBy": "h2-ripio",
+          "covered": true
+        },
+        {
+          "q": "¿Necesito un 4x4?",
+          "coveredBy": "h2-ripio",
+          "covered": true
+        },
+        {
+          "q": "¿Hay que reservar los transbordadores?",
+          "coveredBy": "h2-ferries",
+          "covered": true
+        },
+        {
+          "q": "¿Se puede arrendar auto en Balmaceda?",
+          "coveredBy": "faq",
+          "covered": true
+        },
+        {
+          "q": "¿Cuánto mide la ruta?",
+          "coveredBy": "capsule-main",
+          "covered": true
+        },
+        {
+          "q": "¿Qué ver en el tramo sur?",
+          "coveredBy": "list-itinerario",
+          "covered": true
+        }
       ]
     },
     "honesty": "Semrush mide el volumen de búsqueda de Google, no el espacio de preguntas que la gente le hace a un asistente con IA. Varias de las sub-preguntas de arriba tienen volumen casi nulo en Google y son exactamente lo que se le pregunta a un modelo. Por eso el artículo se ancla en el término con volumen y se estructura para el fan-out: son dos capas, no una."
   },
-
   "ui": {
     "disclaimerLabel": "Ejemplo ilustrativo de Efeonce",
     "disclaimerBody": "Esta página es una muestra de trabajo elaborada por Efeonce. No es una publicación de SKY ni está alojada en sus canales.",
@@ -509,6 +712,9 @@
     "sourceLabel": "Fuente",
     "thesisLabel": "Por qué existe este artículo",
     "licenseTitle": "Imágenes: autoría y licencia",
-    "backToArticle": "Volver al artículo"
+    "backToArticle": "Volver al artículo",
+    "instrumentTitle": "Lo que lee una máquina",
+    "specimenChip": "blog.skyairline.com",
+    "producesLabel": "datos"
   }
 }

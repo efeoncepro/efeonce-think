@@ -148,10 +148,16 @@ try {
   await rm.close()
 
   // Mobile
-  const m = await browser.newPage({ viewport: { width: 390, height: 844 } })
+  // hasTouch + isMobile: sin esto Chromium reporta `hover: hover` en un viewport de 390px y
+  // la captura miente — mostraría "Pasa el cursor" en un teléfono, que no tiene cursor.
+  const m = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
   await m.goto(`${BASE}${ROUTE}`, { waitUntil: 'networkidle' })
   const mScroll = await m.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   check('15. Sin scroll horizontal en 390px', mScroll <= 1, `overflow ${mScroll}px`)
+
+  const hint = (await m.locator('[data-testid="hint-m"]').textContent()) ?? ''
+  const hintVisible = await m.locator('[data-testid="hint-m"]').isVisible()
+  check('16. En táctil el copy no habla de cursor', hintVisible && !hint.includes('cursor'), hint.slice(0, 40))
   await m.screenshot({ path: `${OUT}/hero-mobile.png` })
   await m.screenshot({ path: `${OUT}/full-mobile.png`, fullPage: true })
   await m.close()

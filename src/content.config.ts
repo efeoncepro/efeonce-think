@@ -68,6 +68,17 @@ const block = z.discriminatedUnion('type', [
   }),
 ])
 
+
+/**
+ * El rango del nodo. Sin esto, `og:title` se ve igual que `FAQPage` y la jerarquía no existe.
+ *  1 — mueve un número del diagnóstico (el argumento). Stat grande, expandido.
+ *  2 — estructura (encabezados, alts, cluster). Prosa visible.
+ *  3 — descriptivo (canónica, og:*). Prueba de completitud, NO argumento. Callado y colapsado.
+ */
+const tier = z.union([z.literal(1), z.literal(2), z.literal(3)])
+/** El número que el comité recuerda. Va grande: la prosa es su nota al pie, no al revés. */
+const stat = { stat: z.string().optional(), statNote: z.string().optional() }
+
 const aeoXray = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/aeo-xray' }),
   schema: z.object({
@@ -97,6 +108,11 @@ const aeoXray = defineCollection({
       .regex(/^[a-f0-9]{12}$/, 'Token de 12 hex. Genéralo con `openssl rand -hex 6`; nunca a mano.'),
 
     meta: z.object({
+      /** El nombre del INSTRUMENTO («Radiografía AEO»). Es el h1 de la página. */
+      instrument: z.string(),
+      sampleFor: z.string(),
+      /** El título del ARTÍCULO. Vive SOLO dentro de su panel: si además fuera el h1 de la
+       *  página, la muestra dejaría de llamarse por lo que es y se haría pasar por el artículo. */
       sampleTitle: z.string(),
       kicker: z.string(),
       preparedAt: z.string(),
@@ -122,9 +138,13 @@ const aeoXray = defineCollection({
           detail: z.string().optional(),
           // El "para qué" es obligatorio: sin él la muestra exhibe técnica y no argumenta nada.
           why: z.string().min(30, 'Cada técnica declara para qué sirve, o no entra.'),
+          tier,
+          ...stat,
         }),
       ),
-      og: z.array(z.object({ id: z.string(), coupleId: z.string(), label: z.string(), value: z.string() })),
+      og: z.array(
+        z.object({ id: z.string(), coupleId: z.string(), label: z.string(), value: z.string(), tier }),
+      ),
       headings: z.object({
         coupleId: z.string(),
         why: z.string().min(30),
@@ -142,6 +162,8 @@ const aeoXray = defineCollection({
           metric: z.string(),
           why: z.string().min(30),
           code: z.record(z.string(), z.unknown()),
+          tier,
+          ...stat,
         }),
       ),
       craft: z.array(
@@ -150,6 +172,8 @@ const aeoXray = defineCollection({
           label: z.string(),
           detail: z.string(),
           why: z.string().min(30),
+          tier,
+          ...stat,
         }),
       ),
     }),
@@ -165,6 +189,10 @@ const aeoXray = defineCollection({
           // Sin fuente y sin fecha, una cifra es una opinión con números.
           source: z.string().min(3, 'Toda cifra lleva fuente.'),
           asOf: z.string().min(4, 'Toda cifra lleva as-of.'),
+          /** Los de titular abren el instrumento: la evidencia es el argumento, no el apéndice. */
+          headline: z.boolean(),
+          big: z.string().optional(),
+          bigUnit: z.string().optional(),
         }),
       ),
       fanOut: z.object({
@@ -192,6 +220,9 @@ const aeoXray = defineCollection({
       thesisLabel: z.string(),
       licenseTitle: z.string(),
       backToArticle: z.string(),
+      instrumentTitle: z.string(),
+      specimenChip: z.string(),
+      producesLabel: z.string(),
     }),
   }),
 })

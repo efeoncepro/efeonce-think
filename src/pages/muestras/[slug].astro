@@ -1,21 +1,31 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@layouts/BaseLayout.astro'
+import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 
 /**
  * Radiografía AEO — muestra de trabajo "artículo + su capa de máquina".
  * TASK-1410 (greenhouse-eo). Ver docs/ui/wireframes/TASK-1410-aeo-article-xray.md
  *
  * ⚠️ INVARIANTE #1 — El JSON-LD del artículo se renderiza como TEXTO ESCAPADO.
- * NUNCA se emite dentro de un <script type="application/ld+json">, y esta página
- * NO le pasa `jsonLd` a BaseLayout. Emitir aquí un schema con author/publisher del
- * cliente declararía, en NUESTRO dominio, que Efeonce publicó un artículo suyo:
- * sería un dato estructurado falso, ingerible por crawlers y motores de respuesta,
- * justo en la pieza cuya tesis es el rigor técnico. `scripts/verify-aeo-xray.mjs`
- * falla si aparece un solo `application/ld+json` en el HTML servido.
+ * NUNCA dentro de un <script type="application/ld+json">, y esta página NO le pasa
+ * `jsonLd` a BaseLayout. Emitirlo declararía, en NUESTRO dominio, que Efeonce publicó
+ * un artículo del cliente: un dato estructurado falso, ingerible por crawlers, justo en
+ * la pieza cuya tesis es el rigor técnico. `verify-aeo-xray.mjs` falla si aparece uno.
  *
- * Invariante #2 — noindex + fuera del sitemap (el filter vive en astro.config.mjs).
- * Invariante #8 — el motor NUNCA conoce a un cliente: todo sale del payload.
+ * ── LA DIRECCIÓN DE ARTE: la pieza es un INSTRUMENTO, y tiene que parecerlo. ──
+ *
+ * DOS ZONAS DE MARCA, y la separación es el diseño:
+ *   · Izquierda = la muestra del CLIENTE. Fondo claro, su acento. Es el espécimen.
+ *   · Derecha + todo el chrome = el INSTRUMENTO de Efeonce. Navy + azul. Es la máquina
+ *     que lo lee.
+ * Eso hace tres cosas de una: pone la marca Efeonce donde corresponde (el análisis es
+ * NUESTRO, no puede hablar en el color del cliente), vuelve los dos lados inconfundibles
+ * —así el ojo siempre sabe dónde está— y refuerza el disclaimer sin decir una palabra:
+ * se VE que el artefacto del cliente está contenido dentro de nuestro instrumento.
+ *
+ * EL ACOPLAMIENTO ES ASIMÉTRICO. La fuente susurra, el destino grita. Si los dos gritan
+ * igual, el ojo no sabe cuál es la causa y cuál el efecto — que era exactamente el bug.
  */
 
 export const prerender = true
@@ -23,15 +33,8 @@ export const prerender = true
 export async function getStaticPaths() {
   const samples = await getCollection('aeoXray')
 
-  /**
-   * La URL es `<slug legible>-<token>`, no un token opaco.
-   *
-   * El slug se conserva porque el evaluador LEE la URL antes que el H1:
-   * `sky-carretera-austral` dice "esto lo hicieron para nosotros", no "plantilla con el
-   * logo cambiado". El token la vuelve inadivinable, que es lo que impide que un cliente
-   * pruebe la URL de su competidor. Un token opaco no aportaría nada más: la página
-   * revela el cliente apenas carga.
-   */
+  /** URL = `<slug legible>-<token>`. El slug porque el evaluador lee la URL antes que el H1;
+   *  el token porque sin él la muestra de un cliente es adivinable desde la de otro. */
   return samples.map(sample => ({
     params: { slug: `${sample.id}-${sample.data.token}` },
     props: { sample },
@@ -40,71 +43,109 @@ export async function getStaticPaths() {
 
 const { sample } = Astro.props
 const d = sample.data
-const { ui, machine, evidence, article } = d
+const { ui, machine, evidence, article, client, meta } = d
 
-/**
- * El acoplamiento que viene pintado desde el HTML. ES el frame que va a la lámina.
- *
- * Tiene que ser un par que se vea COMPLETO en el pliegue inicial, a los dos lados.
- * La primera versión usaba el FAQ (el argumento más fuerte: ataca el 37/100), pero el
- * bloque vive muy abajo del artículo: la captura salía sin una sola correspondencia
- * encendida, y un acoplamiento que no se ve no argumenta nada.
- * La cápsula de respuesta está arriba, y su contraparte —el dato de que ese patrón
- * aparece en el 72,4% de las páginas que ChatGPT cita— también. Se ven las dos.
- */
-const HERO_COUPLE = 'capsule-main'
+/** El par que viene pintado desde el HTML: ES el frame que va a la lámina del deck.
+ *  Tiene que verse COMPLETO en el pliegue, a los dos lados. */
+const HERO = 'capsule-main'
 
 type Block = (typeof article.blocks)[number]
 type ImageBlock = Extract<Block, { type: 'image' | 'hero-image' }>
-
 const isImage = (b: Block): b is ImageBlock => b.type === 'image' || b.type === 'hero-image'
-
 const images = article.blocks.filter(isImage)
-const altFor = (coupleId: string) => machine.alts.find(a => a.coupleId === coupleId)
+
+/**
+ * Cuántos datos de máquina produce cada bloque del artículo.
+ * Es lo que alimenta el chip direccional («→ 3 datos»): sin un número, el hover te dice
+ * QUE hay algo al otro lado, pero no CUÁNTO ni hacia dónde mirar.
+ */
+const produces = new Map<string, number>()
+const bump = (id: string) => produces.set(id, (produces.get(id) ?? 0) + 1)
+machine.seo.forEach(x => bump(x.coupleId))
+machine.og.forEach(x => bump(x.coupleId))
+machine.craft.forEach(x => bump(x.coupleId))
+machine.jsonld.forEach(x => bump(x.coupleId))
+machine.alts.forEach(x => bump(x.coupleId))
+machine.headings.tree.forEach(x => bump(x.coupleId))
+
+const kpis = evidence.facts.filter(f => f.headline)
+const details = evidence.facts.filter(f => !f.headline)
 
 /** Escapa el JSON-LD para mostrarlo como TEXTO. Jamás `set:html`. */
-const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
+const asText = (code: unknown) =>
+  JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
 ---
 
 <BaseLayout
-  title={`${d.meta.sampleTitle} — muestra de Efeonce`}
+  title={`${meta.instrument} — muestra de Efeonce para ${meta.sampleFor}`}
   description="Muestra de trabajo de Efeonce: un artículo y su capa de máquina, lado a lado."
   noindex={true}
 >
-  <div class="xray" data-testid="xray-root" style={`--accent:${d.client.accent}`}>
-    <!-- Región 0 — Rótulo persistente. Niega autoría Y alojamiento. No se puede cerrar. -->
-    <div class="bar" data-testid="disclaimer" role="note">
-      <strong>{ui.disclaimerLabel}</strong>
-      <span>{ui.disclaimerBody}</span>
-    </div>
-
-    <!-- Región 1 — Encabezado + la línea que justifica el artículo -->
-    <header class="head">
-      <p class="kick">{d.meta.kicker}</p>
-      <h1>{d.meta.sampleTitle}</h1>
-      <div class="thesis">
-        <p class="thesis-label">{ui.thesisLabel}</p>
-        <p class="thesis-body">{d.thesis}</p>
+  <div class="xr" data-testid="xray-root" style={`--client:${client.accent}`}>
+    <!-- ══ CHROME EFEONCE — la marca es dueña del instrumento, no un pie de página ══ -->
+    <header class="chrome" data-testid="disclaimer">
+      <div class="chrome-in">
+        <div class="brand">
+          <img src="/branding/efeonce-isotipo-negative.svg" alt="Efeonce" width="26" height="26" />
+          <span class="brand-t">{meta.instrument}</span>
+        </div>
+        <p class="rotulo">
+          <strong>{ui.disclaimerLabel}</strong>
+          <span>{ui.disclaimerBody}</span>
+        </p>
       </div>
-      <p class="hint hint-d" data-testid="hint">{ui.hintDesktop}</p>
-      <p class="hint hint-m">{ui.hintMobile}</p>
     </header>
 
+    <!-- ══ LEDE — la página se llama por lo que ES. El título del artículo vive en su panel. ══ -->
+    <section class="lede">
+      <p class="over">{meta.kicker}</p>
+      <h1>{meta.instrument} <em>· muestra para {meta.sampleFor}</em></h1>
+      <div class="thesis">
+        <p class="thesis-l">{ui.thesisLabel}</p>
+        <p class="thesis-b">{d.thesis}</p>
+      </div>
+      <p class="hint hint-d">{ui.hintDesktop}</p>
+      <p class="hint hint-m" data-testid="hint-m">{ui.hintMobile}</p>
+    </section>
+
     <div class="split">
-      <!-- ══ Panel A — El artículo ══ -->
-      <section class="pane pane-a" aria-labelledby="pane-a-title">
-        <div class="pane-head">
-          <h2 id="pane-a-title">{ui.paneArticleTitle}</h2>
-          <p>{ui.paneArticleSubtitle}</p>
+      <!-- ══════ ESPÉCIMEN — la marca del CLIENTE vive acá dentro, y solo acá ══════ -->
+      <section class="specimen" aria-labelledby="sp-t">
+        <div class="sp-head">
+          <div>
+            <h2 id="sp-t">{ui.paneArticleTitle}</h2>
+            <p>{ui.paneArticleSubtitle}</p>
+          </div>
+          <span class="chip-site">{ui.specimenChip}</span>
         </div>
 
         <article class="post">
           {article.blocks.map(b => {
-            const on = 'coupleId' in b && b.coupleId === HERO_COUPLE ? true : undefined
+            if (!('coupleId' in b)) {
+              if (b.type === 'paragraph') return <p class="para">{b.text}</p>
+              if (b.type === 'sources')
+                return (
+                  <div class="srcs">
+                    <p class="blk-t">{b.title}</p>
+                    <ul>{b.items.map(i => <li><a href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
+                  </div>
+                )
 
-            if (b.type === 'hero-image' || b.type === 'image') {
+              return null
+            }
+
+            const on = b.coupleId === HERO ? true : undefined
+            const n = produces.get(b.coupleId) ?? 0
+            const attrs = {
+              'data-couple': b.coupleId,
+              'data-on': on,
+              'data-n': n > 0 ? `${n} ${ui.producesLabel}` : undefined,
+              tabindex: 0,
+            }
+
+            if (isImage(b))
               return (
-                <figure class="blk" data-couple={b.coupleId} data-on={on} tabindex="0">
+                <figure class="blk" {...attrs}>
                   <img src={b.src} alt={b.alt} loading={b.type === 'hero-image' ? 'eager' : 'lazy'} />
                   {b.caption && <figcaption>{b.caption}</figcaption>}
                   <p class="credit">
@@ -112,22 +153,19 @@ const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.o
                   </p>
                 </figure>
               )
-            }
-            if (b.type === 'h1') return <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0"><h3 class="post-h1">{b.text}</h3></div>
-            if (b.type === 'h2') return <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0"><h4 class="post-h2">{b.text}</h4></div>
+            if (b.type === 'h1') return <div class="blk" {...attrs}><h3 class="p-h1">{b.text}</h3></div>
+            if (b.type === 'h2') return <div class="blk" {...attrs}><h4 class="p-h2">{b.text}</h4></div>
             if (b.type === 'answer-capsule')
               return (
-                <div class="blk capsule" data-couple={b.coupleId} data-on={on} tabindex="0">
-                  <span class="tag">Respuesta directa</span>
+                <div class="blk cap" {...attrs}>
+                  <span class="cap-t">Respuesta directa</span>
                   <p>{b.text}</p>
                 </div>
               )
-            if (b.type === 'paragraph') return <p class="para">{b.text}</p>
             if (b.type === 'table')
               return (
-                <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0">
-                  {/* La tabla scrollea DENTRO de su contenedor. La página nunca. */}
-                  <div class="twrap">
+                <div class="blk" {...attrs}>
+                  <div class="tw">
                     <table>
                       <caption>{b.caption}</caption>
                       <thead><tr>{b.headers.map(h => <th scope="col">{h}</th>)}</tr></thead>
@@ -138,15 +176,15 @@ const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.o
               )
             if (b.type === 'ordered-list')
               return (
-                <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0">
-                  <p class="blk-title">{b.title}</p>
+                <div class="blk" {...attrs}>
+                  <p class="blk-t">{b.title}</p>
                   <ol>{b.items.map(i => <li>{i}</li>)}</ol>
                 </div>
               )
             if (b.type === 'faq')
               return (
-                <div class="blk faq" data-couple={b.coupleId} data-on={on} tabindex="0">
-                  <p class="blk-title">{b.title}</p>
+                <div class="blk faq" {...attrs}>
+                  <p class="blk-t">{b.title}</p>
                   {b.items.map(i => (
                     <div class="qa">
                       <p class="q">{i.q}</p>
@@ -157,9 +195,9 @@ const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.o
               )
             if (b.type === 'internal-links')
               return (
-                <div class="blk" data-couple={b.coupleId} data-on={on} tabindex="0">
-                  <p class="blk-title">{b.title}</p>
-                  <ul class="links">
+                <div class="blk" {...attrs}>
+                  <p class="blk-t">{b.title}</p>
+                  <ul class="lnks">
                     {b.items.map(i => (
                       <li>
                         <a href={i.href} rel="nofollow noopener">{i.text}</a>
@@ -169,152 +207,146 @@ const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.o
                   </ul>
                 </div>
               )
-            if (b.type === 'sources')
-              return (
-                <div class="blk sources">
-                  <p class="blk-title">{b.title}</p>
-                  <ul>{b.items.map(i => <li><a href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
-                </div>
-              )
+
             return null
           })}
         </article>
       </section>
 
-      <!-- ══ Panel B — La capa de máquina + la evidencia ══ -->
-      <section class="pane pane-b" aria-labelledby="pane-b-title">
-        <div class="pane-head">
-          <h2 id="pane-b-title">{ui.paneMachineTab}</h2>
-          <p class="sr-status" role="status" aria-live="polite" data-testid="live"></p>
+      <!-- ══════ INSTRUMENTO — navy Efeonce. Nuestro análisis habla con NUESTRA voz. ══════ -->
+      <aside class="inst" aria-labelledby="in-t">
+        <div class="in-head">
+          <h2 id="in-t">{ui.instrumentTitle}</h2>
+          <p class="in-live" role="status" aria-live="polite" data-testid="live"></p>
         </div>
 
-        <div class="mach">
-          <!-- Metadatos + previsualización de resultado -->
-          <div class="grp">
-            <p class="grp-t">Metadatos</p>
-            {machine.seo.map(s => (
-              <div class="node" data-couple-target={s.coupleId} data-on={s.coupleId === HERO_COUPLE ? true : undefined} tabindex="0">
-                <p class="n-label">{s.label} {s.detail && <em>· {s.detail}</em>}</p>
-                <p class="n-value">{s.value}</p>
-                <p class="n-why"><b>{ui.whyLabel}:</b> {s.why}</p>
-              </div>
-            ))}
-            {machine.og.map(o => (
-              <div class="node slim" data-couple-target={o.coupleId} tabindex="0">
-                <p class="n-label">{o.label}</p>
-                <p class="n-value mono">{o.value}</p>
+        <div class="in-body">
+          <!-- La evidencia ABRE el instrumento. Es el argumento, no el apéndice. -->
+          <div class="kpis" data-testid="kpis">
+            {kpis.map(k => (
+              <div class="kpi" data-couple-target={k.coupleId} tabindex="0">
+                <p class="kpi-n">{k.big}</p>
+                <p class="kpi-u">{k.bigUnit}</p>
+                <cite class="kpi-s">{k.source} · {k.asOf}</cite>
               </div>
             ))}
           </div>
 
-          <!-- Oficio medido. Va arriba a propósito: es el bloque más argumentativo,
-               y es la contraparte del acoplamiento héroe que se captura para la lámina. -->
-          <div class="grp">
-            <p class="grp-t">Cómo está escrito</p>
-            {machine.craft.map(c => (
-              <div class="node" data-couple-target={c.coupleId} data-on={c.coupleId === HERO_COUPLE ? true : undefined} tabindex="0">
-                <p class="n-label">{c.label} <em>· {c.detail}</em></p>
-                <p class="n-why"><b>{ui.whyLabel}:</b> {c.why}</p>
-              </div>
-            ))}
-          </div>
-
-          <!-- Jerarquía de encabezados -->
-          <div class="grp">
-            <p class="grp-t">Jerarquía de encabezados</p>
-            <div class="node" data-couple-target={machine.headings.coupleId} tabindex="0">
-              {machine.headings.tree.map(h => (
-                <p class={`hnode l${h.level}`} data-couple-target={h.coupleId} tabindex="0">
-                  <span class="lv">H{h.level}</span> {h.text}
-                </p>
-              ))}
-              <p class="n-why"><b>{ui.whyLabel}:</b> {machine.headings.why}</p>
+          <!-- Nivel 1 primero: lo que mueve un número del diagnóstico. -->
+          <p class="grp">Cómo está escrito</p>
+          {machine.craft.map(c => (
+            <div class={`nd t${c.tier}`} data-couple-target={c.coupleId} data-on={c.coupleId === HERO ? true : undefined} tabindex="0">
+              {c.stat && (
+                <p class="stat">{c.stat} <span>{c.statNote}</span></p>
+              )}
+              <p class="nd-l">{c.label} <em>· {c.detail}</em></p>
+              <p class="why"><b>{ui.whyLabel}:</b> {c.why}</p>
             </div>
-          </div>
+          ))}
 
-          <!-- Los ALT -->
-          <div class="grp">
-            <p class="grp-t">Texto alternativo de las imágenes</p>
-            {machine.alts.map(a => (
-              <div class="node" data-couple-target={a.coupleId} tabindex="0">
-                <p class="n-value">“{a.alt}”</p>
-                <p class="n-why"><b>{ui.whyLabel}:</b> {a.why}</p>
+          <p class="grp">Datos estructurados <em>· se muestran como texto</em></p>
+          <p class="warn">{ui.schemaNote}</p>
+          {/*
+            El ARGUMENTO (el stat + el para qué) va siempre visible; el CÓDIGO va colapsado.
+            Con el JSON desplegado por defecto el panel se volvía un muro de código y el
+            argumento —que es lo que el comité recuerda— quedaba enterrado bajo su propia prueba.
+          */}
+          {machine.jsonld.map(n => (
+            <div class={`nd t${n.tier} sch`} data-couple-target={n.coupleId} tabindex="0">
+              <div class="sch-h">
+                <span class="sch-t">{n.type}</span>
+                <span class="sch-m">{n.metric}</span>
               </div>
-            ))}
-          </div>
-
-          <!-- Datos estructurados — COMO TEXTO, nunca como marcado activo -->
-          <div class="grp">
-            <p class="grp-t">Datos estructurados (JSON-LD)</p>
-            <p class="note" data-testid="schema-note">⚠️ {ui.schemaNote}</p>
-            {machine.jsonld.map(n => (
-              <details class="node schema" data-couple-target={n.coupleId} open={n.coupleId === HERO_COUPLE} data-on={n.coupleId === HERO_COUPLE ? true : undefined}>
-                <summary>
-                  <span class="stype">{n.type}</span>
-                  <span class="smetric">{n.metric}</span>
-                </summary>
-                <p class="n-why"><b>{ui.whyLabel}:</b> {n.why}</p>
+              {n.stat && <p class="stat"><span class="stat-fix">arregla</span>{n.stat} <span>{n.statNote}</span></p>}
+              {n.tier < 3 && <p class="why"><b>{ui.whyLabel}:</b> {n.why}</p>}
+              <details>
+                <summary>Ver el código</summary>
                 <pre role="region" aria-label={`Datos estructurados: ${n.type}`}><code>{asText(n.code)}</code></pre>
               </details>
-            ))}
-          </div>
+            </div>
+          ))}
 
-          <!-- ══ La evidencia ══ -->
-          <div class="grp ev" data-testid="evidence">
-            <p class="grp-t big">{ui.paneEvidenceTab}</p>
-            <p class="ev-intro">{evidence.intro}</p>
-
-            {evidence.facts.map(f => (
-              <div class="node fact" data-couple-target={f.coupleId} tabindex="0">
-                <p class="n-label">{f.label}</p>
-                <p class="f-value">{f.value}</p>
-                <p class="n-why">{f.note}</p>
-                <p class="src"><cite>{ui.sourceLabel}: {f.source} · {f.asOf}</cite></p>
+          <p class="grp">Metadatos</p>
+          {machine.seo.map(s => (
+            <div class={`nd t${s.tier}`} data-couple-target={s.coupleId} tabindex="0">
+              <p class="nd-l">{s.label} {s.detail && <em>· {s.detail}</em>}</p>
+              <p class="nd-v">{s.value}</p>
+              {s.tier < 3 && <p class="why"><b>{ui.whyLabel}:</b> {s.why}</p>}
+            </div>
+          ))}
+          <div class="t3wrap">
+            {machine.og.map(o => (
+              <div class="nd t3" data-couple-target={o.coupleId} tabindex="0">
+                <p class="nd-l">{o.label}</p>
+                <p class="nd-v mono">{o.value}</p>
               </div>
             ))}
-
-            <div class="node">
-              <p class="n-label">{evidence.fanOut.title}</p>
-              <p class="n-why">{evidence.fanOut.note}</p>
-              <ul class="fan">
-                {evidence.fanOut.items.map(i => (
-                  <li data-couple-target={i.coveredBy} tabindex="0">
-                    <span class="chk" aria-hidden="true">{i.covered ? '✓' : '—'}</span>
-                    <span>{i.q}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <p class="honesty">{evidence.honesty}</p>
           </div>
+
+          <p class="grp">Estructura</p>
+          <div class="nd t2" data-couple-target={machine.headings.coupleId} tabindex="0">
+            {machine.headings.tree.map(h => (
+              <p class={`hn l${h.level}`} data-couple-target={h.coupleId} tabindex="0">
+                <span class="lv">H{h.level}</span> {h.text}
+              </p>
+            ))}
+            <p class="why"><b>{ui.whyLabel}:</b> {machine.headings.why}</p>
+          </div>
+          {machine.alts.map(a => (
+            <div class="nd t2" data-couple-target={a.coupleId} tabindex="0">
+              <p class="nd-v">“{a.alt}”</p>
+              <p class="why"><b>{ui.whyLabel}:</b> {a.why}</p>
+            </div>
+          ))}
+
+          <p class="grp">La evidencia <em>· por qué existe este artículo</em></p>
+          {details.map(f => (
+            <div class="nd t2 fct" data-couple-target={f.coupleId} tabindex="0">
+              <p class="nd-l">{f.label}</p>
+              <p class="fct-v">{f.value}</p>
+              <p class="why">{f.note}</p>
+              <cite>{ui.sourceLabel}: {f.source} · {f.asOf}</cite>
+            </div>
+          ))}
+          <div class="nd t2">
+            <p class="nd-l">{evidence.fanOut.title}</p>
+            <p class="why">{evidence.fanOut.note}</p>
+            <ul class="fan">
+              {evidence.fanOut.items.map(i => (
+                <li data-couple-target={i.coveredBy} tabindex="0">
+                  <span class="ok" aria-hidden="true">{i.covered ? '✓' : '—'}</span>{i.q}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <p class="hon">{evidence.honesty}</p>
         </div>
-      </section>
+      </aside>
     </div>
 
-    <!-- Región 5 — Licencias. Es la demostración del requisito, no un pie de página. -->
+    <!-- ══ Licencias: es la demostración del requisito, no una nota al pie ══ -->
     <footer class="lic" data-testid="licenses">
-      <p class="grp-t">{ui.licenseTitle}</p>
+      <p class="grp dark">{ui.licenseTitle}</p>
       <ul>
         {images.map(i => (
           <li>
-            <strong>{altFor(i.coupleId)?.alt.slice(0, 58) ?? i.alt.slice(0, 58)}…</strong>
-            <span>{i.credit.author} · <a href={i.credit.url} rel="nofollow noopener">{i.credit.license}</a></span>
+            <span class="lic-a">{i.alt}</span>
+            <span class="lic-c">{i.credit.author} · <a href={i.credit.url} rel="nofollow noopener">{i.credit.license}</a></span>
           </li>
         ))}
       </ul>
-      <p class="lic-note">
-        Todas las imágenes tienen licencia verificable y crédito visible. Ninguna fue generada con IA.
-      </p>
+      <p class="lic-n">Todas las imágenes tienen licencia verificable y crédito visible. Ninguna fue generada con IA.</p>
+      <div class="slogan"><EfeonceSlogan /></div>
     </footer>
   </div>
 </BaseLayout>
 
 <script>
   /**
-   * Acoplamiento artículo ↔ capa de máquina.
-   * Cero React: el contenido es estático, hidratarlo sería over-hydration.
-   * Esto solo conmuta `data-on`; el CSS hace el resaltado. Sin JS, el estado
+   * Acoplamiento asimétrico artículo ↔ instrumento.
+   *
+   * Cero React: el contenido es estático; hidratarlo para conmutar un resaltado sería
+   * over-hydration. Esto solo mueve `data-on`; el CSS hace todo lo demás. Sin JS, el par
    * héroe ya viene pintado desde el HTML y la pieza sigue argumentando.
    */
   const root = document.querySelector<HTMLElement>('[data-testid="xray-root"]')
@@ -323,10 +355,8 @@ const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.o
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let pinned: string | null = null
 
-    const all = () => root.querySelectorAll<HTMLElement>('[data-couple],[data-couple-target]')
-
     const paint = (id: string | null) => {
-      all().forEach(el => {
+      root.querySelectorAll<HTMLElement>('[data-couple],[data-couple-target]').forEach(el => {
         const mine = el.dataset.couple ?? el.dataset.coupleTarget
         if (id && mine === id) {
           el.dataset.on = 'true'
@@ -336,34 +366,36 @@ const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.o
           el.removeAttribute('aria-current')
         }
       })
-      if (id) {
-        const target = root.querySelector<HTMLElement>(`[data-couple-target="${id}"]`)
-        if (target) {
-          const det = target.closest('details')
-          if (det) det.open = true
+      if (!id) return
 
-          /**
-           * Scrollea SOLO el panel, nunca la página.
-           * `scrollIntoView` no sirve acá: scrollea todos los ancestros scrolleables,
-           * incluido el documento — y arrastrar la página bajo el cursor mientras el
-           * usuario lee el artículo es desorientador. Movemos el scrollTop del panel a mano.
-           */
-          const pane = target.closest<HTMLElement>('.pane-b')
-          if (pane && pane.scrollHeight > pane.clientHeight) {
-            const t = target.getBoundingClientRect()
-            const p = pane.getBoundingClientRect()
-            if (t.top < p.top + 8 || t.bottom > p.bottom - 8) {
-              const delta = t.top - p.top - 12
-              pane.scrollTo({ top: pane.scrollTop + delta, behavior: reduce ? 'auto' : 'smooth' })
-            }
-          }
-          if (live) live.textContent = `Resaltado: ${target.querySelector('.n-label,.stype')?.textContent ?? id}`
+      const target = root.querySelector<HTMLElement>(`[data-couple-target="${id}"]`)
+      if (!target) return
+      target.querySelector('details')?.setAttribute('open', '')
+
+      /**
+       * Scrollea SOLO el panel, nunca la página. `scrollIntoView` no sirve: mueve todos los
+       * ancestros scrolleables, y arrastrar la página bajo el cursor mientras alguien lee es
+       * desorientador. Movemos el scrollTop del instrumento a mano.
+       */
+      const pane = target.closest<HTMLElement>('.inst')
+      if (pane && pane.scrollHeight > pane.clientHeight) {
+        const t = target.getBoundingClientRect()
+        const p = pane.getBoundingClientRect()
+        if (t.top < p.top + 8 || t.bottom > p.bottom - 8) {
+          pane.scrollTo({ top: pane.scrollTop + (t.top - p.top) - 16, behavior: reduce ? 'auto' : 'smooth' })
         }
+      }
+      if (live) {
+        const name = target.querySelector('.nd-l,.sch-t,.kpi-u')?.textContent?.trim()
+        live.textContent = name ? `Resaltado: ${name}` : ''
       }
     }
 
+    const hit = (e: Event) =>
+      (e.target as HTMLElement).closest<HTMLElement>('[data-couple],[data-couple-target]')
+
     const enter = (e: Event) => {
-      const el = (e.target as HTMLElement).closest<HTMLElement>('[data-couple],[data-couple-target]')
+      const el = hit(e)
       if (!el || pinned) return
       paint(el.dataset.couple ?? el.dataset.coupleTarget ?? null)
     }
@@ -371,7 +403,7 @@ const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.o
     root.addEventListener('mouseover', enter)
     root.addEventListener('focusin', enter)
     root.addEventListener('click', e => {
-      const el = (e.target as HTMLElement).closest<HTMLElement>('[data-couple],[data-couple-target]')
+      const el = hit(e)
       if (!el) return
       const id = el.dataset.couple ?? el.dataset.coupleTarget ?? null
       pinned = pinned === id ? null : id
@@ -380,218 +412,351 @@ const asText = (code: unknown) => JSON.stringify({ '@context': 'https://schema.o
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return
       pinned = null
-      paint('capsule-main') // vuelve al héroe
+      paint('capsule-main')
     })
   }
 </script>
 
 <style>
-  .xray {
-    --ink: #0f172a;
-    --muted: #64748b;
+  /* ════════════════════════════════════════════════════════════════════════
+     TOKENS
+     Marca Efeonce (navy + azul) = el instrumento. `--client` = el espécimen.
+     El azul de marca (#0375db) NO alcanza 4.5:1 sobre el navy, así que el texto
+     sobre oscuro usa la versión levantada. El HEX de marca nunca va inline.
+     ════════════════════════════════════════════════════════════════════════ */
+  .xr {
+    --navy: #001a33;
+    --navy-2: #08203a;
+    --navy-3: #0e2c4b;
+    --line-d: #1b3c5e;
+    --blue: #0375db;
+    --blue-up: #58aef5;      /* texto/borde sobre navy */
+    --ink-d: #e9f0f7;        /* texto principal sobre navy */
+    --dim-d: #9db4cb;        /* texto secundario sobre navy (≥4.5:1) */
+
+    --ink: #0d1b2a;
+    --muted: #5a6b7d;
     --line: #e2e8f0;
-    --tint: color-mix(in srgb, var(--accent) 8%, white);
-    --dur: 120ms;
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 0 1rem 3rem;
+    --tint-c: color-mix(in srgb, var(--client) 7%, white);
+
+    /* Escala: base 16 × 1.25. La anterior eran 6 tamaños dentro de 4px — no era escala. */
+    --t-over: 0.6875rem;   /* 11 — solo eyebrows, con tracking */
+    --t-meta: 0.8125rem;   /* 13 */
+    --t-body: 1rem;        /* 16 — el piso */
+    --t-node: 1.25rem;     /* 20 */
+    --t-sect: 1.5625rem;   /* 25 */
+    --t-page: 1.9375rem;   /* 31 */
+    --t-stat: 2.5rem;      /* 40 — el número es el héroe */
+
+    --dur: 140ms;
+    --ease: cubic-bezier(0.2, 0, 0, 1);
+
     color: var(--ink);
+    font-size: var(--t-body);
   }
 
-  /* ── Rótulo persistente ── */
-  .bar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    display: flex;
-    gap: 0.6rem;
-    align-items: baseline;
-    flex-wrap: wrap;
-    margin: 0 -1rem 1.5rem;
-    padding: 0.6rem 1.25rem;
-    background: #1e293b;
-    color: #f1f5f9;
-    font-size: 0.8125rem;
+  /* ── Chrome Efeonce ─────────────────────────────────────────────────── */
+  .chrome { position: sticky; top: 0; z-index: 30; background: var(--navy); color: var(--ink-d); }
+  .chrome-in {
+    max-width: 1560px; margin: 0 auto; padding: 0.6rem 1.25rem;
+    display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;
   }
-  .bar strong { color: #fff; }
-  .bar span { color: #cbd5e1; }
+  .brand { display: flex; gap: 0.55rem; align-items: center; flex-shrink: 0; }
+  .brand img { display: block; }
+  .brand-t {
+    font-family: Poppins, system-ui, sans-serif; font-weight: 600;
+    font-size: var(--t-meta); letter-spacing: 0.01em;
+  }
+  .rotulo {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: baseline;
+    font-size: var(--t-meta); line-height: 1.45;
+    padding-left: 1.25rem; border-left: 1px solid var(--line-d);
+  }
+  .rotulo strong { color: #fff; white-space: nowrap; }
+  .rotulo span { color: var(--dim-d); }
 
-  /* ── Encabezado ── */
-  .head { max-width: 78ch; margin-bottom: 1.1rem; }
-  .kick {
-    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.12em;
+  /* ── Lede ───────────────────────────────────────────────────────────── */
+  .xr > .lede,
+  .xr > .split,
+  .xr > .lic { max-width: 1560px; margin-inline: auto; padding-inline: 1.25rem; }
+  .lede { padding-top: 1.75rem; padding-bottom: 1.25rem; max-width: min(1560px, 82ch + 2.5rem); }
+  .over {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--muted);
   }
-  .head h1 { margin-top: 0.3rem; font-size: 1.65rem; font-weight: 650; line-height: 1.2; }
+  .lede h1 {
+    margin-top: 0.5rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: var(--t-page); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em;
+  }
+  .lede h1 em { font-style: normal; font-weight: 400; color: var(--muted); }
   .thesis {
-    margin-top: 0.7rem; padding: 0.75rem 1rem;
-    border-left: 3px solid var(--accent); background: var(--tint); border-radius: 0 6px 6px 0;
+    margin-top: 1rem; padding: 0.9rem 1.1rem;
+    background: var(--navy); color: var(--ink-d); border-radius: 8px;
+    border-left: 3px solid var(--blue-up);
   }
-  .thesis-label {
-    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--accent);
+  .thesis-l {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--blue-up);
   }
-  .thesis-body { margin-top: 0.35rem; font-size: 0.9375rem; line-height: 1.6; }
-  .hint { margin-top: 0.6rem; font-size: 0.8125rem; color: var(--muted); }
-  /* En un teléfono no hay cursor: el copy cambia con el gesto, no solo el layout. */
+  .thesis-b { margin-top: 0.4rem; font-size: var(--t-body); line-height: 1.6; max-width: 78ch; }
+  .hint { margin-top: 0.8rem; font-size: var(--t-meta); color: var(--muted); }
   .hint-d { display: none; }
-  .hint-m { display: block; }
-  @media (hover: hover) and (pointer: fine) {
-    .hint-d { display: block; }
-    .hint-m { display: none; }
-  }
+  @media (hover: hover) and (pointer: fine) { .hint-d { display: block; } .hint-m { display: none; } }
 
-  /* ── Split ──
-     `min-width: 0` en TODO lo que vive dentro del grid. Sin esto, los hijos heredan
-     `min-width: auto` y se niegan a encogerse: el <pre> del JSON y la tabla empujan
-     la página entera y aparecen ~890px de scroll horizontal en móvil. Es el bug
-     clásico de CSS Grid, y lo cazó el assert 15 del verify. */
+  /* ── Split ──────────────────────────────────────────────────────────── */
   .split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-width: 0; }
-  @media (min-width: 1024px) {
-    .split { grid-template-columns: 1.15fr 1fr; align-items: start; }
-    .pane-b { position: sticky; top: 3.25rem; max-height: calc(100vh - 4.5rem); overflow-y: auto; }
+  @media (min-width: 1080px) {
+    .split { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; }
+    .inst { position: sticky; top: 3.4rem; max-height: calc(100vh - 4.6rem); overflow-y: auto; }
   }
-  .pane { border: 1px solid var(--line); border-radius: 10px; background: #fff; min-width: 0; }
-  .post, .mach, .grp, .node, .blk { min-width: 0; }
-  .pane-head {
-    padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--line); background: #f8fafc;
-    border-radius: 10px 10px 0 0;
-  }
-  .pane-head h2 { font-size: 0.9375rem; font-weight: 650; }
-  .pane-head p { font-size: 0.8125rem; color: var(--muted); }
+  .specimen, .inst { min-width: 0; border-radius: 12px; }
 
-  /* ── El artículo ── */
-  .post { padding: 0.9rem 1.1rem; }
+  /* ══════ ESPÉCIMEN — claro, con el acento del CLIENTE ══════ */
+  .specimen { background: #fff; border: 1px solid var(--line); }
+  .sp-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--line); background: #fbfcfd;
+    border-radius: 12px 12px 0 0;
+  }
+  .sp-head h2 { font-size: var(--t-body); font-weight: 600; }
+  .sp-head p { font-size: var(--t-meta); color: var(--muted); }
+  .chip-site {
+    font-size: var(--t-over); font-weight: 600; color: var(--client);
+    background: var(--tint-c); border: 1px solid color-mix(in srgb, var(--client) 25%, white);
+    padding: 0.2rem 0.55rem; border-radius: 999px; white-space: nowrap;
+  }
+  .post { padding: 1rem 1.1rem; }
+
+  /* Los bloques del artículo son la FUENTE del acoplamiento. */
   .blk {
-    position: relative; margin: 0.5rem -0.5rem; padding: 0.5rem;
-    border-radius: 7px; outline: 2px solid transparent; outline-offset: 1px;
-    transition: outline-color var(--dur) ease-out, background-color var(--dur) ease-out;
-    cursor: pointer;
+    position: relative; margin: 0.45rem -0.55rem; padding: 0.5rem 0.6rem;
+    border-radius: 8px; cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
   }
-  .blk:focus-visible { outline: 2px solid var(--ink); }
-  .post-h1 { font-size: 1.55rem; font-weight: 650; line-height: 1.22; }
-  .post-h2 { margin-top: 0.5rem; font-size: 1.1rem; font-weight: 640; }
-  .para { margin: 0.7rem 0; font-size: 0.9375rem; line-height: 1.7; color: #334155; }
-  .capsule { background: #f8fafc; border-left: 3px solid var(--accent); }
-  .capsule p { font-size: 0.9375rem; line-height: 1.65; font-weight: 500; }
-  .tag {
-    display: inline-block; margin-bottom: 0.3rem; font-size: 0.625rem; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
+  /* AFFORDANCE EN REPOSO: una marca discreta en el borde derecho dice "esto se conecta
+     con algo allá". Sin ella, nada te avisa que el artículo es interactivo. */
+  .blk[data-n]::before {
+    content: ''; position: absolute; right: 0.35rem; top: 50%; translate: 0 -50%;
+    width: 5px; height: 5px; border-radius: 999px;
+    background: color-mix(in srgb, var(--client) 45%, transparent);
+    transition: opacity var(--dur) var(--ease), scale var(--dur) var(--ease);
   }
-  /* El hero se recorta: a altura completa empujaba el artículo fuera del pliegue y la
-     captura para la lámina salía sin una sola correspondencia visible. */
+  .blk[data-n]:hover::before { scale: 1.4; }
+  /* EL CHIP DIRECCIONAL: al acoplar, la fuente apunta al destino y dice CUÁNTO hay.
+     En móvil los paneles se apilan: no hay canaleta que cruzar, así que el chip vive
+     adentro y apunta hacia abajo. Sobresalir ahí solo produciría scroll horizontal. */
+  .blk[data-n]::after {
+    content: '↓ ' attr(data-n);
+    position: absolute; right: 0.2rem; top: 50%; translate: 0 -50%;
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.02em;
+    color: #fff; background: var(--navy);
+    padding: 0.18rem 0.45rem; border-radius: 999px; white-space: nowrap;
+    opacity: 0; scale: 0.9; pointer-events: none; z-index: 2;
+    transition: opacity var(--dur) var(--ease), scale var(--dur) var(--ease);
+  }
+  @media (min-width: 1080px) {
+    /* Con los paneles lado a lado, el chip SÍ sobresale: apunta a través de la canaleta. */
+    .blk[data-n]::after { content: '→ ' attr(data-n); right: -0.55rem; translate: 50% -50%; }
+  }
+  .blk:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* LA FUENTE SUSURRA: tinte + barra lateral. Sin outline — ya la estás tocando. */
+  .blk[data-on] { background: var(--tint-c); border-left-color: var(--client); }
+  .blk[data-on][data-n]::before { opacity: 0; }
+  .blk[data-on][data-n]::after { opacity: 1; scale: 1; }
+
+  .p-h1 { font-size: var(--t-sect); font-weight: 650; line-height: 1.2; letter-spacing: -0.01em; }
+  .p-h2 { margin-top: 0.4rem; font-size: var(--t-node); font-weight: 620; line-height: 1.3; }
+  .para { margin: 0.7rem 0; font-size: var(--t-body); line-height: 1.65; color: #33475b; max-width: 68ch; }
+  .cap { background: #f7f9fb; border-left-color: var(--client); }
+  .cap p { font-size: var(--t-body); line-height: 1.6; max-width: 66ch; }
+  .cap-t {
+    display: block; margin-bottom: 0.25rem; font-size: var(--t-over); font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--client);
+  }
   .blk img { width: 100%; height: auto; border-radius: 6px; display: block; }
   .blk:first-child img { max-height: 150px; object-fit: cover; }
-  figcaption { margin-top: 0.4rem; font-size: 0.8125rem; color: var(--muted); }
-  .credit { margin-top: 0.15rem; font-size: 0.6875rem; color: #94a3b8; }
+  figcaption { margin-top: 0.4rem; font-size: var(--t-meta); color: var(--muted); }
+  .credit { margin-top: 0.15rem; font-size: var(--t-over); color: #94a3b8; }
   .credit a { color: inherit; text-decoration: underline; }
-  .blk-title { font-weight: 640; font-size: 0.9375rem; margin-bottom: 0.45rem; }
+  .blk-t { font-weight: 620; font-size: var(--t-body); margin-bottom: 0.45rem; }
 
-  .twrap { overflow-x: auto; max-width: 100%; }
-  table { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: 0.8125rem; }
-  caption { text-align: left; font-weight: 640; font-size: 0.875rem; padding-bottom: 0.4rem; }
-  th, td { border: 1px solid var(--line); padding: 0.45rem 0.55rem; text-align: left; vertical-align: top; }
-  th { background: #f8fafc; font-weight: 640; }
-
+  .tw { overflow-x: auto; max-width: 100%; }
+  table { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: var(--t-meta); }
+  caption { text-align: left; font-weight: 620; font-size: var(--t-body); padding-bottom: 0.45rem; }
+  th, td { border: 1px solid var(--line); padding: 0.5rem 0.6rem; text-align: left; vertical-align: top; }
+  th { background: #f7f9fb; font-weight: 620; }
   ol { padding-left: 1.15rem; }
-  ol li { font-size: 0.875rem; line-height: 1.6; margin: 0.3rem 0; }
+  ol li { font-size: var(--t-meta); line-height: 1.6; margin: 0.3rem 0; }
   .faq .qa { padding: 0.5rem 0; border-top: 1px solid var(--line); }
-  .faq .q { font-weight: 640; font-size: 0.875rem; }
-  .faq .a { font-size: 0.875rem; line-height: 1.6; color: #475569; margin-top: 0.15rem; }
-  .links li, .sources li { font-size: 0.8125rem; margin: 0.3rem 0; }
-  .links a, .sources a { color: var(--accent); text-decoration: underline; }
-  .links em, .sources em { color: var(--muted); font-style: normal; font-size: 0.75rem; }
-  .sources { border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 0.8rem; }
-  .sources ul { padding-left: 1rem; list-style: disc; }
+  .faq .q { font-weight: 620; font-size: var(--t-meta); }
+  .faq .a { font-size: var(--t-meta); line-height: 1.6; color: #4a5c6e; margin-top: 0.15rem; }
+  .lnks li { font-size: var(--t-meta); margin: 0.3rem 0; }
+  .lnks a { color: var(--client); text-decoration: underline; }
+  .lnks em { color: var(--muted); font-style: normal; font-size: var(--t-over); }
+  .srcs { border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 0.8rem; }
+  .srcs ul { padding-left: 1rem; list-style: disc; }
+  .srcs li { font-size: var(--t-meta); margin: 0.25rem 0; }
+  .srcs a { color: var(--muted); text-decoration: underline; }
 
-  /* ── Panel de máquina ── */
-  .mach { padding: 0.9rem; }
-  .grp { margin-bottom: 1.4rem; }
-  .grp-t {
-    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem;
+  /* ══════ INSTRUMENTO — navy Efeonce ══════ */
+  .inst { background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3); }
+  .in-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--line-d); background: var(--navy-2);
+    border-radius: 12px 12px 0 0; position: sticky; top: 0; z-index: 2;
   }
-  .grp-t.big { font-size: 0.8125rem; color: var(--accent); }
-  .ev { border-top: 2px solid var(--line); padding-top: 1.1rem; }
-  .ev-intro { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.7rem; }
+  .in-head h2 { font-size: var(--t-body); font-weight: 600; }
+  .in-live { font-size: var(--t-over); color: var(--dim-d); text-align: right; }
+  .in-body { padding: 1rem 1rem 1rem 1.3rem; }
 
-  .node {
-    margin-bottom: 0.5rem; padding: 0.55rem 0.7rem;
-    border: 1px solid var(--line); border-radius: 7px; background: #fff;
-    outline: 2px solid transparent; outline-offset: 1px;
-    transition: outline-color var(--dur) ease-out, background-color var(--dur) ease-out;
+  /* KPIs: la evidencia ABRE el instrumento. Tabular-nums, nunca monoespaciada. */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.4rem; }
+  .kpi {
+    padding: 0.7rem 0.75rem; background: var(--navy-2); border: 1px solid var(--line-d);
+    border-radius: 9px; outline: 2px solid transparent;
+    transition: outline-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
   }
-  .node:focus-visible { outline: 2px solid var(--ink); }
-  .n-label { font-size: 0.75rem; font-weight: 700; color: #334155; }
-  .n-label em { font-weight: 400; color: var(--muted); font-style: normal; }
-  .n-value { font-size: 0.8125rem; margin-top: 0.15rem; color: #0f172a; word-break: break-word; }
-  .n-value.mono { font-family: ui-monospace, monospace; font-size: 0.6875rem; color: var(--muted); }
-  .n-why { font-size: 0.75rem; line-height: 1.55; color: #475569; margin-top: 0.35rem; }
-  .n-why b { color: var(--accent); }
-  .slim { padding: 0.35rem 0.7rem; }
+  .kpi-n {
+    font-size: var(--t-stat); font-weight: 700; line-height: 1; color: #fff;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+  }
+  .kpi-u { margin-top: 0.3rem; font-size: var(--t-meta); color: var(--ink-d); line-height: 1.35; }
+  .kpi-s { display: block; margin-top: 0.4rem; font-size: 0.625rem; color: var(--dim-d); font-style: normal; }
+  @media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
 
-  .hnode { font-size: 0.75rem; padding: 0.2rem 0.3rem; border-radius: 4px; outline: 2px solid transparent;
-           transition: outline-color var(--dur) ease-out, background-color var(--dur) ease-out; }
-  .hnode.l2 { padding-left: 1.1rem; }
-  .lv { display: inline-block; min-width: 1.6rem; font-weight: 700; color: var(--accent); font-size: 0.625rem; }
+  .grp {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--blue-up); margin: 1.5rem 0 0.6rem;
+    padding-bottom: 0.4rem; border-bottom: 1px solid var(--line-d);
+  }
+  .grp em { font-style: normal; font-weight: 500; color: var(--dim-d); letter-spacing: 0.04em; text-transform: none; }
+  .warn {
+    font-size: var(--t-meta); line-height: 1.5; color: #ffd166;
+    background: color-mix(in srgb, #ffd166 10%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, #ffd166 30%, var(--navy-2));
+    border-radius: 7px; padding: 0.55rem 0.65rem; margin-bottom: 0.7rem;
+  }
 
-  .note {
-    font-size: 0.75rem; line-height: 1.5; color: #92400e;
-    background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;
-    padding: 0.5rem 0.6rem; margin-bottom: 0.6rem;
+  /* ── LOS TRES NIVELES. `og:title` no puede pesar lo mismo que `FAQPage`. ── */
+  .nd {
+    position: relative; margin-bottom: 0.55rem; padding: 0.7rem 0.8rem;
+    background: var(--navy-2); border: 1px solid var(--line-d); border-radius: 9px;
+    outline: 2px solid transparent; outline-offset: 1px; min-width: 0;
+    transition: outline-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
   }
-  .schema summary { cursor: pointer; display: flex; justify-content: space-between; gap: 0.5rem; align-items: center; }
-  .stype { font-size: 0.75rem; font-weight: 700; font-family: ui-monospace, monospace; }
-  .smetric {
-    font-size: 0.625rem; font-weight: 700; color: #fff; background: var(--accent);
-    padding: 0.1rem 0.4rem; border-radius: 999px; white-space: nowrap;
-  }
-  pre {
-    margin-top: 0.5rem; padding: 0.6rem; background: #0f172a; color: #e2e8f0;
-    border-radius: 6px; font-size: 0.6875rem; line-height: 1.5;
-    overflow-x: auto; max-height: 20rem; max-width: 100%;
-  }
-  .schema { min-width: 0; }
+  .nd:focus-visible { outline: 2px solid var(--blue-up); }
+  .t1 { border-color: color-mix(in srgb, var(--blue-up) 35%, var(--line-d)); background: var(--navy-3); }
+  .t3 { padding: 0.4rem 0.6rem; background: transparent; border-color: transparent; margin-bottom: 0.1rem; }
+  .t3wrap { padding: 0.3rem 0 0.6rem; border-left: 2px solid var(--line-d); margin-left: 0.2rem; }
 
-  .fact .f-value { font-size: 1.05rem; font-weight: 700; color: var(--accent); margin: 0.15rem 0; }
-  .src { margin-top: 0.35rem; font-size: 0.6875rem; color: #94a3b8; }
-  .src cite { font-style: normal; }
-  .fan { margin-top: 0.5rem; }
+  .stat {
+    font-family: Poppins, system-ui, sans-serif;
+    font-size: var(--t-stat); font-weight: 700; line-height: 1.05; color: #fff;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin-bottom: 0.15rem;
+  }
+  .stat span {
+    display: block; font-family: inherit; font-size: var(--t-meta); font-weight: 400;
+    line-height: 1.45; color: var(--dim-d); letter-spacing: 0; margin-top: 0.25rem;
+  }
+  .stat-fix {
+    display: inline-block !important; margin-right: 0.35rem; font-size: var(--t-over) !important;
+    font-weight: 700 !important; letter-spacing: 0.08em !important; text-transform: uppercase;
+    color: var(--blue-up) !important; vertical-align: middle;
+  }
+  .nd-l { font-size: var(--t-meta); font-weight: 700; color: var(--ink-d); }
+  .nd-l em { font-weight: 400; color: var(--dim-d); font-style: normal; }
+  .nd-v { font-size: var(--t-meta); margin-top: 0.2rem; color: var(--ink-d); word-break: break-word; line-height: 1.5; }
+  .nd-v.mono { font-family: ui-monospace, monospace; font-size: 0.6875rem; color: var(--dim-d); }
+  .why { font-size: var(--t-meta); line-height: 1.55; color: var(--dim-d); margin-top: 0.4rem; max-width: 62ch; }
+  .why b { color: var(--blue-up); font-weight: 600; }
+
+  .sch-h { display: flex; justify-content: space-between; gap: 0.6rem; align-items: center; margin-bottom: 0.35rem; }
+  .sch-t { font-size: var(--t-meta); font-weight: 700; font-family: ui-monospace, monospace; color: #fff; }
+  .sch details { margin-top: 0.5rem; }
+  .sch summary {
+    cursor: pointer; font-size: var(--t-over); font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--dim-d); padding: 0.25rem 0;
+    list-style-position: inside;
+  }
+  .sch summary:hover { color: var(--blue-up); }
+  .sch summary:focus-visible { outline: 2px solid var(--blue-up); outline-offset: 2px; border-radius: 4px; }
+  .sch-m {
+    font-size: var(--t-over); font-weight: 700; color: var(--navy);
+    background: var(--blue-up); padding: 0.12rem 0.45rem; border-radius: 999px; white-space: nowrap;
+  }
+  .sch pre {
+    margin-top: 0.6rem; padding: 0.65rem; background: #04101d; color: #cfe3f5;
+    border: 1px solid var(--line-d); border-radius: 7px;
+    font-size: 0.6875rem; line-height: 1.55; overflow-x: auto; max-height: 20rem; max-width: 100%;
+  }
+
+  .hn { font-size: var(--t-meta); padding: 0.2rem 0.3rem; border-radius: 4px; outline: 2px solid transparent;
+        transition: outline-color var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+  .hn.l2 { padding-left: 1.15rem; }
+  .lv { display: inline-block; min-width: 1.7rem; font-weight: 700; color: var(--blue-up); font-size: 0.625rem; }
+
+  .fct-v { font-size: var(--t-node); font-weight: 700; color: var(--blue-up); margin: 0.15rem 0; font-variant-numeric: tabular-nums; }
+  .fct cite { display: block; margin-top: 0.4rem; font-size: 0.625rem; color: var(--dim-d); font-style: normal; }
   .fan li {
-    display: flex; gap: 0.45rem; font-size: 0.75rem; padding: 0.25rem 0.3rem;
-    border-radius: 4px; outline: 2px solid transparent; align-items: baseline;
-    transition: outline-color var(--dur) ease-out, background-color var(--dur) ease-out;
+    display: flex; gap: 0.45rem; font-size: var(--t-meta); padding: 0.28rem 0.3rem; border-radius: 4px;
+    outline: 2px solid transparent; align-items: baseline; color: var(--ink-d);
+    transition: outline-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
   }
-  .chk { color: #16a34a; font-weight: 700; }
-  .honesty {
-    margin-top: 0.7rem; padding: 0.6rem 0.7rem; font-size: 0.75rem; line-height: 1.55;
-    color: #475569; background: #f8fafc; border-radius: 6px; border: 1px dashed var(--line);
+  .ok { color: #62f0df; font-weight: 700; }
+  .hon {
+    margin-top: 0.8rem; padding: 0.7rem 0.8rem; font-size: var(--t-meta); line-height: 1.55;
+    color: var(--dim-d); background: var(--navy-2); border-radius: 8px; border: 1px dashed var(--line-d);
   }
 
-  /* ── Licencias ── */
-  .lic { margin-top: 1.5rem; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 10px; background: #f8fafc; }
-  .lic ul { margin-top: 0.4rem; }
-  .lic li { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; font-size: 0.75rem; padding: 0.3rem 0; border-top: 1px solid var(--line); }
-  .lic strong { font-weight: 500; color: #334155; }
-  .lic span { color: var(--muted); }
-  .lic a { color: var(--accent); text-decoration: underline; }
-  .lic-note { margin-top: 0.6rem; font-size: 0.75rem; font-weight: 600; color: #334155; }
+  /* ══ EL DESTINO GRITA: outline + pulso + marca de origen. La fuente solo susurra. ══ */
+  [data-couple-target][data-on] {
+    outline-color: var(--blue-up) !important;
+    background-color: var(--navy-3) !important;
+    animation: pulse 320ms var(--ease);
+  }
+  [data-couple-target][data-on]::before {
+    content: '←'; position: absolute; left: -0.6rem; top: 0.85rem;
+    font-size: 0.75rem; font-weight: 700; color: var(--navy);
+    background: var(--blue-up); width: 1.25rem; height: 1.25rem; border-radius: 999px;
+    display: grid; place-items: center; line-height: 1;
+    box-shadow: 0 0 0 3px var(--navy);
+  }
+  /* Apilado, el dato viene de ARRIBA, no de la izquierda. La flecha dice la verdad. */
+  @media (max-width: 1079px) {
+    [data-couple-target][data-on]::before { content: '↑'; left: auto; right: 0.5rem; top: -0.6rem; }
+  }
+  @keyframes pulse {
+    0% { outline-color: transparent; }
+    40% { outline-color: #fff; }
+    100% { outline-color: var(--blue-up); }
+  }
 
-  .sr-status { font-size: 0.6875rem; color: var(--muted); }
-
-  /* ── EL ACOPLAMIENTO ── el estado se distingue por MÁS que color (outline + fondo). */
-  [data-on] { outline-color: var(--accent) !important; background-color: var(--tint) !important; }
+  /* ── Licencias + slogan ─────────────────────────────────────────────── */
+  .lic { margin-top: 1.5rem; padding-top: 1.25rem; padding-bottom: 2rem; border-top: 1px solid var(--line); }
+  .grp.dark { color: var(--muted); border-color: var(--line); }
+  .lic li {
+    display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: space-between;
+    font-size: var(--t-meta); padding: 0.45rem 0; border-bottom: 1px solid var(--line);
+  }
+  .lic-a { color: #33475b; max-width: 62ch; }
+  .lic-c { color: var(--muted); white-space: nowrap; }
+  .lic a { color: var(--blue); text-decoration: underline; }
+  .lic-n { margin-top: 0.8rem; font-size: var(--t-meta); font-weight: 600; color: #33475b; }
+  .slogan { margin-top: 1.5rem; }
 
   /* ── Reduced motion: el significado nunca estuvo en el movimiento. ── */
   @media (prefers-reduced-motion: reduce) {
-    .blk, .node, .hnode, .fan li { transition-duration: 0ms !important; }
+    .blk, .nd, .kpi, .hn, .fan li, .blk::after, .blk::before { transition-duration: 0ms !important; }
+    [data-couple-target][data-on] { animation: none !important; }
   }
 
-  /* ── Impresión: apila y expande. No es un entregable diseñado, solo no sale roto. ── */
+  /* ── Impresión: apila, expande, no sale roto. No es un entregable diseñado. ── */
   @media print {
     .split { grid-template-columns: 1fr; }
-    .pane-b { position: static; max-height: none; overflow: visible; }
-    .bar { position: static; }
-    pre { max-height: none; }
+    .inst { position: static; max-height: none; overflow: visible; }
+    .chrome, .in-head { position: static; }
+    .sch pre { max-height: none; }
   }
 </style>
