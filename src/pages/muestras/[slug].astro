@@ -67,9 +67,40 @@ machine.craft.forEach(x => bump(x.coupleId))
 machine.jsonld.forEach(x => bump(x.coupleId))
 machine.alts.forEach(x => bump(x.coupleId))
 machine.headings.tree.forEach(x => bump(x.coupleId))
+// La evidencia y el fan-out también son destinos: si se encienden, se cuentan.
+// Contarlos de menos hace que el chip prometa menos de lo que entrega.
+evidence.facts.forEach(x => bump(x.coupleId))
+evidence.fanOut.items.forEach(x => bump(x.coveredBy))
 
 const kpis = evidence.facts.filter(f => f.headline)
 const details = evidence.facts.filter(f => !f.headline)
+
+/**
+ * La FIRMA del artículo (categoría · autor · fecha · tiempo de lectura).
+ *
+ * No es adorno: es una corrección. El `BlogPosting` declara `author`, `datePublished` y
+ * `articleSection`, y el schema SOLO puede marcar contenido VISIBLE (marcar contenido oculto
+ * es violación de política de Google). Sin la firma en la página, la muestra estaría
+ * violando su propia tesis. Que además le dé al artículo el aire de un post publicado —
+ * en vez de un bloque de texto — es la consecuencia, no el motivo.
+ */
+const words = article.blocks.reduce((n, b) => {
+  const t =
+    'text' in b ? b.text
+    : b.type === 'faq' ? b.items.map(i => `${i.q} ${i.a}`).join(' ')
+    : b.type === 'ordered-list' ? b.items.join(' ')
+    : b.type === 'table' ? b.rows.flat().join(' ')
+    : ''
+
+  return n + t.split(/\s+/).filter(Boolean).length
+}, 0)
+const readMin = Math.max(1, Math.round(words / 200))
+const published = new Date(`${article.publishedAt}T12:00:00Z`).toLocaleDateString('es-CL', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+})
 
 /** Escapa el JSON-LD para mostrarlo como TEXTO. Jamás `set:html`. */
 const asText = (code: unknown) =>
@@ -116,7 +147,12 @@ const asText = (code: unknown) =>
             <h2 id="sp-t">{ui.paneArticleTitle}</h2>
             <p>{ui.paneArticleSubtitle}</p>
           </div>
-          <span class="chip-site">{ui.specimenChip}</span>
+          {/* La URL propuesta, en su contexto. Es el mismo valor que el panel declara como
+              canónica: verlo acá es la mitad de la correspondencia. */}
+          <span class="urlbar" title={article.proposedUrl}>
+            <span class="lock" aria-hidden="true">🔒</span>
+            <span class="url">{article.proposedUrl.replace('https://', '')}</span>
+          </span>
         </div>
 
         <article class="post">
@@ -139,21 +175,41 @@ const asText = (code: unknown) =>
             const attrs = {
               'data-couple': b.coupleId,
               'data-on': on,
-              'data-n': n > 0 ? `${n} ${ui.producesLabel}` : undefined,
+              'data-n': n > 0 ? `${n} ${n === 1 ? ui.producesLabelOne : ui.producesLabel}` : undefined,
               tabindex: 0,
             }
 
             if (isImage(b))
               return (
-                <figure class="blk" {...attrs}>
+                <figure class={`blk fig ${b.type === 'hero-image' ? 'hero' : ''}`} {...attrs}>
                   <img src={b.src} alt={b.alt} loading={b.type === 'hero-image' ? 'eager' : 'lazy'} />
-                  {b.caption && <figcaption>{b.caption}</figcaption>}
-                  <p class="credit">
-                    Foto: {b.credit.author} · <a href={b.credit.url} rel="nofollow noopener">{b.credit.license}</a>
-                  </p>
+                  <div class="fig-m">
+                    {b.caption && <figcaption>{b.caption}</figcaption>}
+                    <p class="credit">
+                      Foto: {b.credit.author} · <a href={b.credit.url} rel="nofollow noopener">{b.credit.license}</a>
+                    </p>
+                  </div>
                 </figure>
               )
-            if (b.type === 'h1') return <div class="blk" {...attrs}><h3 class="p-h1">{b.text}</h3></div>
+
+            /* El H1 arrastra la FIRMA. El BlogPosting declara author/datePublished/articleSection,
+               y el schema SOLO puede marcar contenido visible: sin firma, la muestra violaría su
+               propia tesis. Que además haga que el artículo se lea como un post publicado —y no
+               como un bloque de texto— es la consecuencia. */
+            if (b.type === 'h1')
+              return (
+                <div class="blk head-blk" {...attrs}>
+                  <p class="cat">{article.category}</p>
+                  <h3 class="p-h1">{b.text}</h3>
+                  <p class="byline">
+                    {ui.bylineBy} <b>{article.author}</b>
+                    <span class="dot" aria-hidden="true">·</span>
+                    <time datetime={article.publishedAt}>{published}</time>
+                    <span class="dot" aria-hidden="true">·</span>
+                    {readMin} {ui.readTime}
+                  </p>
+                </div>
+              )
             if (b.type === 'h2') return <div class="blk" {...attrs}><h4 class="p-h2">{b.text}</h4></div>
             if (b.type === 'answer-capsule')
               return (
@@ -161,6 +217,12 @@ const asText = (code: unknown) =>
                   <span class="cap-t">Respuesta directa</span>
                   <p>{b.text}</p>
                 </div>
+              )
+            if (b.type === 'pull-quote')
+              return (
+                <blockquote class="blk pull" {...attrs}>
+                  <p>{b.text}</p>
+                </blockquote>
               )
             if (b.type === 'table')
               return (
@@ -394,9 +456,23 @@ const asText = (code: unknown) =>
     const hit = (e: Event) =>
       (e.target as HTMLElement).closest<HTMLElement>('[data-couple],[data-couple-target]')
 
+    /**
+     * Modalidad de entrada. Sin esto, el mouse QUIETO le roba el acoplamiento al teclado:
+     * al enfocar con Tab la página scrollea, los elementos pasan por debajo del cursor
+     * inmóvil y disparan `mouseover`, que repinta encima de lo que el teclado acababa de
+     * seleccionar. Un usuario que navega con teclado y dejó el mouse apoyado en cualquier
+     * parte no puede conducir la pieza. Lo cazó el assert 12 del verify.
+     */
+    let keyboard = false
+    root.addEventListener('mousemove', () => { keyboard = false }, { passive: true })
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Tab' || e.key.startsWith('Arrow')) keyboard = true
+    })
+
     const enter = (e: Event) => {
       const el = hit(e)
       if (!el || pinned) return
+      if (e.type === 'mouseover' && keyboard) return
       paint(el.dataset.couple ?? el.dataset.coupleTarget ?? null)
     }
 
@@ -520,84 +596,174 @@ const asText = (code: unknown) =>
   }
   .sp-head h2 { font-size: var(--t-body); font-weight: 600; }
   .sp-head p { font-size: var(--t-meta); color: var(--muted); }
-  .chip-site {
-    font-size: var(--t-over); font-weight: 600; color: var(--client);
-    background: var(--tint-c); border: 1px solid color-mix(in srgb, var(--client) 25%, white);
-    padding: 0.2rem 0.55rem; border-radius: 999px; white-space: nowrap;
+  .urlbar {
+    display: flex; gap: 0.4rem; align-items: center; min-width: 0; max-width: 22rem;
+    font-size: var(--t-meta); color: var(--muted);
+    background: #eef2f6; border: 1px solid var(--line);
+    padding: 0.3rem 0.7rem; border-radius: 999px;
   }
-  .post { padding: 1rem 1.1rem; }
+  .lock { font-size: 0.625rem; opacity: 0.6; }
+  .url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* ══════════════════════════════════════════════════════════════════════════
+     EL ESPÉCIMEN ES EDITORIAL, NO PRODUCT UI.
+     Es un mockup de un blog real: cuerpo 18px / interlineado 1.7 / medida 62-66ch /
+     imágenes que respiran / ritmo vertical con aire antes de cada H2.
+     La V2 le aplicó densidad de producto (16px, márgenes de 0.45rem) y por eso se veía
+     plano: le estábamos mostrando al comité un wireframe del contenido, no el contenido.
+     ══════════════════════════════════════════════════════════════════════════ */
+  .specimen { --a-body: 1.125rem; --a-lead: 1.25rem; --a-h1: 2.25rem; --a-h2: 1.5rem; }
+  .post { padding: 0 0 1.5rem; }
+  .post > .para,
+  .post > .srcs { margin-inline: 1.75rem; }
+  @media (max-width: 640px) { .post > .para, .post > .srcs { margin-inline: 1.15rem; } }
 
-  /* Los bloques del artículo son la FUENTE del acoplamiento. */
+  /* ── EL LADO FUENTE DEL ACOPLAMIENTO ──
+     La fuente SUSURRA: tinte + barra lateral, sin outline. Ya la estás tocando; no necesita
+     llamarte. El que grita es el destino. */
   .blk {
-    position: relative; margin: 0.45rem -0.55rem; padding: 0.5rem 0.6rem;
-    border-radius: 8px; cursor: pointer;
+    position: relative; padding: 0.5rem 0.75rem; border-radius: 8px; cursor: pointer;
     border-left: 3px solid transparent;
     transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
   }
-  /* AFFORDANCE EN REPOSO: una marca discreta en el borde derecho dice "esto se conecta
-     con algo allá". Sin ella, nada te avisa que el artículo es interactivo. */
+  .post > .blk:not(.fig) { margin-inline: 1rem; }
+  @media (max-width: 640px) { .post > .blk:not(.fig) { margin-inline: 0.4rem; } }
+  .blk.fig { padding: 0; border-left: 0; }
+  .blk:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .blk[data-on] { background: var(--tint-c); border-left-color: var(--client); }
+  .blk.fig[data-on] { background: transparent; box-shadow: inset 0 0 0 3px var(--client); }
+
+  /* AFORDANCIA EN REPOSO: un punto en el borde derecho dice "esto se conecta con algo allá".
+     Sin ella, nada avisa que el artículo es interactivo. */
   .blk[data-n]::before {
-    content: ''; position: absolute; right: 0.35rem; top: 50%; translate: 0 -50%;
+    content: ''; position: absolute; right: 0.4rem; top: 50%; translate: 0 -50%;
     width: 5px; height: 5px; border-radius: 999px;
     background: color-mix(in srgb, var(--client) 45%, transparent);
     transition: opacity var(--dur) var(--ease), scale var(--dur) var(--ease);
+    z-index: 2;
   }
   .blk[data-n]:hover::before { scale: 1.4; }
-  /* EL CHIP DIRECCIONAL: al acoplar, la fuente apunta al destino y dice CUÁNTO hay.
-     En móvil los paneles se apilan: no hay canaleta que cruzar, así que el chip vive
-     adentro y apunta hacia abajo. Sobresalir ahí solo produciría scroll horizontal. */
+  .blk[data-on][data-n]::before { opacity: 0; }
+
+  /* EL CHIP DIRECCIONAL: apunta al destino y dice CUÁNTO hay al otro lado.
+     Apilado no hay canaleta que cruzar, así que apunta hacia abajo y vive adentro. */
   .blk[data-n]::after {
     content: '↓ ' attr(data-n);
-    position: absolute; right: 0.2rem; top: 50%; translate: 0 -50%;
+    position: absolute; right: 0.25rem; top: 50%; translate: 0 -50%;
     font-size: var(--t-over); font-weight: 700; letter-spacing: 0.02em;
     color: #fff; background: var(--navy);
-    padding: 0.18rem 0.45rem; border-radius: 999px; white-space: nowrap;
-    opacity: 0; scale: 0.9; pointer-events: none; z-index: 2;
+    padding: 0.2rem 0.5rem; border-radius: 999px; white-space: nowrap;
+    opacity: 0; scale: 0.9; pointer-events: none; z-index: 3;
     transition: opacity var(--dur) var(--ease), scale var(--dur) var(--ease);
   }
   @media (min-width: 1080px) {
-    /* Con los paneles lado a lado, el chip SÍ sobresale: apunta a través de la canaleta. */
-    .blk[data-n]::after { content: '→ ' attr(data-n); right: -0.55rem; translate: 50% -50%; }
+    .blk[data-n]::after { content: '→ ' attr(data-n); right: -0.5rem; translate: 50% -50%; }
   }
-  .blk:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-
-  /* LA FUENTE SUSURRA: tinte + barra lateral. Sin outline — ya la estás tocando. */
-  .blk[data-on] { background: var(--tint-c); border-left-color: var(--client); }
-  .blk[data-on][data-n]::before { opacity: 0; }
   .blk[data-on][data-n]::after { opacity: 1; scale: 1; }
 
-  .p-h1 { font-size: var(--t-sect); font-weight: 650; line-height: 1.2; letter-spacing: -0.01em; }
-  .p-h2 { margin-top: 0.4rem; font-size: var(--t-node); font-weight: 620; line-height: 1.3; }
-  .para { margin: 0.7rem 0; font-size: var(--t-body); line-height: 1.65; color: #33475b; max-width: 68ch; }
-  .cap { background: #f7f9fb; border-left-color: var(--client); }
-  .cap p { font-size: var(--t-body); line-height: 1.6; max-width: 66ch; }
-  .cap-t {
-    display: block; margin-bottom: 0.25rem; font-size: var(--t-over); font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase; color: var(--client);
-  }
-  .blk img { width: 100%; height: auto; border-radius: 6px; display: block; }
-  .blk:first-child img { max-height: 150px; object-fit: cover; }
-  figcaption { margin-top: 0.4rem; font-size: var(--t-meta); color: var(--muted); }
-  .credit { margin-top: 0.15rem; font-size: var(--t-over); color: #94a3b8; }
+  /* El HERO es un hero: sangre completa, sin padding. Antes era un thumbnail de 150px. */
+  .fig { margin: 1.75rem 0; }
+  .fig.hero { margin: 0 0 1.5rem; border-radius: 0; }
+  .fig img { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .fig.hero img { border-radius: 0; aspect-ratio: 21 / 9; object-fit: cover; max-height: none; }
+  .fig:not(.hero) img { aspect-ratio: 16 / 9; object-fit: cover; }
+  .fig-m { padding: 0.55rem 1.75rem 0; }
+  figcaption { font-size: 0.9375rem; line-height: 1.5; color: #4a5c6e; }
+  .credit { margin-top: 0.2rem; font-size: var(--t-over); color: #94a3b8; }
   .credit a { color: inherit; text-decoration: underline; }
-  .blk-t { font-weight: 620; font-size: var(--t-body); margin-bottom: 0.45rem; }
 
-  .tw { overflow-x: auto; max-width: 100%; }
-  table { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: var(--t-meta); }
-  caption { text-align: left; font-weight: 620; font-size: var(--t-body); padding-bottom: 0.45rem; }
-  th, td { border: 1px solid var(--line); padding: 0.5rem 0.6rem; text-align: left; vertical-align: top; }
-  th { background: #f7f9fb; font-weight: 620; }
-  ol { padding-left: 1.15rem; }
-  ol li { font-size: var(--t-meta); line-height: 1.6; margin: 0.3rem 0; }
-  .faq .qa { padding: 0.5rem 0; border-top: 1px solid var(--line); }
-  .faq .q { font-weight: 620; font-size: var(--t-meta); }
-  .faq .a { font-size: var(--t-meta); line-height: 1.6; color: #4a5c6e; margin-top: 0.15rem; }
-  .lnks li { font-size: var(--t-meta); margin: 0.3rem 0; }
-  .lnks a { color: var(--client); text-decoration: underline; }
-  .lnks em { color: var(--muted); font-style: normal; font-size: var(--t-over); }
-  .srcs { border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 0.8rem; }
+  /* La FIRMA: categoría, autor, fecha, lectura. Es lo que el BlogPosting declara — y el
+     schema solo puede marcar contenido VISIBLE. Sin esto, la muestra se contradice. */
+  .head-blk { padding-top: 0.25rem; }
+  .cat {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--client); margin-bottom: 0.6rem;
+  }
+  .p-h1 {
+    font-family: Poppins, system-ui, sans-serif;
+    font-size: var(--a-h1); font-weight: 600; line-height: 1.12; letter-spacing: -0.02em;
+    max-width: 20ch; text-wrap: balance;
+  }
+  .byline {
+    display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: baseline;
+    margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line);
+    font-size: 0.9375rem; color: var(--muted);
+  }
+  .byline b { color: var(--ink); font-weight: 600; }
+  .byline .dot { color: #cbd5e1; }
+
+  /* Ritmo editorial: mucho aire ANTES de cada H2, poco después. El ojo agrupa por proximidad. */
+  .p-h2 {
+    margin-top: 2.25rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: var(--a-h2); font-weight: 600; line-height: 1.25; letter-spacing: -0.01em;
+    max-width: 26ch; text-wrap: balance;
+  }
+  .para {
+    margin: 1.1rem 0; font-size: var(--a-body); line-height: 1.7; color: #2c3e50;
+    max-width: 64ch;
+  }
+
+  .cap {
+    margin-top: 1.1rem; padding: 1rem 1.15rem;
+    background: var(--tint-c); border-left-color: var(--client); border-radius: 0 10px 10px 0;
+  }
+  .cap p { font-size: var(--a-lead); line-height: 1.6; color: #1e2f3f; max-width: 58ch; font-weight: 450; }
+  .cap-t {
+    display: block; margin-bottom: 0.4rem; font-size: var(--t-over); font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--client);
+  }
+
+  /* La CITA DESTACADA: rompe el muro de texto y es el pasaje que un motor puede extraer entero. */
+  .pull {
+    margin-block: 2rem; padding: 0.2rem 0 0.2rem 1.4rem;
+    border-left: 4px solid var(--client);
+  }
+  .pull p {
+    font-family: Poppins, system-ui, sans-serif;
+    font-size: 1.4375rem; line-height: 1.35; font-weight: 500; letter-spacing: -0.01em;
+    color: var(--ink); max-width: 30ch; text-wrap: balance;
+  }
+
+  .blk-t {
+    font-family: Poppins, system-ui, sans-serif; font-weight: 600;
+    font-size: 1.1875rem; margin-bottom: 0.7rem; letter-spacing: -0.01em;
+  }
+
+  /* La tabla tiene presencia editorial, no de planilla. */
+  .tw { overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  table { width: 100%; min-width: 32rem; border-collapse: collapse; font-size: 0.9375rem; }
+  caption { text-align: left; font-family: Poppins, system-ui, sans-serif; font-weight: 600;
+            font-size: 1.1875rem; padding-bottom: 0.7rem; letter-spacing: -0.01em; }
+  th, td { border-bottom: 1px solid var(--line); padding: 0.75rem 0.9rem; text-align: left; vertical-align: top; line-height: 1.5; }
+  th { background: #f7f9fb; font-weight: 600; font-size: 0.8125rem; letter-spacing: 0.02em; color: #33475b; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:first-child td { font-weight: 500; }
+  td:first-child { font-weight: 600; color: var(--ink); }
+
+  ol { padding-left: 0; list-style: none; counter-reset: paso; }
+  ol li {
+    position: relative; counter-increment: paso; padding-left: 2.4rem;
+    font-size: var(--a-body); line-height: 1.65; margin: 0.75rem 0; color: #2c3e50; max-width: 60ch;
+  }
+  ol li::before {
+    content: counter(paso); position: absolute; left: 0; top: 0.1rem;
+    width: 1.7rem; height: 1.7rem; border-radius: 999px;
+    background: var(--tint-c); color: var(--client);
+    font-size: 0.8125rem; font-weight: 700; display: grid; place-items: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .faq { margin-top: 1.5rem; }
+  .faq .qa { padding: 0.9rem 0; border-top: 1px solid var(--line); }
+  .faq .q { font-family: Poppins, system-ui, sans-serif; font-weight: 600; font-size: 1.0625rem; line-height: 1.35; }
+  .faq .a { font-size: 1rem; line-height: 1.65; color: #4a5c6e; margin-top: 0.35rem; max-width: 62ch; }
+
+  .lnks { margin-top: 0.2rem; }
+  .lnks li { font-size: 1rem; margin: 0.5rem 0; line-height: 1.5; }
+  .lnks a { color: var(--client); text-decoration: underline; text-underline-offset: 2px; font-weight: 500; }
+  .lnks em { color: var(--muted); font-style: normal; font-size: 0.8125rem; }
+  .srcs { border-top: 1px solid var(--line); margin-top: 2rem; padding-top: 1.1rem; }
   .srcs ul { padding-left: 1rem; list-style: disc; }
-  .srcs li { font-size: var(--t-meta); margin: 0.25rem 0; }
+  .srcs li { font-size: 0.875rem; margin: 0.35rem 0; line-height: 1.5; }
   .srcs a { color: var(--muted); text-decoration: underline; }
 
   /* ══════ INSTRUMENTO — navy Efeonce ══════ */

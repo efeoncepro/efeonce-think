@@ -62,6 +62,12 @@ const block = z.discriminatedUnion('type', [
     items: z.array(z.object({ text: z.string(), href: z.string().url(), note: z.string().optional() })),
   }),
   z.object({
+    /** La cita destacada. Es DATO: el pasaje que un motor puede extraer entero y atribuir. */
+    type: z.literal('pull-quote'),
+    coupleId: z.string(),
+    text: z.string().min(40),
+  }),
+  z.object({
     type: z.literal('sources'),
     title: z.string(),
     items: z.array(z.object({ text: z.string(), href: z.string().url() })),
@@ -220,9 +226,12 @@ const aeoXray = defineCollection({
       thesisLabel: z.string(),
       licenseTitle: z.string(),
       backToArticle: z.string(),
+      bylineBy: z.string(),
+      readTime: z.string(),
       instrumentTitle: z.string(),
       specimenChip: z.string(),
       producesLabel: z.string(),
+      producesLabelOne: z.string(),
     }),
   }),
 })

@@ -101,6 +101,20 @@ try {
   const heroOn = await page.locator('[data-couple="capsule-main"][data-on]').count()
   check('9. El acoplamiento héroe viene pintado desde el HTML', heroOn > 0)
 
+  /* El chip direccional ES la afordancia: sin él, el hover dice QUE hay algo al otro lado,
+     pero no hacia dónde ni cuánto. Se mide sobre el estado héroe, ANTES de tocar nada:
+     medirlo después de interactuar mediría un bloque que ya no está acoplado. */
+  const chip = await page.locator('[data-couple="capsule-main"]').first().evaluate(el => {
+    const st = getComputedStyle(el, '::after')
+
+    return { content: st.content, opacity: st.opacity }
+  })
+  check(
+    '17. El chip direccional es visible en el bloque acoplado',
+    chip.opacity === '1' && chip.content.includes('datos'),
+    `opacity=${chip.opacity} content=${chip.content}`,
+  )
+
   const scrollW = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   check('10. Sin scroll horizontal en 1440px', scrollW <= 1, `overflow ${scrollW}px`)
 
@@ -130,12 +144,38 @@ try {
   const after = await page.evaluate(() => document.documentElement.scrollTop)
   check('13. Al acoplar, la página NO se mueve (scrollea el panel)', Math.abs(after - before) < 5, `${before} → ${after}`)
 
-  // Teclado: el foco produce el mismo acoplamiento
+  // Teclado con el MOUSE APOYADO en otra parte: el cursor quieto no puede robarle el
+  // acoplamiento al teclado (al enfocar, la página scrollea y dispara mouseover fantasma).
+  await page.mouse.move(300, 400)
+  await page.keyboard.press('Tab')
   await page.locator('[data-couple="h2-como-llegar"]').first().focus()
-  await page.waitForTimeout(250)
+  await page.waitForTimeout(350)
   const kb = await page.locator('[data-couple-target="h2-como-llegar"][aria-current="true"]').count()
-  check('12. El foco por teclado acopla igual que el hover (aria-current)', kb > 0)
+  check('12. El teclado acopla aunque el mouse esté apoyado en otra parte', kb > 0)
   await page.screenshot({ path: `${OUT}/couple-keyboard.png` })
+
+  /* LOS FRAMES DE LA LÁMINA — deliberados, no accidentales.
+     Con el hero editorial la correspondencia queda bajo el pliegue: la página se diseña
+     para LEERSE, la lámina se captura donde ARGUMENTA. Dos frames, dos argumentos. */
+  const slide = async (couple, scroll, name) => {
+    await page.keyboard.press('Escape')
+    await page.mouse.move(10, 10)
+    await page.evaluate(y => window.scrollTo(0, y), scroll)
+    await page.waitForTimeout(250)
+    await page.evaluate(id => {
+      document
+        .querySelector(`[data-couple="${id}"]`)
+        ?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+    }, couple)
+    await page.waitForTimeout(500)
+    await page.screenshot({ path: `${OUT}/${name}.png` })
+  }
+
+  // (a) El oficio: la cápsula de respuesta ↔ el 72,4% de las páginas que ChatGPT cita.
+  await slide('capsule-main', 980, 'slide-oficio')
+  // (b) La competencia: el H2 de «cómo se llega» ↔ quién ocupa hoy ese espacio
+  //     (Wikipedia · Instagram · TripAdvisor). Cero aerolíneas.
+  await slide('h2-como-llegar', 1180, 'slide-competencia')
 
   await page.close()
 

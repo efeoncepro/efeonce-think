@@ -175,6 +175,11 @@
         "text": "Si entras por Balmaceda no tocas ninguno de los dos primeros. Es, en la práctica, la razón más concreta para volar: no te ahorras solo kilómetros, te ahorras los dos cuellos de botella que pueden desarmarte el itinerario completo."
       },
       {
+        "type": "pull-quote",
+        "coupleId": "pull-balmaceda",
+        "text": "Volar a Balmaceda no te ahorra solo kilómetros: te ahorra los dos transbordadores que pueden desarmarte el itinerario completo."
+      },
+      {
         "type": "image",
         "coupleId": "img-baker",
         "src": "/muestras/sky-carretera-austral/rio-baker.jpg",
@@ -570,6 +575,15 @@
         "statNote": "más citas con al menos una tabla y una lista numerada"
       },
       {
+        "coupleId": "pull-balmaceda",
+        "label": "Cita destacada",
+        "detail": "1 · el ángulo propio de SKY",
+        "tier": 1,
+        "stat": "+41%",
+        "statNote": "de visibilidad con citas textuales — la táctica GEO de mayor lift medido",
+        "why": "No es una frase decorativa: es el pasaje que un motor de respuesta puede extraer entero y atribuir a SKY. Y dice lo único que ninguna otra fuente del SERP puede decir, porque ninguna es la aerolínea que vuela ahí."
+      },
+      {
         "coupleId": "list-itinerario",
         "label": "Lista numerada",
         "detail": "7 pasos",
@@ -715,6 +729,9 @@
     "backToArticle": "Volver al artículo",
     "instrumentTitle": "Lo que lee una máquina",
     "specimenChip": "blog.skyairline.com",
-    "producesLabel": "datos"
+    "producesLabel": "datos",
+    "bylineBy": "Por",
+    "readTime": "min de lectura",
+    "producesLabelOne": "dato"
   }
 }
