@@ -565,7 +565,10 @@ const probeFor = (id: string) => {
     font-size: var(--t-meta); padding: 0.45rem 0; border-bottom: 1px solid var(--line);
   }
   .lic-a { color: var(--ink-2); max-width: 62ch; }
-  .lic-c { color: var(--muted); white-space: nowrap; }
+  /* Sin `nowrap`: a 320px empujaba el DOCUMENTO 27px (WCAG 1.4.10 · reflow). Es la segunda vez que
+     un `nowrap` decide el ancho de la página — y otra vez en el pie de licencias, que es justo la
+     línea que demuestra el requisito 5 de las bases. Un crédito puede envolver; la página no. */
+  .lic-c { color: var(--muted); }
   .lic a { color: var(--blue); text-decoration: underline; }
   .lic-n { margin-top: 0.8rem; font-size: var(--t-meta); font-weight: var(--w-label); color: var(--ink-2); }
 </style>

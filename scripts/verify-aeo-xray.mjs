@@ -11,14 +11,18 @@
  *   pnpm build && pnpm verify:aeo-xray
  */
 import { chromium } from 'playwright'
-import { readFileSync, existsSync, mkdirSync } from 'node:fs'
+import { readFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs'
 import { spawn } from 'node:child_process'
 import { setTimeout as sleep } from 'node:timers/promises'
 
 const SAMPLE = process.env.XRAY_SAMPLE ?? 'sky-carretera-austral'
 // El token vive en el payload (declarado, estable, versionado). El verify lo LEE de ahí:
 // hardcodearlo acá haría que el gate y la URL real se separen en silencio.
-const { token } = JSON.parse(readFileSync(`src/content/aeo-xray/${SAMPLE}.json`, 'utf8'))
+const payloadRaw = JSON.parse(readFileSync(`src/content/aeo-xray/${SAMPLE}.json`, 'utf8'))
+const { token } = payloadRaw
+/* La tipografía esperada del artículo sale del PAYLOAD, no de una constante: el gate tiene que
+   probar el MOTOR (la frontera cliente/Efeonce se respeta), no que SKY sigue siendo SKY. */
+const clientFamily = payloadRaw.client.font.family.split(',')[0].replace(/['"]/g, '').trim()
 const SLUG = `${SAMPLE}-${token}`
 /** El FLOW: cuatro pantallas. Los gates de HTML corren sobre TODAS — un `ld+json` filtrado en
  *  la pantalla ④ es igual de grave que en la ①. El acoplamiento vive en la ③. */
@@ -68,9 +72,16 @@ const noindexAll = STEPS.every(st => /name=["']robots["'][^>]*noindex/i.test(pag
 check('2. noindex en las 4 pantallas', noindexAll)
 
 // 3. Fuera del sitemap
+/* Fail-CLOSED. Antes, si NO se generaba sitemap el assert pasaba EN VERDE por ausencia: el día que
+   el sitemap se rompiera, el gate que protege «fuera del sitemap» habría dicho que todo está bien.
+   Un assert que se pone verde porque el archivo no existe no verifica nada. */
 const sitemaps = ['dist/client/sitemap-index.xml', 'dist/client/sitemap-0.xml'].filter(existsSync)
 const inSitemap = sitemaps.some(f => readFileSync(f, 'utf8').includes('/muestras/'))
-check('3. La ruta NO aparece en el sitemap', !inSitemap, sitemaps.length ? 'aparece en el sitemap' : 'no se generó sitemap')
+check(
+  '3. El sitemap EXISTE y la ruta no aparece en él',
+  sitemaps.length > 0 && !inSitemap,
+  sitemaps.length === 0 ? 'NO se generó sitemap — el assert no puede verificar nada' : 'la ruta aparece en el sitemap',
+)
 
 // 4. Rótulo
 const rotuloAll = STEPS.every(st => pages[st || 'index'].includes('Ejemplo ilustrativo de Efeonce'))
@@ -113,12 +124,29 @@ check(
   `${atomCites} citas para ${atomCards} átomos`,
 )
 /* View transitions: sin ellas, cuatro pantallas se sienten como cuatro páginas sueltas. */
-check('35. View transitions cross-document activas (CSS puro, cero JS)', allHtml.includes('view-transition') || /@view-transition/.test(readFileSync('src/styles/aeo-xray.css', 'utf8')))
+/* Antes tenía un `|| /@view-transition/.test(readFileSync('src/styles/aeo-xray.css'))`: leía el CSS
+   FUENTE. O sea, verificaba que un string que escribiste tú sigue en el archivo que escribiste tú —
+   si la regla nunca llegaba al bundle, el assert pasaba igual. Ahora mira el CSS EMITIDO. */
+const cssFiles = existsSync('dist/client/_astro')
+  ? readdirSync('dist/client/_astro').filter(f => f.endsWith('.css'))
+  : []
+const emittedCss = cssFiles.map(f => readFileSync(`dist/client/_astro/${f}`, 'utf8')).join('\n')
+check(
+  '35. View transitions cross-document en el CSS EMITIDO (no en el fuente)',
+  /@view-transition/.test(emittedCss),
+  `${cssFiles.length} hojas emitidas; ninguna declara @view-transition`,
+)
 
-// 5. Todo <img> con alt no vacío
-const imgs = html.match(/<img[^>]*>/gi) ?? []
-const badAlt = imgs.filter(t => !/\salt=["'][^"']{5,}["']/i.test(t))
-check(`5. Las ${imgs.length} imágenes tienen alt no vacío`, imgs.length > 0 && badAlt.length === 0, `${badAlt.length} sin alt útil`)
+/* 5. Todo <img> con alt no vacío — EN LAS CUATRO PANTALLAS.
+   Corría solo contra la ③. La ② —la que el comité va a LEER, y la del hero de mayor LCP— no se
+   medía nunca: el gate de calidad de imágenes estaba verificado en 1 de 4 URLs. */
+const allImgs = STEPS.flatMap(st => (pages[st || 'index'].match(/<img[^>]*>/gi) ?? []).map(t => [st || 'index', t]))
+const badAlt = allImgs.filter(([, t]) => !/\salt=["'][^"']{5,}["']/i.test(t))
+check(
+  `5. Las ${allImgs.length} imágenes de las 4 pantallas tienen alt no vacío`,
+  allImgs.length > 0 && badAlt.length === 0,
+  `${badAlt.length} sin alt útil (${[...new Set(badAlt.map(([p]) => p))].join(', ')})`,
+)
 
 /* 6. Crédito + licencia por imagen — PROVEEDOR-AGNÓSTICO.
    Antes matcheaba `creativecommons.org|commons.wikimedia.org` literal. El assert se ató al
@@ -480,13 +508,18 @@ try {
     }
   })
   check(
-    '38. El artículo habla en la tipografía del CLIENTE (Assistant), no en la nuestra',
-    zones.articulo.length > 0 && zones.articulo.every(f => f?.startsWith('Assistant')),
+    /* 🔴 EL GATE VERIFICA LA FRONTERA, NO LA MARCA.
+       Exigía literalmente «Assistant» — o sea, era el test de regresión de SKY, no el del motor: un
+       segundo cliente con su propia tipografía habría fallado el gate por hacer lo CORRECTO. Lo que
+       hay que blindar es el CONTRATO (el artículo habla en la fuente del cliente y NO en la nuestra;
+       la nuestra no cruza a su lado), sea cual sea el cliente. La fuente esperada sale del PAYLOAD. */
+    `38. El artículo habla en la tipografía del CLIENTE (${clientFamily}), no en la nuestra`,
+    zones.articulo.length > 0 && zones.articulo.every(f => f?.startsWith(clientFamily)),
     zones.articulo.join(' · '),
   )
   check(
-    '39. El instrumento y el chrome hablan en la de EFEONCE — Assistant no cruza la frontera',
-    zones.efeonce.length > 0 && zones.efeonce.every(f => f && !f.startsWith('Assistant')),
+    '39. El instrumento y el chrome hablan en la de EFEONCE — la del cliente no cruza la frontera',
+    zones.efeonce.length > 0 && zones.efeonce.every(f => f && !f.startsWith(clientFamily)),
     zones.efeonce.join(' · '),
   )
   await page.close()
@@ -528,10 +561,27 @@ try {
   check('29. CLS ≤ 0.1 (el umbral «good» de Core Web Vitals)', cls <= 0.1, `CLS=${cls}`)
   await cwv.close()
 
-  const m = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
+  /* 🔴 A 320px, Y MIDIENDO TAMBIÉN LOS PANELES.
+     Corría solo a 390px y solo sobre el DOCUMENTO. Pero WCAG 1.4.10 (reflow) exige 320px — y como
+     el instrumento tiene `overflow-y: auto` (lo que fuerza `overflow-x: auto`), su desborde
+     scrolleaba DENTRO del panel: el assert salía VERDE mientras el usuario veía el header cortado,
+     con la cuenta y el botón de salida fuera de pantalla. Un assert que mide el contenedor
+     equivocado da falsa seguridad. */
+  const m = await browser.newPage({ viewport: { width: 320, height: 844 }, hasTouch: true, isMobile: true })
   await m.goto(`${BASE}${ROUTE}`, { waitUntil: 'networkidle' })
-  const mScroll = await m.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
-  check('15. Sin scroll horizontal en 390px', mScroll <= 1, `overflow ${mScroll}px`)
+  const mScroll = await m.evaluate(() => {
+    const doc = document.documentElement.scrollWidth - document.documentElement.clientWidth
+    const panes = [...document.querySelectorAll('.inst, .in-head, .xr-chrome-in, .post-card')]
+      .map(e => e.scrollWidth - e.clientWidth)
+      .filter(n => n > 1)
+
+    return { doc, panes: Math.max(0, ...panes) }
+  })
+  check(
+    '15. Sin scroll horizontal a 320px — ni en el documento NI dentro de los paneles',
+    mScroll.doc <= 1 && mScroll.panes <= 1,
+    `documento=${mScroll.doc}px · paneles=${mScroll.panes}px`,
+  )
 
   const hint = (await m.locator('[data-testid="hint-m"]').textContent()) ?? ''
   const hintVisible = await m.locator('[data-testid="hint-m"]').isVisible()

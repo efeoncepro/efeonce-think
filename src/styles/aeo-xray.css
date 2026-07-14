@@ -183,7 +183,11 @@
      ⚠️ FRONTERA: Assistant vive SOLO bajo `.xr-article`. El chrome, el riel, el
      instrumento y las pantallas ① y ④ son EFEONCE y siguen en Poppins + Geist.
      Este par es un DATO del cliente — cuando la muestra sea de otro, cambia acá. */
-  --client-font: 'Assistant Variable', Assistant, system-ui, sans-serif;
+  /* 🔴 Estos tres los inyecta el PAYLOAD por variable inline en `.xr` (ver la ruta). Aquí solo va el
+     fallback: si un payload no declarara su tipografía, el artículo cae al sistema — nunca a la de
+     otro cliente. Antes estaban hardcodeados en Assistant (SKY) y el cliente #2 dibujaba su artículo
+     con la fuente de SKY, con el gate en verde. */
+  --client-font: system-ui, sans-serif;
   --w-client-title: 700;
   --w-client-body: 400;
 

@@ -3,7 +3,12 @@
     "name": "SKY",
     "legalName": "SKY Airline",
     "site": "blog.skyairline.com",
-    "accent": "#E6007E"
+    "accent": "#E6007E",
+    "font": {
+      "family": "'Assistant Variable', Assistant, system-ui, sans-serif",
+      "titleWeight": 700,
+      "bodyWeight": 400
+    }
   },
   "token": "861c18cc0e37",
   "meta": {

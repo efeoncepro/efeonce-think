@@ -156,6 +156,91 @@ const requireSourceForStats = (data: unknown, ctx: z.RefinementCtx, path: (strin
   for (const [k, v] of Object.entries(node)) requireSourceForStats(v, ctx, [...path, k])
 }
 
+
+/**
+ * 🔴 EL CONTRATO DEL ACOPLAMIENTO, EN EL BUILD — no solo en el gate de Playwright.
+ *
+ * Los asserts 40-41 cazan huérfanos y fantasmas… pero corren DESPUÉS del build, en un navegador.
+ * O sea: el build de un payload con un bloque huérfano PASABA, y la promesa del doc —«un payload
+ * incompleto ROMPE EL BUILD, no publica una muestra a medias»— era falsa para el invariante más
+ * load-bearing de la pieza. Son 12 líneas y cierra el hueco donde vive.
+ *
+ * · HUÉRFANO — bloque acoplable sin contraparte: se ilumina contra la nada. Peor que no acoplarlo.
+ * · FANTASMA — nodo que apunta a un bloque que ya no existe (pasa al renombrar un `coupleId`).
+ */
+const checkCoupling = (d: any, ctx: z.RefinementCtx) => {
+  const artIds = new Set<string>(d.article.blocks.filter((b: any) => b.coupleId).map((b: any) => b.coupleId))
+  const instIds = new Set<string>([
+    ...['seo', 'og', 'craft', 'jsonld', 'alts'].flatMap((k: string) => d.machine[k].map((x: any) => x.coupleId)),
+    d.machine.headings.coupleId,
+    ...d.machine.headings.tree.map((x: any) => x.coupleId),
+    ...d.evidence.facts.map((x: any) => x.coupleId),
+    ...d.evidence.fanOut.items.map((x: any) => x.coveredBy),
+  ])
+
+  for (const id of artIds) {
+    if (!instIds.has(id)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['article', 'blocks'],
+        message: `«${id}» es un bloque HUÉRFANO: es acoplable (se ilumina, invita a pasar el cursor) y NADA en el instrumento lo referencia. Se iluminaría contra la nada — es peor que no acoplarlo.`,
+      })
+    }
+  }
+  for (const id of instIds) {
+    if (!artIds.has(id)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['machine'],
+        message: `«${id}» es un nodo FANTASMA: el instrumento lo referencia y el artículo NO tiene ese bloque. Pasa al renombrar un coupleId.`,
+      })
+    }
+  }
+
+  /* Un KPI de portada sin su cifra grande sale VACÍO en la ① y en el instrumento. */
+  d.evidence.facts.forEach((f: any, i: number) => {
+    if (f.headline && (!f.big || !f.bigUnit)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['evidence', 'facts', i, 'big'],
+        message: `«${f.label}» está marcado como headline (va de KPI grande) pero le falta \`big\` o \`bigUnit\`: saldría una tarjeta vacía.`,
+      })
+    }
+  })
+
+  /* Anclas duplicadas = IDs duplicados en el HTML y un índice que salta al lugar equivocado. */
+  const anchors = d.article.blocks.filter((b: any) => b.anchor).map((b: any) => b.anchor)
+  const dupes = anchors.filter((a: string, i: number) => anchors.indexOf(a) !== i)
+  if (dupes.length) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['article', 'blocks'],
+      message: `Anclas duplicadas (${[...new Set(dupes)].join(', ')}): serían IDs repetidos en el HTML y el índice saltaría al lugar equivocado.`,
+    })
+  }
+}
+
+
+/**
+ * 🔴 EL ACENTO DEL CLIENTE ENTRA COMO COLOR DE TEXTO — y el schema solo validaba la FORMA.
+ *
+ * `regex(/^#[0-9a-fA-F]{6}$/)` comprueba que sea un hex, no que se pueda LEER. El magenta de SKY
+ * (#E6007E) da ~4,5:1 sobre blanco: pasa AA por los pelos, y por suerte. Un payload con un accent
+ * claro —amarillo, lima, celeste; comunísimos en salud y retail— se pintaría igual en la categoría,
+ * los enlaces internos y los números del índice: texto ilegible EN LA PANTALLA DEL CLIENTE, en la
+ * pieza cuya tesis entera es el rigor técnico. El schema tiene que exigir 4,5:1 (WCAG 1.4.3).
+ */
+const contrastOnWhite = (hex: string) => {
+  const v = [1, 3, 5].map(i => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255
+
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  })
+  const L = 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]
+
+  return 1.05 / (L + 0.05)
+}
+
 const aeoXray = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/aeo-xray' }),
   schema: ({ image }) =>
@@ -164,7 +249,27 @@ const aeoXray = defineCollection({
       name: z.string(),
       legalName: z.string(),
       site: z.string(),
-      accent: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+      accent: z
+        .string()
+        .regex(/^#[0-9a-fA-F]{6}$/)
+        .refine(hex => contrastOnWhite(hex) >= 4.5, hex => ({
+          message: `El acento ${hex} da ${contrastOnWhite(hex).toFixed(2)}:1 sobre blanco y WCAG 1.4.3 pide 4,5:1. Entra como color de TEXTO en el artículo (categoría, enlaces, números del índice): quedaría ilegible en la pantalla del cliente, en la pieza cuya tesis es el rigor. Usa un tono más oscuro de la marca para el texto.`,
+        })),
+      /* 🔴 LA TIPOGRAFÍA DEL CLIENTE ES DATO, NO CÓDIGO.
+         Vivía en el CSS (`--client-font: 'Assistant Variable'`), y el propio comentario lo confesaba:
+         «cuando la muestra sea de otro, cambia acá». Eso es un `if (cliente === 'sky')` escrito en
+         CSS. El cliente #2 dibujaría SU artículo —la zona que la arquitectura declara «es el
+         ESPÉCIMEN, es del CLIENTE»— en la tipografía de SKY, y el gate lo bendecía (el assert 38
+         exigía literalmente «Assistant»).
+
+         ⚠️ El @font-face sigue siendo un paso de repo (instalar el paquete fontsource e importarlo):
+         no se puede importar un paquete npm dinámicamente. Pero eso ahora es un paso DECLARADO del
+         manual, no una cadena escondida en una hoja de estilos. */
+      font: z.object({
+        family: z.string().min(3),
+        titleWeight: z.number().int().min(100).max(900),
+        bodyWeight: z.number().int().min(100).max(900),
+      }),
     }),
     /**
      * Token de la URL: `/muestras/<slug>-<token>`.
@@ -257,8 +362,14 @@ const aeoXray = defineCollection({
     }),
 
     /** El FLOW: cuatro pantallas, cada una con UN trabajo. Es dato: el motor no hardcodea rutas. */
+    /* 🔴 CUATRO PANTALLAS, NO N. `getStaticPaths` genera las rutas desde el payload, pero el body
+       las decide con un switch de literales — así que un step renombrado («/post» en vez de
+       «/articulo») generaba la ruta, PASABA EL BUILD y servía una página EN BLANCO: chrome, riel,
+       footer y cero contenido. Sin ruido. Es el bug de huérfanos/fantasmas aplicado al flow.
+       El enum es la verdad: el motor renderiza estas cuatro y solo estas cuatro. El día que haya
+       una quinta pantalla, se agrega acá Y en el render — juntas, o no se agrega. */
     flow: z
-      .array(z.object({ step: z.string(), label: z.string(), next: z.string() }))
+      .array(z.object({ step: z.enum(['', 'articulo', 'radiografia', 'atomizacion']), label: z.string(), next: z.string() }))
       .min(2),
 
     /** ① El hueco. El SERP real. Hoy vivía comprimido en una cajita; es la portada y es el golpe. */
@@ -377,7 +488,10 @@ const aeoXray = defineCollection({
        un `stat` sin `source` + `asOf`. Es la única forma de que el invariante 7 sea estructural
        y no un acuerdo de caballeros: los tres números que no resistían verificación vivían
        justo en la familia que el schema no miraba. */
-    .superRefine((data, ctx) => requireSourceForStats(data, ctx)),
+    .superRefine((data, ctx) => {
+      requireSourceForStats(data, ctx)
+      checkCoupling(data, ctx)
+    }),
 })
 
 export const collections = { aeoXray }

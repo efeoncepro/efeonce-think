@@ -118,7 +118,7 @@ const titles: Record<string, string> = {
 >
   {/* `data-hero` es el puente: el héroe se DERIVA del payload y viaja al script por el DOM, no por
       una constante. Así el JS del acoplamiento deja de conocer un `coupleId` del cliente. */}
-  <div class="xr" data-testid="xray-root" data-hero={HERO} style={`--client:${client.accent}`}>
+  <div class="xr" data-testid="xray-root" data-hero={HERO} style={`--client:${client.accent};--client-font:${client.font.family};--w-client-title:${client.font.titleWeight};--w-client-body:${client.font.bodyWeight}`}>
     <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
     <header class="xr-chrome" data-testid="disclaimer">
       <div class="xr-wrap xr-chrome-in">
