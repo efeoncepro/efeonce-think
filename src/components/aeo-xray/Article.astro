@@ -58,6 +58,19 @@ const published = new Date(`${article.publishedAt}T12:00:00Z`).toLocaleDateStrin
   timeZone: 'UTC',
 })
 
+/**
+ * El ÍNDICE se DERIVA de los H2 del propio artículo. No se declara aparte.
+ * Un índice declarado a mano se desincroniza el día que alguien renombra un título —
+ * y no falla nada, solo miente. Acá el drift es imposible por construcción.
+ *
+ * Nota: el H2 es una PREGUNTA (así lo recupera un motor de respuesta: por pasaje).
+ * El índice es un MAPA (así lo escanea un humano en dos segundos). No son el mismo
+ * texto, y por eso el H2 lleva `short` además de `text`.
+ */
+const tocItems = article.blocks.flatMap(b =>
+  b.type === 'h2' ? [{ anchor: b.anchor, short: b.short }] : [],
+)
+
 const attrsFor = (id: string) => {
   if (!coupled) return {}
   const n = produces.get(id) ?? 0
@@ -149,9 +162,24 @@ const srFor = (id: string) => {
       if (b.type === 'h2')
         return (
           <div class="blk" {...a}>
-            <h4 class="p-h2">{b.text}</h4>
+            {/* `scroll-margin-top` en el CSS: sin él, el ancla deja el título BAJO el
+                header pegajoso. Es el mismo WCAG 2.4.11 que ya nos mordió una vez. */}
+            <h4 class="p-h2" id={b.anchor}>{b.text}</h4>
             {sr && <span class="xr-sr">{sr}</span>}
           </div>
+        )
+      if (b.type === 'toc')
+        return (
+          <nav class="toc" aria-labelledby="toc-t">
+            <p class="toc-t" id="toc-t">{b.title}</p>
+            <ol>
+              {tocItems.map(h => (
+                <li>
+                  <a href={`#${h.anchor}`}>{h.short}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
         )
       if (b.type === 'answer-capsule')
         return (
@@ -328,8 +356,51 @@ const srFor = (id: string) => {
   .p-h2 {
     margin-top: 2.25rem; font-size: var(--a-h2);
     font-weight: var(--w-client-title); line-height: 1.25; letter-spacing: -0.01em; max-width: 26ch; text-wrap: balance;
+    /* Sin esto, el ancla deja el título JUSTO BAJO el header pegajoso: saltas al índice,
+       llegas a la sección, y no ves el título. Es el mismo WCAG 2.4.11 que ya nos mordió. */
+    scroll-margin-top: 5.5rem;
   }
   .para { margin: 1.1rem 0; font-size: var(--a-body); line-height: 1.7; color: var(--ink-2); max-width: 64ch; }
+
+  /* ── ÍNDICE ─────────────────────────────────────────────────────────────────
+     No es decoración: es estructura. Le da al lector un mapa en dos segundos, y le
+     da al motor anclas por sección — que es como recupera pasajes, no páginas. */
+  .toc {
+    margin: 1.75rem 0;
+    padding: 1.1rem 1.25rem;
+    background: var(--surf);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    max-width: 64ch;
+  }
+  .toc-t {
+    font-size: var(--t-over);
+    font-weight: var(--w-client-title);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+  .toc ol { padding-left: 0; list-style: none; counter-reset: toc; margin: 0; }
+  .toc li {
+    counter-increment: toc;
+    position: relative;
+    padding-left: 1.6rem;
+    margin: 0.4rem 0;
+    line-height: 1.45;
+    font-size: 1rem;
+  }
+  .toc li::before {
+    content: counter(toc);
+    position: absolute; left: 0; top: 0;
+    color: var(--client);
+    font-weight: var(--w-client-title);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.875rem;
+  }
+  .toc a { color: var(--ink-2); text-decoration: none; }
+  .toc a:hover { color: var(--client); text-decoration: underline; text-underline-offset: 3px; }
+  .toc a:focus-visible { outline: 2px solid var(--client); outline-offset: 3px; border-radius: 3px; }
 
   .cap {
     margin-top: 1.1rem; padding: 1rem 1.15rem; background: var(--tint-c);

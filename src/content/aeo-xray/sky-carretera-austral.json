@@ -44,9 +44,20 @@
         "text": "La Carretera Austral (Ruta 7) recorre 1.247 km entre Puerto Montt y Villa O'Higgins. La forma más rápida de empezar es volar a Balmaceda, el aeropuerto de Coyhaique, y arrendar un auto ahí mismo: te saltas los tramos más largos y los tres transbordadores del norte. Recorrerla con calma toma entre 10 y 14 días."
       },
       {
+        "type": "paragraph",
+        "text": "Hay un dato que no aparece en ningún mapa y que ordena todo lo demás: en ripio no se maneja a 90. Se maneja a 50, y en calamina a 30. Los 200 kilómetros que Google te promete en dos horas, acá son cuatro. De ahí sale el resto de la planificación: cuántos días pedir, por dónde entrar y qué auto arrendar."
+      },
+      {
+        "type": "toc",
+        "title": "Lo que vas a encontrar acá",
+        "coupleId": "toc"
+      },
+      {
         "type": "h2",
         "coupleId": "h2-como-llegar",
-        "text": "¿Cómo se llega a la Carretera Austral?"
+        "text": "¿Cómo se llega a la Carretera Austral?",
+        "anchor": "como-llegar",
+        "short": "Cómo llegar: las tres puertas de entrada"
       },
       {
         "type": "answer-capsule",
@@ -55,7 +66,11 @@
       },
       {
         "type": "paragraph",
-        "text": "Entrar por Balmaceda te deja parado en la mitad de la ruta: Cerro Castillo a dos horas, las Capillas de Mármol a media jornada. Entrar por Puerto Montt significa hacer los 1.247 km completos, con los tres transbordadores del tramo norte por delante."
+        "text": "La diferencia entre las dos puertas no se mide en kilómetros: se mide en días. Entrar por Balmaceda te deja parado en la mitad de la ruta, con Cerro Castillo a dos horas y las Capillas de Mármol a media jornada. Entrar por Puerto Montt significa hacer los 1.247 km completos —y los tres transbordadores del norte— antes de llegar a lo que probablemente viniste a ver."
+      },
+      {
+        "type": "paragraph",
+        "text": "Ninguna de las dos está mal. Depende de si el viaje es la ruta, o si la ruta es el camino hacia otra cosa."
       },
       {
         "type": "table",
@@ -91,12 +106,22 @@
       {
         "type": "h2",
         "coupleId": "h2-cuantos-dias",
-        "text": "¿Cuántos días necesitas para recorrerla?"
+        "text": "¿Cuántos días necesitas para recorrerla?",
+        "anchor": "cuantos-dias",
+        "short": "Cuántos días necesitas (y por qué el mapa miente)"
       },
       {
         "type": "answer-capsule",
         "coupleId": "capsule-dias",
         "text": "La Carretera Austral completa —los 1.247 km entre Puerto Montt y Villa O'Higgins— toma entre 10 y 14 días si quieres bajarte del auto. Si vuelas a Balmaceda y haces solo el tramo sur, con 5 a 7 días alcanzas para Cerro Castillo, las Capillas de Mármol y el río Baker."
+      },
+      {
+        "type": "paragraph",
+        "text": "Acá el mapa vuelve a mentir. Los 1.247 km parecen tres días de manejo. Son diez, y no porque el camino sea malo: porque te vas a bajar del auto. Esa es toda la gracia."
+      },
+      {
+        "type": "paragraph",
+        "text": "Este es un plan de siete días desde Balmaceda con aire de sobra, para que un día de lluvia no te desarme el itinerario completo."
       },
       {
         "type": "ordered-list",
@@ -113,6 +138,10 @@
         ]
       },
       {
+        "type": "paragraph",
+        "text": "Fíjate que ningún día pasa de cinco horas al volante. No es comodidad: es lo que rinde el ripio."
+      },
+      {
         "type": "image",
         "coupleId": "img-castillo",
         "src": "../../assets/muestras/sky-carretera-austral/cerro-castillo.jpg",
@@ -127,7 +156,9 @@
       {
         "type": "h2",
         "coupleId": "h2-epoca",
-        "text": "¿Cuál es la mejor época para recorrer la Carretera Austral?"
+        "text": "¿Cuál es la mejor época para recorrer la Carretera Austral?",
+        "anchor": "mejor-epoca",
+        "short": "La mejor época para ir"
       },
       {
         "type": "answer-capsule",
@@ -136,17 +167,31 @@
       },
       {
         "type": "paragraph",
-        "text": "En invierno varios tramos y servicios reducen su frecuencia. Si vas fuera de temporada, confirma los horarios de los transbordadores antes de comprometer un itinerario: son ellos, y no el camino, los que mandan."
+        "text": "El clima de Aysén no le hace caso al pronóstico. Puedes salir de Coyhaique con sol, cruzar Cerro Castillo bajo agua y llegar a Río Tranquilo con sol otra vez. No es mal tiempo: son cuatro estaciones en un día. Se viaja por capas, no por app del clima."
+      },
+      {
+        "type": "paragraph",
+        "text": "En invierno varios tramos y servicios bajan su frecuencia. Si vas fuera de temporada, confirma los transbordadores antes de comprometer un itinerario: son ellos, y no el camino, los que mandan."
       },
       {
         "type": "h2",
         "coupleId": "h2-ripio",
-        "text": "¿Está pavimentada? ¿Necesitas un 4x4?"
+        "text": "¿Está pavimentada? ¿Necesitas un 4x4?",
+        "anchor": "ripio-4x4",
+        "short": "¿Está pavimentada? ¿Necesitas 4x4?"
       },
       {
         "type": "answer-capsule",
         "coupleId": "capsule-ripio",
         "text": "La Carretera Austral está pavimentada por tramos y sigue teniendo sectores de ripio, sobre todo al sur de Cerro Castillo. No necesitas un 4x4 para hacerla en verano, pero sí un auto con buena altura, la rueda de repuesto revisada y paciencia con el ripio suelto."
+      },
+      {
+        "type": "paragraph",
+        "text": "El ripio de la Austral no es un camino malo: es un camino distinto. Se anda a 50, se frena antes, y las curvas ciegas se toman a 30 aunque no venga nadie. Y lo que más autos deja botados no es una piedra suelta: es la calamina, esa ondulación que te sacude el auto entero si la tomas rápido."
+      },
+      {
+        "type": "paragraph",
+        "text": "Dos cosas que no se negocian. La rueda de repuesto revisada —la revisada, no la que vino con el auto—, y el estanque lleno cada vez que veas una bomba. Las estaciones existen, pero son chicas y con horarios cortos: entre Cochrane y Villa O'Higgins hay 231 kilómetros sin ninguna."
       },
       {
         "type": "image",
@@ -163,7 +208,9 @@
       {
         "type": "h2",
         "coupleId": "h2-ferries",
-        "text": "Los transbordadores: la parte que no puedes improvisar"
+        "text": "Los transbordadores: la parte que no puedes improvisar",
+        "anchor": "transbordadores",
+        "short": "Los transbordadores: lo único que no controlas"
       },
       {
         "type": "answer-capsule",
@@ -172,7 +219,11 @@
       },
       {
         "type": "paragraph",
-        "text": "Si entras por Balmaceda no tocas ninguno de los dos primeros. Es, en la práctica, la razón más concreta para volar: no te ahorras solo kilómetros, te ahorras los dos cuellos de botella que pueden desarmarte el itinerario completo."
+        "text": "Los transbordadores no son un trámite: son el único punto del viaje que no controlas. El camino siempre está. El barco no: se llena, cambia el horario, se suspende por viento. Un cruce perdido en enero te cuesta un día entero — y ese día ya lo tenías ocupado."
+      },
+      {
+        "type": "paragraph",
+        "text": "Si entras por Balmaceda no tocas ninguno de los dos del norte. Ésa es, en la práctica, la razón más concreta para volar."
       },
       {
         "type": "pull-quote",
@@ -260,6 +311,14 @@
           {
             "text": "Cruces en transbordador y duraciones — GoChile, guía de la Carretera Austral",
             "href": "https://www.gochile.cl/en/articles/guide-to-traveling-the-carretera-austral.htm"
+          },
+          {
+            "text": "Velocidad de manejo en ripio (40–60 km/h) y estado de los caminos — Carretera Austral (portal de ruta)",
+            "href": "https://carretera-austral.cl/informate-del-estado-de-los-caminos/"
+          },
+          {
+            "text": "Distancia Cochrane–Villa O'Higgins (231 km, el tramo más largo sin servicios) — Chile al Sur, guía de combustible",
+            "href": "https://www.chilealsur.com/guia-de-viajes-2/i/92530715/consumo-combustible-carretera-austral"
           }
         ],
         "coupleId": "sources"
@@ -321,7 +380,7 @@
     ],
     "headings": {
       "coupleId": "h1",
-      "why": "Cada H2 es una sub-pregunta del fan-out, escrita como pregunta y autocontenida. Un motor de respuesta recupera pasajes, no páginas: el pasaje tiene que entenderse solo, sin el resto del artículo.",
+      "why": "Cada H2 es una sub-pregunta del fan-out, escrita como pregunta y autocontenida: el motor recupera PASAJES, no páginas, así que el pasaje tiene que entenderse solo. El índice, en cambio, no está escrito como pregunta sino como mapa — porque a quien sirve es al humano que escanea. Son dos lectores distintos y por eso son dos textos distintos.",
       "tree": [
         {
           "level": 1,
@@ -641,6 +700,13 @@
         "stat": "+32%",
         "statNote": "de visibilidad con estadísticas — la segunda táctica GEO de mayor lift",
         "why": "Un motor de respuesta extrae cifras, no adjetivos. «Queda cerca» no se cita; «56 km, una hora por la ruta CH-245» sí. Cada dato del artículo lleva su unidad, y su fuente está enlazada abajo."
+      },
+      {
+        "coupleId": "toc",
+        "label": "Índice con anclas",
+        "detail": "5 secciones · #anchor por H2",
+        "why": "Un índice no es decoración. Le da al lector un mapa en dos segundos —y baja el rebote— y le da al motor un ancla por sección. Un motor de respuesta recupera PASAJES, no páginas: cada ancla es una dirección a la que puede apuntar. Además es lo que le permite a Google mostrar enlaces a secciones dentro del resultado. ⚠️ Como con el FAQ, eso se declara, no se promete.",
+        "tier": 2
       }
     ]
   },

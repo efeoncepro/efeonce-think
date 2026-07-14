@@ -41,8 +41,21 @@ const blockUnion = (image: ImageFn) =>
       credit,
     }),
     z.object({ type: z.literal('h1'), coupleId: z.string(), text: z.string() }),
-    z.object({ type: z.literal('h2'), coupleId: z.string(), text: z.string() }),
+    z.object({
+      type: z.literal('h2'),
+      coupleId: z.string(),
+      text: z.string(),
+      /* El ancla del índice. Va en el H2 y NO en el ToC: el índice se DERIVA de los H2,
+         no se declara aparte. Un índice declarado a mano se desincroniza el día que
+         alguien renombra un título — y nadie se entera, porque no falla nada. */
+      anchor: z.string().regex(/^[a-z0-9-]+$/, 'El ancla es un slug: minúsculas, números y guiones.'),
+      /* La etiqueta corta del índice. El H2 es una PREGUNTA (así lo recupera el motor);
+         el índice es un MAPA (así lo escanea el humano). No son el mismo texto. */
+      short: z.string().min(3),
+    }),
     z.object({ type: z.literal('answer-capsule'), coupleId: z.string(), text: z.string() }),
+    /* El ToC no lleva items: se construye leyendo los H2 del propio artículo. */
+    z.object({ type: z.literal('toc'), coupleId: z.string(), title: z.string().min(3) }),
     z.object({ type: z.literal('paragraph'), text: z.string() }),
     z.object({
       type: z.literal('table'),
