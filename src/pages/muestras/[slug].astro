@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content'
+import { Image } from 'astro:assets'
 import BaseLayout from '@layouts/BaseLayout.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 
@@ -179,7 +180,26 @@ const asText = (code: unknown) =>
               return (
                 <figure class={`blk fig ${b.type === 'hero-image' ? 'hero' : ''}`} {...attrs}>
                   <span class="sr">{ui.srProduces.replace('{n}', String(n))}</span>
-                  <img src={b.src} alt={b.alt} loading={b.type === 'hero-image' ? 'eager' : 'lazy'} />
+                  {/*
+                    `<Image>` de astro:assets, no un `<img>` crudo. De acá salen `width`/`height`
+                    (sin ellos: CLS), el `srcset` (sin él un teléfono baja el hero completo) y
+                    AVIF/WebP. Una pieza que argumenta rigor técnico no puede reprobar un PageSpeed:
+                    el comité —o su área de TI— nos lo va a correr.
+                  */}
+                  <Image
+                    src={b.src}
+                    alt={b.alt}
+                    widths={b.type === 'hero-image' ? [640, 960, 1400] : [480, 720, 1000]}
+                    sizes={
+                      b.type === 'hero-image'
+                        ? '(min-width: 1080px) 52vw, 100vw'
+                        : '(min-width: 1080px) 46vw, 92vw'
+                    }
+                    format="avif"
+                    quality={72}
+                    loading={b.type === 'hero-image' ? 'eager' : 'lazy'}
+                    fetchpriority={b.type === 'hero-image' ? 'high' : 'auto'}
+                  />
                   <div class="fig-m">
                     {b.caption && <figcaption>{b.caption}</figcaption>}
                     <p class="credit">
@@ -296,6 +316,8 @@ const asText = (code: unknown) =>
         <div class="in-head">
           <h2 id="in-t">{ui.instrumentTitle}</h2>
           <p class="in-live" role="status" aria-live="polite" data-testid="live"></p>
+          {/* Solo móvil: cierra la hoja y devuelve el foco al bloque que la abrió. */}
+          <button class="sheet-x" type="button" data-close-sheet aria-label={ui.backToArticle}>✕</button>
         </div>
 
         <div class="in-body">
@@ -439,12 +461,29 @@ const asText = (code: unknown) =>
     let pinned: string | null = null
 
     const inst = root.querySelector<HTMLElement>('.inst')
+    /**
+     * MÓVIL: el instrumento vive DIEZ PANTALLAS más abajo del artículo. Sin esto, tocas un
+     * bloque, se enciende el chip «↓ 3 datos»… y no pasa nada más: el dato está fuera de
+     * alcance y el argumento central de la pieza simplemente NO EXISTE en un teléfono.
+     * Apilado, el instrumento sube como hoja inferior. No es un adorno: es lo que hace que
+     * la correspondencia se pueda ver con el pulgar.
+     */
+    const sheet = () => window.matchMedia('(max-width: 1079px)').matches
+    let opener: HTMLElement | null = null
+
+    const closeSheet = () => {
+      root.dataset.sheet = ''
+      opener?.focus()
+      opener = null
+    }
+    root.querySelector('[data-close-sheet]')?.addEventListener('click', closeSheet)
 
     const paint = (id: string | null) => {
       // Con un solo destino basta el resaltado. Pero el H1 enciende NUEVE nodos repartidos por
       // todo el panel: ves uno y los otros ocho quedan fuera de vista. Atenuar lo no-acoplado
       // hace que lo encendido resalte aunque esté disperso — y le dice al ojo cuántos hay.
       if (inst) inst.dataset.focus = id ? 'true' : ''
+      if (sheet() && id) root.dataset.sheet = 'open'
 
       root.querySelectorAll<HTMLElement>('[data-couple],[data-couple-target]').forEach(el => {
         const mine = el.dataset.couple ?? el.dataset.coupleTarget
@@ -468,7 +507,7 @@ const asText = (code: unknown) =>
        * desorientador. Movemos el scrollTop del instrumento a mano.
        */
       const pane = target.closest<HTMLElement>('.inst')
-      if (pane && pane.scrollHeight > pane.clientHeight) {
+      if (pane && pane.scrollHeight > pane.clientHeight + 4) {
         /**
          * El encabezado del instrumento es `position: sticky`. Si scrolleamos el nodo al
          * borde del panel, el header lo TAPA — y el usuario ve medio número cortado sin
@@ -528,11 +567,13 @@ const asText = (code: unknown) =>
       const el = hit(e)
       if (!el) return
       const id = el.dataset.couple ?? el.dataset.coupleTarget ?? null
+      if (sheet() && el.dataset.couple) opener = el // para devolverle el foco al cerrar
       pinned = pinned === id ? null : id
       paint(pinned ?? id)
     })
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return
+      if (root.dataset.sheet === 'open') { closeSheet(); return }
       pinned = null
       paint('capsule-main')
     })
@@ -986,6 +1027,38 @@ const asText = (code: unknown) =>
   @media (prefers-reduced-motion: reduce) {
     .blk, .nd, .kpi, .hn, .fan li, .blk::after, .blk::before { transition-duration: 0ms !important; }
     [data-couple-target][data-on] { animation: none !important; }
+  }
+
+  /* ══════ MÓVIL: el instrumento sube como HOJA INFERIOR ══════
+     Apilado, el instrumento queda diez pantallas bajo el artículo. Sin esto, el
+     acoplamiento —que ES el argumento— no se puede ver con el pulgar. */
+  .sheet-x { display: none; }
+  @media (max-width: 1079px) {
+    .sheet-x {
+      display: grid; place-items: center; width: 2.25rem; height: 2.25rem;
+      border-radius: 999px; border: 1px solid var(--line-d); background: var(--navy-3);
+      color: var(--ink-d); font-size: 1rem; cursor: pointer; flex-shrink: 0;
+    }
+    .sheet-x:focus-visible { outline: 2px solid var(--blue-up); outline-offset: 2px; }
+
+    .xr[data-sheet='open'] .inst {
+      position: fixed; inset: auto 0 0 0; z-index: 40;
+      max-height: 72vh; overflow-y: auto;
+      border-radius: 16px 16px 0 0; border-bottom: 0;
+      box-shadow: 0 -14px 40px rgb(0 0 0 / 0.4);
+      animation: sheetUp 220ms var(--ease);
+    }
+    .xr[data-sheet='open'] .inst .in-head { border-radius: 16px 16px 0 0; }
+    /* El pulgar necesita saber que puede arrastrar/cerrar: un tirador, como cualquier hoja. */
+    .xr[data-sheet='open'] .inst .in-head::before {
+      content: ''; position: absolute; top: 0.4rem; left: 50%; translate: -50% 0;
+      width: 2.25rem; height: 4px; border-radius: 999px; background: var(--line-d);
+    }
+    .xr[data-sheet='open'] .in-head { padding-top: 1.1rem; }
+  }
+  @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) {
+    .xr[data-sheet='open'] .inst { animation: none; }
   }
 
   /* ── Impresión: apila, expande, no sale roto. No es un entregable diseñado. ── */

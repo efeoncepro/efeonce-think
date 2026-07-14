@@ -24,7 +24,7 @@
       {
         "type": "hero-image",
         "coupleId": "img-hero",
-        "src": "/muestras/sky-carretera-austral/carretera-austral-ruta7.jpg",
+        "src": "../../assets/muestras/sky-carretera-austral/carretera-austral-ruta7.jpg",
         "alt": "Camino de ripio de la Carretera Austral entre bosque nativo y montañas, en la Región de Aysén",
         "caption": "La Ruta 7 atraviesa 1.247 km de la Patagonia chilena.",
         "credit": {
@@ -115,7 +115,7 @@
       {
         "type": "image",
         "coupleId": "img-castillo",
-        "src": "/muestras/sky-carretera-austral/cerro-castillo.jpg",
+        "src": "../../assets/muestras/sky-carretera-austral/cerro-castillo.jpg",
         "alt": "Las agujas de roca del Cerro Castillo nevadas sobre un lago, en el Parque Nacional Cerro Castillo",
         "caption": "Cerro Castillo queda a dos horas de Coyhaique. Es la primera parada si entras por Balmaceda.",
         "credit": {
@@ -151,7 +151,7 @@
       {
         "type": "image",
         "coupleId": "img-senaletica",
-        "src": "/muestras/sky-carretera-austral/senaletica-ruta7.jpg",
+        "src": "../../assets/muestras/sky-carretera-austral/senaletica-ruta7.jpg",
         "alt": "Señalética de la Ruta 7 al costado de un tramo de ripio de la Carretera Austral",
         "caption": "La Ruta 7 alterna pavimento y ripio. El sur es el tramo más exigente.",
         "credit": {
@@ -182,7 +182,7 @@
       {
         "type": "image",
         "coupleId": "img-baker",
-        "src": "/muestras/sky-carretera-austral/rio-baker.jpg",
+        "src": "../../assets/muestras/sky-carretera-austral/rio-baker.jpg",
         "alt": "Aguas turquesas del río Baker entre laderas de vegetación patagónica, en la Región de Aysén",
         "caption": "El río Baker, el más caudaloso de Chile, corre junto a la Ruta 7 en el tramo sur.",
         "credit": {

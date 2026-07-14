@@ -1,0 +1,225 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import EfeonceMeetingEmbed from '@/components/EfeonceMeetingEmbed.astro'
+import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
+import { axis } from '@lib/report-tokens'
+
+const meetingUrl =
+  'https://meetings.hubspot.com/efeoncepro/agenda-discovery?utm_source=think_preview&utm_medium=owned_preview&utm_campaign=growth_cta_meeting_embed&utm_content=preview_primary'
+---
+
+<BaseLayout
+  title="Preview Meeting Embed | Efeonce Think"
+  description="Preview interno noindex del embed transversal de reuniones."
+  canonical="/preview/meeting-embed"
+  noindex
+>
+  <main
+    class="meeting-preview"
+    data-capture="meeting-embed-preview"
+    style={`--axis-blue:${axis.accent[500]};--axis-blue-dark:${axis.accent[700]};--axis-navy:${axis.accent[900]};--axis-navy-soft:${axis.accent[800]};--axis-gray-50:${axis.gray[50]};--axis-gray-100:${axis.gray[100]};--axis-gray-200:${axis.gray[200]};--axis-gray-600:${axis.gray[600]};--axis-gray-800:${axis.gray[800]};--axis-gray-900:${axis.gray[900]};`}
+  >
+    <section class="preview-shell" aria-labelledby="meeting-preview-title">
+      <header class="preview-brand" aria-label="Efeonce Think">
+        <a href="/" aria-label="Ir a Efeonce Think">
+          <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" />
+        </a>
+        <EfeonceSlogan color="rgba(255,255,255,.62)" size=".6rem" />
+      </header>
+
+      <div class="preview-grid">
+        <div class="preview-copy">
+          <p class="preview-kicker">Growth CTA</p>
+          <h1 id="meeting-preview-title">Una reunión cuando el diagnóstico ya tiene contexto.</h1>
+          <p>
+            El calendario vive dentro de la experiencia, sin perder atribución ni romper el ritmo visual.
+          </p>
+        </div>
+
+        <article class="preview-card" aria-label="Vista previa de agenda">
+          <p class="preview-card-kicker">Siguiente paso</p>
+          <h2>Mide primero. Actúa con foco después.</h2>
+          <p>
+            Revisa la señal, alinea prioridades y agenda una conversación con el equipo.
+          </p>
+          <div class="preview-actions">
+            <a class="preview-primary press" href="/brand-visibility">Hacer mi diagnóstico AEO</a>
+            <EfeonceMeetingEmbed
+              mode="overlay"
+              meetingUrl={meetingUrl}
+              ctaId="think_preview_meeting_primary"
+              ctaLocation="meeting_embed_preview"
+              surfaceId="think_preview_meeting_embed"
+              heading="Agenda una sesión AEO"
+              description="Revisamos el contexto, priorizamos brechas y definimos el siguiente movimiento."
+              triggerLabel="Agendar reunión"
+            />
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .meeting-preview {
+    min-height: 100dvh;
+    overflow-x: clip;
+    background:
+      radial-gradient(circle at 80% 10%, rgba(54, 215, 197, 0.15), transparent 30%),
+      linear-gradient(160deg, var(--axis-navy-soft) 0%, var(--axis-navy) 62%, #001a33 100%);
+    color: #fff;
+  }
+
+  .preview-shell {
+    width: min(1180px, calc(100% - clamp(2rem, 6vw, 5rem)));
+    margin-inline: auto;
+    padding: clamp(1.6rem, 3vw, 2.4rem) 0 clamp(4rem, 8vw, 7rem);
+  }
+
+  .preview-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.2rem;
+  }
+
+  .preview-brand img {
+    width: 150px;
+    height: auto;
+  }
+
+  .preview-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(22rem, 0.72fr);
+    gap: clamp(2rem, 6vw, 5.5rem);
+    align-items: center;
+    padding-top: clamp(4.6rem, 12vh, 8rem);
+  }
+
+  .preview-copy {
+    max-width: 640px;
+  }
+
+  .preview-kicker,
+  .preview-card-kicker {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 820;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .preview-kicker {
+    display: inline-flex;
+    border: 1px solid rgba(54, 215, 197, 0.28);
+    border-radius: 999px;
+    padding: 0.38rem 0.68rem;
+    color: #62f0df;
+    background: rgba(54, 215, 197, 0.08);
+  }
+
+  .preview-copy h1 {
+    margin: 1.25rem 0 0;
+    max-width: 720px;
+    color: #fff;
+    font-family: 'Poppins', 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: clamp(3rem, 5.4vw, 5.8rem);
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 0.98;
+  }
+
+  .preview-copy p:not(.preview-kicker) {
+    max-width: 58ch;
+    margin: 1.25rem 0 0;
+    color: rgba(255, 255, 255, 0.74);
+    font-size: 1.05rem;
+    line-height: 1.64;
+  }
+
+  .preview-card {
+    min-width: 0;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 1.45rem;
+    padding: clamp(1.1rem, 2vw, 1.35rem);
+    background:
+      radial-gradient(circle at 90% 0%, rgba(3, 117, 219, 0.1), transparent 36%),
+      rgba(255, 255, 255, 0.96);
+    color: var(--axis-gray-900);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.24);
+  }
+
+  .preview-card-kicker {
+    color: var(--axis-blue);
+  }
+
+  .preview-card h2 {
+    margin: 0.45rem 0 0;
+    color: var(--axis-gray-900);
+    font-size: 1.35rem;
+    font-weight: 720;
+    line-height: 1.15;
+  }
+
+  .preview-card p:not(.preview-card-kicker) {
+    margin: 0.6rem 0 0;
+    color: var(--axis-gray-600);
+    font-size: 0.92rem;
+    line-height: 1.58;
+  }
+
+  .preview-actions {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1.2rem;
+  }
+
+  .preview-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    border-radius: 999px;
+    padding: 0.78rem 1.25rem;
+    background: var(--axis-blue);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 720;
+    text-decoration: none;
+    box-shadow: 0 14px 34px rgba(0, 122, 255, 0.24);
+  }
+
+  .preview-primary:focus-visible {
+    outline: 2px solid rgba(54, 215, 197, 0.9);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 860px) {
+    .preview-grid {
+      grid-template-columns: 1fr;
+      padding-top: 3.6rem;
+    }
+
+    .preview-copy h1 {
+      font-size: clamp(2.55rem, 14vw, 4rem);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .preview-shell {
+      width: min(100% - 1.5rem, 390px);
+    }
+
+    .preview-brand {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .preview-card {
+      border-radius: 1.1rem;
+      padding: 1rem;
+    }
+  }
+</style>

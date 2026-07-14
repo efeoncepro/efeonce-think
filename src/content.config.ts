@@ -20,60 +20,68 @@ const credit = z.object({
   url: z.string().url(),
 })
 
-const imageBlock = z.object({
-  type: z.enum(['image', 'hero-image']),
-  coupleId: z.string().min(1),
-  src: z.string().min(1),
-  // Un alt vacío en una muestra que EXHIBE los alts sería una broma cruel.
-  alt: z.string().min(10, 'El alt es contenido de la muestra: describe la imagen de verdad.'),
-  caption: z.string().optional(),
-  credit,
-})
+/**
+ * `src: image()` es lo que mete la foto al pipeline de Astro: de ahí salen `width`/`height`
+ * (sin ellos hay CLS garantizado), el `srcset` (sin él un teléfono se traga los 527 KB del
+ * hero) y AVIF/WebP (2-3× más liviano). Vivían en `public/`, que SALTA todo eso — y una
+ * pieza que argumenta rigor técnico no puede reprobar su propio PageSpeed.
+ * El helper solo existe dentro de `schema: ({ image }) => …`.
+ */
+type ImageFn = Parameters<Parameters<typeof defineCollection>[0]['schema'] & object>[0]['image']
 
-const block = z.discriminatedUnion('type', [
-  imageBlock,
-  z.object({ type: z.literal('h1'), coupleId: z.string(), text: z.string() }),
-  z.object({ type: z.literal('h2'), coupleId: z.string(), text: z.string() }),
-  z.object({ type: z.literal('answer-capsule'), coupleId: z.string(), text: z.string() }),
-  z.object({ type: z.literal('paragraph'), text: z.string() }),
-  z.object({
-    type: z.literal('table'),
-    coupleId: z.string(),
-    caption: z.string(),
-    headers: z.array(z.string()).min(2),
-    rows: z.array(z.array(z.string())).min(1),
-  }),
-  z.object({
-    type: z.literal('ordered-list'),
-    coupleId: z.string(),
-    title: z.string(),
-    items: z.array(z.string()).min(2),
-  }),
-  z.object({
-    type: z.literal('faq'),
-    coupleId: z.string(),
-    title: z.string(),
-    items: z.array(z.object({ q: z.string(), a: z.string() })).min(2),
-  }),
-  z.object({
-    type: z.literal('internal-links'),
-    coupleId: z.string(),
-    title: z.string(),
-    items: z.array(z.object({ text: z.string(), href: z.string().url(), note: z.string().optional() })),
-  }),
-  z.object({
-    /** La cita destacada. Es DATO: el pasaje que un motor puede extraer entero y atribuir. */
-    type: z.literal('pull-quote'),
-    coupleId: z.string(),
-    text: z.string().min(40),
-  }),
-  z.object({
-    type: z.literal('sources'),
-    coupleId: z.string(),
-    title: z.string(),
-    items: z.array(z.object({ text: z.string(), href: z.string().url() })),
-  }),
-])
+const blockUnion = (image: ImageFn) =>
+  z.discriminatedUnion('type', [
+    z.object({
+      type: z.enum(['image', 'hero-image']),
+      coupleId: z.string().min(1),
+      src: image(),
+      // Un alt vacío en una muestra que EXHIBE los alts sería una broma cruel.
+      alt: z.string().min(10, 'El alt es contenido de la muestra: describe la imagen de verdad.'),
+      caption: z.string().optional(),
+      credit,
+    }),
+    z.object({ type: z.literal('h1'), coupleId: z.string(), text: z.string() }),
+    z.object({ type: z.literal('h2'), coupleId: z.string(), text: z.string() }),
+    z.object({ type: z.literal('answer-capsule'), coupleId: z.string(), text: z.string() }),
+    z.object({ type: z.literal('paragraph'), text: z.string() }),
+    z.object({
+      type: z.literal('table'),
+      coupleId: z.string(),
+      caption: z.string(),
+      headers: z.array(z.string()).min(2),
+      rows: z.array(z.array(z.string())).min(1),
+    }),
+    z.object({
+      type: z.literal('ordered-list'),
+      coupleId: z.string(),
+      title: z.string(),
+      items: z.array(z.string()).min(2),
+    }),
+    z.object({
+      type: z.literal('faq'),
+      coupleId: z.string(),
+      title: z.string(),
+      items: z.array(z.object({ q: z.string(), a: z.string() })).min(2),
+    }),
+    z.object({
+      type: z.literal('internal-links'),
+      coupleId: z.string(),
+      title: z.string(),
+      items: z.array(z.object({ text: z.string(), href: z.string().url(), note: z.string().optional() })),
+    }),
+    z.object({
+      /** La cita destacada. Es DATO: el pasaje que un motor puede extraer entero y atribuir. */
+      type: z.literal('pull-quote'),
+      coupleId: z.string(),
+      text: z.string().min(40),
+    }),
+    z.object({
+      type: z.literal('sources'),
+      coupleId: z.string(),
+      title: z.string(),
+      items: z.array(z.object({ text: z.string(), href: z.string().url() })),
+    }),
+    ])
 
 
 /**
@@ -88,7 +96,8 @@ const stat = { stat: z.string().optional(), statNote: z.string().optional() }
 
 const aeoXray = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/aeo-xray' }),
-  schema: z.object({
+  schema: ({ image }) =>
+    z.object({
     client: z.object({
       name: z.string(),
       legalName: z.string(),
@@ -132,7 +141,7 @@ const aeoXray = defineCollection({
       category: z.string(),
       author: z.string(),
       publishedAt: z.string(),
-      blocks: z.array(block).min(3),
+      blocks: z.array(blockUnion(image)).min(3),
     }),
 
     machine: z.object({

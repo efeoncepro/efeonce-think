@@ -1,0 +1,773 @@
+---
+interface Props {
+  mode?: 'overlay' | 'inline' | 'handoff'
+  meetingUrl?: string
+  ctaId: string
+  ctaLocation: string
+  surfaceId: string
+  heading?: string
+  description?: string
+  triggerLabel?: string
+  fallbackLabel?: string
+}
+
+const {
+  mode = 'overlay',
+  meetingUrl = 'https://meetings.hubspot.com/efeoncepro/agenda-discovery',
+  ctaId,
+  ctaLocation,
+  surfaceId,
+  heading = 'Agenda una reunión',
+  description = 'Elige un horario disponible y llegamos con el contexto de esta lectura.',
+  triggerLabel = 'Agendar reunión',
+  fallbackLabel = 'Abrir calendario en HubSpot',
+} = Astro.props
+
+const panelId = `${surfaceId}-panel`
+const hostId = `${surfaceId}-host`
+const destinationId = 'hubspot_meetings_agenda_discovery'
+const ctaVariant = mode === 'handoff' ? 'direct_handoff' : `${mode}_panel`
+const isEmbeddedMode = mode === 'inline' || mode === 'overlay'
+---
+
+<div
+  class="efeonce-meeting-embed"
+  data-efeonce-meeting-root
+  data-meeting-url={meetingUrl}
+  data-surface-id={surfaceId}
+  data-surface-kind="hubspot_meetings_embed"
+  data-cta-id={ctaId}
+  data-cta-kind="meeting_booking"
+  data-cta-location={ctaLocation}
+  data-cta-variant={ctaVariant}
+  data-destination-id={destinationId}
+  data-meeting-mode={mode}
+>
+  {mode === 'handoff' ? (
+    <a
+      class="efeonce-meeting-trigger press"
+      href={meetingUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-efeonce-meeting-direct
+    >
+      <span class="efeonce-meeting-trigger-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M7 2v3M17 2v3M4.5 9h15M6.5 5h11A2.5 2.5 0 0 1 20 7.5v10A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-10A2.5 2.5 0 0 1 6.5 5Z" />
+          <path d="m9 14 2 2 4-5" />
+        </svg>
+      </span>
+      {triggerLabel}
+    </a>
+  ) : isEmbeddedMode ? (
+    <>
+      <button
+        class="efeonce-meeting-trigger press"
+        type="button"
+        aria-expanded="false"
+        aria-controls={panelId}
+        data-efeonce-meeting-trigger
+      >
+        <span class="efeonce-meeting-trigger-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M7 2v3M17 2v3M4.5 9h15M6.5 5h11A2.5 2.5 0 0 1 20 7.5v10A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-10A2.5 2.5 0 0 1 6.5 5Z" />
+            <path d="m9 14 2 2 4-5" />
+          </svg>
+        </span>
+        {triggerLabel}
+      </button>
+
+      <section
+        id={panelId}
+        class:list={['efeonce-meeting-panel', mode === 'overlay' && 'is-overlay']}
+        aria-labelledby={`${surfaceId}-title`}
+        aria-modal={mode === 'overlay' ? 'true' : undefined}
+        role={mode === 'overlay' ? 'dialog' : undefined}
+        hidden
+        data-efeonce-meeting-panel
+      >
+        <div class="efeonce-meeting-dialog">
+          <div class="efeonce-meeting-panel-head">
+            <div>
+              <p class="efeonce-meeting-kicker">Reunión</p>
+              <h3 id={`${surfaceId}-title`}>{heading}</h3>
+              <p>{description}</p>
+            </div>
+            <div class="efeonce-meeting-panel-actions">
+              <a
+                class="efeonce-meeting-fallback"
+                href={meetingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-efeonce-meeting-fallback
+              >
+                {fallbackLabel}
+              </a>
+              {mode === 'overlay' && (
+                <button
+                  class="efeonce-meeting-close"
+                  type="button"
+                  aria-label="Cerrar agenda"
+                  data-efeonce-meeting-close
+                >
+                  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <path d="m6 6 12 12M18 6 6 18" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div
+            id={hostId}
+            class="efeonce-meeting-host meetings-iframe-container"
+            data-efeonce-meeting-host
+            aria-live="polite"
+          >
+            <div class="efeonce-meeting-skeleton" aria-hidden="true"></div>
+          </div>
+        </div>
+      </section>
+    </>
+  ) : null}
+</div>
+
+<script>
+  type MeetingMode = 'embed' | 'direct'
+  type DataLayerPayload = Record<string, string | undefined>
+  type EfeonceWindow = Window & typeof globalThis & {
+    dataLayer?: DataLayerPayload[]
+    hbspt?: {
+      meetings?: {
+        create?: (selector: string) => void
+      }
+    }
+    __efeonceHubSpotMeetingsPromise?: Promise<void>
+  }
+
+  const HUBSPOT_MEETINGS_SRC = 'https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js'
+  const CAMPAIGN_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid']
+  const efeonceWindow = window as EfeonceWindow
+
+  const readUrl = (value: string) => {
+    try {
+      return new URL(value, window.location.href)
+    } catch {
+      return new URL('https://meetings.hubspot.com/efeoncepro/agenda-discovery')
+    }
+  }
+
+  const hasVisitCampaignParams = () => {
+    const current = new URL(window.location.href)
+    return CAMPAIGN_KEYS.some((key) => current.searchParams.has(key))
+  }
+
+  const decorateMeetingUrl = (rawUrl: string, mode: MeetingMode) => {
+    const url = readUrl(rawUrl)
+    const current = new URL(window.location.href)
+    const hasVisitParams = hasVisitCampaignParams()
+
+    if (mode === 'embed') {
+      url.searchParams.set('embed', 'true')
+    }
+
+    if (hasVisitParams) {
+      CAMPAIGN_KEYS.forEach((key) => {
+        if (mode === 'embed') {
+          url.searchParams.delete(key)
+          return
+        }
+
+        const value = current.searchParams.get(key)
+        if (value) url.searchParams.set(key, value)
+        else url.searchParams.delete(key)
+      })
+    }
+
+    return url.toString()
+  }
+
+  const pageUri = () => {
+    const path = window.location.pathname
+    if (/^\/brand-visibility\/r\/[^/]+\/?$/.test(path)) return '/brand-visibility/r/[token]'
+    if (/^\/r\/[^/]+\/?$/.test(path)) return '/r/[token]'
+    if (/^\/s\/[^/]+\/?$/.test(path)) return '/s/[code]'
+    return path || '/'
+  }
+
+  const campaignParams = (root: HTMLElement) => {
+    const params: Record<string, string> = {}
+    const current = new URL(window.location.href)
+    const meeting = readUrl(root.dataset.meetingUrl || '')
+
+    CAMPAIGN_KEYS.forEach((key) => {
+      const value = current.searchParams.get(key) || meeting.searchParams.get(key)
+      if (value) params[key] = value
+    })
+
+    return params
+  }
+
+  const pushEvent = (root: HTMLElement, event: string, extra: DataLayerPayload = {}) => {
+    efeonceWindow.dataLayer = efeonceWindow.dataLayer || []
+    const payload: DataLayerPayload = {
+      event,
+      page_uri: pageUri(),
+      page_name: document.title,
+      surface_id: root.dataset.surfaceId,
+      surface_kind: root.dataset.surfaceKind,
+      destination_id: root.dataset.destinationId,
+      meeting_provider: 'hubspot',
+      ...campaignParams(root),
+      ...extra,
+    }
+
+    Object.keys(payload).forEach((key) => {
+      if (!payload[key]) delete payload[key]
+    })
+
+    efeonceWindow.dataLayer.push(payload)
+  }
+
+  const pushCtaClick = (root: HTMLElement, extra: DataLayerPayload = {}) => {
+    pushEvent(root, 'gh_cta_clicked', {
+      cta_id: root.dataset.ctaId,
+      cta_kind: root.dataset.ctaKind,
+      cta_location: root.dataset.ctaLocation,
+      cta_variant: root.dataset.ctaVariant,
+      ...extra,
+    })
+  }
+
+  const loadHubSpotMeetings = () => {
+    const win = efeonceWindow
+
+    if (win.hbspt?.meetings?.create) {
+      return Promise.resolve()
+    }
+
+    if (win.__efeonceHubSpotMeetingsPromise) {
+      return win.__efeonceHubSpotMeetingsPromise
+    }
+
+    win.__efeonceHubSpotMeetingsPromise = new Promise<void>((resolve, reject) => {
+      const existing = document.querySelector(`script[src="${HUBSPOT_MEETINGS_SRC}"]`)
+      if (existing) {
+        existing.addEventListener('load', () => resolve(), { once: true })
+        existing.addEventListener('error', reject, { once: true })
+        return
+      }
+
+      const script = document.createElement('script')
+      script.async = true
+      script.src = HUBSPOT_MEETINGS_SRC
+      script.addEventListener('load', () => resolve(), { once: true })
+      script.addEventListener('error', reject, { once: true })
+      document.head.append(script)
+    })
+
+    return win.__efeonceHubSpotMeetingsPromise
+  }
+
+  const markLoadedWhenIframeLoads = (root: HTMLElement, host: HTMLElement) => {
+    let loaded = false
+    const markLoaded = () => {
+      if (loaded) return
+      loaded = true
+      host.classList.add('is-loaded')
+      pushEvent(root, 'gh_meeting_embed_loaded')
+    }
+
+    const attach = () => {
+      const iframe = host.querySelector('iframe')
+      if (!(iframe instanceof HTMLIFrameElement)) return false
+      iframe.addEventListener('load', markLoaded, { once: true })
+      window.setTimeout(() => {
+        if (iframe.src) markLoaded()
+      }, 900)
+      return true
+    }
+
+    if (attach()) return
+
+    const observer = new MutationObserver(() => {
+      if (attach()) observer.disconnect()
+    })
+    observer.observe(host, { childList: true, subtree: true })
+
+    window.setTimeout(() => {
+      observer.disconnect()
+      if (!loaded) {
+        host.classList.add('is-failed')
+        pushEvent(root, 'gh_meeting_embed_failed', { reason_class: 'iframe_timeout' })
+      }
+    }, 12000)
+  }
+
+  const mountMeeting = async (root: HTMLElement) => {
+    if (root.dataset.meetingMounted === 'true') return
+
+    const host = root.querySelector('[data-efeonce-meeting-host]')
+    if (!(host instanceof HTMLElement)) return
+
+    root.dataset.meetingMounted = 'true'
+    host.dataset.src = decorateMeetingUrl(root.dataset.meetingUrl || '', 'embed')
+    pushEvent(root, 'gh_meeting_embed_viewed')
+
+    try {
+      await loadHubSpotMeetings()
+      const selector = `[data-efeonce-meeting-host]#${CSS.escape(host.id)}`
+      efeonceWindow.hbspt?.meetings?.create?.(selector)
+      markLoadedWhenIframeLoads(root, host)
+    } catch {
+      host.classList.add('is-failed')
+      pushEvent(root, 'gh_meeting_embed_failed', { reason_class: 'script_load_failed' })
+    }
+  }
+
+  const initMeetingRoot = (root: HTMLElement) => {
+    const trigger = root.querySelector('[data-efeonce-meeting-trigger]')
+    const panel = root.querySelector('[data-efeonce-meeting-panel]')
+    const close = root.querySelector('[data-efeonce-meeting-close]')
+    const fallback = root.querySelector('[data-efeonce-meeting-fallback]')
+    const isOverlay = root.dataset.meetingMode === 'overlay'
+
+    if (fallback instanceof HTMLAnchorElement) {
+      fallback.href = decorateMeetingUrl(root.dataset.meetingUrl || '', 'direct')
+      fallback.addEventListener('click', () => {
+        pushCtaClick(root, {
+          cta_id: `${root.dataset.ctaId || 'meeting'}_direct_fallback`,
+          cta_variant: 'direct_fallback',
+        })
+      })
+    }
+
+    const direct = root.querySelector('[data-efeonce-meeting-direct]')
+    if (direct instanceof HTMLAnchorElement) {
+      direct.href = decorateMeetingUrl(root.dataset.meetingUrl || '', 'direct')
+      direct.addEventListener('click', () => {
+        pushCtaClick(root)
+      })
+    }
+
+    if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement)) return
+
+    const setPanelOpen = (nextOpen: boolean) => {
+      panel.hidden = !nextOpen
+      trigger.setAttribute('aria-expanded', String(nextOpen))
+      root.classList.toggle('is-open', nextOpen)
+      document.documentElement.classList.toggle('efeonce-meeting-lock-scroll', nextOpen && isOverlay)
+
+      if (!nextOpen) {
+        trigger.focus({ preventScroll: true })
+        return
+      }
+
+      panel.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+
+      if (isOverlay) {
+        window.requestAnimationFrame(() => {
+          const closeButton = root.querySelector('[data-efeonce-meeting-close]')
+          if (closeButton instanceof HTMLButtonElement) closeButton.focus({ preventScroll: true })
+        })
+      }
+    }
+
+    trigger.addEventListener('click', () => {
+      const nextOpen = panel.hidden
+      setPanelOpen(nextOpen)
+      pushCtaClick(root)
+
+      if (nextOpen) {
+        mountMeeting(root)
+        if (!isOverlay) {
+          panel.scrollIntoView({
+            block: 'nearest',
+            inline: 'nearest',
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+          })
+        }
+      }
+    })
+
+    if (close instanceof HTMLButtonElement) {
+      close.addEventListener('click', () => {
+        setPanelOpen(false)
+      })
+    }
+
+    panel.addEventListener('click', (event) => {
+      if (!isOverlay || event.target !== panel) return
+      setPanelOpen(false)
+    })
+
+    document.addEventListener('keydown', (event) => {
+      if (!isOverlay || event.key !== 'Escape' || panel.hidden) return
+      setPanelOpen(false)
+    })
+
+    window.addEventListener('message', (event) => {
+      if (!isOverlay || panel.hidden || event.origin !== 'https://meetings.hubspot.com') return
+
+      const data = event.data
+      const isHeightMessage =
+        (typeof data === 'string' && data.includes('"height"')) ||
+        (typeof data === 'object' && data !== null && 'height' in data)
+
+      if (!isHeightMessage) return
+
+      window.setTimeout(() => {
+        panel.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      }, 120)
+    })
+  }
+
+  document.querySelectorAll('[data-efeonce-meeting-root]').forEach((root) => {
+    if (root instanceof HTMLElement) initMeetingRoot(root)
+  })
+</script>
+
+<style>
+  .efeonce-meeting-embed {
+    display: grid;
+    gap: 0.85rem;
+    min-width: 0;
+  }
+
+  .efeonce-meeting-trigger,
+  .efeonce-meeting-fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    border-radius: 999px;
+    text-decoration: none;
+    letter-spacing: 0;
+  }
+
+  .efeonce-meeting-trigger {
+    width: 100%;
+    min-height: 3rem;
+    border: 1px solid rgba(224, 231, 255, 0.96);
+    padding: 0.78rem 1.25rem;
+    background: #ffffff;
+    color: #05345d;
+    font-size: 0.875rem;
+    font-weight: 720;
+    box-shadow: 0 14px 34px rgba(2, 60, 112, 0.08);
+    cursor: pointer;
+    transition:
+      border-color 0.18s cubic-bezier(0.2, 0, 0, 1),
+      box-shadow 0.18s cubic-bezier(0.2, 0, 0, 1),
+      transform 0.18s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .efeonce-meeting-trigger:hover {
+    border-color: rgba(3, 117, 219, 0.34);
+    box-shadow: 0 18px 42px rgba(3, 117, 219, 0.14);
+  }
+
+  .efeonce-meeting-trigger:focus-visible,
+  .efeonce-meeting-fallback:focus-visible {
+    outline: 2px solid rgba(3, 117, 219, 0.72);
+    outline-offset: 3px;
+  }
+
+  .efeonce-meeting-trigger-icon {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 1.28rem;
+    height: 1.28rem;
+    color: currentColor;
+  }
+
+  .efeonce-meeting-trigger-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+  }
+
+  .efeonce-meeting-panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(224, 231, 255, 0.96);
+    border-radius: 1.2rem;
+    background:
+      radial-gradient(circle at 90% 0%, rgba(3, 117, 219, 0.09), transparent 32%),
+      #ffffff;
+    box-shadow: 0 24px 62px rgba(2, 60, 112, 0.12);
+  }
+
+  .efeonce-meeting-panel[hidden] {
+    display: none;
+  }
+
+  .efeonce-meeting-panel.is-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: clamp(1rem, 3vw, 2rem);
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0;
+    background:
+      radial-gradient(circle at 80% 0%, rgba(54, 215, 197, 0.18), transparent 34%),
+      rgba(0, 26, 51, 0.78);
+    box-shadow: none;
+    backdrop-filter: blur(16px);
+    overscroll-behavior: contain;
+  }
+
+  .efeonce-meeting-panel.is-overlay[hidden] {
+    display: none;
+  }
+
+  .efeonce-meeting-dialog {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .efeonce-meeting-panel.is-overlay .efeonce-meeting-dialog {
+    width: min(980px, calc(100vw - clamp(2rem, 6vw, 4rem)));
+    max-height: min(920px, calc(100dvh - clamp(2rem, 6vw, 4rem)));
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    border-radius: clamp(1rem, 2.4vw, 1.55rem);
+    background:
+      radial-gradient(circle at 88% 0%, rgba(3, 117, 219, 0.1), transparent 34%),
+      #ffffff;
+    box-shadow: 0 36px 96px rgba(0, 0, 0, 0.34);
+  }
+
+  .efeonce-meeting-panel-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: start;
+    padding: 1.05rem 1.05rem 0.85rem;
+  }
+
+  .efeonce-meeting-panel.is-overlay .efeonce-meeting-panel-head {
+    border-bottom: 1px solid rgba(224, 231, 255, 0.9);
+    padding: clamp(0.9rem, 1.8vw, 1.2rem);
+  }
+
+  .efeonce-meeting-panel-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.6rem;
+  }
+
+  .efeonce-meeting-kicker {
+    margin: 0;
+    color: #0375db;
+    font-size: 0.68rem;
+    font-weight: 820;
+    letter-spacing: 0.11em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .efeonce-meeting-panel h3 {
+    margin: 0.25rem 0 0;
+    color: #0f2135;
+    font-size: 1.05rem;
+    font-weight: 720;
+    line-height: 1.18;
+  }
+
+  .efeonce-meeting-panel p:not(.efeonce-meeting-kicker) {
+    margin: 0.35rem 0 0;
+    color: #64748b;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  .efeonce-meeting-fallback {
+    min-height: 2.35rem;
+    border: 1px solid rgba(3, 117, 219, 0.16);
+    padding: 0.56rem 0.78rem;
+    color: #0375db;
+    background: rgba(3, 117, 219, 0.055);
+    font-size: 0.78rem;
+    font-weight: 720;
+    white-space: nowrap;
+  }
+
+  .efeonce-meeting-close {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 2.35rem;
+    height: 2.35rem;
+    border: 1px solid rgba(15, 33, 53, 0.12);
+    border-radius: 999px;
+    background: #ffffff;
+    color: #0f2135;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(2, 60, 112, 0.08);
+  }
+
+  .efeonce-meeting-close svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 2;
+  }
+
+  .efeonce-meeting-close:hover {
+    border-color: rgba(3, 117, 219, 0.28);
+    color: #0375db;
+  }
+
+  .efeonce-meeting-close:focus-visible {
+    outline: 2px solid rgba(3, 117, 219, 0.72);
+    outline-offset: 3px;
+  }
+
+  .efeonce-meeting-host {
+    position: relative;
+    min-height: 700px;
+    overflow: hidden;
+    border-top: 1px solid rgba(224, 231, 255, 0.9);
+    background: #f8fbff;
+  }
+
+  .efeonce-meeting-panel.is-overlay .efeonce-meeting-host {
+    height: min(760px, calc(100dvh - 11rem));
+    min-height: 620px;
+    border-top: 0;
+  }
+
+  .efeonce-meeting-host :global(iframe) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    border: 0 !important;
+  }
+
+  .efeonce-meeting-skeleton {
+    position: absolute;
+    inset: 1rem;
+    border-radius: 1rem;
+    background:
+      linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.78), transparent) -45% 0 / 42% 100% no-repeat,
+      linear-gradient(180deg, rgba(3, 117, 219, 0.11), rgba(3, 117, 219, 0.045));
+    animation: efeonceMeetingSkeleton 1.35s ease-in-out infinite;
+  }
+
+  .efeonce-meeting-host.is-loaded .efeonce-meeting-skeleton {
+    display: none;
+  }
+
+  .efeonce-meeting-host.is-failed::after {
+    content: "No pudimos cargar el calendario dentro de la pagina. Usa el enlace directo de HubSpot.";
+    position: absolute;
+    inset: 1rem;
+    display: grid;
+    place-items: center;
+    border: 1px dashed rgba(3, 117, 219, 0.28);
+    border-radius: 1rem;
+    padding: 1rem;
+    color: #475569;
+    background: rgba(255, 255, 255, 0.92);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  @keyframes efeonceMeetingSkeleton {
+    0% {
+      background-position: -45% 0, 0 0;
+    }
+    100% {
+      background-position: 145% 0, 0 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .efeonce-meeting-panel.is-overlay {
+      display: block;
+      padding: 0;
+    }
+
+    .efeonce-meeting-panel.is-overlay .efeonce-meeting-dialog {
+      width: 100%;
+      max-height: none;
+      overflow: visible;
+      min-height: 100dvh;
+      border: 0;
+      border-radius: 0;
+    }
+
+    .efeonce-meeting-panel-head {
+      grid-template-columns: 1fr;
+    }
+
+    .efeonce-meeting-panel.is-overlay .efeonce-meeting-panel-head {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #f8fbff;
+    }
+
+    .efeonce-meeting-panel.is-overlay .efeonce-meeting-panel-head p:not(.efeonce-meeting-kicker),
+    .efeonce-meeting-panel.is-overlay .efeonce-meeting-fallback {
+      display: none;
+    }
+
+    .efeonce-meeting-panel-actions {
+      align-self: start;
+    }
+
+    .efeonce-meeting-fallback {
+      width: 100%;
+      white-space: normal;
+    }
+
+    .efeonce-meeting-host {
+      min-height: 760px;
+    }
+
+    .efeonce-meeting-panel.is-overlay .efeonce-meeting-host {
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+    }
+
+    .efeonce-meeting-panel.is-overlay .efeonce-meeting-host :global(iframe) {
+      height: max(1720px, 200dvh) !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .efeonce-meeting-trigger,
+    .efeonce-meeting-skeleton {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    .efeonce-meeting-trigger:hover {
+      transform: none !important;
+    }
+  }
+
+  :global(html.efeonce-meeting-lock-scroll),
+  :global(html.efeonce-meeting-lock-scroll body) {
+    overflow: hidden !important;
+  }
+</style>

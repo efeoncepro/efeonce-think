@@ -113,6 +113,20 @@ check('22. WCAG 2.1.1 — el <pre> scrolleable es enfocable por teclado', preAll
 // 23. Sin JS el hover no produce nada: el copy no puede prometerlo.
 check('23. Sin JS, el hint NO promete interactividad (viene hidden)', /class="hint[^"]*"[^>]*hidden|hidden[^>]*class="hint/.test(html))
 
+/* 25-27. 🔴 CORE WEB VITALS. La pieza ARGUMENTA rigor técnico: si el comité (o su área de
+   TI) le corre un PageSpeed y sale mal, se cae todo lo demás. Las imágenes vivían en
+   `public/`, que SALTA el pipeline de Astro: sin width/height (CLS), sin srcset (el teléfono
+   bajaba los 527 KB del hero) y sin AVIF. */
+const artImgs = (html.match(/<img[^>]*_astro[^>]*>/g) ?? [])
+const withDims = artImgs.filter(t => /\swidth="\d+"/.test(t) && /\sheight="\d+"/.test(t))
+check('25. Toda imagen del artículo declara width y height (sin eso: CLS)', artImgs.length > 0 && withDims.length === artImgs.length, `${withDims.length}/${artImgs.length}`)
+
+const withSrcset = artImgs.filter(t => t.includes('srcset='))
+check('26. Toda imagen sirve srcset (un teléfono no puede bajar el hero de escritorio)', withSrcset.length === artImgs.length, `${withSrcset.length}/${artImgs.length}`)
+
+const modern = artImgs.filter(t => /\.avif|\.webp/.test(t))
+check('27. Formato moderno (AVIF/WebP), no JPEG crudo', modern.length === artImgs.length, `${modern.length}/${artImgs.length}`)
+
 // 8. Sin JS: el contenido sigue ahí (es HTML estático — se verifica sobre el mismo string)
 const degrada =
   html.includes('Carretera Austral') && html.includes('FAQPage') && html.includes('Semrush')
@@ -269,6 +283,32 @@ try {
   // Mobile
   // hasTouch + isMobile: sin esto Chromium reporta `hover: hover` en un viewport de 390px y
   // la captura miente — mostraría "Pasa el cursor" en un teléfono, que no tiene cursor.
+  /* 28-29. La transferencia REAL, no el peso en disco: el navegador baja UNA variante por
+     imagen. Antes el móvil se tragaba 1,5 MB de JPEG pensados para escritorio. */
+  const cwv = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 })
+  let imgBytes = 0
+  cwv.on('response', async r => {
+    try {
+      if ((r.headers()['content-type'] ?? '').startsWith('image')) imgBytes += (await r.body()).length
+    } catch {}
+  })
+  await cwv.goto(`${BASE}${ROUTE}`, { waitUntil: 'networkidle' })
+  const imgKb = Math.round(imgBytes / 1024)
+  check('28. En móvil, las imágenes pesan < 200 KB transferidos', imgKb < 200, `${imgKb} KB`)
+
+  const cls = await cwv.evaluate(
+    () =>
+      new Promise(res => {
+        let v = 0
+        new PerformanceObserver(l => {
+          for (const e of l.getEntries()) if (!e.hadRecentInput) v += e.value
+        }).observe({ type: 'layout-shift', buffered: true })
+        setTimeout(() => res(Number(v.toFixed(4))), 1200)
+      }),
+  )
+  check('29. CLS ≤ 0.1 (el umbral «good» de Core Web Vitals)', cls <= 0.1, `CLS=${cls}`)
+  await cwv.close()
+
   const m = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
   await m.goto(`${BASE}${ROUTE}`, { waitUntil: 'networkidle' })
   const mScroll = await m.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
@@ -279,6 +319,27 @@ try {
   check('16. En táctil el copy no habla de cursor', hintVisible && !hint.includes('cursor'), hint.slice(0, 40))
   await m.screenshot({ path: `${OUT}/hero-mobile.png` })
   await m.screenshot({ path: `${OUT}/full-mobile.png`, fullPage: true })
+
+  /* 30. 🔴 EL ACOPLAMIENTO TIENE QUE EXISTIR EN MÓVIL.
+     Apilado, el instrumento queda a DIEZ PANTALLAS del artículo: tocabas un bloque, se
+     encendía el chip «↓ 3 datos»… y no pasaba nada más. El argumento central de la pieza
+     simplemente NO EXISTÍA en un teléfono. Ahora el instrumento sube como hoja inferior.
+     Y se mide con getBoundingClientRect, NO con isVisible(): `isVisible` solo mira el CSS
+     y devolvía `true` para un nodo que estaba diez pantallas fuera de la vista. */
+  await m.locator('[data-couple="table-entradas"]').first().scrollIntoViewIfNeeded()
+  await m.waitForTimeout(250)
+  await m.locator('[data-couple="table-entradas"]').first().tap()
+  await m.waitForTimeout(800)
+  const inView = await m
+    .locator('[data-couple-target="table-entradas"][data-on]')
+    .first()
+    .evaluate(el => {
+      const r = el.getBoundingClientRect()
+
+      return r.top >= 0 && r.bottom <= window.innerHeight && r.height > 0
+    })
+  check('30. En móvil, al tocar un bloque el dato acoplado ENTRA al viewport (hoja inferior)', inView)
+  await m.screenshot({ path: `${OUT}/mobile-sheet.png` })
   await m.close()
 } finally {
   await browser.close()
