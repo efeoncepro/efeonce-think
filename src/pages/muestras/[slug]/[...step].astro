@@ -432,7 +432,7 @@ const titles: Record<string, string> = {
   .g-punch-b { margin-top: 0.7rem; font-size: var(--t-body); line-height: 1.6; color: var(--dim-d); max-width: 60ch; }
   .g-aside {
     margin-top: 1rem; padding: 0.8rem 0.9rem; font-size: var(--t-meta); line-height: 1.55;
-    color: #33475b; background: #f7f9fb; border: 1px dashed var(--line); border-radius: 8px;
+    color: var(--ink-2); background: var(--surf); border: 1px dashed var(--line); border-radius: 8px;
   }
 
   /* ══════════ ③ LA RADIOGRAFÍA ══════════ */
@@ -449,7 +449,7 @@ const titles: Record<string, string> = {
   }
 
   /* ══════════ ④ DÓNDE MÁS VIVE ══════════ */
-  .at-intro { margin-top: 1rem; font-size: 1.125rem; line-height: 1.65; color: #2c3e50; max-width: 68ch; }
+  .at-intro { margin-top: 1rem; font-size: 1.125rem; line-height: 1.65; color: var(--ink-2); max-width: 68ch; }
   .at-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-top: 2rem; }
   @media (min-width: 980px) { .at-grid { grid-template-columns: repeat(3, 1fr); align-items: start; } }
 
@@ -504,14 +504,14 @@ const titles: Record<string, string> = {
   }
   .atom-code summary:hover { color: var(--blue-up); }
   .atom-code pre {
-    margin-top: 0.6rem; padding: 0.65rem; background: #04101d; color: #cfe3f5;
+    margin-top: 0.6rem; padding: 0.65rem; background: var(--navy-sunk); color: var(--code-d);
     border: 1px solid var(--line-d); border-radius: 7px; font-size: 0.6875rem; line-height: 1.55;
     overflow-x: auto; max-height: 16rem;
   }
   .atom-hon {
     margin-top: 1rem; padding: 0.7rem 0.8rem; font-size: var(--t-meta); line-height: 1.55;
-    color: #ffd166; background: color-mix(in srgb, #ffd166 8%, var(--navy-2));
-    border: 1px solid color-mix(in srgb, #ffd166 25%, var(--navy-2)); border-radius: 8px;
+    color: var(--amber); background: color-mix(in srgb, var(--amber) 8%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--amber) 25%, var(--navy-2)); border-radius: 8px;
   }
   .at-close {
     margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);

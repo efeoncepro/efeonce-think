@@ -57,6 +57,9 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
+      '@fontsource-variable/assistant':
+        specifier: ^5.2.9
+        version: 5.2.9
       '@types/node':
         specifier: ^24.12.2
         version: 24.13.2
@@ -527,6 +530,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fontsource-variable/assistant@5.2.9':
+    resolution: {integrity: sha512-O7ipeZX2h3kd+gFYo+qcmUi/PjIbgDKkVT7/ZhFKlt9XH++Nr0fPpkmZq2fPOWQazjZG6exdW2K5x8rAIhZuTA==}
 
   '@fontsource-variable/geist@5.2.9':
     resolution: {integrity: sha512-TP+QSBG3wxKGPE33CbMy/L0Nu3qvJ6Fy81Yc4LnQ95xH+i+cfEp8fyU8/kfV14YwszxIFPhnoMTbjL71waVpyQ==}
@@ -2898,6 +2904,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.1':
     optional: true
+
+  '@fontsource-variable/assistant@5.2.9': {}
 
   '@fontsource-variable/geist@5.2.9': {}
 

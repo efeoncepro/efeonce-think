@@ -37,6 +37,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@fontsource-variable/assistant": "^5.2.9",
     "@types/node": "^24.12.2",
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.2",

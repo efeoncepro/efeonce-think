@@ -91,19 +91,58 @@
    TOKENS
    ══════════════════════════════════════════════════════════════════════════ */
 .xr {
-  --navy: #001a33;
-  --navy-2: #08203a;
-  --navy-3: #0e2c4b;
-  --line-d: #1b3c5e;
-  --blue: #0375db;
-  --blue-up: #58aef5; /* el azul de marca no llega a 4.5:1 sobre navy; sobre oscuro va el levantado */
-  --ink-d: #e9f0f7;
-  --dim-d: #9db4cb;
-  --mint: #62f0df;
+  /* ── AXIS · la rampa de marca (verbatim del SoT) ────────────────────────────
+     Fuente: greenhouse-eo → src/@core/theme/axis-tokens.ts (Figma AXIS
+     yyMksCoijfMaIoYplXKZaR, nodo 11205:5341). Estos son los ÚNICOS hex de marca
+     que se escriben acá; TODO lo demás se deriva de ellos.
 
-  --ink: #0d1b2a;
-  --muted: #5a6b7d;
+     ⚠️ El navy de Efeonce NO es un color aparte: es el peldaño 800/900 de la
+     rampa del acento. El propio token lo dice — «navy = accent-800 #023c70
+     (misma familia, NO hue aparte)». Un navy inventado (era #001a33: rgb 0,26,51,
+     casi negro-azul) no es un tono más oscuro de la marca — es OTRA marca. */
+  --ax-primary-100: #cfe4fa;
+  --ax-primary-300: #6facf0;
+  --ax-primary-500: #0375db; /* el acento */
+  --ax-primary-700: #024c8f;
+  --ax-primary-800: #023c70; /* «el navy» que nombra AXIS */
+  --ax-primary-900: #00284d;
+  --ax-success-300: #8fd3ae;
+  --ax-warning-100: #ffd773;
+
+  /* ── Zona EFEONCE (chrome · instrumento · tarjetas navy): superficies derivadas
+     Elevación sobre oscuro = superficie MÁS CLARA. Los intermedios se mezclan
+     entre peldaños AXIS: siguen siendo AXIS, no hex nuevos. */
+  --navy: var(--ax-primary-900); /* el lienzo */
+  --navy-2: color-mix(in srgb, var(--ax-primary-800) 45%, var(--ax-primary-900)); /* elevación 1 */
+  --navy-3: color-mix(in srgb, var(--ax-primary-800) 80%, var(--ax-primary-900)); /* elevación 2 · borde */
+  --navy-sunk: color-mix(in srgb, var(--ax-primary-900) 55%, black); /* el bloque de código: hundido, no elevado */
+  --line-d: var(--ax-primary-700); /* divisores internos */
+
+  --blue: var(--ax-primary-500);
+  /* El acento (500) da 3,24:1 sobre el navy y NO pasa AA. Sobre oscuro va el 300
+     de la misma rampa: 6,26:1. Es el mismo azul, no otro azul. */
+  --blue-up: var(--ax-primary-300);
+  --mint: var(--ax-success-300); /* el ✓ de cobertura — 8,58:1 */
+  --amber: var(--ax-warning-100); /* los bloques de honestidad — 10,79:1 */
+
+  /* Texto sobre navy: se desatura hacia el NAVY, no hacia el acento. Mezclarlo con
+     el 500 daría un celeste saturado que COMPITE con el color de enlace. */
+  --ink-d: color-mix(in srgb, white 93%, var(--ax-primary-900)); /* 13,0:1 */
+  --dim-d: color-mix(in srgb, white 64%, var(--ax-primary-900)); /* 6,9:1 */
+  --code-d: var(--ax-primary-100);
+
+  /* ── Zona CLIENTE (el artículo): neutrales editoriales + el acento del cliente.
+     Deliberadamente NO lleva navy Efeonce: es la simulación del blog del cliente,
+     y teñirlo con nuestra marca sería mentir sobre cómo se vería publicado. */
+  --ink: #0d1b2a; /* titulares */
+  --ink-2: #2c3e50; /* cuerpo */
+  --ink-3: #4a5c6e; /* secundario */
+  --muted: #5a6b7d; /* meta */
+  --faint: #7c8fa3; /* créditos */
   --line: #e2e8f0;
+  --line-2: #cbd5e1;
+  --surf: #f7f9fb; /* cabecera de tabla */
+  --surf-2: #eef2f6;
   --tint-c: color-mix(in srgb, var(--client) 7%, white);
 
   /* Escala desde una razón (base 16 × 1.25). Seis tamaños dentro de 4px no es una escala. */
@@ -131,6 +170,22 @@
   --w-body: 400; /* Geist sobre claro */
   --w-body-dark: 500; /* Geist sobre navy — el MISMO peso óptico */
   --w-label: 600; /* Geist — rótulos, th, overlines */
+
+  /* ── Tipografía del CLIENTE — SOLO dentro del artículo ─────────────────────
+     El artículo NO es una pieza de Efeonce: es la SIMULACIÓN de cómo se vería
+     publicado en el blog del cliente. Ponerle Poppins es la misma mentira que
+     teñirlo con nuestro navy — muestra un resultado que el cliente nunca vería.
+     Un mockup que no usa la tipografía del cliente no es un mockup: es un ejemplo.
+
+     SKY (blog.skyairline.com) usa UNA familia —Assistant— y solo dos pesos:
+     700 en titulares, 400 en cuerpo a 18px. No inventamos un tercer peso.
+
+     ⚠️ FRONTERA: Assistant vive SOLO bajo `.xr-article`. El chrome, el riel, el
+     instrumento y las pantallas ① y ④ son EFEONCE y siguen en Poppins + Geist.
+     Este par es un DATO del cliente — cuando la muestra sea de otro, cambia acá. */
+  --client-font: 'Assistant Variable', Assistant, system-ui, sans-serif;
+  --w-client-title: 700;
+  --w-client-body: 400;
 
   --dur: 140ms;
   --ease: cubic-bezier(0.2, 0, 0, 1);

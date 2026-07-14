@@ -168,9 +168,9 @@ const asText = (code: unknown) =>
   }
   .grp em { font-style: normal; font-weight: var(--w-body-dark); color: var(--dim-d); text-transform: none; letter-spacing: 0.04em; }
   .warn {
-    font-size: var(--t-meta); line-height: 1.5; color: #ffd166;
-    background: color-mix(in srgb, #ffd166 10%, var(--navy-2));
-    border: 1px solid color-mix(in srgb, #ffd166 30%, var(--navy-2));
+    font-size: var(--t-meta); line-height: 1.5; color: var(--amber);
+    background: color-mix(in srgb, var(--amber) 10%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--amber) 30%, var(--navy-2));
     border-radius: 7px; padding: 0.55rem 0.65rem; margin-bottom: 0.7rem;
   }
 
@@ -220,7 +220,7 @@ const asText = (code: unknown) =>
   .sch summary:hover { color: var(--blue-up); }
   .sch summary:focus-visible { outline: 2px solid var(--blue-up); outline-offset: 2px; border-radius: 4px; }
   .sch pre {
-    margin-top: 0.6rem; padding: 0.65rem; background: #04101d; color: #cfe3f5;
+    margin-top: 0.6rem; padding: 0.65rem; background: var(--navy-sunk); color: var(--code-d);
     border: 1px solid var(--line-d); border-radius: 7px; font-size: 0.6875rem; line-height: 1.55;
     overflow-x: auto; max-height: 20rem; max-width: 100%;
   }

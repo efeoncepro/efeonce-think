@@ -323,6 +323,34 @@ try {
     dark?.w === 500,
     `.nd-v=${dark?.w}`,
   )
+
+  /* 38-39. LA FRONTERA DE LAS DOS ZONAS.
+     El artículo es la SIMULACIÓN del blog del cliente: si no habla en la tipografía del
+     cliente, no es un mockup — es un ejemplo, y le muestra al comité un resultado que
+     nunca vería publicado. Y al revés: el análisis es NUESTRO y no puede hablar con la
+     voz del cliente. Si alguien borra la frontera, nada falla: se ve "bien" y MIENTE. */
+  const zones = await page.evaluate(() => {
+    const fam = s => {
+      const e = document.querySelector(s)
+
+      return e ? getComputedStyle(e).fontFamily.split(',')[0].replace(/['"]/g, '') : null
+    }
+
+    return {
+      articulo: ['.p-h1', '.p-h2', '.para', '.cap p'].map(fam),
+      efeonce: ['.stat', '.nd-v', '.xr-brand-t', '.sp-head h2'].map(fam),
+    }
+  })
+  check(
+    '38. El artículo habla en la tipografía del CLIENTE (Assistant), no en la nuestra',
+    zones.articulo.length > 0 && zones.articulo.every(f => f?.startsWith('Assistant')),
+    zones.articulo.join(' · '),
+  )
+  check(
+    '39. El instrumento y el chrome hablan en la de EFEONCE — Assistant no cruza la frontera',
+    zones.efeonce.length > 0 && zones.efeonce.every(f => f && !f.startsWith('Assistant')),
+    zones.efeonce.join(' · '),
+  )
   await page.close()
 
   // Reduced motion
