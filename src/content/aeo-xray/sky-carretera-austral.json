@@ -1134,31 +1134,31 @@
   "atoms": [
     {
       "id": "video",
-      "coupleId": "h2-como-llegar",
-      "kind": "Video simple",
-      "bornFrom": "Del H2 «¿Cómo se llega a la Carretera Austral?»",
+      "coupleId": "list-itinerario",
+      "kind": "Video + Reel",
+      "bornFrom": "Del itinerario — día 4, Capillas de Mármol",
       "stat": "16%",
       "statNote": "de las respuestas con IA citan YouTube; a Reddit lo citan en el 10%. Es la plataforma social más citada. Y lo que un motor lee de un video es su TRANSCRIPCIÓN — por eso el guion y la transcripción SON el entregable, no un extra",
       "source": "Adweek — dato de Bluefish; agregación de 4 firmas (Bluefish, Emberos, Goodie AI, Profound)",
       "asOf": "2026-01",
-      "why": "El video no es «contenido extra»: es un canal de búsqueda en sí mismo. Un video con título, descripción y transcripción es RECUPERABLE — un motor lo puede citar igual que a una página. Y es donde el pasajero busca «cómo es la Carretera Austral» antes de comprar el pasaje.",
-      "honesty": "Así se entrega el video: guion, título, descripción, miniatura y datos estructurados. La producción va en el mes 1 — esta muestra especifica el entregable, no lo simula.",
+      "why": "El video no es «contenido extra»: es un canal de búsqueda en sí mismo. El master horizontal cubre la historia completa; el Reel 9:16 toma el momento que el pasajero guarda y manda — navegar a Capillas de Mármol desde Puerto Río Tranquilo. Ambos son recuperables si tienen título, descripción y transcripción.",
+      "honesty": "Este preview es IA ilustrativa para mostrar el formato, no material oficial de SKY. El entregable real lleva guion, subtítulos/transcripción, miniatura, disclosure editorial y datos estructurados.",
       "deliverable": [
         {
           "k": "Título",
-          "v": "Carretera Austral: vuela a Balmaceda y arrienda ahí (te saltas 2 transbordadores)"
+          "v": "Carretera Austral en 7 días: Balmaceda, Cerro Castillo y Capillas de Mármol"
         },
         {
           "k": "Duración",
-          "v": "60–90 s · vertical y horizontal"
+          "v": "Master horizontal 16:9 + Reel vertical 9:16"
         },
         {
           "k": "Descripción",
-          "v": "La forma más rápida de empezar la Carretera Austral es volar a Balmaceda, el aeropuerto de Coyhaique, y arrendar en el mismo terminal. Te saltas los tramos más largos y los dos transbordadores del norte. Vuelos a Balmaceda con SKY."
+          "v": "La ruta puede empezar por Balmaceda y seguir por Cerro Castillo hasta Puerto Río Tranquilo, donde las Capillas de Mármol se recorren en navegación o kayak guiado. Un artículo se convierte en master de video y en Reel sin perder la trazabilidad del itinerario."
         },
         {
           "k": "Guion",
-          "v": "1) El mapa: 1.247 km entre Puerto Montt y Villa O'Higgins. 2) El problema: los dos transbordadores del tramo norte. 3) El atajo: Balmaceda, a 56 km de Coyhaique. 4) El auto en el terminal. 5) Cerro Castillo, la primera parada."
+          "v": "1) Llegar por Balmaceda. 2) Primera parada: Cerro Castillo. 3) Puerto Río Tranquilo. 4) Navegación o kayak guiado a Capillas de Mármol. 5) Volver al artículo para armar el tramo completo."
         },
         {
           "k": "Transcripción",
@@ -1169,13 +1169,22 @@
         "src": "/muestras/sky-carretera-austral/carretera-austral-capillas-kayak-omni.mp4",
         "poster": "/muestras/sky-carretera-austral/carretera-austral-capillas-kayak-omni-poster.jpg",
         "alt": "Dos viajeros navegan en kayak frente a las Capillas de Mármol como muestra ilustrativa de video para la Carretera Austral.",
-        "label": "Muestra 10 s · Omni",
+        "label": "Master 16:9 · Omni 10 s",
+        "disclosure": "IA ilustrativa"
+      },
+      "reel": {
+        "src": "/muestras/sky-carretera-austral/carretera-austral-capillas-kayak-reel-omni-native-9x16.mp4",
+        "poster": "/muestras/sky-carretera-austral/carretera-austral-capillas-kayak-reel-omni-native-9x16-poster.jpg",
+        "alt": "Reel vertical generado con Gemini Omni: dos viajeros navegan en kayak frente a las Capillas de Mármol.",
+        "label": "Reel 9:16 · Omni nativo 10 s",
+        "title": "Capillas de Mármol en formato Reel",
+        "description": "La misma escena se produce para feed vertical, sin reciclar el master horizontal: otro encuadre, otro consumo, la misma trazabilidad del artículo.",
         "disclosure": "IA ilustrativa"
       },
       "code": {
         "@type": "VideoObject",
-        "name": "Carretera Austral: vuela a Balmaceda y arrienda ahí",
-        "description": "La forma más rápida de empezar la Carretera Austral es volar a Balmaceda y arrendar en el terminal: te saltas los dos transbordadores del tramo norte.",
+        "name": "Carretera Austral en 7 días: Balmaceda, Cerro Castillo y Capillas de Mármol",
+        "description": "Itinerario audiovisual para explicar cómo entrar por Balmaceda y llegar a Puerto Río Tranquilo para recorrer las Capillas de Mármol.",
         "uploadDate": "2026-07-15",
         "duration": "PT1M20S",
         "thumbnailUrl": "https://blog.skyairline.com/wp-content/uploads/carretera-austral-thumb.jpg",

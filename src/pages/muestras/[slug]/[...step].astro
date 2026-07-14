@@ -331,6 +331,19 @@ const titles: Record<string, string> = {
                           <strong>{codeField(a.code, 'name') || a.kind}</strong>
                         </div>
                       </div>
+                      {a.reel && (
+                        <div class="reel-artifact" data-capture="atom-video-reel">
+                          <div class="reel-phone">
+                            <video class="reel-preview" src={a.reel.src} poster={a.reel.poster} muted playsinline loop autoplay preload="metadata" aria-label={a.reel.alt}></video>
+                            {a.reel.disclosure && <span class="video-disclosure">{a.reel.disclosure}</span>}
+                          </div>
+                          <div class="reel-copy">
+                            <span>{a.reel.label || 'Reel vertical 9:16'}</span>
+                            <strong>{a.reel.title || 'Reel vertical'}</strong>
+                            {a.reel.description && <p>{a.reel.description}</p>}
+                          </div>
+                        </div>
+                      )}
                       <div class="video-script">
                         <span>Guion + transcripción</span>
                         <p>{deliverableValue(a, /guion/i) || codeField(a.code, 'description')}</p>
@@ -1070,6 +1083,34 @@ const titles: Record<string, string> = {
     display: block; margin-top: 0.2rem; font-family: Poppins, system-ui, sans-serif;
     font-size: 1rem; line-height: 1.25; color: #fff;
   }
+  .reel-artifact {
+    display: grid; grid-template-columns: minmax(7.5rem, 0.48fr) minmax(0, 1fr); gap: 0.8rem; align-items: center;
+    padding: 0.7rem; border-radius: 12px;
+    background: color-mix(in srgb, var(--blue-up) 7%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--blue-up) 22%, var(--navy-3));
+  }
+  .reel-phone {
+    position: relative; overflow: hidden; width: 100%; max-width: 10.25rem; justify-self: center;
+    border-radius: 13px; background: var(--navy-sunk);
+    border: 1px solid color-mix(in srgb, #fff 15%, transparent);
+    box-shadow: 0 18px 40px color-mix(in srgb, #000 24%, transparent);
+  }
+  .reel-preview {
+    display: block; width: 100%; aspect-ratio: 9 / 16; object-fit: cover;
+    background: var(--navy-sunk); filter: saturate(1.05) contrast(1.02);
+  }
+  .reel-copy { min-width: 0; }
+  .reel-copy span {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0; text-transform: uppercase; color: var(--blue-up);
+  }
+  .reel-copy strong {
+    display: block; margin-top: 0.25rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: clamp(1rem, 2.1vw, 1.25rem); line-height: 1.22; color: #fff;
+  }
+  .reel-copy p {
+    margin-top: 0.45rem; font-size: var(--t-meta); line-height: 1.5; color: var(--dim-d);
+  }
   .video-script {
     padding: 0.75rem 0.85rem; border-radius: 10px; background: color-mix(in srgb, var(--blue-up) 8%, var(--navy-2));
     border: 1px solid color-mix(in srgb, var(--blue-up) 24%, var(--navy-3));
@@ -1081,6 +1122,10 @@ const titles: Record<string, string> = {
   .video-script p {
     margin-top: 0.35rem; font-size: var(--t-meta); line-height: 1.45; color: var(--ink-d);
     display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  @media (max-width: 560px) {
+    .reel-artifact { grid-template-columns: 1fr; }
+    .reel-phone { max-width: min(14rem, 82vw); }
   }
 
   .atom-d { margin-top: 1rem; display: grid; grid-template-columns: 1fr; gap: 0.15rem; }

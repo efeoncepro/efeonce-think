@@ -427,6 +427,17 @@ const aeoXray = defineCollection({
               disclosure: z.string().optional(),
             })
             .optional(),
+          reel: z
+            .object({
+              src: z.string().min(1),
+              poster: z.string().min(1),
+              alt: z.string().min(10),
+              label: z.string().optional(),
+              title: z.string().optional(),
+              description: z.string().optional(),
+              disclosure: z.string().optional(),
+            })
+            .optional(),
           /* ¿Este átomo EXHIBE las imágenes del artículo? El átomo de imágenes argumentaba sobre
              los `alt` y no mostraba ni una foto: dos átomos demostraban y uno solo afirmaba. Es DATO
              del payload — el motor no puede saber cuál es «el de imágenes» sin conocer al cliente. */
