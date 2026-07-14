@@ -262,6 +262,8 @@
         "type": "faq",
         "coupleId": "faq",
         "title": "Preguntas frecuentes",
+        "anchor": "preguntas-frecuentes",
+        "short": "Preguntas frecuentes",
         "items": [
           {
             "q": "¿Cuánto mide la Carretera Austral?",
@@ -356,8 +358,8 @@
         "id": "meta-description",
         "coupleId": "capsule-main",
         "label": "Meta description",
-        "value": "Vuela a Balmaceda y arrienda ahí: te saltas los tres transbordadores del norte. Cuántos días necesitas, cuándo ir y si hace falta un 4x4.",
-        "detail": "137 caracteres",
+        "value": "Vuela a Balmaceda y arrienda ahí: te saltas los dos transbordadores del norte. Cuántos días necesitas, cuándo ir y si hace falta un 4x4.",
+        "detail": "136 caracteres",
         "why": "Es la cápsula de respuesta comprimida. Adelanta el dato accionable en vez de describir el artículo.",
         "tier": 2
       },
@@ -383,7 +385,7 @@
         "id": "og-image",
         "coupleId": "img-hero",
         "label": "og:image",
-        "value": "/muestras/sky-carretera-austral/carretera-austral-ruta7.jpg",
+        "value": "https://blog.skyairline.com/wp-content/uploads/capillas-de-marmol-general-carrera.jpg",
         "tier": 3
       },
       {
@@ -522,7 +524,7 @@
             "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#webpage"
           },
           "headline": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas",
-          "description": "Vuela a Balmaceda y arrienda ahí: te saltas los tres transbordadores del norte. Cuántos días necesitas, cuándo ir y si hace falta un 4x4.",
+          "description": "Vuela a Balmaceda y arrienda ahí: te saltas los dos transbordadores del norte. Cuántos días necesitas, cuándo ir y si hace falta un 4x4.",
           "datePublished": "2026-07-15",
           "dateModified": "2026-07-15",
           "inLanguage": "es-CL",
@@ -710,6 +712,13 @@
       },
       {
         "coupleId": "capsule-como-llegar",
+        "label": "Cápsula de respuesta",
+        "detail": "51 palabras · «¿Cómo llego?»",
+        "why": "Es la cápsula que más importa: responde la pregunta que abre el viaje, y la responde con el ángulo que solo SKY puede dar. Si el motor extrae un pasaje de este artículo, lo más probable es que sea éste — por eso está escrito para viajar solo, sin el resto de la página.",
+        "tier": 2
+      },
+      {
+        "coupleId": "capsule-como-llegar",
         "label": "Datos con unidad y fuente",
         "detail": "1.247 km · 56 km · 40 min · 5 h",
         "tier": 1,
@@ -720,7 +729,7 @@
       {
         "coupleId": "toc",
         "label": "Índice con anclas",
-        "detail": "5 secciones · #anchor por H2",
+        "detail": "6 secciones · #anchor por H2",
         "why": "Un índice no es decoración. Le da al lector un mapa en dos segundos —y baja el rebote— y le da al motor un ancla por sección. Un motor de respuesta recupera PASAJES, no páginas: cada ancla es una dirección a la que puede apuntar. Además es lo que le permite a Google mostrar enlaces a secciones dentro del resultado. ⚠️ Como con el FAQ, eso se declara, no se promete.",
         "tier": 2
       },
@@ -985,23 +994,25 @@
     ],
     "punch": "Cero aerolíneas. Y SKY es la que vuela a Balmaceda, el aeropuerto de entrada.",
     "punchNote": "Wikipedia, Instagram y TripAdvisor describen la ruta, la fotografían y la reseñan. Ninguna resuelve la logística de llegada — que es lo primero que pregunta quien de verdad va a ir. Y ninguna puede: no son la aerolínea.",
-    "aside": "SKY ya tiene una página del tema publicada, y aun así no aparece en las primeras cien posiciones."
+    "aside": "SKY ya tiene una página del tema publicada, y aun así no aparece en las primeras cien posiciones. Este artículo no viene a reescribirla: responde otra pregunta —cómo llegar y cómo recorrerla— y enlaza de vuelta a ella. No compite con la página que ya existe: la apuntala."
   },
-  "atomsIntro": "Su oferta dice, textual: «no entregamos un artículo que vive en una URL». Esto es lo que significa. Cada pieza de abajo nace del artículo que acaba de leer, y cada una abre una superficie distinta donde un motor de respuesta puede encontrar a SKY.",
+  "atomsIntro": "Nuestra oferta dice, textual: «no entregamos un artículo que vive en una URL». Esto es lo que significa. Cada pieza de abajo nace del artículo que acaba de leer, y cada una abre una superficie distinta donde un motor de respuesta puede encontrar a SKY.",
   "atoms": [
     {
       "id": "video",
       "coupleId": "h2-como-llegar",
       "kind": "Video simple",
       "bornFrom": "Del H2 «¿Cómo se llega a la Carretera Austral?»",
-      "stat": "#1",
-      "statNote": "YouTube superó a Reddit como la plataforma social más citada por los motores de respuesta",
+      "stat": "16%",
+      "statNote": "de las respuestas con IA citan YouTube; a Reddit lo citan en el 10%. Es la plataforma social más citada — y la superó porque los motores leen la transcripción, no el video",
+      "source": "AI Platform Citation Source Index 2026 — 680 millones de citas, 6 estudios independientes (vía Adweek)",
+      "asOf": "2026-04",
       "why": "El video no es «contenido extra»: es un canal de búsqueda en sí mismo. Un video con título, descripción y transcripción es RECUPERABLE — un motor lo puede citar igual que a una página. Y es donde el pasajero busca «cómo es la Carretera Austral» antes de comprar el pasaje.",
       "honesty": "Así se entrega el video: guion, título, descripción, miniatura y datos estructurados. La producción va en el mes 1 — esta muestra especifica el entregable, no lo simula.",
       "deliverable": [
         {
           "k": "Título",
-          "v": "Carretera Austral: vuela a Balmaceda y arrienda ahí (te saltas 3 transbordadores)"
+          "v": "Carretera Austral: vuela a Balmaceda y arrienda ahí (te saltas 2 transbordadores)"
         },
         {
           "k": "Duración",
@@ -1009,11 +1020,11 @@
         },
         {
           "k": "Descripción",
-          "v": "La forma más rápida de empezar la Carretera Austral es volar a Balmaceda, el aeropuerto de Coyhaique, y arrendar en el mismo terminal. Te saltas los tramos más largos y los tres transbordadores del norte. Vuelos a Balmaceda con SKY."
+          "v": "La forma más rápida de empezar la Carretera Austral es volar a Balmaceda, el aeropuerto de Coyhaique, y arrendar en el mismo terminal. Te saltas los tramos más largos y los dos transbordadores del norte. Vuelos a Balmaceda con SKY."
         },
         {
           "k": "Guion",
-          "v": "1) El mapa: 1.247 km entre Puerto Montt y Villa O'Higgins. 2) El problema: los tres transbordadores del tramo norte. 3) El atajo: Balmaceda, a 56 km de Coyhaique. 4) El auto en el terminal. 5) Cerro Castillo a dos horas."
+          "v": "1) El mapa: 1.247 km entre Puerto Montt y Villa O'Higgins. 2) El problema: los dos transbordadores del tramo norte. 3) El atajo: Balmaceda, a 56 km de Coyhaique. 4) El auto en el terminal. 5) Cerro Castillo a dos horas."
         },
         {
           "k": "Transcripción",
@@ -1023,7 +1034,7 @@
       "code": {
         "@type": "VideoObject",
         "name": "Carretera Austral: vuela a Balmaceda y arrienda ahí",
-        "description": "La forma más rápida de empezar la Carretera Austral es volar a Balmaceda y arrendar en el terminal: te saltas los tres transbordadores del tramo norte.",
+        "description": "La forma más rápida de empezar la Carretera Austral es volar a Balmaceda y arrendar en el terminal: te saltas los dos transbordadores del tramo norte.",
         "uploadDate": "2026-07-15",
         "duration": "PT1M20S",
         "thumbnailUrl": "https://blog.skyairline.com/wp-content/uploads/carretera-austral-thumb.jpg",
@@ -1039,7 +1050,9 @@
       "kind": "Pieza social",
       "bornFrom": "De la cita destacada — el ángulo propio de SKY",
       "stat": "3×",
-      "statNote": "las menciones de marca off-site correlacionan ~3× más que los backlinks con la visibilidad en IA",
+      "statNote": "las menciones de marca sin enlace correlacionan con las citas en IA (0,664) casi 3× más que los backlinks (0,218). Es correlación, no causalidad — lo advierten los propios autores",
+      "source": "Ahrefs — correlación entre señales de marca y citas en IA, sobre 75.000 marcas",
+      "asOf": "2026-07",
       "why": "La distribución social no se hace por alcance: se hace por ENTIDAD. Cada mención de SKY fuera de su sitio le enseña al modelo quién es SKY y de qué habla con autoridad. Es la palanca de off-page que más pesa hoy, y no es un backlink.",
       "honesty": "Efeonce produce y entrega la pieza y el copy. La publicación queda en el equipo de SKY: no administramos sus cuentas.",
       "post": {
@@ -1068,7 +1081,9 @@
       "kind": "Set de imágenes",
       "bornFrom": "Las cuatro fotos del artículo, con su ALT y su ImageObject",
       "stat": "4",
-      "statNote": "imágenes con licencia verificable, crédito visible y texto alternativo escrito, no rellenado",
+      "statNote": "imágenes con licencia verificable, crédito visible y texto alternativo escrito, no rellenado. Ninguna fue generada con IA",
+      "source": "Las cuatro fotos de esta muestra — autor, licencia y enlace en el pie de la radiografía",
+      "asOf": "2026-07",
       "why": "La búsqueda de imágenes es la superficie más subestimada. Un `alt` que dice «paisaje» no sirve para nada; uno que dice «las agujas de roca del Cerro Castillo nevadas sobre un lago» hace que esa foto se recupere por «Cerro Castillo» — y arrastre a SKY con ella.",
       "honesty": "Requisito 5 de las bases: imagen apta y libre de derechos, o con permisos. Cada foto de esta muestra lleva autor, licencia y enlace verificable. Ninguna fue generada con IA.",
       "deliverable": [

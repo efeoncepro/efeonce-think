@@ -71,9 +71,16 @@ const blockUnion = (image: ImageFn) =>
       items: z.array(z.string()).min(2),
     }),
     z.object({
+      /** El FAQ es una SECCIÓN, no un apéndice: el árbol de encabezados lo declara como H2 y
+          cubre dos preguntas del fan-out. Por eso `anchor` y `short` son OBLIGATORIOS — sin
+          ellos renderizaba como párrafo suelto, sin ancla y fuera del índice, mientras la capa
+          de máquina lo declaraba como encabezado. La capa de máquina solo puede declarar lo
+          que la página realmente tiene. */
       type: z.literal('faq'),
       coupleId: z.string(),
       title: z.string(),
+      anchor: z.string(),
+      short: z.string(),
       items: z.array(z.object({ q: z.string(), a: z.string() })).min(2),
     }),
     z.object({
@@ -234,8 +241,15 @@ const aeoXray = defineCollection({
           coupleId: z.string(),
           kind: z.string(),
           bornFrom: z.string(),
+          /* La cifra del átomo y SU FUENTE. `source` + `asOf` son obligatorios por la misma
+             razón que en `evidence.facts`: sin fuente y sin fecha, una cifra es una opinión
+             con números. La ④ afirmaba tres cifras con CERO citas mientras la ① y la ③ citaban
+             todo — en la pantalla que cierra el argumento, y en la pieza cuya tesis es el rigor.
+             Obligatorio en el schema para que no vuelva a pasar en el próximo payload. */
           stat: z.string(),
           statNote: z.string(),
+          source: z.string().min(8),
+          asOf: z.string().min(4),
           why: z.string().min(40),
           /** Lo que la muestra NO puede fingir. Decirlo suma; simularlo destruye la pieza. */
           honesty: z.string().min(20),

@@ -202,7 +202,11 @@ const titles: Record<string, string> = {
                   <span class="atom-from">{a.bornFrom}</span>
                 </div>
 
+                {/* La cifra va CON su fuente. La ④ afirmaba tres números sin una sola cita
+                    mientras la ① y la ③ citaban todo — en la pieza cuya tesis es el rigor.
+                    Sin fuente y sin fecha, una cifra es una opinión con números. */}
                 <p class="atom-stat">{a.stat} <span>{a.statNote}</span></p>
+                <cite class="atom-cite">{a.source} · {a.asOf}</cite>
                 <p class="atom-why">{a.why}</p>
 
                 {/* La pieza social se RENDERIZA. Es un mockup del entregable, como todo el resto. */}
@@ -474,10 +478,20 @@ const titles: Record<string, string> = {
     display: block; font-family: inherit; font-size: var(--t-meta); font-weight: var(--w-body-dark);
     line-height: 1.45; color: var(--dim-d); letter-spacing: 0; margin-top: 0.3rem;
   }
+  /* La fuente de la cifra. Sobre navy el texto sube un paso (--w-body-dark): el mismo peso
+     sobre oscuro se rasteriza más fino. Misma voz, distinto sustrato. */
+  .atom-cite {
+    display: block; margin-top: 0.5rem; font-size: 0.75rem; line-height: 1.45;
+    color: var(--dim-d); font-style: normal; font-weight: var(--w-body-dark);
+  }
   .atom-why { margin-top: 0.9rem; font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d); }
 
-  /* La pieza social, renderizada. Es un mockup del entregable. */
+  /* La pieza social, renderizada. Es un mockup del entregable.
+     `position: relative` NO es cosmético: `.pc-brand` es absolute, y sin este ancla se
+     colgaba del `.atom` (el único ancestro posicionado) — la marca de SKY terminaba abajo
+     del todo, encima de NUESTRA nota de honestidad, como si SKY la firmara. */
   .post-card {
+    position: relative;
     margin-top: 1rem; padding: 1.1rem; border-radius: 12px;
     background: linear-gradient(160deg, color-mix(in srgb, var(--client) 90%, black), color-mix(in srgb, var(--client) 55%, black));
     color: #fff; aspect-ratio: 4 / 5; display: flex; flex-direction: column; justify-content: center; gap: 0.6rem;

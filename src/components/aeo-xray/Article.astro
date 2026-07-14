@@ -67,8 +67,11 @@ const published = new Date(`${article.publishedAt}T12:00:00Z`).toLocaleDateStrin
  * El índice es un MAPA (así lo escanea un humano en dos segundos). No son el mismo
  * texto, y por eso el H2 lleva `short` además de `text`.
  */
+/* El índice se DERIVA de las secciones — nunca se escribe a mano (el drift sería inevitable).
+   El FAQ es una sección más: el árbol de encabezados lo declara como H2 y cubre dos preguntas
+   del fan-out. Dejarlo fuera lo volvía la única sección sin ancla y sin entrada en el índice. */
 const tocItems = article.blocks.flatMap(b =>
-  b.type === 'h2' ? [{ anchor: b.anchor, short: b.short }] : [],
+  b.type === 'h2' || b.type === 'faq' ? [{ anchor: b.anchor, short: b.short }] : [],
 )
 
 const attrsFor = (id: string) => {
@@ -226,7 +229,11 @@ const srFor = (id: string) => {
       if (b.type === 'faq')
         return (
           <div class="blk faq" {...a}>
-            <p class="blk-t">{b.title}</p>
+            {/* Encabezado de SECCIÓN, igual que los otros cinco — no un párrafo en negrita.
+                El árbol de la capa de máquina lo declara como H2 y aquí cubre dos preguntas
+                del fan-out: si renderiza como <p>, el instrumento declara un encabezado que
+                la página no tiene. Mismo `p-h2` + ancla que el resto (WCAG 2.4.11 incluido). */}
+            <h4 class="p-h2" id={b.anchor}>{b.title}</h4>
             {b.items.map(i => (
               <div class="qa">
                 <p class="q">{i.q}</p>

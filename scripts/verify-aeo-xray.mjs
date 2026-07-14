@@ -83,6 +83,20 @@ check('32. La radiografía (③) SÍ tiene el acoplamiento', html.includes('data
 const railAll = STEPS.every(st => (pages[st || 'index'].match(/class="xr-step"/g) ?? []).length >= 3)
 check('33. El riel avisa en las 4 pantallas que el recorrido tiene más', railAll)
 check('34. La atomización (④) declara la línea de sangre al bloque del artículo', /atom[\s\S]*data-couple-target/.test(pages.atomizacion))
+
+/* 42b. CADA CIFRA DE LA ④, CON SU FUENTE.
+   La ④ afirmaba tres cifras —«#1», «3×», «4»— con CERO <cite>, mientras la ① citaba 3 veces
+   y la ③ cinco. Justo en la pantalla que CIERRA el argumento, y en la pieza cuya tesis entera
+   es que una cifra sin fuente es una opinión con números. El schema ya lo obliga (`source` +
+   `asOf` en cada átomo); esto verifica que además se RENDERICE — un dato obligatorio que no
+   se pinta no le sirve de nada al evaluador que lo quiere comprobar. */
+const atomCards = (pages.atomizacion.match(/<article class="atom"/g) ?? []).length
+const atomCites = (pages.atomizacion.match(/<cite class="atom-cite"/g) ?? []).length
+check(
+  '42b. Cada cifra de la atomización (④) se muestra con su fuente y su fecha',
+  atomCards > 0 && atomCites === atomCards,
+  `${atomCites} citas para ${atomCards} átomos`,
+)
 /* View transitions: sin ellas, cuatro pantallas se sienten como cuatro páginas sueltas. */
 check('35. View transitions cross-document activas (CSS puro, cero JS)', allHtml.includes('view-transition') || /@view-transition/.test(readFileSync('src/styles/aeo-xray.css', 'utf8')))
 

@@ -79,9 +79,47 @@ for (const b of d.article.blocks) {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   LA MISMA HISTORIA, CONTADA POR LAS OTRAS DOS CAPAS.
+
+   El artículo puede quedar perfectamente coherente CONSIGO MISMO y aun así la pieza
+   se desmiente — porque la prosa vive en TRES capas y este script solo leía una.
+   Pasó de verdad (2026-07-14): el artículo se corrigió a «los DOS transbordadores del
+   norte» y la corrección se detuvo ahí. La meta description, el BlogPosting y las
+   cuatro líneas del átomo de video siguieron diciendo «los TRES» — durante días, con
+   el gate en verde. Y en la ③ quedaban lado a lado: la cápsula decía dos, la meta
+   description decía tres, a diez centímetros de distancia.
+
+   La capa de máquina y los átomos son PROSA que el evaluador lee. Se releen igual. */
+const line = (label, text) => {
+  if (!text) return
+  console.log(`  ${C.dim}${label}${C.r}`)
+  wrap(String(text)).forEach(l => console.log(`  ${C.nar}│${C.r} ${l}`))
+}
+
+console.log(`\n${C.b}══ LA CAPA DE MÁQUINA — la misma historia, en prosa que el evaluador LEE${C.r}`)
+console.log(`${C.dim}   ¿dice exactamente lo mismo que el artículo de arriba? Los números, sobre todo.${C.r}\n`)
+for (const n of [...d.machine.seo, ...d.machine.og]) line(`${n.label}${n.detail ? ` (${n.detail})` : ''}`, n.value)
+for (const n of d.machine.jsonld) {
+  const desc = n.code?.description ?? n.code?.headline ?? n.code?.name
+  if (desc) line(`JSON-LD · ${n.type}`, desc)
+}
+
+console.log(`\n${C.b}══ LOS ÁTOMOS (④) — también son prosa, y también se contradicen${C.r}\n`)
+for (const a of d.atoms) {
+  console.log(`  ${C.b}${a.kind}${C.r} ${C.dim}· ${a.bornFrom}${C.r}`)
+  line(`cifra`, `${a.stat} — ${a.statNote}  [${a.source} · ${a.asOf}]`)
+  a.deliverable.forEach(x => line(x.k, x.v))
+  if (a.post) line('pieza', `${a.post.hook} ${a.post.body}`)
+  if (a.code?.description) line(`JSON-LD · ${a.code['@type']}`, a.code.description)
+  console.log('')
+}
+
 console.log(`\n${C.dim}${'─'.repeat(78)}${C.r}`)
-console.log(`${caps} cápsulas · ${paras} párrafos de narrador\n`)
-console.log(`${C.b}Las tres preguntas, en orden:${C.r}`)
+console.log(`${caps} cápsulas · ${paras} párrafos de narrador · ${d.atoms.length} átomos\n`)
+console.log(`${C.b}Las cuatro preguntas, en orden:${C.r}`)
 console.log(`  1. ¿Algún párrafo AFIRMA algo que otro bloque desmiente?  (la peor)`)
 console.log(`  2. ¿Algún párrafo REPITE su cápsula en vez de aportar?    (sobra)`)
-console.log(`  3. ¿Algún párrafo discute con un adversario INVENTADO?    («parecen tres días» — ¿a quién?)\n`)
+console.log(`  3. ¿Algún párrafo discute con un adversario INVENTADO?    («parecen tres días» — ¿a quién?)`)
+console.log(`  4. ¿La MÁQUINA y los ÁTOMOS cuentan la misma historia que el artículo?`)
+console.log(`     ${C.dim}(el «tres transbordadores» sobrevivió acá tres capas, con el gate en verde)${C.r}\n`)
