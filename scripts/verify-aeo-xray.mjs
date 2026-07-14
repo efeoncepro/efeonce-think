@@ -251,6 +251,58 @@ try {
   check('11. Hover en el artículo resalta su contraparte en la capa de máquina', coupled > 0)
   await page.screenshot({ path: `${OUT}/couple-image.png` })
 
+  /* 11b-11c. EL INSTRUMENTO ENFOCA — y el chip no puede mentir.
+     El panel se ordena POR FAMILIA (Metadatos · Estructura · Evidencia) pero al tocar un bloque la
+     pregunta es «¿qué produce ESTO?»: los datos de un bloque NUNCA son contiguos. Cuando el panel
+     sólo atenuaba y scrolleaba al primer match, de 51 datos prometidos por los chips **44 no se
+     veían jamás** — el `h1` prometía 11 y mostraba 0, y el único visible solía ser el más
+     tautológico («tu H2 está en la lista de H2»), así que para quien no sabe SEO no pasaba nada.
+     Un chip que promete «4 datos» y muestra uno miente, y en la pieza cuya tesis es el rigor esa es
+     la mentira más cara. Estos dos asserts recorren TODOS los bloques acoplables. */
+  const foco = await page.evaluate(async () => {
+    const sleep = ms => new Promise(r => setTimeout(r, ms))
+    const vis = el => {
+      const r = el.getBoundingClientRect()
+
+      return r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight
+    }
+    const ruido = []
+    const miente = []
+
+    for (const src of document.querySelectorAll('[data-couple]')) {
+      const id = src.dataset.couple
+      src.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      await sleep(120)
+
+      // (a) cero ruido: nada visible en el panel puede pertenecer a OTRO bloque.
+      const ajenos = [...document.querySelectorAll('.inst [data-couple-target]')].filter(
+        el => el.dataset.coupleTarget !== id && vis(el) && !el.querySelector(`[data-couple-target="${id}"]`),
+      )
+      if (ajenos.length) ruido.push(`${id}:${ajenos.length}`)
+
+      // (b) el header declara la cuenta EXACTA que promete el chip.
+      const n = document.querySelectorAll(`.inst [data-couple-target="${id}"]`).length
+      const nota = document.querySelector('[data-testid="focus-note"]')?.textContent ?? ''
+      if (n > 0 && !nota.includes(String(n))) miente.push(`${id}: dice "${nota}" y produce ${n}`)
+
+      src.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+      await sleep(40)
+    }
+
+    return { ruido, miente }
+  })
+
+  check(
+    '11b. Al enfocar, el panel NO muestra un solo nodo de otro bloque (el instrumento enfoca, no atenúa)',
+    foco.ruido.length === 0,
+    `bloques con ruido ajeno visible: ${foco.ruido.join(', ')}`,
+  )
+  check(
+    '11c. El header declara la cuenta EXACTA que el chip promete (un chip que promete 4 y muestra 1, miente)',
+    foco.miente.length === 0,
+    foco.miente.join(' · '),
+  )
+
   /**
    * El acoplamiento scrollea el PANEL, nunca la página.
    *

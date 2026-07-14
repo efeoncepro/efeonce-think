@@ -280,6 +280,7 @@ const titles: Record<string, string> = {
     if (root) {
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const inst = root.querySelector<HTMLElement>('.inst')
+      const focusNote = root.querySelector<HTMLElement>('[data-testid="focus-note"]')
       let pinned: string | null = null
 
       /** MÓVIL: el instrumento vive apilado bajo el artículo. Sube como hoja al acoplar. */
@@ -292,8 +293,27 @@ const titles: Record<string, string> = {
       }
       root.querySelector('[data-close-sheet]')?.addEventListener('click', closeSheet)
 
-      const paint = (id: string | null) => {
-        if (inst) inst.dataset.focus = id ? 'true' : ''
+      /* Salir del enfoque y volver al MAPA. Mismo destino que Escape, pero descubrible. */
+      root.querySelector('[data-show-all]')?.addEventListener('click', () => {
+        pinned = null
+        paint('capsule-main', false)
+      })
+
+      /**
+       * `collapse` separa los DOS MODOS del instrumento:
+       *
+       *  · MAPA (collapse=false) — el estado de llegada. El panel entero, agrupado por familia, con
+       *    el acoplamiento héroe ya resaltado. Es el argumento de masa: «miren TODO lo que hay que
+       *    poner para que una máquina cite esto». Si el panel se colapsara también al cargar, ese
+       *    argumento no existiría nunca: el evaluador aterrizaría viendo tres tarjetas sueltas.
+       *
+       *  · ENFOQUE (collapse=true) — cuando el evaluador INTERROGA un bloque. El panel se reduce a
+       *    lo que ese bloque produce y nada más.
+       *
+       * Primero ves la máquina entera. Después la apuntas.
+       */
+      const paint = (id: string | null, collapse = true) => {
+        if (inst) inst.dataset.focus = id && collapse ? 'true' : ''
         if (sheet() && id) root.dataset.sheet = 'open'
 
         root.querySelectorAll<HTMLElement>('[data-couple],[data-couple-target]').forEach(el => {
@@ -306,35 +326,87 @@ const titles: Record<string, string> = {
             el.removeAttribute('aria-current')
           }
         })
-        if (!id) return
+        /**
+         * EL INSTRUMENTO ENFOCA (no solo atenúa).
+         *
+         * El panel está ordenado POR FAMILIA (Metadatos · Datos estructurados · Estructura ·
+         * Evidencia), pero al tocar un bloque la pregunta es «¿qué produce ESTO?» — una consulta
+         * POR PRODUCTOR contra un layout POR FAMILIA. Los datos de un bloque nunca son contiguos.
+         *
+         * Antes solo atenuábamos y scrolleábamos al PRIMER match. Medido: de 51 datos prometidos
+         * por los chips, 44 NO se veían nunca. El `h1` prometía 11 y mostraba 0. El primero en el
+         * DOM suele ser el más aburrido («tu H2 está en la lista de H2») y el argumento de verdad
+         * —«nadie en ese resultado resuelve la llegada»— quedaba 1.000px abajo, invisible.
+         * Un chip que promete «4 datos» y muestra uno MIENTE, y en la pieza cuya tesis es el rigor
+         * eso es lo más caro que puede pasar.
+         *
+         * Ahora el panel COLAPSA a lo que ese bloque produce y nada más: los N datos quedan
+         * apilados arriba, sin cacería. En reposo vuelve a ser el mapa completo.
+         */
+        const body = inst?.querySelector<HTMLElement>('.in-body')
+        body?.querySelectorAll<HTMLElement>('[data-hide]').forEach(el => delete el.dataset.hide)
+
+        if (!id) {
+          if (focusNote) focusNote.textContent = ''
+          if (live) live.textContent = ''
+          if (inst) inst.dataset.more = ''
+
+          return
+        }
 
         const target = root.querySelector<HTMLElement>(`[data-couple-target="${id}"]`)
         if (!target) return
         target.querySelector('details')?.setAttribute('open', '')
 
-        /**
-         * Scrollea SOLO el panel, y respeta el header pegajoso. Si scrolleamos al borde del
-         * panel, el header TAPA el nodo y el usuario ve medio número cortado sin entender qué
-         * se le señala: es WCAG 2.2 AA 2.4.11 (Focus Not Obscured).
-         */
-        const pane = target.closest<HTMLElement>('.inst')
-        if (pane && pane.scrollHeight > pane.clientHeight + 4) {
-          const head = pane.querySelector<HTMLElement>('.in-head')
-          const safeTop = (head?.offsetHeight ?? 0) + 12
-          const t = target.getBoundingClientRect()
-          const p = pane.getBoundingClientRect()
-          const top = t.top - p.top
+        /* En modo MAPA se resalta y se acabó: no se colapsa, no se scrollea, no se anuncia cuenta. */
+        if (!collapse) {
+          if (focusNote) focusNote.textContent = ''
+          if (inst) inst.dataset.more = ''
 
-          if (top < safeTop || t.bottom - p.top > pane.clientHeight - 12) {
-            pane.scrollTo({ top: pane.scrollTop + top - safeTop, behavior: reduce ? 'auto' : 'smooth' })
-          }
+          return
         }
+
+        if (body) {
+          /* Se conserva: cada nodo activo, su cadena de ancestros (para no romper el contenedor
+             que lo envuelve) y todo lo que cuelga de él (el dato es el nodo ENTERO). */
+          const keep = new Set<Element>()
+
+          body.querySelectorAll<HTMLElement>('[data-on]').forEach(on => {
+            for (let el: Element | null = on; el && el !== body; el = el.parentElement) keep.add(el)
+            on.querySelectorAll('*').forEach(d => keep.add(d))
+          })
+
+          /* Se colapsa: los rótulos de familia, los nodos de otros bloques, las filas del árbol
+             que no son ésta y las preguntas del fan-out que este bloque no cubre. */
+          body
+            .querySelectorAll<HTMLElement>(':scope > *, .kpi, .t3wrap > *, .hn, .fan li')
+            .forEach(el => {
+              if (!keep.has(el)) el.dataset.hide = 'true'
+            })
+        }
+
+        /* Con el panel ya colapsado, los N datos empiezan arriba: se vuelve al tope en vez de
+           perseguir un nodo. Y el header pegajoso deja de poder taparlo (WCAG 2.2 AA 2.4.11). */
+        const pane = target.closest<HTMLElement>('.inst')
+        pane?.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
+
+        const all = root.querySelectorAll(`[data-couple-target="${id}"]`).length
+        const cuenta = `${all} ${all === 1 ? 'dato' : 'datos'}`
+
+        /* El H1 produce ONCE datos y en pantalla caben cuatro. Si la pila enfocada desborda, hay que
+           DECIRLO: si no, el header promete once y el ojo ve cuatro — que es la misma mentira que
+           vinimos a arreglar, sólo que más chica. */
+        requestAnimationFrame(() => {
+          if (!inst || !pane) return
+          inst.dataset.more = pane.scrollHeight > pane.clientHeight + 4 ? 'true' : ''
+        })
+
+        /* El comprador no tiene por qué saber SEO: se le dice en palabras, no solo con un realce. */
+        if (focusNote) focusNote.textContent = `Lo que produce este bloque · ${cuenta}`
         if (live) {
-          const all = root.querySelectorAll(`[data-couple-target="${id}"]`).length
           const name = target.querySelector('.nd-l,.sch-t,.kpi-u')?.textContent?.trim()
-          live.textContent = name
-            ? `${all} ${all === 1 ? 'dato resaltado' : 'datos resaltados'}. Primero: ${name}`
-            : ''
+
+          live.textContent = name ? `${cuenta}. Primero: ${name}` : cuenta
         }
       }
 
@@ -373,7 +445,10 @@ const titles: Record<string, string> = {
         if (e.key !== 'Escape') return
         if (root.dataset.sheet === 'open') { closeSheet(); return }
         pinned = null
-        paint('capsule-main')
+        /* Escape devuelve al MAPA (el panel entero), no a otro enfoque: es la salida del
+           instrumento, y sin ella —al no haber `mouseout`, el acoplamiento es pegajoso a
+           propósito— no habría forma de volver a ver la máquina completa sin recargar. */
+        paint('capsule-main', false)
       })
     }
   </script>

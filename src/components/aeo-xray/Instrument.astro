@@ -31,6 +31,13 @@ const asText = (code: unknown) =>
 <aside class="inst" aria-labelledby="in-t">
   <div class="in-head">
     <h2 id="in-t">{ui.instrumentTitle}</h2>
+    {/* Al enfocar, el panel DICE en palabras qué acaba de pasar. El comprador no tiene por qué
+        saber SEO: un realce sutil sobre una fila de un árbol de encabezados no le comunica nada. */}
+    <p class="in-focus" data-testid="focus-note" aria-hidden="true"></p>
+    {/* La salida del enfoque. `Escape` ya funcionaba, pero nadie lo descubre: sin un botón, un
+        evaluador que interroga un bloque queda encerrado en esos N datos y no puede volver a ver
+        la máquina completa. Es un <button> de verdad (teclado + lector de pantalla gratis). */}
+    <button class="in-all" type="button" data-show-all>Ver toda la capa</button>
     <p class="in-live" role="status" aria-live="polite" data-testid="live"></p>
     {/* Solo móvil: cierra la hoja y devuelve el foco al bloque que la abrió. */}
     <button class="sheet-x" type="button" data-close-sheet aria-label={ui.backToArticle}>✕</button>
@@ -143,7 +150,42 @@ const asText = (code: unknown) =>
     border-radius: 12px 12px 0 0; position: sticky; top: 0; z-index: 2;
   }
   .in-head h2 { font-size: var(--t-body); font-weight: var(--w-label); }
-  .in-live { font-size: var(--t-over); color: var(--dim-d); text-align: right; }
+  /* El anuncio para lectores de pantalla. Es SOLO para ellos: la versión visible es `.in-focus`,
+     y tener las dos a la vista imprimía la cuenta dos veces en el header. */
+  .in-live {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
+
+  /* EL INSTRUMENTO ENFOCA. Colapsa todo lo que el bloque tocado NO produce, para que los N datos
+     que el chip promete queden apilados arriba, juntos y sin cacería. Antes el panel solo atenuaba
+     y scrolleaba al primer match: de 51 datos prometidos, 44 no se veían NUNCA. */
+  .inst [data-hide] { display: none; }
+
+  /* Y lo dice en palabras: el comprador no tiene por qué saber SEO para entender qué pasó. */
+  .in-focus {
+    margin-left: auto; font-size: var(--t-over); font-weight: var(--w-label);
+    color: var(--blue-up); white-space: nowrap;
+  }
+  .in-focus:empty { display: none; }
+
+  /* Solo existe cuando el instrumento está enfocado: en modo mapa no hay de qué salir. */
+  .in-all { display: none; }
+  .inst[data-focus='true'] .in-all {
+    display: inline-block; padding: 0.3rem 0.6rem; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line-d); background: transparent; color: var(--dim-d);
+    font: inherit; font-size: var(--t-over); font-weight: var(--w-label); white-space: nowrap;
+  }
+  .inst[data-focus='true'] .in-all:hover { color: #fff; border-color: var(--blue-up); }
+
+  /* Si la pila enfocada desborda (el H1 produce ONCE datos y en pantalla caben cuatro), se avisa.
+     Un degradado al pie dice «hay más abajo» sin robarle una línea al panel. */
+  .inst { position: relative; }
+  .inst[data-more='true']::after {
+    content: ''; position: sticky; bottom: 0; display: block; height: 3.5rem; margin-top: -3.5rem;
+    pointer-events: none; border-radius: 0 0 12px 12px;
+    background: linear-gradient(to top, var(--navy) 15%, transparent);
+  }
   .in-body { padding: 1rem 1rem 1rem 1.3rem; }
 
   /* Los KPI abren el instrumento. Tabular-nums, NUNCA monoespaciada. */

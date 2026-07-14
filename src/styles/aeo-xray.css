@@ -524,14 +524,18 @@ figure[data-couple][data-on] {
   100% { outline-color: var(--blue-up); }
 }
 
-/* Con un acoplamiento activo, lo NO acoplado se atenúa. Es lo que hace legibles los DIEZ
-   destinos del H1 sin que el ojo tenga que cazarlos uno por uno. */
-.inst[data-focus='true'] .nd:not([data-on]),
-.inst[data-focus='true'] .kpi:not([data-on]),
-.inst[data-focus='true'] .grp,
-.inst[data-focus='true'] .warn {
-  opacity: 0.35;
-}
+/* ══ EL ATENUADO SE RETIRÓ, A PROPÓSITO ══
+   Antes, con un acoplamiento activo, lo NO acoplado bajaba a opacity .35. Se escribió para «hacer
+   legibles los diez destinos del H1 sin cazarlos uno por uno» — y nunca lo logró: seguían fuera de
+   pantalla. Atenuar no es enfocar.
+
+   Ahora el panel COLAPSA a lo que el bloque produce (ver `paint()`), así que todo lo que queda
+   visible ES la respuesta. Atenuar acá solo apagaba las explicaciones «Para qué sirve» de los
+   contenedores que sí conservamos —el árbol de encabezados y el fan-out—, que son justo el texto en
+   castellano que un comprador que no sabe SEO necesita leer.
+
+   Regla: en modo enfoque, todo lo visible va a plena opacidad. Si algo no aporta, se colapsa; no se
+   atenúa a medias. */
 
 /* ══ MÓVIL: el instrumento sube como HOJA INFERIOR ══
    Apilado, el instrumento queda a DIEZ PANTALLAS del artículo. Sin esto, tocabas un bloque,
