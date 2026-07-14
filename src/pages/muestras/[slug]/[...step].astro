@@ -318,9 +318,16 @@ const titles: Record<string, string> = {
                   {artifactKind(a) === 'video' && imageBlocks[0] && (
                     <figure class="video-artifact">
                       <div class="video-frame">
-                        <Image src={imageBlocks[0].src} alt={imageBlocks[0].alt} widths={[360, 720]} sizes="420px" format="avif" quality={70} loading="lazy" />
+                        {a.video ? (
+                          <>
+                            <video class="video-preview" src={a.video.src} poster={a.video.poster} muted playsinline loop autoplay preload="metadata" aria-label={a.video.alt}></video>
+                            {a.video.disclosure && <span class="video-disclosure">{a.video.disclosure}</span>}
+                          </>
+                        ) : (
+                          <Image src={imageBlocks[0].src} alt={imageBlocks[0].alt} widths={[360, 720]} sizes="420px" format="avif" quality={70} loading="lazy" />
+                        )}
                         <div class="video-caption">
-                          <span>{deliverableValue(a, /duraci/i) || 'Video recuperable'}</span>
+                          <span>{a.video?.label || deliverableValue(a, /duraci/i) || 'Video recuperable'}</span>
                           <strong>{codeField(a.code, 'name') || a.kind}</strong>
                         </div>
                       </div>
@@ -1039,8 +1046,17 @@ const titles: Record<string, string> = {
     position: relative; overflow: hidden; border-radius: 12px; background: var(--navy-sunk);
     border: 1px solid color-mix(in srgb, var(--blue-up) 24%, var(--navy-3));
   }
-  .video-frame img {
+  .video-frame img,
+  .video-frame video {
     width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; filter: saturate(1.08) contrast(1.02);
+  }
+  .video-frame video { background: var(--navy-sunk); }
+  .video-disclosure {
+    position: absolute; top: 0.65rem; left: 0.65rem; z-index: 1;
+    display: inline-flex; align-items: center; padding: 0.25rem 0.45rem; border-radius: 999px;
+    background: color-mix(in srgb, var(--navy-sunk) 72%, transparent);
+    border: 1px solid color-mix(in srgb, #fff 22%, transparent);
+    color: #fff; font-size: 0.66rem; line-height: 1; font-weight: var(--w-label);
   }
   .video-caption {
     position: absolute; inset: auto 0 0; padding: 2.4rem 0.85rem 0.8rem;

@@ -1165,6 +1165,13 @@
           "v": "Se entrega completa, en es-CL, para subtítulos y para que un motor de respuesta pueda leerla."
         }
       ],
+      "video": {
+        "src": "/muestras/sky-carretera-austral/carretera-austral-capillas-kayak-omni.mp4",
+        "poster": "/muestras/sky-carretera-austral/carretera-austral-capillas-kayak-omni-poster.jpg",
+        "alt": "Dos viajeros navegan en kayak frente a las Capillas de Mármol como muestra ilustrativa de video para la Carretera Austral.",
+        "label": "Muestra 10 s · Omni",
+        "disclosure": "IA ilustrativa"
+      },
       "code": {
         "@type": "VideoObject",
         "name": "Carretera Austral: vuela a Balmaceda y arrienda ahí",
