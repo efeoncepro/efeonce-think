@@ -30,24 +30,32 @@ const asText = (code: unknown) =>
 
 <aside class="inst" aria-labelledby="in-t">
   <div class="in-head">
-    <h2 id="in-t">{ui.instrumentTitle}</h2>
+    {/* `tabindex="-1"`: alcanzable por script, nunca por Tab. Es el destino seguro del foco cuando
+        el panel colapsa bajo él, y el ancla del focus-return al salir del enfoque. */}
+    <h2 id="in-t" tabindex="-1">{ui.instrumentTitle}</h2>
     {/* Al enfocar, el panel DICE en palabras qué acaba de pasar. El comprador no tiene por qué
         saber SEO: un realce sutil sobre una fila de un árbol de encabezados no le comunica nada. */}
     <p class="in-focus" data-testid="focus-note" aria-hidden="true"></p>
     {/* La salida del enfoque. `Escape` ya funcionaba, pero nadie lo descubre: sin un botón, un
         evaluador que interroga un bloque queda encerrado en esos N datos y no puede volver a ver
-        la máquina completa. Es un <button> de verdad (teclado + lector de pantalla gratis). */}
-    <button class="in-all" type="button" data-show-all>Ver toda la capa</button>
+        la máquina completa. Es un <button> de verdad (teclado + lector de pantalla gratis).
+        Nace `disabled` porque la llegada es el modo MAPA: no hay de qué salir todavía. */}
+    <button class="in-all" type="button" data-show-all disabled>Ver toda la capa</button>
     <p class="in-live" role="status" aria-live="polite" data-testid="live"></p>
     {/* Solo móvil: cierra la hoja y devuelve el foco al bloque que la abrió. */}
     <button class="sheet-x" type="button" data-close-sheet aria-label={ui.backToArticle}>✕</button>
   </div>
 
-  <div class="in-body">
+  {/* El panel es CONTENIDO: se LEE. Sus nodos ya NO son tab-stops — lo eran solo para que el
+      `focusin` disparara el acoplamiento desde ESTE lado, y eso se eliminó (el instrumento no
+      puede repintarse a sí mismo). Eran 55 paradas de teclado que no hacían nada. Los controles
+      viven en el ARTÍCULO (un <button> de sonda por bloque); acá solo quedan los <pre>
+      scrolleables (WCAG 2.1.1) y los <summary>, que sí deben ser alcanzables. */}
+  <div class="in-body" id="in-body">
     {/* La evidencia ABRE el instrumento: es el argumento, no el apéndice. */}
     <div class="kpis" data-testid="kpis">
       {kpis.map(k => (
-        <div class="kpi" data-couple-target={k.coupleId} tabindex="0">
+        <div class="kpi" data-couple-target={k.coupleId}>
           <p class="kpi-n">{k.big}</p>
           <p class="kpi-u">{k.bigUnit}</p>
           <cite class="kpi-s">{k.source} · {k.asOf}</cite>
@@ -57,7 +65,7 @@ const asText = (code: unknown) =>
 
     <p class="grp">Cómo está escrito</p>
     {machine.craft.map(c => (
-      <div class={`nd t${c.tier}`} data-couple-target={c.coupleId} data-on={c.coupleId === hero ? true : undefined} tabindex="0">
+      <div class={`nd t${c.tier}`} data-couple-target={c.coupleId} data-on={c.coupleId === hero ? true : undefined}>
         {/* La cifra va CON su fuente, igual que en la ① y en la ④. La ③ era la única pantalla
             donde los números flotaban — justo la que argumenta el rigor. El schema ya lo obliga
             (superRefine de la raíz); esto lo RENDERIZA: un dato obligatorio que no se pinta no le
@@ -72,7 +80,7 @@ const asText = (code: unknown) =>
     <p class="grp">Datos estructurados <em>· se muestran como texto</em></p>
     <p class="warn">{ui.schemaNote}</p>
     {machine.jsonld.map(n => (
-      <div class={`nd t${n.tier} sch`} data-couple-target={n.coupleId} tabindex="0">
+      <div class={`nd t${n.tier} sch`} data-couple-target={n.coupleId}>
         <div class="sch-h">
           <span class="sch-t">{n.type}</span>
           <span class="sch-m">{n.metric}</span>
@@ -88,7 +96,7 @@ const asText = (code: unknown) =>
 
     <p class="grp">Metadatos</p>
     {machine.seo.map(s => (
-      <div class={`nd t${s.tier}`} data-couple-target={s.coupleId} tabindex="0">
+      <div class={`nd t${s.tier}`} data-couple-target={s.coupleId}>
         <p class="nd-l">{s.label} {s.detail && <em>· {s.detail}</em>}</p>
         <p class="nd-v">{s.value}</p>
         {s.tier < 3 && <p class="why"><b>{ui.whyLabel}:</b> {s.why}</p>}
@@ -96,7 +104,7 @@ const asText = (code: unknown) =>
     ))}
     <div class="t3wrap">
       {machine.og.map(o => (
-        <div class="nd t3" data-couple-target={o.coupleId} tabindex="0">
+        <div class="nd t3" data-couple-target={o.coupleId}>
           <p class="nd-l">{o.label}</p>
           <p class="nd-v mono">{o.value}</p>
         </div>
@@ -104,16 +112,16 @@ const asText = (code: unknown) =>
     </div>
 
     <p class="grp">Estructura</p>
-    <div class="nd t2" data-couple-target={machine.headings.coupleId} tabindex="0">
+    <div class="nd t2" data-couple-target={machine.headings.coupleId}>
       {machine.headings.tree.map(h => (
-        <p class={`hn l${h.level}`} data-couple-target={h.coupleId} tabindex="0">
+        <p class={`hn l${h.level}`} data-couple-target={h.coupleId}>
           <span class="lv">H{h.level}</span> {h.text}
         </p>
       ))}
       <p class="why"><b>{ui.whyLabel}:</b> {machine.headings.why}</p>
     </div>
     {machine.alts.map(a => (
-      <div class="nd t2" data-couple-target={a.coupleId} tabindex="0">
+      <div class="nd t2" data-couple-target={a.coupleId}>
         <p class="nd-v">“{a.alt}”</p>
         <p class="why"><b>{ui.whyLabel}:</b> {a.why}</p>
       </div>
@@ -121,7 +129,7 @@ const asText = (code: unknown) =>
 
     <p class="grp">La evidencia <em>· por qué existe este artículo</em></p>
     {details.map(f => (
-      <div class="nd t2 fct" data-couple-target={f.coupleId} tabindex="0">
+      <div class="nd t2 fct" data-couple-target={f.coupleId}>
         <p class="nd-l">{f.label}</p>
         <p class="fct-v">{f.value}</p>
         <p class="why">{f.note}</p>
@@ -133,7 +141,7 @@ const asText = (code: unknown) =>
       <p class="why">{evidence.fanOut.note}</p>
       <ul class="fan">
         {evidence.fanOut.items.map(i => (
-          <li data-couple-target={i.coveredBy} tabindex="0">
+          <li data-couple-target={i.coveredBy}>
             <span class="ok" aria-hidden="true">{i.covered ? '✓' : '—'}</span>{i.q}
           </li>
         ))}
@@ -149,8 +157,15 @@ const asText = (code: unknown) =>
     font-weight: var(--w-body-dark);
     border-radius: 12px; min-width: 0;
   }
+  /* 🔴 `flex-wrap` NO es cosmético (WCAG 1.4.10 · reflow).
+     Sin él, a 390px el header sumaba ~440px de contenido `nowrap` y se recortaba justo lo que el
+     invariante 12b declara load-bearing: LA CUENTA en palabras y EL BOTÓN DE SALIDA. En un teléfono,
+     la «salida descubrible» quedaba fuera de la pantalla. Y como el panel tiene `overflow-y: auto`
+     (lo que fuerza `overflow-x: auto`), el desborde scrolleaba DENTRO del panel → el assert de
+     scroll horizontal, que mide el DOCUMENTO, salía verde mientras el usuario veía el header roto. */
   .in-head {
-    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+    gap: 0.5rem 1rem;
     padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--line-d); background: var(--navy-2);
     border-radius: 12px 12px 0 0; position: sticky; top: 0; z-index: 2;
   }
@@ -167,10 +182,12 @@ const asText = (code: unknown) =>
      y scrolleaba al primer match: de 51 datos prometidos, 44 no se veían NUNCA. */
   .inst [data-hide] { display: none; }
 
-  /* Y lo dice en palabras: el comprador no tiene por qué saber SEO para entender qué pasó. */
+  /* Y lo dice en palabras: el comprador no tiene por qué saber SEO para entender qué pasó.
+     Sin `nowrap`: es una FRASE, no un chip — que envuelva en dos líneas es correcto, y es lo que
+     impide que se recorte en un teléfono. */
   .in-focus {
-    margin-left: auto; font-size: var(--t-over); font-weight: var(--w-label);
-    color: var(--blue-up); white-space: nowrap;
+    margin-left: auto; font-size: var(--t-meta); font-weight: var(--w-label);
+    color: var(--blue-up); min-width: 0;
   }
   .in-focus:empty { display: none; }
 
@@ -180,14 +197,20 @@ const asText = (code: unknown) =>
     color: var(--dim-d); font-style: normal; font-weight: var(--w-body-dark);
   }
 
-  /* Solo existe cuando el instrumento está enfocado: en modo mapa no hay de qué salir. */
-  .in-all { display: none; }
-  .inst[data-focus='true'] .in-all {
-    display: inline-block; padding: 0.3rem 0.6rem; border-radius: 999px; cursor: pointer;
+  /* 🔴 UN CONTROL QUE DESAPARECE AL USARSE NUNCA ES LA RESPUESTA.
+     Antes este botón solo existía en modo enfoque: al presionarlo salías del enfoque → el CSS lo
+     borraba → el foco caía al inicio del documento y el usuario de teclado quedaba perdido en una
+     página de 9.000px. Es el mismo bug que el botón vino a arreglar, ahora en la salida.
+     Ahora está SIEMPRE: en modo mapa queda `disabled` (no hay de qué salir) y conserva su sitio,
+     así el foco sobrevive al clic. Mínimo 24×24 (WCAG 2.2 · 2.5.8). */
+  .in-all {
+    padding: 0.45rem 0.7rem; min-height: 24px; border-radius: 999px; cursor: pointer;
     border: 1px solid var(--line-d); background: transparent; color: var(--dim-d);
-    font: inherit; font-size: var(--t-over); font-weight: var(--w-label); white-space: nowrap;
+    font: inherit; font-size: var(--t-over); font-weight: var(--w-label);
   }
-  .inst[data-focus='true'] .in-all:hover { color: #fff; border-color: var(--blue-up); }
+  .in-all:hover:not(:disabled) { color: #fff; border-color: var(--blue-up); }
+  .in-all:focus-visible { outline: 2px solid var(--blue-up); outline-offset: 2px; }
+  .in-all:disabled { opacity: 0.35; cursor: default; }
 
   /* Si la pila enfocada desborda (el H1 produce ONCE datos y en pantalla caben cuatro), se avisa.
      Un degradado al pie dice «hay más abajo» sin robarle una línea al panel. */
@@ -233,7 +256,17 @@ const asText = (code: unknown) =>
     outline: 2px solid transparent; outline-offset: 1px; min-width: 0;
     scroll-margin-top: 4rem; /* Focus Not Obscured (2.4.11): el header pegajoso no lo tapa */
   }
-  .nd:focus-visible, .kpi:focus-visible { outline: 2px solid var(--blue-up); }
+  /* 🔴 WCAG 2.4.7 — TODO lo que recibe foco lo MUESTRA.
+     `outline: 2px solid transparent` se usa en varias reglas base como reserva de espacio (para que
+     el anillo no mueva el layout al aparecer). El problema: esa regla de AUTOR gana sobre el anillo
+     por defecto del navegador. Y el `:focus-visible` solo cubría `.nd` y `.kpi` — así que las ~10
+     filas del árbol de encabezados (`.hn`) y los ítems del fan-out (`.fan li`), que SÍ llevan
+     `tabindex="0"`, eran tab-stops reales con el foco INVISIBLE. El usuario de teclado tabulaba por
+     el instrumento y no sabía dónde estaba. El `--blue-up` da 5,5:1 sobre el navy (cumple 1.4.11). */
+  .nd:focus-visible,
+  .kpi:focus-visible,
+  .hn:focus-visible,
+  .fan li:focus-visible { outline: 2px solid var(--blue-up); outline-offset: 1px; }
   .t1 { border-color: color-mix(in srgb, var(--blue-up) 35%, var(--line-d)); background: var(--navy-3); }
   .t3 { padding: 0.4rem 0.6rem; background: transparent; border-color: transparent; margin-bottom: 0.1rem; }
   .t3wrap { padding: 0.3rem 0 0.6rem; border-left: 2px solid var(--line-d); margin-left: 0.2rem; }
@@ -284,7 +317,8 @@ const asText = (code: unknown) =>
     overflow-x: auto; max-height: 20rem; max-width: 100%;
   }
 
-  .hn { font-size: var(--t-meta); padding: 0.2rem 0.3rem; border-radius: 4px; outline: 2px solid transparent; scroll-margin-top: 4rem; }
+  /* `min-height: 24px` — WCAG 2.2 · 2.5.8. Medían ~23px y son tap targets contiguos. */
+  .hn { font-size: var(--t-meta); padding: 0.3rem; min-height: 24px; border-radius: 4px; outline: 2px solid transparent; scroll-margin-top: 4rem; }
   .hn.l2 { padding-left: 1.15rem; }
   .lv { display: inline-block; min-width: 1.7rem; font-weight: var(--w-label); color: var(--blue-up); font-size: 0.625rem; }
 

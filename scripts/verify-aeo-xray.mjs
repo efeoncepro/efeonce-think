@@ -191,9 +191,17 @@ check(
   `stats: ${stats.map(x => x.replace(/<[^>]+>/g, '').trim().slice(0, 12)).join(' | ')}`,
 )
 
-// 21. El chip direccional es `content` de CSS: invisible para lectores de pantalla.
-const srCount = (html.match(/class="[^"]*\bxr-sr\b[^"]*"[^>]*>Produce \d+ datos/g) ?? []).length
-check('21. Cada bloque acoplable anuncia cuántos datos produce (el chip solo existe para quien ve)', srCount >= 6, `${srCount} bloques con voz`)
+/* 21. El chip direccional es `content` de CSS: invisible para lectores de pantalla. La voz del
+   bloque vive en un <button> REAL (rol + nombre + Enter/Space + `aria-controls` al panel), no en un
+   span decorativo: antes el bloque era un `div[tabindex=0]` sin rol ni nombre, y «fijar» el
+   acoplamiento era exclusivo del mouse (un div no dispara `click` con Enter — WCAG 2.1.1). */
+const probes = (html.match(/<button class="probe"[^>]*aria-controls="in-body"[^>]*>/g) ?? []).length
+const probeNamed = (html.match(/<button class="probe"[\s\S]{0,180}?Produce \d+ datos/g) ?? []).length
+check(
+  '21. Cada bloque acoplable es un CONTROL con nombre, no un div focusable (rol + teclado + aria-controls)',
+  probes >= 6 && probeNamed >= 6,
+  `${probes} botones de sonda · ${probeNamed} con nombre accesible`,
+)
 
 // 22. Una región con scroll tiene que ser alcanzable por teclado (WCAG 2.1.1).
 const preTab = (html.match(/<pre[^>]*tabindex="0"/g) ?? []).length
@@ -341,7 +349,7 @@ try {
   // acoplamiento al teclado (al enfocar, la página scrollea y dispara mouseover fantasma).
   await page.mouse.move(300, 400)
   await page.keyboard.press('Tab')
-  await page.locator('[data-couple="h2-como-llegar"]').first().focus()
+  await page.locator('[data-couple="h2-como-llegar"] [data-probe]').first().focus()
   await page.waitForTimeout(350)
   const kb = await page.locator('[data-couple-target="h2-como-llegar"][aria-current="true"]').count()
   check('12. El teclado acopla aunque el mouse esté apoyado en otra parte', kb > 0)
@@ -406,13 +414,21 @@ try {
   check('19. WCAG 2.4.11 — el header pegajoso no tapa el nodo acoplado', obscured === true, `top del nodo bajo el header: ${obscured}`)
 
   /* El texto para lectores de pantalla NO puede verse. Si se ve, no es accesibilidad: es un
-     bug visual. (Pasó: el reemplazo de CSS apuntaba a una clase que ya no existía = no-op.) */
-  const srVisible = await page.locator('.xr-sr').first().isVisible()
-  const srBox = await page.locator('.xr-sr').first().boundingBox()
+     bug visual. (Pasó: el reemplazo de CSS apuntaba a una clase que ya no existía = no-op.)
+     Hoy ese texto es el NOMBRE ACCESIBLE del botón de sonda: el lector de pantalla lo lee, el ojo
+     ve el punto. Y el botón mide ≥24×24 (WCAG 2.2 · 2.5.8) — antes el span medía 1×1. */
+  const probe = page.locator('[data-probe]').first()
+  const probeName = (await probe.textContent())?.trim() ?? ''
+  const probeBox = await probe.boundingBox()
+  const probeInk = await probe.evaluate(el => getComputedStyle(el).fontSize)
   check(
-    '24. El texto para lectores de pantalla es invisible (pero está en el DOM)',
-    !srVisible || (srBox !== null && srBox.width <= 2 && srBox.height <= 2),
-    `visible=${srVisible} box=${JSON.stringify(srBox)}`,
+    '24. La voz del bloque la lee el lector de pantalla y NO se ve (y el target mide ≥24px)',
+    /Produce \d+ datos/.test(probeName) &&
+      probeInk === '0px' &&
+      probeBox !== null &&
+      probeBox.width >= 24 &&
+      probeBox.height >= 24,
+    `nombre="${probeName}" fontSize=${probeInk} box=${JSON.stringify(probeBox)}`,
   )
 
   /* 36. EL PESO QUE EL NAVEGADOR DIBUJA, no el que el CSS pide.

@@ -413,12 +413,68 @@
   transition: outline-color var(--dur) var(--ease), background-color var(--dur) var(--ease),
     border-color var(--dur) var(--ease), opacity var(--dur) var(--ease);
 }
-[data-couple] {
+/* ══ 🔴 SIN JAVASCRIPT, LA AFORDANCIA NO PUEDE MENTIR ══
+   El artículo se lee entero sin JS (es Astro estático, y el par héroe viene pintado desde el HTML).
+   Eso estaba bien resuelto. Lo que NO: el `cursor: pointer`, el punto del borde, el botón y el chip
+   se servían igual — o sea, la página prometía un acoplamiento que sin JS no existe. El equipo ya
+   había identificado ESE riesgo y lo resolvió… solo para el hint (que nace `hidden`). La lección
+   quedó a medio aplicar: el punto, el cursor y el botón prometen igual de fuerte que el copy.
+
+   Ahora TODA la afordancia cuelga de `[data-js]`, que el script pone en su primera línea. */
+:where(.xr[data-js]) [data-couple] {
   cursor: pointer;
 }
 [data-couple]:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
+}
+
+/* EL BOTÓN DE SONDA. Ocupa el lugar del punto decorativo, pero es un `<button>` de verdad: rol,
+   nombre accesible, Enter/Space y `aria-expanded` gratis. El texto es solo para lectores de
+   pantalla; lo que se ve es el punto. Mínimo 24×24 (WCAG 2.2 · 2.5.8). */
+.probe {
+  display: none;
+}
+:where(.xr[data-js]) .probe {
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  translate: 0 -50%;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  /* El texto vive, pero no se ve: el lector de pantalla lo lee, el ojo ve el punto. */
+  font-size: 0;
+  color: transparent;
+  z-index: 3;
+}
+:where(.xr[data-js]) .probe::before {
+  content: '';
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  translate: 0 -50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--client) 45%, transparent);
+  transition: scale var(--dur) var(--ease);
+}
+:where(.xr[data-js]) [data-couple]:hover .probe::before,
+:where(.xr[data-js]) .probe:hover::before {
+  scale: 1.4;
+}
+:where(.xr[data-js]) [data-couple][data-on] .probe::before {
+  opacity: 0;
+}
+.probe:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* LA FUENTE SUSURRA: tinte + barra lateral. Sin outline — ya la estás tocando. */
@@ -431,31 +487,14 @@ figure[data-couple][data-on] {
   box-shadow: inset 0 0 0 3px var(--client);
 }
 
-/* AFORDANCIA EN REPOSO: un punto en el borde derecho dice "esto se conecta con algo allá".
-   Sin ella, NADA avisa que el artículo es interactivo. */
-[data-couple][data-n]::before {
-  content: '';
-  position: absolute;
-  right: 0.4rem;
-  top: 50%;
-  translate: 0 -50%;
-  width: 5px;
-  height: 5px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--client) 45%, transparent);
-  transition: opacity var(--dur) var(--ease), scale var(--dur) var(--ease);
-  z-index: 2;
-}
-[data-couple][data-n]:hover::before {
-  scale: 1.4;
-}
-[data-couple][data-on][data-n]::before {
-  opacity: 0;
-}
+/* AFORDANCIA EN REPOSO: el punto del borde derecho dice "esto se conecta con algo allá".
+   Ya NO es un `::before` decorativo del bloque: es el `::before` del BOTÓN de sonda (ver arriba),
+   para que la afordancia visual y el control accesible sean la misma cosa — y no dos cosas que
+   pueden desincronizarse. Sin JS no aparece ninguno de los dos: no se promete lo que no se cumple. */
 
 /* EL CHIP DIRECCIONAL: apunta al destino y dice CUÁNTO hay al otro lado.
    Apilado no hay canaleta que cruzar: apunta hacia abajo y vive adentro. */
-[data-couple][data-n]::after {
+:where(.xr[data-js]) [data-couple][data-n]::after {
   content: '↓ ' attr(data-n);
   position: absolute;
   right: 0.25rem;
@@ -475,7 +514,7 @@ figure[data-couple][data-on] {
   transition: opacity var(--dur) var(--ease), scale var(--dur) var(--ease);
 }
 @media (min-width: 1080px) {
-  [data-couple][data-n]::after {
+  :where(.xr[data-js]) [data-couple][data-n]::after {
     content: '→ ' attr(data-n);
     right: -0.5rem;
     translate: 50% -50%;

@@ -55,7 +55,26 @@ const next = flow[i + 1]
 const href = (s: string) => (s ? `${base}/${s}` : base)
 
 /** El par pintado desde el HTML: sin JS, la pieza sigue argumentando. */
-const HERO = 'capsule-main'
+/**
+ * 🔴 EL MOTOR NO PUEDE CONOCER UN `coupleId` DEL CLIENTE.
+ *
+ * Antes esto era `const HERO = 'capsule-main'` — una cadena de SKY escrita en el motor, y repetida
+ * DOS veces más dentro del `<script>` del cliente. Sostenía dos invariantes: el par héroe pintado
+ * desde el HTML (*sin JS, la pieza sigue argumentando*) y la salida del enfoque. Un payload que
+ * llamara a su cápsula `capsule-hero` llegaba **sin `data-on`** y no fallaba nada: simplemente el
+ * argumento zero-JS desaparecía en silencio. El acoplamiento más barato de romper y el más caro de
+ * detectar.
+ *
+ * Ahora el héroe se DERIVA del payload: la primera cápsula de respuesta acoplable del artículo. Y
+ * viaja al script por `data-hero`, no por una constante — así el JS deja de conocer al cliente.
+ */
+const coupleIdOf = (b: (typeof d.article.blocks)[number]): string =>
+  'coupleId' in b && typeof b.coupleId === 'string' ? b.coupleId : ''
+
+const HERO =
+  d.article.blocks.filter(b => b.type === 'answer-capsule').map(coupleIdOf).find(Boolean) ??
+  d.article.blocks.map(coupleIdOf).find(Boolean) ??
+  ''
 
 /**
  * Cuántos datos de máquina produce cada bloque — alimenta el chip direccional («→ 3 datos»).
@@ -89,7 +108,9 @@ const titles: Record<string, string> = {
   description="Muestra de trabajo de Efeonce: un artículo, su capa de máquina y dónde más vive."
   noindex={true}
 >
-  <div class="xr" data-testid="xray-root" style={`--client:${client.accent}`}>
+  {/* `data-hero` es el puente: el héroe se DERIVA del payload y viaja al script por el DOM, no por
+      una constante. Así el JS del acoplamiento deja de conocer un `coupleId` del cliente. */}
+  <div class="xr" data-testid="xray-root" data-hero={HERO} style={`--client:${client.accent}`}>
     <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
     <header class="xr-chrome" data-testid="disclaimer">
       <div class="xr-wrap xr-chrome-in">
@@ -272,6 +293,14 @@ const titles: Record<string, string> = {
      * el CSS hace el resto. Sin JS, el par héroe ya viene pintado desde el HTML.
      */
     const root = document.querySelector<HTMLElement>('[data-testid="xray-root"]')
+    /* El héroe llega por el DOM, DERIVADO del payload. El script no conoce al cliente. */
+    const HERO = root?.dataset.hero ?? ''
+
+    /* 🔴 PRIMERA LÍNEA: recién ahora la página puede prometer un acoplamiento.
+       Todas las afordancias (cursor, punto, botón de sonda, chip) cuelgan de `[data-js]`. Sin JS
+       el artículo se lee entero y la capa de máquina se lee apilada abajo — pero NADA promete una
+       interacción que no existe. La lección ya estaba aprendida para el hint; faltaba el resto. */
+    if (root) root.dataset.js = 'on'
     const live = document.querySelector<HTMLElement>('[data-testid="live"]')
 
     // El hint promete que el hover produce algo. Sin JS no produce nada: solo aparece con JS.
@@ -281,6 +310,10 @@ const titles: Record<string, string> = {
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const inst = root.querySelector<HTMLElement>('.inst')
       const focusNote = root.querySelector<HTMLElement>('[data-testid="focus-note"]')
+      /* El destino seguro del foco cuando el panel colapsa bajo él, y el ancla del focus-return
+         al salir del enfoque. Es `tabindex="-1"`: alcanzable por script, nunca por Tab. */
+      const instTitle = root.querySelector<HTMLElement>('#in-t')
+      const showAll = root.querySelector<HTMLButtonElement>('[data-show-all]')
       let pinned: string | null = null
 
       /** MÓVIL: el instrumento vive apilado bajo el artículo. Sube como hoja al acoplar. */
@@ -293,11 +326,23 @@ const titles: Record<string, string> = {
       }
       root.querySelector('[data-close-sheet]')?.addEventListener('click', closeSheet)
 
-      /* Salir del enfoque y volver al MAPA. Mismo destino que Escape, pero descubrible. */
-      root.querySelector('[data-show-all]')?.addEventListener('click', () => {
+      /**
+       * SALIR DEL ENFOQUE → volver al MAPA. Una sola puerta, usada por el botón y por Escape.
+       *
+       * El foco se mueve EXPLÍCITAMENTE al título del instrumento. Antes el botón se ocultaba al
+       * activarse (solo existía en modo enfoque), así que el foco caía al inicio del documento y el
+       * usuario de teclado quedaba perdido en una página de 9.000px — el mismo bug que el botón vino
+       * a arreglar, ahora en la salida. Hoy el botón NO desaparece: queda `disabled` en su sitio.
+       */
+      const exitFocus = () => {
         pinned = null
-        paint('capsule-main', false)
-      })
+        paint(HERO, false)
+        if (showAll) showAll.disabled = true
+        instTitle?.focus({ preventScroll: true })
+        if (live) live.textContent = 'Capa completa: el instrumento vuelve a mostrarse entero.'
+      }
+
+      showAll?.addEventListener('click', exitFocus)
 
       /**
        * `collapse` separa los DOS MODOS del instrumento:
@@ -318,13 +363,19 @@ const titles: Record<string, string> = {
 
         root.querySelectorAll<HTMLElement>('[data-couple],[data-couple-target]').forEach(el => {
           const mine = el.dataset.couple ?? el.dataset.coupleTarget
-          if (id && mine === id) {
+          const on = Boolean(id) && mine === id
+
+          if (on) {
             el.dataset.on = 'true'
             el.setAttribute('aria-current', 'true')
           } else {
             delete el.dataset.on
             el.removeAttribute('aria-current')
           }
+
+          /* El botón de sonda DICE si la capa de su bloque está desplegada en el panel. Sin esto,
+             el lector de pantalla no sabe que el bloque controla algo remoto — ni si está activo. */
+          if (el.dataset.couple) el.querySelector('[data-probe]')?.setAttribute('aria-expanded', String(on))
         })
         /**
          * EL INSTRUMENTO ENFOCA (no solo atenúa).
@@ -376,6 +427,17 @@ const titles: Record<string, string> = {
             on.querySelectorAll('*').forEach(d => keep.add(d))
           })
 
+          /* 🔴 NUNCA OCULTAR BAJO EL FOCO. `display:none` saca el nodo del árbol de accesibilidad Y
+             del orden de tabulación: si el elemento activo queda dentro de lo que vamos a colapsar,
+             el foco cae al `<body>` y el usuario aparece al inicio de una página de 9.000px sin
+             entender qué pasó. Se lo movemos ANTES, al header del instrumento, que es el sitio
+             correcto: es donde acaba de aparecer la cuenta («Lo que produce este bloque · 4 datos»). */
+          const active = document.activeElement
+
+          if (active instanceof HTMLElement && body.contains(active) && !keep.has(active)) {
+            instTitle?.focus({ preventScroll: true })
+          }
+
           /* Se colapsa: los rótulos de familia, los nodos de otros bloques, las filas del árbol
              que no son ésta y las preguntas del fan-out que este bloque no cubre. */
           body
@@ -403,10 +465,17 @@ const titles: Record<string, string> = {
 
         /* El comprador no tiene por qué saber SEO: se le dice en palabras, no solo con un realce. */
         if (focusNote) focusNote.textContent = `Lo que produce este bloque · ${cuenta}`
+        if (showAll) showAll.disabled = false
+
+        /* El anuncio tiene que ser HONESTO: si el resto de la capa se colapsó, hay que decirlo — y
+           decir cómo volver. Antes anunciaba «4 datos. Primero: X» y dejaba al usuario de lector de
+           pantalla creyendo que el panel seguía entero. */
         if (live) {
           const name = target.querySelector('.nd-l,.sch-t,.kpi-u')?.textContent?.trim()
 
-          live.textContent = name ? `${cuenta}. Primero: ${name}` : cuenta
+          live.textContent =
+            `Enfocado: ${cuenta}${name ? `. Primero: ${name}` : ''}. ` +
+            'El resto de la capa está colapsada. Botón «Ver toda la capa» para volver.'
         }
       }
 
@@ -424,11 +493,30 @@ const titles: Record<string, string> = {
         if (e.key === 'Tab' || e.key.startsWith('Arrow')) keyboard = true
       })
 
+      /**
+       * 🔴 EL INSTRUMENTO NO PUEDE REPINTARSE DESDE SÍ MISMO.
+       *
+       * Antes, `enter()` escuchaba sobre `[data-couple]` Y `[data-couple-target]` — o sea, los DOS
+       * lados del split. Con el modo enfoque (que colapsa con `display:none` todo lo que el bloque
+       * no produce), eso volvía el panel inusable con teclado:
+       *
+       *   1. El usuario tabula al primer nodo del instrumento.
+       *   2. `focusin` → `paint(ese nodo)` → el 90% del panel se pone `display:none`.
+       *   3. Tab: ya no queda nada enfocable dentro → SALE del instrumento.
+       *
+       * El evaluador con teclado NUNCA podía recorrer la capa de máquina: se le deshacía cada vez
+       * que la tocaba. Y con mouse pasaba la variante fea: abrías un «Ver el código», movías el
+       * cursor a otro bloque, y el elemento enfocado desaparecía → el foco caía al `<body>`.
+       *
+       * El acoplamiento nace en el ARTÍCULO y viaja al instrumento. Nunca al revés.
+       */
       const enter = (e: Event) => {
         const el = hit(e)
         if (!el || pinned) return
         if (e.type === 'mouseover' && keyboard) return
-        paint(el.dataset.couple ?? el.dataset.coupleTarget ?? null)
+        // Solo el lado del artículo dispara el acoplamiento. El panel se lee, no se repinta.
+        if (!el.dataset.couple) return
+        paint(el.dataset.couple)
       }
 
       root.addEventListener('mouseover', enter)
@@ -448,7 +536,7 @@ const titles: Record<string, string> = {
         /* Escape devuelve al MAPA (el panel entero), no a otro enfoque: es la salida del
            instrumento, y sin ella —al no haber `mouseout`, el acoplamiento es pegajoso a
            propósito— no habría forma de volver a ver la máquina completa sin recargar. */
-        paint('capsule-main', false)
+        exitFocus()
       })
     }
   </script>

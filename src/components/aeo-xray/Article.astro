@@ -74,6 +74,23 @@ const tocItems = article.blocks.flatMap(b =>
   b.type === 'h2' || b.type === 'faq' ? [{ anchor: b.anchor, short: b.short }] : [],
 )
 
+/**
+ * 🔴 EL BLOQUE NO ES UN CONTROL. EL BOTÓN DENTRO DE ÉL, SÍ.
+ *
+ * Antes cada bloque acoplable era un `<div tabindex="0">` **sin rol, sin nombre accesible y sin
+ * relación ARIA con el panel**. Tres consecuencias:
+ *   · Al lector de pantalla se le presentaba como contenido plano que casualmente recibe foco: nada
+ *     le decía que ese bloque CONTROLA un panel remoto, ni dónde aterriza el resultado. El eje entero
+ *     de la pieza —la correspondencia artículo ↔ capa de máquina— le era invisible.
+ *   · Un `div[tabindex=0]` **no dispara `click` con Enter ni Space** → fijar/soltar el acoplamiento
+ *     era una función EXCLUSIVA DEL MOUSE (WCAG 2.1.1).
+ *   · Y 22 tab-stops que sin JS no hacían absolutamente nada.
+ *
+ * No se convierte el bloque en `role="button"`: un `<h2>` dentro de un botón es peor semántica que
+ * el problema. El patrón correcto es el **disclosure remoto** — el punto que era un `::before`
+ * decorativo pasa a ser un `<button>` de verdad, con `aria-controls` al panel y `aria-expanded`.
+ * El botón hereda foco, rol, nombre y Enter/Space **gratis**.
+ */
 const attrsFor = (id: string) => {
   if (!coupled) return {}
   const n = produces.get(id) ?? 0
@@ -82,10 +99,11 @@ const attrsFor = (id: string) => {
     'data-couple': id,
     'data-on': id === hero ? true : undefined,
     'data-n': n > 0 ? `${n} ${n === 1 ? ui.producesLabelOne : ui.producesLabel}` : undefined,
-    tabindex: 0,
   }
 }
-const srFor = (id: string) => {
+
+/** El nombre accesible del botón: sale del copy que ya existe en el payload. */
+const probeFor = (id: string) => {
   const n = produces.get(id) ?? 0
 
   return coupled && n > 0 ? ui.srProduces.replace('{n}', String(n)) : null
@@ -114,12 +132,16 @@ const srFor = (id: string) => {
       }
 
       const a = attrsFor(b.coupleId)
-      const sr = srFor(b.coupleId)
+      const probe = probeFor(b.coupleId)
 
       if (isImage(b))
         return (
           <figure class={`blk fig ${b.type === 'hero-image' ? 'hero' : ''}`} {...a}>
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
             {/* `<Image>` de astro:assets: de acá salen width/height (sin ellos, CLS), el srcset
                 (sin él un teléfono baja el hero de escritorio) y AVIF. Una pieza que argumenta
                 rigor técnico no puede reprobar su propio PageSpeed. */}
@@ -150,7 +172,11 @@ const srFor = (id: string) => {
       if (b.type === 'h1')
         return (
           <div class="blk head-blk" {...a}>
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
             <p class="cat">{article.category}</p>
             <h3 class="p-h1">{b.text}</h3>
             <p class="byline">
@@ -168,7 +194,11 @@ const srFor = (id: string) => {
             {/* `scroll-margin-top` en el CSS: sin él, el ancla deja el título BAJO el
                 header pegajoso. Es el mismo WCAG 2.4.11 que ya nos mordió una vez. */}
             <h4 class="p-h2" id={b.anchor}>{b.text}</h4>
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
           </div>
         )
       if (b.type === 'toc')
@@ -195,20 +225,32 @@ const srFor = (id: string) => {
           <div class={`blk ${coupled ? 'cap' : 'cap-read'}`} {...a}>
             {coupled && <span class="cap-t">Respuesta directa</span>}
             <p>{b.text}</p>
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
           </div>
         )
       if (b.type === 'pull-quote')
         return (
           <blockquote class="blk pull" {...a}>
             <p>{b.text}</p>
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
           </blockquote>
         )
       if (b.type === 'table')
         return (
           <div class="blk" {...a}>
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
             <div class="tw">
               <table>
                 <caption>{b.caption}</caption>
@@ -223,7 +265,11 @@ const srFor = (id: string) => {
           <div class="blk" {...a}>
             <p class="blk-t">{b.title}</p>
             <ol>{b.items.map(i => <li>{i}</li>)}</ol>
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
           </div>
         )
       if (b.type === 'faq')
@@ -240,7 +286,11 @@ const srFor = (id: string) => {
                 <p class="a">{i.a}</p>
               </div>
             ))}
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
           </div>
         )
       if (b.type === 'internal-links')
@@ -255,7 +305,11 @@ const srFor = (id: string) => {
                 </li>
               ))}
             </ul>
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
           </div>
         )
       if (b.type === 'sources')
@@ -263,7 +317,11 @@ const srFor = (id: string) => {
           <div class="blk srcs" {...a}>
             <p class="blk-t">{b.title}</p>
             <ul>{b.items.map(i => <li><a href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
-            {sr && <span class="xr-sr">{sr}</span>}
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
           </div>
         )
 
@@ -351,7 +409,13 @@ const srFor = (id: string) => {
   .fig.hero :global(img) { border-radius: 0; }
   .fig-m { padding: 0.55rem 1.75rem 0; }
   figcaption { font-size: 0.9375rem; line-height: 1.5; color: var(--ink-3); }
-  .credit { margin-top: 0.25rem; font-size: 0.75rem; color: var(--faint); }
+  /* 🔴 WCAG 1.4.3 — y la ironía ERA el hallazgo.
+     El crédito usaba `--faint` (#7c8fa3), que da 3,33:1 sobre blanco. El mínimo es 4,5:1. Y el
+     crédito visible ES la demostración del requisito 5 de las bases («imagen apta y libre de
+     derechos, con licencia verificable»): un evaluador que le pasa axe a la muestra encontraba su
+     fallo AA justo en la línea que existe para probar cumplimiento. En una agencia que vende rigor,
+     eso no es un bug: es el titular. `--muted` (#5a6b7d) da 5,5:1 y ya se usa para meta. */
+  .credit { margin-top: 0.25rem; font-size: 0.8125rem; color: var(--muted); }
   .credit a { color: inherit; text-decoration: underline; }
 
   .head-blk { padding-top: 0.25rem; }
