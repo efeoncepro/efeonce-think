@@ -35,6 +35,23 @@ type Block = (typeof article.blocks)[number]
 type ImageBlock = Extract<Block, { type: 'image' | 'hero-image' }>
 const isImage = (b: Block): b is ImageBlock => b.type === 'image' || b.type === 'hero-image'
 
+const articleBlocks: Block[] = (() => {
+  if (coupled) return [...article.blocks]
+
+  const blocks = [...article.blocks]
+  const heroIndex = blocks.findIndex(b => b.type === 'hero-image')
+  const headlineIndex = blocks.findIndex(b => b.type === 'h1')
+
+  // La ② es lectura editorial. Un blog premium abre con titular/firma antes de
+  // pedirle al lector que atraviese una foto de 16:9 completa.
+  if (heroIndex >= 0 && headlineIndex > heroIndex) {
+    const [headline] = blocks.splice(headlineIndex, 1)
+    blocks.splice(heroIndex, 0, headline)
+  }
+
+  return blocks
+})()
+
 /**
  * La FIRMA (categoría · autor · fecha · lectura). No es adorno: el `BlogPosting` declara
  * `author`, `datePublished` y `articleSection`, y el schema SOLO puede marcar contenido
@@ -124,7 +141,7 @@ const probeFor = (id: string) => {
   </div>
 
   <article class="post xr-article">
-    {article.blocks.map(b => {
+    {articleBlocks.map(b => {
       if (!('coupleId' in b)) {
         if (b.type === 'paragraph') return <p class="para">{b.text}</p>
 
@@ -149,11 +166,15 @@ const probeFor = (id: string) => {
               class={b.type === 'hero-image' ? 'xr-hero-img' : ''}
               src={b.src}
               alt={b.alt}
-              widths={b.type === 'hero-image' ? [640, 960, 1400] : [480, 720, 1000]}
+              widths={
+                b.type === 'hero-image'
+                  ? coupled ? [640, 960, 1400] : [640, 960, 1400, 1600]
+                  : coupled ? [480, 720, 1000] : [480, 720, 1000, 1400]
+              }
               sizes={
                 b.type === 'hero-image'
-                  ? coupled ? '(min-width: 1080px) 52vw, 100vw' : '(min-width: 820px) 800px, 100vw'
-                  : coupled ? '(min-width: 1080px) 46vw, 92vw' : '(min-width: 820px) 740px, 92vw'
+                  ? coupled ? '(min-width: 1080px) 52vw, 100vw' : '(min-width: 1440px) 1400px, (min-width: 820px) calc(100vw - 4rem), 100vw'
+                  : coupled ? '(min-width: 1080px) 46vw, 92vw' : '(min-width: 820px) 980px, 92vw'
               }
               format="avif"
               quality={72}
@@ -366,10 +387,10 @@ const probeFor = (id: string) => {
   /* Leyendo (pantalla ②): la medida manda, no el ancho del contenedor. */
   .sp-read {
     --a-h1: 2.6rem;
-    --a-body: 1.16rem;
-    --a-lead: 1.32rem;
-    --read-measure: min(78ch, calc(100% - clamp(2.5rem, 7vw, 7rem)));
-    width: min(100%, 76rem);
+    --a-body: 1.18rem;
+    --a-lead: 1.28rem;
+    --read-measure: min(48rem, 100%);
+    width: min(100%, 92rem);
     max-width: none;
     margin-inline: auto;
     overflow: hidden;
@@ -437,22 +458,46 @@ const probeFor = (id: string) => {
   .fig.hero :global(img) { border-radius: 0; }
   .fig-m { padding: 0.55rem 1.75rem 0; }
   .sp-read .post {
+    display: grid;
+    grid-template-columns:
+      minmax(clamp(1.35rem, 11vw, 14rem), 1fr)
+      minmax(0, var(--read-measure))
+      minmax(clamp(1.2rem, 7vw, 18rem), 1.28fr);
     padding-bottom: clamp(3rem, 6vw, 5rem);
   }
   .sp-read .post > .para,
   .sp-read .post > .blk:not(.fig),
   .sp-read .fig-m,
   .sp-read .toc {
+    grid-column: 2;
     box-sizing: border-box;
-    width: var(--read-measure);
+    width: 100%;
     max-width: none;
-    margin-inline: auto;
+    margin-inline: 0;
   }
   .sp-read .post > .blk:not(.fig) {
     padding-inline: 0;
   }
+  .sp-read .post > .fig {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .sp-read .fig {
+    display: grid;
+    grid-template-columns:
+      minmax(clamp(1.35rem, 11vw, 14rem), 1fr)
+      minmax(0, var(--read-measure))
+      minmax(clamp(1.2rem, 7vw, 18rem), 1.28fr);
+  }
+  .sp-read .fig :global(img) {
+    grid-column: 2 / 4;
+    width: 100%;
+  }
+  .sp-read .fig.hero :global(img) {
+    grid-column: 1 / -1;
+  }
   .sp-read .fig.hero {
-    margin-bottom: clamp(2.1rem, 4vw, 3.25rem);
+    margin-block: 0 clamp(2.4rem, 4.8vw, 3.6rem);
   }
   .sp-read .fig:not(.hero) {
     margin-block: clamp(2.4rem, 5vw, 3.8rem);
@@ -461,18 +506,19 @@ const probeFor = (id: string) => {
     padding-top: clamp(0.75rem, 1.6vw, 1rem);
   }
   .sp-read .head-blk {
-    padding-top: clamp(1rem, 2.5vw, 1.8rem);
+    padding-top: clamp(2.3rem, 5vw, 4.25rem);
+    padding-bottom: clamp(1.35rem, 3vw, 2.25rem);
   }
   .sp-read .cat {
     margin-bottom: 0.85rem;
   }
   .sp-read .p-h1 {
-    max-width: 33ch;
+    max-width: 40ch;
   }
   .sp-read .byline {
     margin-top: 1.15rem;
     padding-top: 1.05rem;
-    margin-bottom: clamp(1.7rem, 3.6vw, 2.7rem);
+    margin-bottom: 0;
   }
   .sp-read .para {
     margin-block: 1.45rem;
@@ -714,6 +760,14 @@ const probeFor = (id: string) => {
     }
     .sp-read .fig-m {
       padding-top: 0.5rem;
+    }
+    .sp-read .post,
+    .sp-read .fig {
+      grid-template-columns: minmax(1.15rem, 1fr) minmax(0, var(--read-measure)) minmax(1.15rem, 1fr);
+    }
+    .sp-read .fig :global(img),
+    .sp-read .fig.hero :global(img) {
+      grid-column: 1 / -1;
     }
   }
 
