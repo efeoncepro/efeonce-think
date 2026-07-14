@@ -106,6 +106,36 @@ check(
   `${creditRows.length} créditos · ${licRows.length} filas del pie · ${linked.length}/${rows.length} con licencia enlazada`,
 )
 
+/* 40-41. EL CONTRATO DEL ACOPLAMIENTO — huérfanos y fantasmas.
+   Un bloque acoplable PROMETE que hay algo al otro lado: se ilumina, invita a pasar el
+   cursor, ofrece foco de teclado. Si el instrumento no lo referencia, la promesa se rompe
+   en silencio — no falla nada, simplemente no pasa nada. Es peor que no acoplarlo.
+   Pasó de verdad: 4 de las 6 cápsulas quedaron huérfanas al agregar secciones, porque el
+   instrumento declaraba la técnica UNA vez y el artículo la aplica SEIS.
+   El espejo del bug es el fantasma: un nodo que apunta a un bloque que ya no existe (pasa
+   al renombrar un coupleId). Los dos se cazan con el mismo par de conjuntos. */
+const payload = JSON.parse(readFileSync(`src/content/aeo-xray/${SAMPLE}.json`, 'utf8'))
+const artIds = new Set(payload.article.blocks.filter(b => b.coupleId).map(b => b.coupleId))
+const instIds = new Set([
+  ...['seo', 'og', 'craft', 'jsonld', 'alts'].flatMap(k => payload.machine[k].map(x => x.coupleId)),
+  payload.machine.headings.coupleId,
+  ...payload.machine.headings.tree.map(x => x.coupleId),
+  ...payload.evidence.facts.map(x => x.coupleId),
+  ...payload.evidence.fanOut.items.map(x => x.coveredBy),
+])
+const orphans = [...artIds].filter(id => !instIds.has(id))
+const ghosts = [...instIds].filter(id => !artIds.has(id))
+check(
+  '40. Cero bloques HUÉRFANOS — ninguno se ilumina contra la nada',
+  orphans.length === 0,
+  `acoplables sin contraparte en el instrumento: ${orphans.join(', ')}`,
+)
+check(
+  '41. Cero nodos FANTASMA — ninguno apunta a un bloque que ya no existe',
+  ghosts.length === 0,
+  `el instrumento referencia bloques inexistentes: ${ghosts.join(', ')}`,
+)
+
 // 7. Toda cifra de evidencia con fuente + as-of
 const cites = (html.match(/<cite[\s>]/gi) ?? []).length
 check('7. Toda cifra de evidencia lleva <cite> con fuente y as-of', cites >= 5, `${cites} cites`)

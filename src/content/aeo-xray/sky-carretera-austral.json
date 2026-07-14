@@ -723,6 +723,34 @@
         "detail": "5 secciones · #anchor por H2",
         "why": "Un índice no es decoración. Le da al lector un mapa en dos segundos —y baja el rebote— y le da al motor un ancla por sección. Un motor de respuesta recupera PASAJES, no páginas: cada ancla es una dirección a la que puede apuntar. Además es lo que le permite a Google mostrar enlaces a secciones dentro del resultado. ⚠️ Como con el FAQ, eso se declara, no se promete.",
         "tier": 2
+      },
+      {
+        "coupleId": "capsule-dias",
+        "label": "Cápsula de respuesta",
+        "detail": "42 palabras · «¿Cuántos días?»",
+        "why": "El mismo patrón, repetido bajo cada H2 — no una vez. Un motor de respuesta recupera PASAJES, no páginas: esta cápsula tiene que responder «¿Cuántos días?» por sí sola, sin el resto del artículo. Es la que más se pregunta después de decidir ir.",
+        "tier": 2
+      },
+      {
+        "coupleId": "capsule-epoca",
+        "label": "Cápsula de respuesta",
+        "detail": "44 palabras · «¿Cuál es la mejor época?»",
+        "why": "El mismo patrón, repetido bajo cada H2 — no una vez. Un motor de respuesta recupera PASAJES, no páginas: esta cápsula tiene que responder «¿Cuál es la mejor época?» por sí sola, sin el resto del artículo. Es estacional: sube en primavera austral.",
+        "tier": 2
+      },
+      {
+        "coupleId": "capsule-ripio",
+        "label": "Cápsula de respuesta",
+        "detail": "46 palabras · «¿Está pavimentada? ¿4x4?»",
+        "why": "El mismo patrón, repetido bajo cada H2 — no una vez. Un motor de respuesta recupera PASAJES, no páginas: esta cápsula tiene que responder «¿Está pavimentada? ¿4x4?» por sí sola, sin el resto del artículo. Es la pregunta que decide el arriendo del auto.",
+        "tier": 2
+      },
+      {
+        "coupleId": "capsule-ferries",
+        "label": "Cápsula de respuesta",
+        "detail": "53 palabras · «¿Hay que reservar los transbordadores?»",
+        "why": "El mismo patrón, repetido bajo cada H2 — no una vez. Un motor de respuesta recupera PASAJES, no páginas: esta cápsula tiene que responder «¿Hay que reservar los transbordadores?» por sí sola, sin el resto del artículo. Es la que nadie responde bien — y el ángulo de SKY.",
+        "tier": 2
       }
     ]
   },
