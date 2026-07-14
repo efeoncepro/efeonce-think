@@ -41,11 +41,11 @@
       {
         "type": "answer-capsule",
         "coupleId": "capsule-main",
-        "text": "La Carretera Austral (Ruta 7) recorre 1.247 km entre Puerto Montt y Villa O'Higgins. La forma más rápida de empezar es volar a Balmaceda, el aeropuerto de Coyhaique, y arrendar un auto ahí mismo: te saltas los tramos más largos y los tres transbordadores del norte. Recorrerla con calma toma entre 10 y 14 días."
+        "text": "Hay dos formas de empezar la Carretera Austral. Una: manejar los 1.247 km desde Puerto Montt y subir el auto a dos barcazas. La otra: volar a Balmaceda, arrendar un auto en el mismo terminal y estar en la mitad de la Ruta 7 antes del almuerzo. Recorrerla toma entre 10 y 14 días."
       },
       {
         "type": "paragraph",
-        "text": "La Carretera Austral tiene un detalle que el mapa no te cuenta: no es continua. Hay puntos donde el camino simplemente se acaba y tienes que subir el auto a una barcaza. Esos cruces son lo único del viaje que no depende de ti — y son los que deciden si tu itinerario se sostiene o se cae. Por eso la primera decisión no es qué auto arrendar: es por dónde entrar."
+        "text": "Los 1.247 kilómetros son los mismos para todos. Lo que cambia —y lo que ordena el resto del viaje— es dónde decides empezarlos."
       },
       {
         "type": "toc",
@@ -62,15 +62,15 @@
       {
         "type": "answer-capsule",
         "coupleId": "capsule-como-llegar",
-        "text": "Hay tres puertas de entrada. La más rápida es volar a Balmaceda (BBA) y arrendar un auto en el mismo terminal: el aeropuerto queda a 56 km de Coyhaique, una hora por la ruta CH-245, y te deja en el centro de la ruta. Las otras dos parten en Puerto Montt, el kilómetro 0."
+        "text": "Volar a Balmaceda (BBA) es la entrada más directa: el aeropuerto queda a 56 km de Coyhaique —una hora por la ruta CH-245—, tiene arriendo de autos en el mismo terminal y te deja en el centro de la ruta. Las otras dos entradas parten en Puerto Montt, el kilómetro 0."
       },
       {
         "type": "paragraph",
-        "text": "En la práctica son dos puntos de partida, porque manejar desde Santiago también te deja en Puerto Montt. Y la diferencia entre ellos no se mide en kilómetros: se mide en días. Balmaceda te deja parado en la mitad de la ruta, con Cerro Castillo a dos horas y las Capillas de Mármol a media jornada. Puerto Montt significa hacer los 1.247 km completos —y los tres transbordadores del norte— antes de llegar a lo que probablemente viniste a ver."
+        "text": "Puerto Montt es el kilómetro cero, y ahí arranca la parte que casi nadie cuenta: los primeros tramos de la Ruta 7 no son camino, son agua. Hay que subir el auto a una barcaza dos veces antes de llegar a Chaitén, y las dos se reservan."
       },
       {
         "type": "paragraph",
-        "text": "Ninguna de las dos está mal. Depende de si el viaje es la ruta, o si la ruta es el camino hacia otra cosa."
+        "text": "Balmaceda te deja del otro lado de eso. Aterrizas, retiras el auto en el terminal y ya estás en el centro de la ruta: Cerro Castillo a dos horas, las Capillas de Mármol a media jornada. La tercera entrada —manejar desde Santiago— termina igual en Puerto Montt, con dos días de Ruta 5 encima por cada lado."
       },
       {
         "type": "table",
@@ -87,7 +87,7 @@
             "Balmaceda (BBA)",
             "Vuelo directo a Balmaceda + 56 km hasta Coyhaique (≈1 h, ruta CH-245)",
             "Coyhaique, en el centro de la ruta",
-            "Los tres transbordadores del tramo norte"
+            "Los dos transbordadores del tramo norte"
           ],
           [
             "Puerto Montt",
@@ -113,15 +113,15 @@
       {
         "type": "answer-capsule",
         "coupleId": "capsule-dias",
-        "text": "La Carretera Austral completa —los 1.247 km entre Puerto Montt y Villa O'Higgins— toma entre 10 y 14 días si quieres bajarte del auto. Si vuelas a Balmaceda y haces solo el tramo sur, con 5 a 7 días alcanzas para Cerro Castillo, las Capillas de Mármol y el río Baker."
+        "text": "Entre 10 y 14 días para la ruta completa, si quieres bajarte del auto. Si vuelas a Balmaceda y haces solo el tramo sur, con 5 a 7 días te alcanza para Cerro Castillo, las Capillas de Mármol y el río Baker."
       },
       {
         "type": "paragraph",
-        "text": "Diez días suenan a mucho hasta que entiendes de qué están hechos. No son diez días de manejo: son diez días de parar. Si lo único que quieres es cruzar los 1.247 km, se hacen en bastante menos — pero entonces no viste nada, y no era eso a lo que ibas."
+        "text": "Esos días no son de manejo: son de parar. Cruzar la ruta se puede hacer en mucho menos, si lo único que quieres es cruzarla. Pero entonces te vas a acordar del volante y no del lago."
       },
       {
         "type": "paragraph",
-        "text": "Este es un plan de siete días desde Balmaceda, con aire de sobra para que un día de lluvia no te desarme el itinerario completo."
+        "text": "Este es un plan de siete días desde Balmaceda, con aire de sobra para que un día de lluvia no te desarme el resto."
       },
       {
         "type": "ordered-list",
@@ -139,7 +139,7 @@
       },
       {
         "type": "paragraph",
-        "text": "Fíjate que hay días casi sin volante: el de las Capillas se hace en bote, y la tarde queda libre. Eso no es que al plan le sobre tiempo. Es lo que hace que llegues a mirar, en vez de llegar reventado."
+        "text": "Fíjate en el día cuatro: no hay volante. Las Capillas se ven desde un bote y la tarde queda libre. Ese día no es relleno — es la razón por la que estás acá."
       },
       {
         "type": "image",
@@ -167,11 +167,11 @@
       },
       {
         "type": "paragraph",
-        "text": "El clima de Aysén no le hace caso al pronóstico. Puedes salir de Coyhaique con sol, cruzar Cerro Castillo bajo agua y llegar a Río Tranquilo con sol otra vez. No es mal tiempo: son cuatro estaciones en un día, y ninguna dura demasiado."
+        "text": "Acá el pronóstico es una sugerencia. Puedes salir de Coyhaique con sol, cruzar Cerro Castillo bajo agua y llegar a Río Tranquilo con sol otra vez. No es mal clima: son cuatro estaciones en un día, y ninguna dura demasiado."
       },
       {
         "type": "paragraph",
-        "text": "Lo que sí conviene planificar es el invierno: varios tramos y servicios bajan su frecuencia. Si vas fuera de temporada, confirma los transbordadores antes de comprometer nada. Son ellos, y no el camino, los que mandan."
+        "text": "Lo que sí conviene planificar es el invierno, cuando varios tramos y servicios bajan la frecuencia. Y fuera de temporada, lo primero que se confirma no es el hotel: son los transbordadores."
       },
       {
         "type": "h2",
@@ -183,15 +183,15 @@
       {
         "type": "answer-capsule",
         "coupleId": "capsule-ripio",
-        "text": "La Carretera Austral está pavimentada por tramos y sigue teniendo sectores de ripio, sobre todo al sur de Cerro Castillo. No necesitas un 4x4 para hacerla en verano, pero sí un auto con buena altura, la rueda de repuesto revisada y paciencia con el ripio suelto."
+        "text": "La Ruta 7 está pavimentada por tramos y sigue teniendo sectores de ripio, sobre todo al sur de Cerro Castillo. No necesitas un 4x4 para hacerla en verano, pero sí un auto con buena altura, la rueda de repuesto revisada y paciencia con el ripio suelto."
       },
       {
         "type": "paragraph",
-        "text": "El ripio del sur no es un camino malo: es un camino distinto. Se anda a 50, se frena antes, y las curvas ciegas se toman a 30 aunque no venga nadie. Y lo que más autos deja botados no es una piedra suelta: es la calamina, esa ondulación que te sacude el auto entero si la tomas rápido."
+        "text": "El ripio del sur no es un camino malo: es otro camino. Se anda a 50, se frena antes y las curvas ciegas se toman a 30 aunque no venga nadie. Lo que deja autos botados no es una piedra grande — es la calamina, esa ondulación que te sacude el auto entero si la tomas rápido."
       },
       {
         "type": "paragraph",
-        "text": "De todo eso, lo que más gente subestima es la rueda de repuesto. Revisada de verdad — no la que vino con el auto y nadie miró en tres años. Y carga bencina cada vez que veas una bomba, aunque tengas medio estanque: existen, pero son chicas y con horarios cortos. Si decides seguir más al sur de Cochrane, ojo con eso: entre ahí y Villa O'Higgins hay 231 kilómetros sin una sola."
+        "text": "Lo que más gente subestima es la rueda de repuesto. Revisada de verdad, no la que vino con el auto y nadie miró en tres años. Y carga bencina cada vez que veas una bomba, aunque tengas medio estanque: las estaciones existen, pero son chicas y con horarios cortos. Si sigues más al sur de Cochrane, ojo con eso — entre ahí y Villa O'Higgins hay 231 kilómetros sin una sola."
       },
       {
         "type": "image",
@@ -215,20 +215,24 @@
       {
         "type": "answer-capsule",
         "coupleId": "capsule-ferries",
-        "text": "La Carretera Austral no es continua: tiene cruces en transbordador que hay que reservar. Los dos del tramo norte salen de Caleta La Arena (unos 40 minutos) y de Hornopirén (unas cinco horas). En el extremo sur, el cruce de Puerto Yungay a Río Bravo dura cerca de una hora y es gratuito."
+        "text": "La Ruta 7 no es continua: tiene cruces en transbordador que hay que reservar. Los dos del tramo norte salen de Caleta La Arena (unos 40 minutos) y de Hornopirén (unas cinco horas). En el extremo sur, el cruce de Puerto Yungay a Río Bravo dura cerca de una hora y es gratuito."
       },
       {
         "type": "paragraph",
-        "text": "Los transbordadores no son un trámite: son el único punto del viaje que no controlas. El camino siempre está. El barco no: se llena, cambia el horario, se suspende por viento. Un cruce perdido en enero te cuesta un día entero — y ese día ya lo tenías ocupado."
+        "text": "Acá está el nudo del viaje. Todo lo demás se puede improvisar: cambias de hotel, te saltas un mirador, manejas una hora más. El barco no. Se llena, cambia el horario, se suspende por viento. Un cruce que pierdes en enero te cuesta un día entero — y ese día ya lo tenías ocupado."
       },
       {
         "type": "paragraph",
-        "text": "Si entras por Balmaceda no tocas ninguno de los dos del norte. Ésa es, en la práctica, la razón más concreta para volar."
+        "text": "Si entras por Balmaceda no tocas ninguno de los dos del norte."
       },
       {
         "type": "pull-quote",
         "coupleId": "pull-balmaceda",
-        "text": "Volar a Balmaceda no te ahorra solo kilómetros: te ahorra los dos transbordadores que pueden desarmarte el itinerario completo."
+        "text": "Volar a Balmaceda no te ahorra solo kilómetros: te ahorra la única parte del viaje que no depende de ti."
+      },
+      {
+        "type": "paragraph",
+        "text": "Los 1.247 kilómetros terminan en Villa O'Higgins, donde el camino se acaba de verdad: no hay curva siguiente, no hay pueblo después. Casi nadie llega hasta ahí en su primer viaje, y no hace falta. Basta con elegir bien dónde empezar."
       },
       {
         "type": "image",
@@ -647,7 +651,7 @@
       {
         "coupleId": "capsule-main",
         "label": "Cápsula de respuesta",
-        "detail": "55 palabras",
+        "detail": "54 palabras",
         "why": "Respuesta directa en 40–60 palabras bajo el título. Es el patrón presente en el 72,4% de las páginas que ChatGPT cita. Sin ella, el motor tiene que inferir la respuesta del cuerpo del texto — y muchas veces prefiere citar a otro.",
         "tier": 1,
         "stat": "72,4%",
