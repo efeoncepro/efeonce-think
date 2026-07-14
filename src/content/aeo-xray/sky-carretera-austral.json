@@ -45,7 +45,7 @@
       },
       {
         "type": "paragraph",
-        "text": "Hay un dato que no aparece en ningún mapa y que ordena todo lo demás: en ripio no se maneja a 90. Se maneja a 50, y en calamina a 30. Los 200 kilómetros que Google te promete en dos horas, acá son cuatro. De ahí sale el resto de la planificación: cuántos días pedir, por dónde entrar y qué auto arrendar."
+        "text": "La Carretera Austral tiene un detalle que el mapa no te cuenta: no es continua. Hay puntos donde el camino simplemente se acaba y tienes que subir el auto a una barcaza. Esos cruces son lo único del viaje que no depende de ti — y son los que deciden si tu itinerario se sostiene o se cae. Por eso la primera decisión no es qué auto arrendar: es por dónde entrar."
       },
       {
         "type": "toc",
@@ -66,7 +66,7 @@
       },
       {
         "type": "paragraph",
-        "text": "La diferencia entre las dos puertas no se mide en kilómetros: se mide en días. Entrar por Balmaceda te deja parado en la mitad de la ruta, con Cerro Castillo a dos horas y las Capillas de Mármol a media jornada. Entrar por Puerto Montt significa hacer los 1.247 km completos —y los tres transbordadores del norte— antes de llegar a lo que probablemente viniste a ver."
+        "text": "En la práctica son dos puntos de partida, porque manejar desde Santiago también te deja en Puerto Montt. Y la diferencia entre ellos no se mide en kilómetros: se mide en días. Balmaceda te deja parado en la mitad de la ruta, con Cerro Castillo a dos horas y las Capillas de Mármol a media jornada. Puerto Montt significa hacer los 1.247 km completos —y los tres transbordadores del norte— antes de llegar a lo que probablemente viniste a ver."
       },
       {
         "type": "paragraph",
@@ -108,7 +108,7 @@
         "coupleId": "h2-cuantos-dias",
         "text": "¿Cuántos días necesitas para recorrerla?",
         "anchor": "cuantos-dias",
-        "short": "Cuántos días necesitas (y por qué el mapa miente)"
+        "short": "Cuántos días necesitas (y de qué están hechos)"
       },
       {
         "type": "answer-capsule",
@@ -117,11 +117,11 @@
       },
       {
         "type": "paragraph",
-        "text": "Acá el mapa vuelve a mentir. Los 1.247 km parecen tres días de manejo. Son diez, y no porque el camino sea malo: porque te vas a bajar del auto. Esa es toda la gracia."
+        "text": "Diez días suenan a mucho hasta que entiendes de qué están hechos. No son diez días de manejo: son diez días de parar. Si lo único que quieres es cruzar los 1.247 km, se hacen en bastante menos — pero entonces no viste nada, y no era eso a lo que ibas."
       },
       {
         "type": "paragraph",
-        "text": "Este es un plan de siete días desde Balmaceda con aire de sobra, para que un día de lluvia no te desarme el itinerario completo."
+        "text": "Este es un plan de siete días desde Balmaceda, con aire de sobra para que un día de lluvia no te desarme el itinerario completo."
       },
       {
         "type": "ordered-list",
@@ -139,7 +139,7 @@
       },
       {
         "type": "paragraph",
-        "text": "Fíjate que ningún día pasa de cinco horas al volante. No es comodidad: es lo que rinde el ripio."
+        "text": "Fíjate que hay días casi sin volante: el de las Capillas se hace en bote, y la tarde queda libre. Eso no es que al plan le sobre tiempo. Es lo que hace que llegues a mirar, en vez de llegar reventado."
       },
       {
         "type": "image",
@@ -167,11 +167,11 @@
       },
       {
         "type": "paragraph",
-        "text": "El clima de Aysén no le hace caso al pronóstico. Puedes salir de Coyhaique con sol, cruzar Cerro Castillo bajo agua y llegar a Río Tranquilo con sol otra vez. No es mal tiempo: son cuatro estaciones en un día. Se viaja por capas, no por app del clima."
+        "text": "El clima de Aysén no le hace caso al pronóstico. Puedes salir de Coyhaique con sol, cruzar Cerro Castillo bajo agua y llegar a Río Tranquilo con sol otra vez. No es mal tiempo: son cuatro estaciones en un día, y ninguna dura demasiado."
       },
       {
         "type": "paragraph",
-        "text": "En invierno varios tramos y servicios bajan su frecuencia. Si vas fuera de temporada, confirma los transbordadores antes de comprometer un itinerario: son ellos, y no el camino, los que mandan."
+        "text": "Lo que sí conviene planificar es el invierno: varios tramos y servicios bajan su frecuencia. Si vas fuera de temporada, confirma los transbordadores antes de comprometer nada. Son ellos, y no el camino, los que mandan."
       },
       {
         "type": "h2",
@@ -187,11 +187,11 @@
       },
       {
         "type": "paragraph",
-        "text": "El ripio de la Austral no es un camino malo: es un camino distinto. Se anda a 50, se frena antes, y las curvas ciegas se toman a 30 aunque no venga nadie. Y lo que más autos deja botados no es una piedra suelta: es la calamina, esa ondulación que te sacude el auto entero si la tomas rápido."
+        "text": "El ripio del sur no es un camino malo: es un camino distinto. Se anda a 50, se frena antes, y las curvas ciegas se toman a 30 aunque no venga nadie. Y lo que más autos deja botados no es una piedra suelta: es la calamina, esa ondulación que te sacude el auto entero si la tomas rápido."
       },
       {
         "type": "paragraph",
-        "text": "Dos cosas que no se negocian. La rueda de repuesto revisada —la revisada, no la que vino con el auto—, y el estanque lleno cada vez que veas una bomba. Las estaciones existen, pero son chicas y con horarios cortos: entre Cochrane y Villa O'Higgins hay 231 kilómetros sin ninguna."
+        "text": "De todo eso, lo que más gente subestima es la rueda de repuesto. Revisada de verdad — no la que vino con el auto y nadie miró en tres años. Y carga bencina cada vez que veas una bomba, aunque tengas medio estanque: existen, pero son chicas y con horarios cortos. Si decides seguir más al sur de Cochrane, ojo con eso: entre ahí y Villa O'Higgins hay 231 kilómetros sin una sola."
       },
       {
         "type": "image",
