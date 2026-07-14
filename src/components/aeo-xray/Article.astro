@@ -390,11 +390,10 @@ const probeFor = (id: string) => {
     --a-h2: clamp(1.45rem, 2vw, 1.72rem);
     --a-body: 1.125rem;
     --a-lead: 1.22rem;
-    --article-canvas: min(100%, 90rem);
-    --article-gutter: clamp(8rem, 10vw, 11rem);
-    --article-measure: min(48rem, calc(100% - var(--article-gutter) - 1.25rem));
+    --article-canvas: min(100%, 74rem);
+    --article-measure: min(100%, 56rem);
     --media-width: 100%;
-    --inline-media-width: min(100%, 82rem);
+    --inline-media-width: min(100%, 64rem);
     width: var(--article-canvas);
     max-width: none;
     margin-inline: auto;
@@ -471,7 +470,7 @@ const probeFor = (id: string) => {
     box-sizing: border-box;
     width: var(--article-measure);
     max-width: none;
-    margin-inline: var(--article-gutter) auto;
+    margin-inline: auto;
   }
   .sp-read .post > .blk:not(.fig) {
     padding-inline: 0;
@@ -494,10 +493,10 @@ const probeFor = (id: string) => {
     border-radius: 10px;
   }
   .sp-read .fig.hero {
-    margin-block: clamp(1.25rem, 2.4vw, 2rem) clamp(1.8rem, 3.5vw, 2.7rem);
+    margin-block: clamp(1.1rem, 2.1vw, 1.65rem) clamp(1.45rem, 2.8vw, 2.1rem);
   }
   .sp-read .fig:not(.hero) {
-    margin-block: clamp(1.8rem, 3.5vw, 2.65rem);
+    margin-block: clamp(1.55rem, 3vw, 2.25rem);
   }
   .sp-read .fig-m {
     padding: 0.65rem 0 0;
@@ -519,18 +518,18 @@ const probeFor = (id: string) => {
     margin-bottom: 0;
   }
   .sp-read .para {
-    margin-block: 1.12rem;
+    margin-block: 1rem;
     line-height: 1.72;
   }
   .sp-read .cap-read {
-    margin-block: 1.35rem 1.45rem;
+    margin-block: 1.15rem 1.25rem;
   }
   .sp-read .p-h2 {
     margin-top: clamp(2.4rem, 4vw, 3.25rem);
   }
   .sp-read .toc {
     position: static;
-    margin-block: clamp(1.6rem, 3vw, 2.2rem);
+    margin-block: clamp(1.25rem, 2.4vw, 1.75rem);
     padding: clamp(1rem, 2vw, 1.35rem) clamp(1rem, 2.5vw, 1.5rem);
   }
   .sp-read .para,
@@ -743,7 +742,6 @@ const probeFor = (id: string) => {
       --a-body: 1.0625rem;
       --a-lead: 1.16rem;
       --article-canvas: 100%;
-      --article-gutter: 0;
       --article-measure: min(100% - 2.35rem, 64ch);
       --media-width: min(100% - 2.35rem, 64ch);
       --inline-media-width: min(100% - 2.35rem, 64ch);
@@ -765,7 +763,6 @@ const probeFor = (id: string) => {
 
   @media (max-width: 380px) {
     .sp-read {
-      --article-gutter: 0;
       --article-measure: min(100% - 1.8rem, 64ch);
       --media-width: min(100% - 1.8rem, 64ch);
       --inline-media-width: min(100% - 1.8rem, 64ch);
