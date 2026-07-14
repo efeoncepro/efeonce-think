@@ -184,7 +184,13 @@ const srFor = (id: string) => {
       if (b.type === 'answer-capsule')
         return (
           <div class="blk cap" {...a}>
-            <span class="cap-t">Respuesta directa</span>
+            {/* El rótulo «Respuesta directa» es ANOTACIÓN, no artículo: nombra la técnica.
+                En la pantalla ② —que se llama «lo que ve el lector»— no tiene nada que
+                hacer: interrumpe la lectura y le avisa al evaluador que está viendo un
+                ejercicio en vez de dejarlo LEER. La cápsula se queda (es contenido real,
+                y un destacado bajo el título es un patrón editorial legítimo); lo que se
+                va es el letrero que la explica. Explicarla es trabajo de la ③. */}
+            {coupled && <span class="cap-t">Respuesta directa</span>}
             <p>{b.text}</p>
             {sr && <span class="xr-sr">{sr}</span>}
           </div>
@@ -258,19 +264,25 @@ const srFor = (id: string) => {
     })}
   </article>
 
-  {/* El pie de licencias no es una nota: ES la demostración del requisito 5 de las bases. */}
-  <footer class="lic" data-testid="licenses">
-    <p class="lic-t">{ui.licenseTitle}</p>
-    <ul>
-      {article.blocks.filter(isImage).map(i => (
-        <li>
-          <span class="lic-a">{i.alt}</span>
-          <span class="lic-c">{i.credit.author} · <a href={i.credit.url} rel="nofollow noopener">{i.credit.license}</a></span>
-        </li>
-      ))}
-    </ul>
-    <p class="lic-n">{ui.licenseNote}</p>
-  </footer>
+  {/* El pie de licencias ES la demostración del requisito 5 de las bases — pero es NUESTRA
+      prueba, no el artículo del lector. Ojo: el crédito de cada foto SÍ se queda dentro del
+      artículo (un blog real acredita sus imágenes); lo que sale de la ② es este INVENTARIO
+      con la nota de servicio, que es un argumento comercial y no una pieza editorial.
+      Enseñarlo en la pantalla que se llama «lo que ve el lector» sería mentir en el rótulo. */}
+  {coupled && (
+    <footer class="lic" data-testid="licenses">
+      <p class="lic-t">{ui.licenseTitle}</p>
+      <ul>
+        {article.blocks.filter(isImage).map(i => (
+          <li>
+            <span class="lic-a">{i.alt}</span>
+            <span class="lic-c">{i.credit.author} · <a href={i.credit.url} rel="nofollow noopener">{i.credit.license}</a></span>
+          </li>
+        ))}
+      </ul>
+      <p class="lic-n">{ui.licenseNote}</p>
+    </footer>
+  )}
 </section>
 
 <style>
