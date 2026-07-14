@@ -134,6 +134,7 @@ const asText = (code: unknown) =>
 <style>
   .inst {
     background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
+    font-weight: var(--w-body-dark);
     border-radius: 12px; min-width: 0;
   }
   .in-head {
@@ -141,7 +142,7 @@ const asText = (code: unknown) =>
     padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--line-d); background: var(--navy-2);
     border-radius: 12px 12px 0 0; position: sticky; top: 0; z-index: 2;
   }
-  .in-head h2 { font-size: var(--t-body); font-weight: 600; }
+  .in-head h2 { font-size: var(--t-body); font-weight: var(--w-label); }
   .in-live { font-size: var(--t-over); color: var(--dim-d); text-align: right; }
   .in-body { padding: 1rem 1rem 1rem 1.3rem; }
 
@@ -152,7 +153,8 @@ const asText = (code: unknown) =>
     border-radius: 9px; outline: 2px solid transparent;
   }
   .kpi-n {
-    font-size: var(--t-stat); font-weight: 700; line-height: 1; color: #fff;
+    font-family: Poppins, system-ui, sans-serif;
+    font-size: var(--t-stat); font-weight: var(--w-display); line-height: 1; color: #fff;
     font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
   }
   .kpi-u { margin-top: 0.3rem; font-size: var(--t-meta); color: var(--ink-d); line-height: 1.35; }
@@ -160,11 +162,11 @@ const asText = (code: unknown) =>
   @media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
 
   .grp {
-    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--blue-up); margin: 1.5rem 0 0.6rem; padding-bottom: 0.4rem;
     border-bottom: 1px solid var(--line-d);
   }
-  .grp em { font-style: normal; font-weight: 500; color: var(--dim-d); text-transform: none; letter-spacing: 0.04em; }
+  .grp em { font-style: normal; font-weight: var(--w-body-dark); color: var(--dim-d); text-transform: none; letter-spacing: 0.04em; }
   .warn {
     font-size: var(--t-meta); line-height: 1.5; color: #ffd166;
     background: color-mix(in srgb, #ffd166 10%, var(--navy-2));
@@ -184,35 +186,35 @@ const asText = (code: unknown) =>
   .t3wrap { padding: 0.3rem 0 0.6rem; border-left: 2px solid var(--line-d); margin-left: 0.2rem; }
 
   .stat {
-    font-family: Poppins, system-ui, sans-serif; font-size: var(--t-stat); font-weight: 700;
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--t-stat); font-weight: var(--w-display);
     line-height: 1.05; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
     margin-bottom: 0.15rem;
   }
   .stat span {
-    display: block; font-size: var(--t-meta); font-weight: 400; line-height: 1.45;
+    display: block; font-size: var(--t-meta); font-weight: var(--w-body-dark); line-height: 1.45;
     color: var(--dim-d); letter-spacing: 0; margin-top: 0.25rem;
   }
   .stat-fix {
     display: inline-block !important; margin-right: 0.35rem; font-size: var(--t-over) !important;
-    font-weight: 700 !important; letter-spacing: 0.08em !important; text-transform: uppercase;
+    font-weight: var(--w-label) !important; letter-spacing: 0.08em !important; text-transform: uppercase;
     color: var(--blue-up) !important; vertical-align: middle;
   }
-  .nd-l { font-size: var(--t-meta); font-weight: 700; color: var(--ink-d); }
-  .nd-l em { font-weight: 400; color: var(--dim-d); font-style: normal; }
+  .nd-l { font-size: var(--t-meta); font-weight: var(--w-label); color: var(--ink-d); }
+  .nd-l em { font-weight: var(--w-body-dark); color: var(--dim-d); font-style: normal; }
   .nd-v { font-size: var(--t-meta); margin-top: 0.2rem; color: var(--ink-d); word-break: break-word; line-height: 1.5; }
   .nd-v.mono { font-family: ui-monospace, monospace; font-size: 0.6875rem; color: var(--dim-d); }
   .why { font-size: var(--t-meta); line-height: 1.55; color: var(--dim-d); margin-top: 0.4rem; max-width: 62ch; }
-  .why b { color: var(--blue-up); font-weight: 600; }
+  .why b { color: var(--blue-up); font-weight: var(--w-label); }
 
   .sch-h { display: flex; justify-content: space-between; gap: 0.6rem; align-items: center; margin-bottom: 0.35rem; }
-  .sch-t { font-size: var(--t-meta); font-weight: 700; font-family: ui-monospace, monospace; color: #fff; }
+  .sch-t { font-size: var(--t-meta); font-weight: var(--w-label); font-family: ui-monospace, monospace; color: #fff; }
   .sch-m {
-    font-size: var(--t-over); font-weight: 700; color: var(--navy); background: var(--blue-up);
+    font-size: var(--t-over); font-weight: var(--w-label); color: var(--navy); background: var(--blue-up);
     padding: 0.12rem 0.45rem; border-radius: 999px; white-space: nowrap;
   }
   .sch details { margin-top: 0.5rem; }
   .sch summary {
-    cursor: pointer; font-size: var(--t-over); font-weight: 700; letter-spacing: 0.06em;
+    cursor: pointer; font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.06em;
     text-transform: uppercase; color: var(--dim-d); padding: 0.25rem 0; list-style-position: inside;
   }
   .sch summary:hover { color: var(--blue-up); }
@@ -225,15 +227,15 @@ const asText = (code: unknown) =>
 
   .hn { font-size: var(--t-meta); padding: 0.2rem 0.3rem; border-radius: 4px; outline: 2px solid transparent; scroll-margin-top: 4rem; }
   .hn.l2 { padding-left: 1.15rem; }
-  .lv { display: inline-block; min-width: 1.7rem; font-weight: 700; color: var(--blue-up); font-size: 0.625rem; }
+  .lv { display: inline-block; min-width: 1.7rem; font-weight: var(--w-label); color: var(--blue-up); font-size: 0.625rem; }
 
-  .fct-v { font-size: var(--t-node); font-weight: 700; color: var(--blue-up); margin: 0.15rem 0; font-variant-numeric: tabular-nums; }
+  .fct-v { font-size: var(--t-node); font-weight: var(--w-label); color: var(--blue-up); margin: 0.15rem 0; font-variant-numeric: tabular-nums; }
   .fct cite { display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--dim-d); font-style: normal; }
   .fan li {
     display: flex; gap: 0.45rem; font-size: var(--t-meta); padding: 0.28rem 0.3rem; border-radius: 4px;
     outline: 2px solid transparent; align-items: baseline; color: var(--ink-d); scroll-margin-top: 4rem;
   }
-  .ok { color: var(--mint); font-weight: 700; }
+  .ok { color: var(--mint); font-weight: var(--w-label); }
   .hon {
     margin-top: 0.8rem; padding: 0.7rem 0.8rem; font-size: var(--t-meta); line-height: 1.55;
     color: var(--dim-d); background: var(--navy-2); border-radius: 8px; border: 1px dashed var(--line-d);

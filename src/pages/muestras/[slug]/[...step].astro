@@ -4,6 +4,11 @@ import BaseLayout from '@layouts/BaseLayout.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import Article from '@/components/aeo-xray/Article.astro'
 import Instrument from '@/components/aeo-xray/Instrument.astro'
+// Los pesos de display de la pieza. SIN estos imports la ruta solo hereda los del slogan
+// (800/900i, que son de la marca) y el algoritmo de matching CSS resuelve TODO 600/700 a 800:
+// los titulares salían ExtraBold sin que el CSS lo pidiera. Un @font-face que falta no falla: sustituye.
+import '@fontsource/poppins/500.css'
+import '@fontsource/poppins/600.css'
 import '@styles/aeo-xray.css'
 
 /**
@@ -364,12 +369,12 @@ const titles: Record<string, string> = {
   /* ══════════ ① EL HUECO ══════════ */
   .gap, .at { padding-block: 2rem 1rem; }
   .g-kick {
-    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em;
+    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--muted);
   }
   .g-h1, .at-h1 {
     margin-top: 0.6rem; font-family: Poppins, system-ui, sans-serif;
-    font-size: clamp(1.9rem, 1.2rem + 2.4vw, 3rem); font-weight: 600; line-height: 1.1;
+    font-size: clamp(1.9rem, 1.2rem + 2.4vw, 3rem); font-weight: var(--w-display-lg); line-height: 1.1;
     letter-spacing: -0.02em; max-width: 24ch; text-wrap: balance;
   }
   .g-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-top: 2rem; }
@@ -377,7 +382,7 @@ const titles: Record<string, string> = {
 
   .g-serp { border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem 1.25rem; background: #fff; }
   .g-serp-t {
-    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--muted); margin-bottom: 0.7rem;
   }
   .g-list { list-style: none; }
@@ -386,8 +391,8 @@ const titles: Record<string, string> = {
     padding: 0.55rem 0; border-bottom: 1px solid var(--line); font-size: 0.9375rem;
   }
   .g-list li:last-child { border-bottom: 0; }
-  .g-pos { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--muted); font-size: 0.8125rem; }
-  .g-dom { font-weight: 600; color: var(--ink); }
+  .g-pos { font-variant-numeric: tabular-nums; font-weight: var(--w-label); color: var(--muted); font-size: 0.8125rem; }
+  .g-dom { font-weight: var(--w-label); color: var(--ink); }
   .g-kind { font-size: var(--t-meta); color: var(--muted); }
   .g-note { margin-top: 0.8rem; font-size: var(--t-meta); color: var(--muted); }
 
@@ -395,10 +400,12 @@ const titles: Record<string, string> = {
   @media (max-width: 520px) { .g-kpis { grid-template-columns: 1fr; } }
   .g-kpi {
     padding: 0.85rem 0.9rem; background: var(--navy); color: var(--ink-d);
+    font-weight: var(--w-body-dark);
     border-radius: 10px; border: 1px solid var(--navy-3);
   }
   .g-kpi-n {
-    font-size: 2.1rem; font-weight: 700; line-height: 1; color: #fff;
+    font-family: Poppins, system-ui, sans-serif;
+    font-size: 2.1rem; font-weight: var(--w-display); line-height: 1; color: #fff;
     font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
   }
   .g-kpi-u { margin-top: 0.3rem; font-size: var(--t-meta); line-height: 1.35; }
@@ -409,7 +416,7 @@ const titles: Record<string, string> = {
     color: var(--ink-d); border-radius: 12px; border-left: 4px solid var(--blue-up);
   }
   .g-punch-t {
-    font-family: Poppins, system-ui, sans-serif; font-size: 1.375rem; font-weight: 600;
+    font-family: Poppins, system-ui, sans-serif; font-size: 1.375rem; font-weight: var(--w-display);
     line-height: 1.3; color: #fff; text-wrap: balance;
   }
   .g-punch-b { margin-top: 0.7rem; font-size: var(--t-body); line-height: 1.6; color: var(--dim-d); max-width: 60ch; }
@@ -445,16 +452,16 @@ const titles: Record<string, string> = {
   .atom-h { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.9rem; }
   .atom-k {
     font-family: Poppins, system-ui, sans-serif; font-size: var(--t-node);
-    font-weight: 600; color: #fff;
+    font-weight: var(--w-display); color: #fff;
   }
   /* La LÍNEA DE SANGRE: de qué bloque del artículo nació. No son entregables sueltos. */
   .atom-from { font-size: var(--t-meta); color: var(--blue-up); }
   .atom-stat {
-    font-family: Poppins, system-ui, sans-serif; font-size: 2.25rem; font-weight: 700;
+    font-family: Poppins, system-ui, sans-serif; font-size: 2.25rem; font-weight: var(--w-display);
     line-height: 1.05; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
   }
   .atom-stat span {
-    display: block; font-family: inherit; font-size: var(--t-meta); font-weight: 400;
+    display: block; font-family: inherit; font-size: var(--t-meta); font-weight: var(--w-body-dark);
     line-height: 1.45; color: var(--dim-d); letter-spacing: 0; margin-top: 0.3rem;
   }
   .atom-why { margin-top: 0.9rem; font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d); }
@@ -465,24 +472,24 @@ const titles: Record<string, string> = {
     background: linear-gradient(160deg, color-mix(in srgb, var(--client) 90%, black), color-mix(in srgb, var(--client) 55%, black));
     color: #fff; aspect-ratio: 4 / 5; display: flex; flex-direction: column; justify-content: center; gap: 0.6rem;
   }
-  .pc-hook { font-size: var(--t-meta); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.85; }
-  .pc-body { font-family: Poppins, system-ui, sans-serif; font-size: 1.25rem; font-weight: 600; line-height: 1.3; text-wrap: balance; }
+  .pc-hook { font-size: var(--t-meta); font-weight: var(--w-label); text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.85; }
+  .pc-body { font-family: Poppins, system-ui, sans-serif; font-size: 1.25rem; font-weight: var(--w-display); line-height: 1.3; text-wrap: balance; }
   .pc-cta { font-size: var(--t-meta); opacity: 0.9; }
   .pc-brand {
     position: absolute; right: 1.9rem; bottom: 1.9rem; font-family: Poppins, system-ui, sans-serif;
-    font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.06em; opacity: 0.75;
+    font-weight: var(--w-display); font-size: 0.8125rem; letter-spacing: 0.06em; opacity: 0.75;
   }
 
   .atom-d { margin-top: 1rem; display: grid; grid-template-columns: 1fr; gap: 0.15rem; }
   .atom-d dt {
-    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--blue-up); margin-top: 0.6rem;
   }
   .atom-d dd { font-size: var(--t-meta); line-height: 1.55; color: var(--ink-d); }
 
   .atom-code { margin-top: 1rem; }
   .atom-code summary {
-    cursor: pointer; font-size: var(--t-over); font-weight: 700; letter-spacing: 0.06em;
+    cursor: pointer; font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.06em;
     text-transform: uppercase; color: var(--dim-d); list-style-position: inside;
   }
   .atom-code summary:hover { color: var(--blue-up); }
@@ -498,7 +505,7 @@ const titles: Record<string, string> = {
   }
   .at-close {
     margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
-    font-size: 1.125rem; font-weight: 500; color: var(--ink);
+    font-size: 1.125rem; font-weight: var(--w-body); color: var(--ink);
   }
 
   .xr-foot { padding-block: 1.5rem 3rem; border-top: 1px solid var(--line); }

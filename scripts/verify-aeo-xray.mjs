@@ -293,6 +293,36 @@ try {
     `visible=${srVisible} box=${JSON.stringify(srBox)}`,
   )
 
+  /* 36. EL PESO QUE EL NAVEGADOR DIBUJA, no el que el CSS pide.
+     Bug real: la ruta nunca importó Poppins 600/500 — solo heredaba los del slogan (800/900i).
+     Un @font-face que falta NO falla: el algoritmo de matching CSS (Fonts L4 §5.2) busca hacia
+     arriba y SUSTITUYE. Todo H1/H2/stat salía ExtraBold 800 mientras el CSS decía 600. Se veía
+     "raro pero dibujado", así que no lo cazó ni el build, ni el lint, ni un assert de string:
+     solo el ojo. Este assert compara el peso COMPUTADO contra el sistema, y por eso vale. */
+  const weights = await page.evaluate(() => {
+    const w = s => {
+      const e = document.querySelector(s)
+      if (!e) return null
+      const c = getComputedStyle(e)
+
+      return { sel: s, fam: c.fontFamily.split(',')[0].replace(/['"]/g, ''), w: Number(c.fontWeight) }
+    }
+
+    return ['.p-h1', '.p-h2', '.stat', '.kpi-n', '.para', '.nd-v', '.nd-l'].map(w).filter(Boolean)
+  })
+  const poppins = weights.filter(x => x.fam === 'Poppins')
+  const heavy = poppins.filter(x => x.w > 600)
+  check(
+    '36. Ningún display de la pieza se dibuja por encima de Poppins 600 (el 700+ es del lockup de marca)',
+    poppins.length > 0 && heavy.length === 0,
+    heavy.length ? heavy.map(x => `${x.sel}=${x.w}`).join(' ') : `${poppins.length} nodos Poppins ≤600`,
+  )
+  const dark = weights.find(x => x.sel === '.nd-v')
+  check(
+    '37. El texto sobre navy sube un paso (500): el mismo peso sobre oscuro se ve más fino',
+    dark?.w === 500,
+    `.nd-v=${dark?.w}`,
+  )
   await page.close()
 
   // Reduced motion

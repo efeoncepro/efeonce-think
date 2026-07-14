@@ -261,7 +261,7 @@ const srFor = (id: string) => {
     padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--line); background: #fbfcfd;
     border-radius: 12px 12px 0 0;
   }
-  .sp-head h2 { font-size: var(--t-body); font-weight: 600; }
+  .sp-head h2 { font-size: var(--t-body); font-weight: var(--w-label); }
   .sp-head p { font-size: var(--t-meta); color: var(--muted); }
   .urlbar {
     display: flex; gap: 0.4rem; align-items: center; min-width: 0; max-width: 24rem;
@@ -295,11 +295,11 @@ const srFor = (id: string) => {
 
   .head-blk { padding-top: 0.25rem; }
   .cat {
-    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em;
+    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--client); margin-bottom: 0.6rem;
   }
   .p-h1 {
-    font-family: Poppins, system-ui, sans-serif; font-size: var(--a-h1); font-weight: 600;
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--a-h1); font-weight: var(--w-display-lg);
     line-height: 1.12; letter-spacing: -0.02em; max-width: 20ch; text-wrap: balance;
   }
   .byline {
@@ -307,13 +307,13 @@ const srFor = (id: string) => {
     margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line);
     font-size: 0.9375rem; color: var(--muted);
   }
-  .byline b { color: var(--ink); font-weight: 600; }
+  .byline b { color: var(--ink); font-weight: var(--w-label); }
   .byline .dot { color: #cbd5e1; }
 
   /* Ritmo editorial: mucho aire ANTES de cada H2, poco después. El ojo agrupa por proximidad. */
   .p-h2 {
     margin-top: 2.25rem; font-family: Poppins, system-ui, sans-serif; font-size: var(--a-h2);
-    font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; max-width: 26ch; text-wrap: balance;
+    font-weight: var(--w-display); line-height: 1.25; letter-spacing: -0.01em; max-width: 26ch; text-wrap: balance;
   }
   .para { margin: 1.1rem 0; font-size: var(--a-body); line-height: 1.7; color: #2c3e50; max-width: 64ch; }
 
@@ -321,32 +321,32 @@ const srFor = (id: string) => {
     margin-top: 1.1rem; padding: 1rem 1.15rem; background: var(--tint-c);
     border-left-color: var(--client); border-radius: 0 10px 10px 0;
   }
-  .cap p { font-size: var(--a-lead); line-height: 1.6; color: #1e2f3f; max-width: 58ch; font-weight: 450; }
+  .cap p { font-size: var(--a-lead); line-height: 1.6; color: #1e2f3f; max-width: 58ch; font-weight: var(--w-body); }
   .cap-t {
-    display: block; margin-bottom: 0.4rem; font-size: var(--t-over); font-weight: 700;
+    display: block; margin-bottom: 0.4rem; font-size: var(--t-over); font-weight: var(--w-label);
     letter-spacing: 0.1em; text-transform: uppercase; color: var(--client);
   }
 
   .pull { margin-block: 2rem; padding: 0.2rem 0 0.2rem 1.4rem; border-left: 4px solid var(--client); }
   .pull p {
     font-family: Poppins, system-ui, sans-serif; font-size: 1.4375rem; line-height: 1.35;
-    font-weight: 500; letter-spacing: -0.01em; color: var(--ink); max-width: 30ch; text-wrap: balance;
+    font-weight: var(--w-quote); letter-spacing: -0.01em; color: var(--ink); max-width: 30ch; text-wrap: balance;
   }
 
   .blk-t {
-    font-family: Poppins, system-ui, sans-serif; font-weight: 600; font-size: 1.1875rem;
+    font-family: Poppins, system-ui, sans-serif; font-weight: var(--w-display); font-size: 1.1875rem;
     margin-bottom: 0.7rem; letter-spacing: -0.01em;
   }
   .tw { overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
   table { width: 100%; min-width: 32rem; border-collapse: collapse; font-size: 0.9375rem; }
   caption {
-    text-align: left; font-family: Poppins, system-ui, sans-serif; font-weight: 600;
+    text-align: left; font-family: Poppins, system-ui, sans-serif; font-weight: var(--w-display);
     font-size: 1.1875rem; padding-bottom: 0.7rem; letter-spacing: -0.01em;
   }
   th, td { border-bottom: 1px solid var(--line); padding: 0.75rem 0.9rem; text-align: left; vertical-align: top; line-height: 1.5; }
-  th { background: #f7f9fb; font-weight: 600; font-size: 0.8125rem; color: #33475b; }
+  th { background: #f7f9fb; font-weight: var(--w-label); font-size: 0.8125rem; color: #33475b; }
   tbody tr:last-child td { border-bottom: none; }
-  td:first-child { font-weight: 600; color: var(--ink); }
+  td:first-child { font-weight: var(--w-label); color: var(--ink); }
 
   ol { padding-left: 0; list-style: none; counter-reset: paso; }
   ol li {
@@ -357,17 +357,17 @@ const srFor = (id: string) => {
     content: counter(paso); position: absolute; left: 0; top: 0.1rem;
     width: 1.7rem; height: 1.7rem; border-radius: 999px;
     background: var(--tint-c); color: var(--client);
-    font-size: 0.8125rem; font-weight: 700; display: grid; place-items: center;
+    font-size: 0.8125rem; font-weight: var(--w-label); display: grid; place-items: center;
     font-variant-numeric: tabular-nums;
   }
 
   .faq { margin-top: 1.5rem; }
   .faq .qa { padding: 0.9rem 0; border-top: 1px solid var(--line); }
-  .faq .q { font-family: Poppins, system-ui, sans-serif; font-weight: 600; font-size: 1.0625rem; line-height: 1.35; }
+  .faq .q { font-family: Poppins, system-ui, sans-serif; font-weight: var(--w-display); font-size: 1.0625rem; line-height: 1.35; }
   .faq .a { font-size: 1rem; line-height: 1.65; color: #4a5c6e; margin-top: 0.35rem; max-width: 62ch; }
 
   .lnks li { font-size: 1rem; margin: 0.5rem 0; line-height: 1.5; }
-  .lnks a { color: var(--client); text-decoration: underline; text-underline-offset: 2px; font-weight: 500; }
+  .lnks a { color: var(--client); text-decoration: underline; text-underline-offset: 2px; font-weight: var(--w-body); }
   .lnks em { color: var(--muted); font-style: normal; font-size: 0.8125rem; }
   .srcs { border-top: 1px solid var(--line); margin-top: 2rem; padding-top: 1.1rem; }
   .srcs ul { padding-left: 1rem; list-style: disc; }
@@ -376,7 +376,7 @@ const srFor = (id: string) => {
 
   .lic { margin: 0 1.1rem; padding: 1.1rem 0 1.4rem; border-top: 1px solid var(--line); }
   .lic-t {
-    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--muted); margin-bottom: 0.5rem;
   }
   .lic li {
@@ -386,5 +386,5 @@ const srFor = (id: string) => {
   .lic-a { color: #33475b; max-width: 62ch; }
   .lic-c { color: var(--muted); white-space: nowrap; }
   .lic a { color: var(--blue); text-decoration: underline; }
-  .lic-n { margin-top: 0.8rem; font-size: var(--t-meta); font-weight: 600; color: #33475b; }
+  .lic-n { margin-top: 0.8rem; font-size: var(--t-meta); font-weight: var(--w-label); color: #33475b; }
 </style>
