@@ -357,14 +357,25 @@ const probeFor = (id: string) => {
     --a-lead: 1.25rem;
     --a-h1: 2.25rem;
     --a-h2: 1.5rem;
+    --read-measure: min(64ch, calc(100% - 3.5rem));
     background: #fff;
     border: 1px solid var(--line);
     border-radius: 12px;
     min-width: 0;
   }
   /* Leyendo (pantalla ②): la medida manda, no el ancho del contenedor. */
-  .sp-read { max-width: 52rem; margin-inline: auto; }
-  .sp-read { --a-h1: 2.6rem; }
+  .sp-read {
+    --a-h1: 2.6rem;
+    width: min(100%, 58rem);
+    max-width: none;
+    margin-inline: auto;
+    overflow: hidden;
+    border-color: color-mix(in srgb, var(--line) 86%, white);
+    border-radius: 14px;
+    box-shadow:
+      0 34px 90px color-mix(in srgb, var(--navy) 11%, transparent),
+      0 1px 0 rgb(255 255 255 / 0.9) inset;
+  }
 
   .sp-head {
     display: flex; justify-content: space-between; align-items: center; gap: 1rem;
@@ -381,6 +392,20 @@ const probeFor = (id: string) => {
   }
   .lock { font-size: 0.625rem; opacity: 0.6; }
   .url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sp-read .sp-head {
+    padding: 0.72rem 0.9rem;
+    background: linear-gradient(180deg, #fff, var(--surf));
+    border-radius: 14px 14px 0 0;
+  }
+  .sp-read .sp-head h2 {
+    color: var(--ink-3);
+    font-size: var(--t-meta);
+  }
+  .sp-read .sp-head p { display: none; }
+  .sp-read .urlbar {
+    max-width: min(32rem, 62vw);
+    background: #fff;
+  }
 
   .xr-article {
     font-family: var(--client-font);
@@ -408,6 +433,33 @@ const probeFor = (id: string) => {
   .fig :global(img) { aspect-ratio: 16 / 9; object-fit: cover; }
   .fig.hero :global(img) { border-radius: 0; }
   .fig-m { padding: 0.55rem 1.75rem 0; }
+  .sp-read .post {
+    padding-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .sp-read .post > .para,
+  .sp-read .post > .blk:not(.fig),
+  .sp-read .fig-m,
+  .sp-read .toc {
+    box-sizing: border-box;
+    width: var(--read-measure);
+    max-width: none;
+    margin-inline: auto;
+  }
+  .sp-read .post > .blk:not(.fig) {
+    padding-inline: 0;
+  }
+  .sp-read .para,
+  .sp-read .cap-read p,
+  .sp-read .faq .a {
+    text-wrap: pretty;
+  }
+  .sp-read .p-h1,
+  .sp-read .p-h2,
+  .sp-read .pull p,
+  .sp-read .blk-t,
+  .sp-read caption {
+    letter-spacing: 0;
+  }
   figcaption { font-size: 0.9375rem; line-height: 1.5; color: var(--ink-3); }
   /* 🔴 WCAG 1.4.3 — y la ironía ERA el hallazgo.
      El crédito usaba `--faint` (#7c8fa3), que da 3,33:1 sobre blanco. El mínimo es 4,5:1. Y el
@@ -571,4 +623,39 @@ const probeFor = (id: string) => {
   .lic-c { color: var(--muted); }
   .lic a { color: var(--blue); text-decoration: underline; }
   .lic-n { margin-top: 0.8rem; font-size: var(--t-meta); font-weight: var(--w-label); color: var(--ink-2); }
+
+  @media (max-width: 760px) {
+    .sp {
+      --read-measure: min(100% - 2.3rem, 64ch);
+    }
+    .sp-read {
+      --a-h1: 2.2rem;
+      --a-body: 1.0625rem;
+      --a-lead: 1.16rem;
+      border-radius: 12px;
+    }
+    .sp-read .sp-head {
+      display: grid;
+      align-items: start;
+      gap: 0.55rem;
+      border-radius: 12px 12px 0 0;
+    }
+    .sp-read .urlbar {
+      max-width: 100%;
+      width: 100%;
+    }
+    .sp-read .fig-m {
+      padding-top: 0.5rem;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .sp {
+      --read-measure: min(100% - 1.8rem, 64ch);
+    }
+    .sp-read {
+      --a-h1: 2rem;
+      --a-h2: 1.35rem;
+    }
+  }
 </style>

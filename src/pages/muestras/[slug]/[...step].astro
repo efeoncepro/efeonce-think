@@ -271,7 +271,12 @@ const titles: Record<string, string> = {
       )}
 
       {/* ══════════ ② EL ARTÍCULO — a ancho completo. Acá por fin se LEE. ══════════ */}
-      {step === 'articulo' && <Article d={d} />}
+      {step === 'articulo' && (
+        <div class="read-stage" data-capture="aeo-xray-article-read">
+          <div class="read-progress" aria-hidden="true"></div>
+          <Article d={d} />
+        </div>
+      )}
 
       {/* ══════════ ③ LA RADIOGRAFÍA — el split con el acoplamiento ══════════ */}
       {step === 'radiografia' && (
@@ -970,6 +975,65 @@ const titles: Record<string, string> = {
     .g-kind { grid-column: 2; justify-self: start; white-space: normal; line-height: 1.25; }
     .g-diagnosis p,
     .g-aside { grid-template-columns: 1fr; gap: 0.35rem; }
+  }
+
+  /* ══════════ ② EL ARTÍCULO ══════════ */
+  .read-stage {
+    position: relative;
+    isolation: isolate;
+    width: min(100%, 82rem);
+    margin-inline: auto;
+    padding-block: clamp(1.4rem, 4vw, 3.25rem) 1rem;
+  }
+  .read-stage::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0 50% auto 50%;
+    width: 100vw;
+    height: min(54rem, 82%);
+    margin-inline: -50vw;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--blue-up) 10%, white), transparent 74%),
+      linear-gradient(90deg, transparent, color-mix(in srgb, var(--client) 8%, white) 50%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  }
+  .read-progress { display: none; }
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .read-progress {
+        display: block;
+        position: sticky;
+        top: 5.55rem;
+        z-index: 21;
+        width: min(100%, 58rem);
+        height: 3px;
+        margin: 0 auto 0.75rem;
+        overflow: hidden;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--line) 72%, transparent);
+      }
+      .read-progress::after {
+        content: '';
+        display: block;
+        height: 100%;
+        transform: scaleX(0);
+        transform-origin: 0 50%;
+        background: linear-gradient(90deg, var(--blue), var(--client));
+        animation: xr-read-progress linear both;
+        animation-timeline: scroll(root block);
+      }
+      @keyframes xr-read-progress {
+        to { transform: scaleX(1); }
+      }
+    }
+  }
+  @media (max-width: 720px) {
+    .read-stage {
+      width: 100%;
+      padding-block-start: 0.95rem;
+    }
+    .read-progress { top: 5.15rem; }
   }
 
   /* ══════════ ③ LA RADIOGRAFÍA ══════════ */
