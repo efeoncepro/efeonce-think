@@ -93,8 +93,18 @@ const titles: Record<string, string> = {
     <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
     <header class="xr-chrome" data-testid="disclaimer">
       <div class="xr-wrap xr-chrome-in">
+        {/* LOCKUP, no isotipo. El isotipo solo comunica a quien YA conoce la marca —
+            y el comité que abre esto no la conoce. El logotipo dice QUIÉN; el nombre de
+            la herramienta, QUÉ. El separador impide que se lean como una sola cosa. */}
         <a class="xr-brand" href={base}>
-          <img src="/branding/efeonce-isotipo-negative.svg" alt="Efeonce" width="26" height="26" />
+          <img
+            class="xr-logo"
+            src="/branding/efeonce-logo-negative.svg"
+            alt="Efeonce"
+            width="102"
+            height="24"
+          />
+          <span class="xr-brand-sep" aria-hidden="true"></span>
           <span class="xr-brand-t">{meta.instrument}</span>
         </a>
         <p class="xr-rotulo">
