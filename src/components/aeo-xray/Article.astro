@@ -181,15 +181,15 @@ const srFor = (id: string) => {
             </ol>
           </nav>
         )
+      /* LA CÁPSULA. En la ③ va con su aparato (recuadro + rótulo): ahí es donde el trabajo
+         DEBE verse. En la ② va como lo que ES para el lector — el primer párrafo de la
+         sección, el que responde de una. Seis cajas de color gritan «acá hay una técnica
+         aplicada» tan fuerte como el letrero que las nombra, y en un blog real no existen.
+         🔴 Y no cuesta NADA en AEO: el valor de la cápsula vive en el TEXTO (answer-first,
+         40-60 palabras, bajo su H2). El motor lee el texto, no el CSS. */
       if (b.type === 'answer-capsule')
         return (
-          <div class="blk cap" {...a}>
-            {/* El rótulo «Respuesta directa» es ANOTACIÓN, no artículo: nombra la técnica.
-                En la pantalla ② —que se llama «lo que ve el lector»— no tiene nada que
-                hacer: interrumpe la lectura y le avisa al evaluador que está viendo un
-                ejercicio en vez de dejarlo LEER. La cápsula se queda (es contenido real,
-                y un destacado bajo el título es un patrón editorial legítimo); lo que se
-                va es el letrero que la explica. Explicarla es trabajo de la ③. */}
+          <div class={`blk ${coupled ? 'cap' : 'cap-read'}`} {...a}>
             {coupled && <span class="cap-t">Respuesta directa</span>}
             <p>{b.text}</p>
             {sr && <span class="xr-sr">{sr}</span>}
@@ -414,9 +414,22 @@ const srFor = (id: string) => {
   .toc a:hover { color: var(--client); text-decoration: underline; text-underline-offset: 3px; }
   .toc a:focus-visible { outline: 2px solid var(--client); outline-offset: 3px; border-radius: 3px; }
 
+  /* ③ La radiografía: la cápsula CON su aparato. Acá el recuadro es correcto — es la
+     pantalla donde el trabajo tiene que verse. */
   .cap {
     margin-top: 1.1rem; padding: 1rem 1.15rem; background: var(--tint-c);
     border-left-color: var(--client); border-radius: 0 10px 10px 0;
+  }
+  /* ② El artículo: la cápsula SIN aparato. Ni caja, ni tinte, ni borde. Es el primer
+     párrafo de la sección y se lee como tal. Lo único que conserva es un punto más de
+     tamaño y un poco más de aire — porque SÍ es la frase que resume, y un buen artículo
+     también la destaca. Pero la destaca con TIPOGRAFÍA, no con un recuadro de color. */
+  .cap-read { margin: 1.1rem 0; }
+  .cap-read p {
+    font-size: var(--a-lead);
+    line-height: 1.6;
+    color: var(--ink);
+    max-width: 62ch;
   }
   .cap p { font-size: var(--a-lead); line-height: 1.6; color: var(--ink); max-width: 58ch; font-weight: var(--w-client-body); }
   .cap-t {
