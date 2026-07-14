@@ -273,7 +273,6 @@ const titles: Record<string, string> = {
       {/* ══════════ ② EL ARTÍCULO — a ancho completo. Acá por fin se LEE. ══════════ */}
       {step === 'articulo' && (
         <div class="read-stage" data-capture="aeo-xray-article-read">
-          <div class="read-progress" aria-hidden="true"></div>
           <Article d={d} />
         </div>
       )}
@@ -989,51 +988,60 @@ const titles: Record<string, string> = {
     content: '';
     position: absolute;
     z-index: -1;
-    inset: 0 50% auto 50%;
-    width: 100vw;
+    inset: 0;
     height: min(54rem, 82%);
-    margin-inline: -50vw;
     background:
       linear-gradient(180deg, color-mix(in srgb, var(--blue-up) 10%, white), transparent 74%),
       linear-gradient(90deg, transparent, color-mix(in srgb, var(--client) 8%, white) 50%, transparent);
-    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
-  }
-  .read-progress { display: none; }
-  @supports (animation-timeline: scroll()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .read-progress {
-        display: block;
-        position: sticky;
-        top: 5.55rem;
-        z-index: 21;
-        width: min(100%, 58rem);
-        height: 3px;
-        margin: 0 auto 0.75rem;
-        overflow: hidden;
-        border-radius: 999px;
-        background: color-mix(in srgb, var(--line) 72%, transparent);
-      }
-      .read-progress::after {
-        content: '';
-        display: block;
-        height: 100%;
-        transform: scaleX(0);
-        transform-origin: 0 50%;
-        background: linear-gradient(90deg, var(--blue), var(--client));
-        animation: xr-read-progress linear both;
-        animation-timeline: scroll(root block);
-      }
-      @keyframes xr-read-progress {
-        to { transform: scaleX(1); }
-      }
-    }
+    border-radius: 20px;
   }
   @media (max-width: 720px) {
     .read-stage {
       width: 100%;
       padding-block-start: 0.95rem;
     }
-    .read-progress { top: 5.15rem; }
+  }
+
+  .xr[data-step='articulo'] .xr-next {
+    position: fixed;
+    right: clamp(1rem, 5vw, 5rem);
+    bottom: clamp(1rem, 2.4vw, 2rem);
+    z-index: 24;
+    padding: 0;
+    pointer-events: none;
+  }
+  .xr[data-step='articulo'] .xr-next a {
+    pointer-events: auto;
+    max-width: min(31rem, calc(100vw - 2rem));
+    border: 1px solid var(--navy-3);
+    box-shadow: 0 18px 52px color-mix(in srgb, var(--navy) 26%, transparent);
+  }
+  .xr[data-step='articulo'] .xr-next a:hover {
+    transform: translateY(-2px);
+  }
+  .xr[data-step='articulo'] .xr-foot {
+    padding-bottom: 7rem;
+  }
+  @media (max-width: 720px) {
+    .xr[data-step='articulo'] .xr-next {
+      right: 1rem;
+      left: 1rem;
+      bottom: 0.75rem;
+    }
+    .xr[data-step='articulo'] .xr-next a {
+      width: 100%;
+      max-width: none;
+      justify-content: space-between;
+      padding: 0.85rem 1rem;
+    }
+    .xr[data-step='articulo'] .xr-next-t {
+      font-size: 1rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .xr[data-step='articulo'] .xr-next a:hover {
+      transform: none;
+    }
   }
 
   /* ══════════ ③ LA RADIOGRAFÍA ══════════ */
