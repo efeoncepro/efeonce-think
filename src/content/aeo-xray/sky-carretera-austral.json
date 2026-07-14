@@ -1060,9 +1060,12 @@
     }
   ],
   "gap": {
-    "kicker": "El punto de partida",
-    "headline": "18.100 búsquedas al mes en este territorio. En el resultado no hay una sola aerolínea.",
-    "serpTitle": "Quién ocupa hoy ese resultado de búsqueda",
+    "kicker": "El hueco de búsqueda",
+    "headline": "Hay demanda. No hay aerolíneas.",
+    "lead": "18.100 búsquedas mensuales por «carretera austral». El Top 12 está ocupado por enciclopedias, redes y portales de turismo; ninguna aerolínea ocupa la intención de llegada.",
+    "serpTitle": "Top 12 de Google",
+    "serpBadge": "0 aerolíneas",
+    "serpSummary": "Enciclopedias, redes, portales y reseñas ocupan el resultado. La marca que sí puede resolver la llegada no aparece.",
     "serpNote": "Top 12 real, medido con Semrush el 13 de julio de 2026.",
     "serp": [
       {
@@ -1126,9 +1129,13 @@
         "kind": "Red social"
       }
     ],
-    "punch": "Cero aerolíneas. Y SKY es la que vuela a Balmaceda, el aeropuerto de entrada.",
-    "punchNote": "Wikipedia, Instagram y TripAdvisor describen la ruta, la fotografían y la reseñan. Ninguna resuelve la logística de llegada —que es lo primero que pregunta quien de verdad va a ir—. Y ninguna puede: no son la aerolínea. ⚠️ Para ser exactos: este artículo no compite por «carretera austral» (ese término es el tamaño del territorio, y su página madre ya lo ocupa). Ataca la intención de llegada, donde SKY es la única respuesta posible — y donde hoy rankea 11º con «aeropuerto balmaceda» (6.600 búsquedas/mes).",
-    "aside": "SKY ya tiene una página del tema publicada, y aun así no aparece en las primeras cien posiciones. Este artículo no viene a reescribirla: responde otra pregunta —cómo llegar y cómo recorrerla— y enlaza de vuelta a ella. No compite con la página que ya existe: la apuntala."
+    "diagnosisLabel": "Diagnóstico",
+    "punch": "SKY vuela a Balmaceda, pero no ocupa la respuesta de llegada.",
+    "punchNote": "Wikipedia, Instagram y TripAdvisor describen la ruta, la fotografían y la reseñan. Ninguna resuelve la logística de llegada: no son la aerolínea.",
+    "punchWhy": "El pasajero no solo busca qué es la Carretera Austral. Busca cómo entrar, dónde aterrizar y cómo armar el tramo sin perder días en transbordadores.",
+    "punchOpportunity": "La oportunidad accionable es la intención de llegada, donde SKY puede ser respuesta propia y hoy rankea 11º con «aeropuerto balmaceda» (6.600 búsquedas/mes).",
+    "asideLabel": "Alcance",
+    "aside": "Este artículo no reescribe la página que SKY ya tiene sobre el tema: la apuntala. Responde otra pregunta —cómo llegar y cómo recorrerla— y enlaza de vuelta a la página madre."
   },
   "atomsIntro": "El pasajero no busca en un solo lugar: le pregunta a un chat, mira un video, escanea un feed. Un artículo publicado alcanza uno de esos lugares. El mismo trabajo, repartido, los alcanza todos.",
   "atoms": [

@@ -387,11 +387,18 @@ const aeoXray = defineCollection({
     gap: z.object({
       kicker: z.string(),
       headline: z.string(),
+      lead: z.string().optional(),
       serpTitle: z.string(),
+      serpBadge: z.string().optional(),
+      serpSummary: z.string().optional(),
       serpNote: z.string(),
       serp: z.array(z.object({ pos: z.number(), domain: z.string(), kind: z.string() })).min(5),
+      diagnosisLabel: z.string().optional(),
       punch: z.string(),
       punchNote: z.string(),
+      punchWhy: z.string().optional(),
+      punchOpportunity: z.string().optional(),
+      asideLabel: z.string().optional(),
       aside: z.string(),
     }),
 
