@@ -898,7 +898,7 @@
     "readTime": "min de lectura",
     "producesLabelOne": "dato",
     "srProduces": "Produce {n} datos en la capa de máquina.",
-    "closing": "Así se produce cada una de las 8 piezas mensuales del plan.",
+    "closing": "Así se trabaja cada uno de los 8 artículos del mes.",
     "flowNext": "Siguiente",
     "flowOf": "de",
     "licenseNote": "Las fotografías son de Shutterstock, licenciadas por Efeonce. La búsqueda, la licencia y el costo de las imágenes están incluidos en el servicio. Ninguna fue generada con IA."
@@ -996,7 +996,7 @@
     "punchNote": "Wikipedia, Instagram y TripAdvisor describen la ruta, la fotografían y la reseñan. Ninguna resuelve la logística de llegada — que es lo primero que pregunta quien de verdad va a ir. Y ninguna puede: no son la aerolínea.",
     "aside": "SKY ya tiene una página del tema publicada, y aun así no aparece en las primeras cien posiciones. Este artículo no viene a reescribirla: responde otra pregunta —cómo llegar y cómo recorrerla— y enlaza de vuelta a ella. No compite con la página que ya existe: la apuntala."
   },
-  "atomsIntro": "Nuestra oferta dice, textual: «no entregamos un artículo que vive en una URL». Esto es lo que significa. Cada pieza de abajo nace del artículo que acaba de leer, y cada una abre una superficie distinta donde un motor de respuesta puede encontrar a SKY.",
+  "atomsIntro": "El pasajero no busca en un solo lugar: le pregunta a un chat, mira un video, escanea un feed. Un artículo publicado alcanza uno de esos lugares. El mismo trabajo, repartido, los alcanza todos.",
   "atoms": [
     {
       "id": "video",

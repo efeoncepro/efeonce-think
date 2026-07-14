@@ -84,6 +84,21 @@ const railAll = STEPS.every(st => (pages[st || 'index'].match(/class="xr-step"/g
 check('33. El riel avisa en las 4 pantallas que el recorrido tiene más', railAll)
 check('34. La atomización (④) declara la línea de sangre al bloque del artículo', /atom[\s\S]*data-couple-target/.test(pages.atomizacion))
 
+/* 34b. LA MUESTRA SE DEFIENDE SOLA — nunca cita NUESTROS documentos.
+   La ④ abría con «Nuestra oferta dice, textual: …». Le hablaba al comité sobre NUESTRO PDF, no
+   sobre su negocio: convertía la muestra en una nota al pie de la propuesta en vez de una pieza
+   que se sostiene por sí misma, y quedaba huérfana el día que se mande el enlace sin la oferta
+   adjunta. Además rompe la reutilización: el motor es genérico, esa línea era de la licitación.
+   Citar las BASES del cliente sí vale (es SU documento, y hablar su idioma suma). Citar la
+   oferta propia, no. */
+const autoreferencia = /nuestra oferta|nuestra propuesta|la oferta dice|esta propuesta|nuestro documento/i
+const paginasAutoref = STEPS.filter(st => autoreferencia.test(pages[st || 'index']))
+check(
+  '34b. El copy visible NUNCA cita nuestra propia oferta (la muestra se defiende sola)',
+  paginasAutoref.length === 0,
+  `pantallas que hablan de nuestro PDF: ${paginasAutoref.map(s => s || '(el hueco)').join(', ')}`,
+)
+
 /* 42b. CADA CIFRA DE LA ④, CON SU FUENTE.
    La ④ afirmaba tres cifras —«#1», «3×», «4»— con CERO <cite>, mientras la ① citaba 3 veces
    y la ③ cinco. Justo en la pantalla que CIERRA el argumento, y en la pieza cuya tesis entera
