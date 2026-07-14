@@ -274,6 +274,9 @@ const aeoXray = defineCollection({
       sourceLabel: z.string(),
       thesisLabel: z.string(),
       licenseTitle: z.string(),
+      /* La nota de licencia es COPY, no una constante del componente: cambia con el cliente
+         y con el proveedor de imágenes. Vivía hardcodeada en Article.astro. */
+      licenseNote: z.string().min(20),
       backToArticle: z.string(),
       bylineBy: z.string(),
       readTime: z.string(),

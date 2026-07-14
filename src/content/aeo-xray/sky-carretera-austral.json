@@ -24,13 +24,13 @@
       {
         "type": "hero-image",
         "coupleId": "img-hero",
-        "src": "../../assets/muestras/sky-carretera-austral/carretera-austral-ruta7.jpg",
-        "alt": "Camino de ripio de la Carretera Austral entre bosque nativo y montañas, en la Región de Aysén",
+        "src": "../../assets/muestras/sky-carretera-austral/ruta7-lago-general-carrera.jpg",
+        "alt": "Camino de ripio de la Carretera Austral bordeando el lago General Carrera, con montañas nevadas al fondo, en la Región de Aysén",
         "caption": "La Ruta 7 atraviesa 1.247 km de la Patagonia chilena.",
         "credit": {
-          "author": "Jason Hollinger",
-          "license": "CC BY 2.0",
-          "url": "https://commons.wikimedia.org/wiki/File:Carretera_Austral_(3184411267).jpg"
+          "author": "high fliers / Shutterstock",
+          "license": "Licencia estándar",
+          "url": "https://www.shutterstock.com/image-photo/1964017498"
         }
       },
       {
@@ -116,12 +116,12 @@
         "type": "image",
         "coupleId": "img-castillo",
         "src": "../../assets/muestras/sky-carretera-austral/cerro-castillo.jpg",
-        "alt": "Las agujas de roca del Cerro Castillo nevadas sobre un lago, en el Parque Nacional Cerro Castillo",
+        "alt": "Las agujas de roca nevadas del Cerro Castillo recortadas contra el cielo, en el Parque Nacional Cerro Castillo",
         "caption": "Cerro Castillo queda a dos horas de Coyhaique. Es la primera parada si entras por Balmaceda.",
         "credit": {
-          "author": "Natalia Reyes Escobar",
-          "license": "CC BY-SA 4.0",
-          "url": "https://commons.wikimedia.org/wiki/File:Cerro_Castillo_Parque_Nacional_Cerro_Castillo_14.jpg"
+          "author": "Nature's Charm / Shutterstock",
+          "license": "Licencia estándar",
+          "url": "https://www.shutterstock.com/image-photo/727927363"
         }
       },
       {
@@ -150,14 +150,14 @@
       },
       {
         "type": "image",
-        "coupleId": "img-senaletica",
-        "src": "../../assets/muestras/sky-carretera-austral/senaletica-ruta7.jpg",
-        "alt": "Señalética de la Ruta 7 al costado de un tramo de ripio de la Carretera Austral",
+        "coupleId": "img-ripio",
+        "src": "../../assets/muestras/sky-carretera-austral/ruta7-ripio.jpg",
+        "alt": "Tramo de ripio de la Ruta 7 junto a un cerco de campo, con bosque nativo y montañas al fondo",
         "caption": "La Ruta 7 alterna pavimento y ripio. El sur es el tramo más exigente.",
         "credit": {
-          "author": "Ivotoledo45",
-          "license": "CC BY-SA 4.0",
-          "url": "https://commons.wikimedia.org/wiki/File:Carretera_Austral_2010s_sign_style.jpg"
+          "author": "Greens and Blues / Shutterstock",
+          "license": "Licencia estándar",
+          "url": "https://www.shutterstock.com/image-photo/726103312"
         }
       },
       {
@@ -181,14 +181,14 @@
       },
       {
         "type": "image",
-        "coupleId": "img-baker",
-        "src": "../../assets/muestras/sky-carretera-austral/rio-baker.jpg",
-        "alt": "Aguas turquesas del río Baker entre laderas de vegetación patagónica, en la Región de Aysén",
-        "caption": "El río Baker, el más caudaloso de Chile, corre junto a la Ruta 7 en el tramo sur.",
+        "coupleId": "img-capillas",
+        "src": "../../assets/muestras/sky-carretera-austral/capillas-de-marmol.jpg",
+        "alt": "Interior de las Capillas de Mármol sobre las aguas turquesas del lago General Carrera, en Puerto Río Tranquilo",
+        "caption": "Las Capillas de Mármol, en Puerto Río Tranquilo, quedan sobre la Ruta 7. Se visitan en bote desde la orilla del lago General Carrera.",
         "credit": {
-          "author": "Germán Póo-Caamaño",
-          "license": "CC BY 2.0",
-          "url": "https://commons.wikimedia.org/wiki/File:Baker_River_delta.jpg"
+          "author": "Greens and Blues / Shutterstock",
+          "license": "Licencia estándar",
+          "url": "https://www.shutterstock.com/image-photo/651382048"
         }
       },
       {
@@ -363,23 +363,23 @@
     "alts": [
       {
         "coupleId": "img-hero",
-        "alt": "Camino de ripio de la Carretera Austral entre bosque nativo y montañas, en la Región de Aysén",
-        "why": "Describe lo que se ve y nombra la entidad geográfica. Un alt como «paisaje» o «foto 1» no le sirve ni a un lector de pantalla ni a la búsqueda de imágenes."
+        "alt": "Camino de ripio de la Carretera Austral bordeando el lago General Carrera, con montañas nevadas al fondo, en la Región de Aysén",
+        "why": "Describe lo que se ve y nombra dos entidades geográficas (Carretera Austral, lago General Carrera). Un alt como «paisaje» o «foto 1» no le sirve ni a un lector de pantalla ni a la búsqueda de imágenes."
       },
       {
         "coupleId": "img-castillo",
-        "alt": "Las agujas de roca del Cerro Castillo nevadas sobre un lago, en el Parque Nacional Cerro Castillo",
+        "alt": "Las agujas de roca nevadas del Cerro Castillo recortadas contra el cielo, en el Parque Nacional Cerro Castillo",
         "why": "Nombra el hito exacto. Es lo que permite que la imagen se recupere por «Cerro Castillo» y no solo por «montaña»."
       },
       {
-        "coupleId": "img-senaletica",
-        "alt": "Señalética de la Ruta 7 al costado de un tramo de ripio de la Carretera Austral",
-        "why": "Refuerza la entidad «Ruta 7» y aporta el dato visual del ripio, que es una de las preguntas del artículo."
+        "coupleId": "img-ripio",
+        "alt": "Tramo de ripio de la Ruta 7 junto a un cerco de campo, con bosque nativo y montañas al fondo",
+        "why": "Aporta el dato visual del ripio, que es literalmente una de las preguntas que responde el artículo («¿está pavimentada?»)."
       },
       {
-        "coupleId": "img-baker",
-        "alt": "Aguas turquesas del río Baker entre laderas de vegetación patagónica, en la Región de Aysén",
-        "why": "Nombra el río y la región. El alt es contenido, no un trámite de accesibilidad."
+        "coupleId": "img-capillas",
+        "alt": "Interior de las Capillas de Mármol sobre las aguas turquesas del lago General Carrera, en Puerto Río Tranquilo",
+        "why": "Nombra el hito y la localidad (Puerto Río Tranquilo). El artículo menciona las Capillas en el cuerpo: la imagen y el texto se refuerzan."
       }
     ],
     "jsonld": [
@@ -472,15 +472,21 @@
         "coupleId": "img-hero",
         "type": "ImageObject",
         "metric": "Ser encontrada — 40/100",
-        "why": "El «alt» vive en el HTML; el ImageObject vive en la capa de datos. Son cosas distintas y hacen falta las dos: una la lee un lector de pantalla, la otra la lee un motor que indexa imágenes.",
+        "why": "El «alt» vive en el HTML; el ImageObject vive en la capa de datos. Hacen falta los dos. Y `license` + `acquireLicensePage` son las propiedades que Google lee para saber que la imagen está licenciada y dónde se licencia: es la gestión de derechos, hecha legible por una máquina.",
         "code": {
           "@type": "ImageObject",
           "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#primaryimage",
-          "url": "https://blog.skyairline.com/wp-content/uploads/carretera-austral-ruta7.jpg",
-          "contentUrl": "https://blog.skyairline.com/wp-content/uploads/carretera-austral-ruta7.jpg",
+          "url": "https://blog.skyairline.com/wp-content/uploads/ruta7-lago-general-carrera.jpg",
+          "contentUrl": "https://blog.skyairline.com/wp-content/uploads/ruta7-lago-general-carrera.jpg",
           "caption": "La Ruta 7 atraviesa 1.247 km de la Patagonia chilena.",
-          "creditText": "Jason Hollinger",
-          "license": "https://creativecommons.org/licenses/by/2.0/"
+          "creditText": "high fliers / Shutterstock",
+          "license": "https://www.shutterstock.com/license",
+          "creator": {
+            "@type": "Person",
+            "name": "high fliers"
+          },
+          "copyrightNotice": "© Shutterstock",
+          "acquireLicensePage": "https://www.shutterstock.com/image-photo/1964017498"
         },
         "tier": 3
       },
@@ -775,7 +781,8 @@
     "srProduces": "Produce {n} datos en la capa de máquina.",
     "closing": "Así se produce cada una de las 8 piezas mensuales del plan.",
     "flowNext": "Siguiente",
-    "flowOf": "de"
+    "flowOf": "de",
+    "licenseNote": "Las fotografías son de Shutterstock, licenciadas por Efeonce. La búsqueda, la licencia y el costo de las imágenes están incluidos en el servicio. Ninguna fue generada con IA."
   },
   "flow": [
     {

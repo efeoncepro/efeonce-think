@@ -241,7 +241,7 @@ const srFor = (id: string) => {
         </li>
       ))}
     </ul>
-    <p class="lic-n">Todas las imágenes tienen licencia verificable y crédito visible. Ninguna fue generada con IA.</p>
+    <p class="lic-n">{ui.licenseNote}</p>
   </footer>
 </section>
 
@@ -295,8 +295,13 @@ const srFor = (id: string) => {
   .fig { margin: 1.75rem 0; }
   .fig.hero { margin: 0 0 1.5rem; }
   .fig :global(img) { width: 100%; height: auto; display: block; border-radius: 8px; }
-  .fig.hero :global(img) { border-radius: 0; aspect-ratio: 21 / 9; object-fit: cover; }
-  .fig:not(.hero) :global(img) { aspect-ratio: 16 / 9; object-fit: cover; }
+  /* TODAS a 16:9, hero incluido. El hero era una franja 21:9 y ése fue el error:
+     sacar una franja 21:9 de una foto 3:2 tira el 60% del alto — la composición del
+     fotógrafo (el camino, el primer plano) se pierde y queda solo cielo. 16:9 desde
+     3:2 recorta ~15% de alto: la foto sobrevive. El formato se elige por la foto,
+     no al revés. */
+  .fig :global(img) { aspect-ratio: 16 / 9; object-fit: cover; }
+  .fig.hero :global(img) { border-radius: 0; }
   .fig-m { padding: 0.55rem 1.75rem 0; }
   figcaption { font-size: 0.9375rem; line-height: 1.5; color: var(--ink-3); }
   .credit { margin-top: 0.25rem; font-size: 0.75rem; color: var(--faint); }

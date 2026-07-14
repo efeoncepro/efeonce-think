@@ -91,9 +91,20 @@ const imgs = html.match(/<img[^>]*>/gi) ?? []
 const badAlt = imgs.filter(t => !/\salt=["'][^"']{5,}["']/i.test(t))
 check(`5. Las ${imgs.length} imágenes tienen alt no vacío`, imgs.length > 0 && badAlt.length === 0, `${badAlt.length} sin alt útil`)
 
-// 6. Crédito + licencia por imagen
-const credits = (html.match(/creativecommons\.org|commons\.wikimedia\.org/gi) ?? []).length
-check('6. Cada imagen tiene autoría + licencia enlazada', credits >= imgs.length, `${credits} enlaces de licencia para ${imgs.length} imágenes`)
+/* 6. Crédito + licencia por imagen — PROVEEDOR-AGNÓSTICO.
+   Antes matcheaba `creativecommons.org|commons.wikimedia.org` literal. El assert se ató al
+   proveedor del día y se cayó solo cuando las fotos pasaron a ser stock licenciado — y eso NO
+   es una regresión, es un cambio legítimo. Lo que hay que blindar es el CONTRATO (cada foto
+   declara autoría y ENLAZA su licencia), no el dominio de quien la emite. */
+const creditRows = html.match(/<p class="credit"[^>]*>[\s\S]*?<\/p>/g) ?? []
+const licRows = html.match(/<span class="lic-c"[^>]*>[\s\S]*?<\/span>/g) ?? []
+const rows = [...creditRows, ...licRows]
+const linked = rows.filter(r => /<a[^>]+href="https?:\/\//i.test(r))
+check(
+  '6. Cada imagen declara autoría y ENLAZA su licencia (sea cual sea el proveedor)',
+  creditRows.length >= 4 && licRows.length >= 4 && linked.length === rows.length,
+  `${creditRows.length} créditos · ${licRows.length} filas del pie · ${linked.length}/${rows.length} con licencia enlazada`,
+)
 
 // 7. Toda cifra de evidencia con fuente + as-of
 const cites = (html.match(/<cite[\s>]/gi) ?? []).length
