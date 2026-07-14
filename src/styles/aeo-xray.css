@@ -29,13 +29,27 @@
   view-transition-name: xr-rail;
 }
 
-/* El artículo persiste entre ② y ③: el browser morphea su caja. */
-.xr-article {
+/* El espécimen persiste entre ② y ③: el browser morphea la pieza completa.
+   La ② puede ser editorial y limpia, pero el objeto que viaja debe ser el mismo
+   que aterriza como tarjeta inspeccionable en la ③. Si el nombre vive solo en
+   el `<article>` interno, el marco desaparece y el gesto pierde su argumento. */
+.sp {
   view-transition-name: xr-article;
 }
 /* El hero viaja con él. */
 .xr-hero-img {
   view-transition-name: xr-hero;
+}
+
+::view-transition-group(xr-article),
+::view-transition-group(xr-hero),
+::view-transition-old(xr-article),
+::view-transition-new(xr-article),
+::view-transition-old(xr-hero),
+::view-transition-new(xr-hero) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  mix-blend-mode: normal;
 }
 
 /* El instrumento ENTRA desde la derecha: no aparece, LLEGA. */
