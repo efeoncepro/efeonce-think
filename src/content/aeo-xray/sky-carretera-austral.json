@@ -24,13 +24,13 @@
       {
         "type": "hero-image",
         "coupleId": "img-hero",
-        "src": "../../assets/muestras/sky-carretera-austral/ruta7-lago-general-carrera.jpg",
-        "alt": "Camino de ripio de la Carretera Austral bordeando el lago General Carrera, con montañas nevadas al fondo, en la Región de Aysén",
-        "caption": "La Ruta 7 atraviesa 1.247 km de la Patagonia chilena.",
+        "src": "../../assets/muestras/sky-carretera-austral/capillas-de-marmol.jpg",
+        "alt": "Las Capillas de Mármol sobre las aguas turquesas del lago General Carrera, en Puerto Río Tranquilo, Región de Aysén",
+        "caption": "Las Capillas de Mármol, sobre la Ruta 7. La Carretera Austral atraviesa 1.247 km de la Patagonia chilena.",
         "credit": {
-          "author": "high fliers / Shutterstock",
+          "author": "Greens and Blues / Shutterstock",
           "license": "Licencia estándar",
-          "url": "https://www.shutterstock.com/image-photo/1964017498"
+          "url": "https://www.shutterstock.com/image-photo/426215383"
         }
       },
       {
@@ -181,14 +181,14 @@
       },
       {
         "type": "image",
-        "coupleId": "img-capillas",
-        "src": "../../assets/muestras/sky-carretera-austral/capillas-de-marmol.jpg",
-        "alt": "Interior de las Capillas de Mármol sobre las aguas turquesas del lago General Carrera, en Puerto Río Tranquilo",
-        "caption": "Las Capillas de Mármol, en Puerto Río Tranquilo, quedan sobre la Ruta 7. Se visitan en bote desde la orilla del lago General Carrera.",
+        "coupleId": "img-queulat",
+        "src": "../../assets/muestras/sky-carretera-austral/ventisquero-queulat.jpg",
+        "alt": "El Ventisquero Colgante del Queulat, un glaciar suspendido entre acantilados con dos cascadas cayendo al bosque, en el Parque Nacional Queulat",
+        "caption": "El Ventisquero Colgante del Queulat, sobre la Ruta 7 al norte de Coyhaique. Se llega en auto desde Balmaceda.",
         "credit": {
-          "author": "Greens and Blues / Shutterstock",
+          "author": "Nature's Charm / Shutterstock",
           "license": "Licencia estándar",
-          "url": "https://www.shutterstock.com/image-photo/651382048"
+          "url": "https://www.shutterstock.com/image-photo/1053987227"
         }
       },
       {
@@ -363,13 +363,13 @@
     "alts": [
       {
         "coupleId": "img-hero",
-        "alt": "Camino de ripio de la Carretera Austral bordeando el lago General Carrera, con montañas nevadas al fondo, en la Región de Aysén",
-        "why": "Describe lo que se ve y nombra dos entidades geográficas (Carretera Austral, lago General Carrera). Un alt como «paisaje» o «foto 1» no le sirve ni a un lector de pantalla ni a la búsqueda de imágenes."
+        "alt": "Las Capillas de Mármol sobre las aguas turquesas del lago General Carrera, en Puerto Río Tranquilo, Región de Aysén",
+        "why": "Nombra el hito Y la entidad geográfica (Capillas de Mármol · lago General Carrera · Aysén). Tres entidades en un alt: es lo que permite que la imagen se recupere por cualquiera de las tres, no solo por «paisaje»."
       },
       {
         "coupleId": "img-castillo",
         "alt": "Las agujas de roca nevadas del Cerro Castillo recortadas contra el cielo, en el Parque Nacional Cerro Castillo",
-        "why": "Nombra el hito exacto. Es lo que permite que la imagen se recupere por «Cerro Castillo» y no solo por «montaña»."
+        "why": "Nombra el hito exacto. Permite que la imagen se recupere por «Cerro Castillo» y no solo por «montaña»."
       },
       {
         "coupleId": "img-ripio",
@@ -377,9 +377,9 @@
         "why": "Aporta el dato visual del ripio, que es literalmente una de las preguntas que responde el artículo («¿está pavimentada?»)."
       },
       {
-        "coupleId": "img-capillas",
-        "alt": "Interior de las Capillas de Mármol sobre las aguas turquesas del lago General Carrera, en Puerto Río Tranquilo",
-        "why": "Nombra el hito y la localidad (Puerto Río Tranquilo). El artículo menciona las Capillas en el cuerpo: la imagen y el texto se refuerzan."
+        "coupleId": "img-queulat",
+        "alt": "El Ventisquero Colgante del Queulat, un glaciar suspendido entre acantilados con dos cascadas cayendo al bosque, en el Parque Nacional Queulat",
+        "why": "Nombra el hito y el parque. El Queulat es el ícono visual de la Ruta 7 y hoy SKY no aparece en ninguna búsqueda que lo mencione."
       }
     ],
     "jsonld": [
@@ -476,17 +476,17 @@
         "code": {
           "@type": "ImageObject",
           "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#primaryimage",
-          "url": "https://blog.skyairline.com/wp-content/uploads/ruta7-lago-general-carrera.jpg",
-          "contentUrl": "https://blog.skyairline.com/wp-content/uploads/ruta7-lago-general-carrera.jpg",
-          "caption": "La Ruta 7 atraviesa 1.247 km de la Patagonia chilena.",
-          "creditText": "high fliers / Shutterstock",
+          "url": "https://blog.skyairline.com/wp-content/uploads/capillas-de-marmol-general-carrera.jpg",
+          "contentUrl": "https://blog.skyairline.com/wp-content/uploads/capillas-de-marmol-general-carrera.jpg",
+          "caption": "Las Capillas de Mármol, sobre la Ruta 7. La Carretera Austral atraviesa 1.247 km de la Patagonia chilena.",
+          "creditText": "Greens and Blues / Shutterstock",
           "license": "https://www.shutterstock.com/license",
           "creator": {
             "@type": "Person",
-            "name": "high fliers"
+            "name": "Greens and Blues"
           },
           "copyrightNotice": "© Shutterstock",
-          "acquireLicensePage": "https://www.shutterstock.com/image-photo/1964017498"
+          "acquireLicensePage": "https://www.shutterstock.com/image-photo/426215383"
         },
         "tier": 3
       },
