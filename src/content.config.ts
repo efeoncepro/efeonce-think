@@ -296,6 +296,10 @@ const aeoXray = defineCollection({
           /** Lo que la muestra NO puede fingir. Decirlo suma; simularlo destruye la pieza. */
           honesty: z.string().min(20),
           deliverable: z.array(z.object({ k: z.string(), v: z.string() })).min(2),
+          /* ¿Este átomo EXHIBE las imágenes del artículo? El átomo de imágenes argumentaba sobre
+             los `alt` y no mostraba ni una foto: dos átomos demostraban y uno solo afirmaba. Es DATO
+             del payload — el motor no puede saber cuál es «el de imágenes» sin conocer al cliente. */
+          showsImages: z.boolean().optional(),
           code: z.record(z.string(), z.unknown()).optional(),
           post: z.object({ hook: z.string(), body: z.string(), cta: z.string() }).optional(),
         }),
@@ -357,6 +361,15 @@ const aeoXray = defineCollection({
       flowOf: z.string(),
       srProduces: z.string(),
       closing: z.string(),
+      /* 🔴 LA PIEZA PROMETÍA VERIFICABILIDAD Y NUNCA ENTREGABA LA HERRAMIENTA.
+         La arquitectura dice, textual, que esto es «una prueba que el comité puede verificar por su
+         cuenta» — y en ninguna de las cuatro pantallas se le decía CÓMO. Convertir un claim en una
+         comprobación que el evaluador hace con SUS PROPIAS MANOS es el movimiento de mayor
+         apalancamiento que la pieza tiene, y no cuesta nada: es el argumento que después él repite
+         en la reunión interna. Le pedíamos fe donde podíamos darle prueba. */
+      verifyTitle: z.string(),
+      verifySteps: z.array(z.object({ what: z.string(), how: z.string() })).min(2),
+      verifyNote: z.string(),
     }),
   })
     /* 🔴 EL GATE DE LAS CIFRAS. Recorre el payload ENTERO —craft, jsonld, seo, og, átomos,

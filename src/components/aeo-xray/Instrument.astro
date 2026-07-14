@@ -182,6 +182,10 @@ const asText = (code: unknown) =>
      y scrolleaba al primer match: de 51 datos prometidos, 44 no se veían NUNCA. */
   .inst [data-hide] { display: none; }
 
+  /* En modo ENFOQUE el panel pasa a flex para que el `order` por tier opere (ver `paint()`).
+     En modo MAPA se conserva el flujo normal: ahí el orden POR FAMILIA es el correcto. */
+  .inst[data-focus='true'] .in-body { display: flex; flex-direction: column; }
+
   /* Y lo dice en palabras: el comprador no tiene por qué saber SEO para entender qué pasó.
      Sin `nowrap`: es una FRASE, no un chip — que envuelva en dos líneas es correcto, y es lo que
      impide que se recorte en un teléfono. */
@@ -289,7 +293,17 @@ const asText = (code: unknown) =>
   .nd-l em { font-weight: var(--w-body-dark); color: var(--dim-d); font-style: normal; }
   .nd-v { font-size: var(--t-meta); margin-top: 0.2rem; color: var(--ink-d); word-break: break-word; line-height: 1.5; }
   .nd-v.mono { font-family: ui-monospace, monospace; font-size: 0.6875rem; color: var(--dim-d); }
-  .why { font-size: var(--t-meta); line-height: 1.55; color: var(--dim-d); margin-top: 0.4rem; max-width: 62ch; }
+  /* 🔴 EL «PARA QUÉ SIRVE» ES EL ARGUMENTO — no puede leerse en letra de product UI.
+     Estaba en --t-meta (13px), la misma densidad que el equipo YA diagnosticó como el error del
+     artículo («le aplicamos densidad de product UI a un artefacto editorial») y arregló allá,
+     dejándosela entera al instrumento. Pero acá vive lo que el comité tiene que LEER. Y la ③ se
+     proyecta como lámina de deck: 13px escalados son ~9px. Sube a 16px de 1080px para arriba. */
+  .why {
+    font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d); margin-top: 0.5rem; max-width: 62ch;
+  }
+  @media (min-width: 1080px) {
+    .why, .fct-v, .nd-v:not(.mono) { font-size: var(--t-body); line-height: 1.6; }
+  }
   .why b { color: var(--blue-up); font-weight: var(--w-label); }
 
   /* `flex-wrap` NO es cosmético: sin él, la píldora de métrica (`white-space: nowrap`) empujaba el

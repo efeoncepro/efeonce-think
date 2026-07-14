@@ -276,12 +276,24 @@
   background: var(--navy-2);
   border-bottom: 1px solid var(--line-d);
 }
+/* 🔴 EL RIEL ESCONDÍA EL 4.º PASO EN MÓVIL — y su trabajo declarado es, textual, «avisar que el
+   recorrido tiene más pantallas». A 390px caben tres pastillas y «Dónde más vive» quedaba cortado,
+   sin scrollbar (`scrollbar-width: none`), sin degradado y sin corte parcial visible: nada insinuaba
+   que hubiera una cuarta. La máscara al borde derecho lo resuelve sin una línea de JS. */
 .xr-rail-in {
   display: flex;
   gap: 0.25rem;
   overflow-x: auto;
   scrollbar-width: none;
   padding-block: 0.35rem;
+  scroll-padding-inline: 1rem;
+  mask-image: linear-gradient(to right, black calc(100% - 2.5rem), transparent);
+}
+@media (min-width: 720px) {
+  /* En pantallas donde caben los cuatro pasos, la máscara sobra. */
+  .xr-rail-in {
+    mask-image: none;
+  }
 }
 .xr-rail-in::-webkit-scrollbar {
   display: none;
@@ -477,10 +489,25 @@
   border-radius: 4px;
 }
 
-/* LA FUENTE SUSURRA: tinte + barra lateral. Sin outline — ya la estás tocando. */
+/* 🔴 LA FUENTE SUSURRA — PERO TIENE QUE OÍRSE.
+   La regla original era `background: var(--tint-c); border-left-color: var(--client)`. Y la CÁPSULA
+   EN REPOSO usa… exactamente la misma declaración. Son idénticas. Consecuencia: el tinte dejó de
+   significar «esto es lo que estás tocando» y pasó a significar «esto es una cápsula» — y al
+   interrogar una cápsula el bloque NO CAMBIABA EN NADA. En la demo en vivo, el panel colapsaba
+   dramáticamente y el lado del artículo no confirmaba quién lo había causado. La tesis entera de la
+   pieza es la CORRESPONDENCIA: si la fuente no se distingue, no hay correspondencia que ver.
+
+   «La fuente susurra» era correcto cuando el reposo era neutro. Con el reposo ya tintado, el susurro
+   se perdió en el ruido. Ahora el estado activo tiene un CANAL PROPIO que el reposo no usa: anillo
+   en el acento del cliente + tinte más profundo + barra más ancha. No es un anillo de FOCO (eso
+   sigue siendo `:focus-visible`), así que la razón original —«ya la estás tocando, no hace falta
+   gritar»— se conserva: es un realce, no una alarma. */
 [data-couple][data-on] {
-  background: var(--tint-c);
+  background: color-mix(in srgb, var(--client) 14%, white);
   border-left-color: var(--client);
+  border-left-width: 5px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--client) 55%, transparent);
+  border-radius: 4px;
 }
 figure[data-couple][data-on] {
   background: transparent;

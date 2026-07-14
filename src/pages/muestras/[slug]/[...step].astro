@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets'
 import { getCollection } from 'astro:content'
 import BaseLayout from '@layouts/BaseLayout.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
@@ -46,7 +47,7 @@ export async function getStaticPaths() {
 
 const { sample, step } = Astro.props
 const d = sample.data
-const { ui, machine, evidence, meta, client, flow, gap, atoms } = d
+const { ui, machine, evidence, meta, client, flow, gap, atoms, thesis } = d
 
 const base = `/muestras/${sample.id}-${d.token}`
 const i = flow.findIndex(s => s.step === step)
@@ -91,6 +92,13 @@ machine.headings.tree.forEach(x => bump(x.coupleId))
 bump(machine.headings.coupleId)
 evidence.facts.forEach(x => bump(x.coupleId))
 evidence.fanOut.items.forEach(x => bump(x.coveredBy))
+
+/* Las fotos del artículo — las mismas, con su alt. El átomo de imágenes las EXHIBE en vez de
+   limitarse a argumentar sobre ellas. */
+const imageBlocks = d.article.blocks.filter(
+  (b): b is Extract<typeof b, { type: 'image' | 'hero-image' }> =>
+    b.type === 'image' || b.type === 'hero-image',
+)
 
 const asText = (code: unknown) =>
   JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
@@ -144,7 +152,11 @@ const titles: Record<string, string> = {
             href={href(s.step)}
             aria-current={n === i ? 'step' : undefined}
           >
-            <span class={`xr-step-n ${n < i ? 'xr-step-done' : ''}`}>{n < i ? '✓' : n + 1}</span>
+            {/* Número, nunca ✓. El ✓ afirmaba «ya lo viste» a quien entró por deep-link desde el
+                deck y NO lo vio: historia inventada, y apagaba el scent que lo mandaría a leer el
+                artículo primero — que es la lectura de la que depende la ③. El estado activo lo
+                comunica `aria-current` + el realce, que es lo honesto. */}
+            <span class="xr-step-n">{n + 1}</span>
             {s.label}
           </a>
         ))}
@@ -175,8 +187,8 @@ const titles: Record<string, string> = {
 
             <div class="g-side">
               <div class="g-kpis">
-                {evidence.facts.filter(f => f.headline).map(k => (
-                  <div class="g-kpi">
+                {evidence.facts.filter(f => f.headline).map((k, n) => (
+                  <div class={`g-kpi ${n === 2 ? 'g-kpi-hit' : ''}`}>
                     <p class="g-kpi-n">{k.big}</p>
                     <p class="g-kpi-u">{k.bigUnit}</p>
                     <cite>{k.source} · {k.asOf}</cite>
@@ -199,6 +211,24 @@ const titles: Record<string, string> = {
       {/* ══════════ ③ LA RADIOGRAFÍA — el split con el acoplamiento ══════════ */}
       {step === 'radiografia' && (
         <>
+          {/* 🔴 LA PANTALLA QUE CARGA TODO EL ARGUMENTO ERA LA ÚNICA SIN TITULAR.
+              La ① tiene kicker + H1 + punch. La ④ tiene kicker + H1 + intro. La ③ abría directo con
+              el hint —«pase el cursor y verá…»—, que dice CÓMO SE USA y nunca POR QUÉ IMPORTA. Doble
+              golpe: para quien recorre en orden, la revelación llegaba sin enunciar; y para quien
+              entra por DEEP-LINK desde el deck (caso de primera clase, la propia arquitectura lo
+              promueve) era una pantalla partida sin contexto. No se defendía sola.
+
+              Y la ironía: el payload YA TENÍA `thesis` (el schema lo obliga, `min(40)`) y
+              `ui.thesisLabel`… y el motor NO LOS RENDERIZABA EN NINGUNA PARTE. Prosa obligatoria que
+              nadie veía. */}
+          <header class="r-head">
+            <p class="g-kick">{ui.thesisLabel}</p>
+            <h1 class="r-h1">
+              El schema solo puede marcar contenido <em>visible</em>. Por eso cada dato de la derecha
+              corresponde a algo que está en la izquierda.
+            </h1>
+            <p class="r-thesis">{thesis}</p>
+          </header>
           <p class="r-hint hint-d" hidden data-hint>{ui.hintDesktop}</p>
           <p class="r-hint hint-m" hidden data-hint data-testid="hint-m">{ui.hintMobile}</p>
           <div class="split">
@@ -240,6 +270,24 @@ const titles: Record<string, string> = {
                   </div>
                 )}
 
+                {/* 🔴 ASIMETRÍA DE PRUEBA: el átomo de video ESPECIFICA el entregable y el social lo
+                    RENDERIZA — pero el de imágenes, cuyo argumento textual es «un alt que dice
+                    "paisaje" no sirve para nada; uno que dice "las agujas de roca del Cerro Castillo
+                    nevadas sobre un lago" hace que esa foto se recupere», NO MOSTRABA NI UNA FOTO NI
+                    UN ALT. Dos átomos demostraban y uno solo afirmaba — en la pieza cuya regla entera
+                    es demostrar. Y de paso dejaba un hueco blanco de ~600px en la lámina de cierre.
+                    Ahora enseña las cuatro fotos reales con su alt: el argumento se ve. */}
+                {a.showsImages && (
+                  <ul class="atom-imgs">
+                    {imageBlocks.map(img => (
+                      <li>
+                        <Image src={img.src} alt={img.alt} widths={[220, 440]} sizes="200px" format="avif" quality={65} loading="lazy" />
+                        <p class="atom-alt"><span>alt</span> “{img.alt}”</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
                 <dl class="atom-d">
                   {a.deliverable.map(x => (
                     <>
@@ -262,7 +310,39 @@ const titles: Record<string, string> = {
             ))}
           </div>
 
-          <p class="at-close">{ui.closing}</p>
+          {/* 🔴 EL RECORRIDO MORÍA ACÁ. Cuatro pantallas construyendo tensión y la soltaba en el
+              vacío: la última línea era un párrafo con un borde encima, y después el footer. Un
+              comité que termina convencido y SIN NADA QUE HACER con esa convicción se queda
+              exactamente donde estaba — y el competidor de fondo es la indecisión.
+
+              El cierre hace dos cosas que la pieza prometía y no entregaba:
+              1. Cierra el arco contra la ① (el hueco → la disciplina que lo tapa).
+              2. Le da al evaluador la HERRAMIENTA para verificarlo con sus propias manos. La
+                 arquitectura dice, textual, que esto es «una prueba que el comité puede verificar
+                 por su cuenta» — y en ninguna pantalla se le decía CÓMO. Convertir un claim en una
+                 comprobación que hace él mismo es lo que le da el argumento que va a repetir en la
+                 reunión interna. Hoy le pedíamos fe donde podíamos darle prueba. */}
+          <footer class="at-end">
+            <p class="at-close">{ui.closing}</p>
+
+            <div class="verify">
+              <p class="verify-t">{ui.verifyTitle}</p>
+              <ol class="verify-l">
+                {ui.verifySteps.map(v => (
+                  <li>
+                    <strong>{v.what}</strong>
+                    <span>{v.how}</span>
+                  </li>
+                ))}
+              </ol>
+              {/* ⚠️ EL VALIDADOR IMPORTA. Schema.org valida ESTRUCTURA. El Rich Results Test de
+                  Google reportaría el `FAQPage` como «detectado pero NO elegible para resultado
+                  enriquecido» — que es exactamente el autogol del invariante 6, con el evaluador
+                  de testigo. Es la herramienta correcta por la MISMA razón por la que la pieza no
+                  promete la cajita. */}
+              <p class="verify-n">{ui.verifyNote}</p>
+            </div>
+          </footer>
         </section>
       )}
 
@@ -270,7 +350,7 @@ const titles: Record<string, string> = {
         <div class="xr-next">
           <a href={href(next.step)}>
             <span>
-              <span class="xr-next-l">{ui.flowNext} · {i + 2} {ui.flowOf} {flow.length}</span>
+              <span class="xr-next-l">{ui.flowNext}: paso {i + 2} {ui.flowOf} {flow.length}</span>
               <span class="xr-next-t">{cur.next}</span>
             </span>
             <span class="xr-next-arrow" aria-hidden="true">→</span>
@@ -445,6 +525,41 @@ const titles: Record<string, string> = {
             .forEach(el => {
               if (!keep.has(el)) el.dataset.hide = 'true'
             })
+
+          /* 🔴 EL ORDEN IMPORTA TANTO COMO LA VISIBILIDAD.
+             Se arregló QUÉ se ve; faltaba QUÉ SE LEE PRIMERO. Los nodos supervivientes quedaban en
+             orden del DOM = orden de FAMILIA (craft → jsonld → seo → estructura → evidencia AL
+             FINAL). Al interrogar un H2, lo primero que leía el comité era «cada H2 es una
+             sub-pregunta del FAN-OUT… el motor recupera PASAJES, no páginas» — jerga pura. Y los dos
+             nodos que de verdad ARGUMENTAN («cero aerolíneas en ese resultado», «Balmaceda es el
+             ángulo que solo SKY tiene», ambos con fuente) iban 2.º y 3.º.
+
+             El `tier` existe en el payload (1 = mueve un número del diagnóstico) y en modo enfoque no
+             se usaba. Para quien no sabe SEO, la PRIMERA frase decide si sigue o se desconecta.
+
+             Se ordenan los HIJOS DIRECTOS del panel (un `.hn` anidado no se puede reordenar solo):
+             cada uno toma el mejor rango que sobrevive dentro suyo.
+
+             ⚠️ Y el `tier` SOLO no alcanza: la evidencia y el árbol de encabezados son AMBOS tier 2,
+             así que ordenar por tier los dejaba igual. El tier mide la importancia en la CAPA DE
+             MÁQUINA; lo que decide si el comité sigue leyendo es otra cosa. Para quien no sabe SEO,
+             la EVIDENCIA es el argumento («cero aerolíneas en ese resultado», «Balmaceda es el
+             ángulo que solo SKY tiene»): va primero, siempre. Después el tier. */
+          const rank = (el: Element) => {
+            if (el.matches('.fct, .kpi') || el.querySelector('.fct, .kpi')) return 0
+            const t = /\bt([123])\b/.exec(el.className)?.[1]
+
+            return t ? Number(t) : 2
+          }
+
+          body.querySelectorAll<HTMLElement>(':scope > *').forEach(child => {
+            if (child.dataset.hide) return
+            const own = child.matches('[data-on]') ? rank(child) : 9
+            const inner = [...child.querySelectorAll('[data-on]')].map(n => rank(n.parentElement ?? n))
+            const best = Math.min(own, ...(inner.length ? inner : [9]))
+
+            child.style.order = String(best === 9 ? 2 : best)
+          })
         }
 
         /* Con el panel ya colapsado, los N datos empiezan arriba: se vuelve al tope en vez de
@@ -588,6 +703,24 @@ const titles: Record<string, string> = {
   .g-kpi-u { margin-top: 0.3rem; font-size: var(--t-meta); line-height: 1.35; }
   .g-kpi cite { display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--dim-d); font-style: normal; }
 
+  /* EL GOLPE. El «0 citas en 35 respuestas» no puede pesar lo mismo que el contexto: es el número
+     que dice «no existe cuando alguien le pregunta a una máquina», y es el que conecta con el
+     diagnóstico. Mismo patrón que `.g-punch`, que ya funciona. */
+  .g-kpi-hit {
+    border-left: 4px solid var(--blue); background: var(--surf-2);
+  }
+  .g-kpi-hit .g-kpi-n { font-size: 2.6rem; color: var(--blue); }
+
+  /* LA OBJECIÓN #1 DEL COMITÉ («ya tenemos una página de eso») estaba en la caja más gris, más chica
+     y de borde punteado de la pantalla — pintada como un descargo legal. Pero es, a la vez, la
+     DESACTIVACIÓN de la objeción y la PRUEBA de que hicimos la tarea. El copy ya estaba bien; el
+     problema era puramente de peso. */
+  .g-aside {
+    border-left: 3px solid var(--line-2); border-radius: 0 8px 8px 0;
+    background: var(--surf); border-style: solid; padding: 1rem 1.1rem;
+    font-size: var(--t-body); line-height: 1.65; color: var(--ink-2);
+  }
+
   .g-punch {
     margin-top: 1rem; padding: 1.1rem 1.2rem; background: var(--navy);
     color: var(--ink-d); border-radius: 12px; border-left: 4px solid var(--blue-up);
@@ -603,10 +736,34 @@ const titles: Record<string, string> = {
   }
 
   /* ══════════ ③ LA RADIOGRAFÍA ══════════ */
+  /* EL MARCO DE LA ③. La pantalla que carga toda la revelación no puede abrir con una instrucción:
+     abre con el ARGUMENTO. Y si alguien entra por deep-link desde el deck, acá se defiende sola. */
+  .r-head { max-width: 74ch; margin: 0 0 1.5rem; }
+  .r-h1 {
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--t-sect); font-weight: var(--w-display);
+    line-height: 1.2; letter-spacing: -0.01em; color: var(--ink); margin-top: 0.3rem; text-wrap: balance;
+  }
+  .r-h1 em { font-style: italic; color: var(--blue); }
+  .r-thesis { margin-top: 0.7rem; font-size: var(--t-body); line-height: 1.65; color: var(--ink-3); }
+
   .r-hint { padding-top: 1.25rem; font-size: var(--t-meta); color: var(--muted); }
   .hint-d { display: none; }
   @media (hover: hover) and (pointer: fine) { .hint-d { display: block; } .hint-m { display: none; } }
+  /* 🔴 EN UN TELÉFONO, LA ③ ERA LA ② OTRA VEZ.
+     Apilado, el grid ponía el ARTÍCULO primero y el INSTRUMENTO después: el comité llegaba a la
+     pantalla que se llama «La radiografía» y lo único que veía —durante ~10 pantallazos de scroll—
+     era el mismo artículo que acababa de leer, con unos tintes encima. El argumento entero de la
+     pieza quedaba enterrado. Y el enlace se manda por CORREO: la primera apertura es en el teléfono.
+
+     La hoja inferior ya resolvía la INTERACCIÓN; lo que faltaba era la ARQUITECTURA DE INFORMACIÓN.
+     Ahora, apilado, el instrumento va PRIMERO (en modo mapa: «miren todo lo que hay que poner para
+     que una máquina cite esto») y el artículo debajo — que además ya se leyó en la ②. En desktop el
+     orden natural se conserva: el artículo a la izquierda, el instrumento a la derecha. */
   .split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-width: 0; padding-top: 0.75rem; }
+  .split > :global(.inst) { order: -1; }
+  @media (min-width: 1080px) {
+    .split > :global(.inst) { order: 0; }
+  }
   @media (min-width: 1080px) {
     .split { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; }
     .split :global(.inst) {
@@ -618,7 +775,7 @@ const titles: Record<string, string> = {
   /* ══════════ ④ DÓNDE MÁS VIVE ══════════ */
   .at-intro { margin-top: 1rem; font-size: 1.125rem; line-height: 1.65; color: var(--ink-2); max-width: 68ch; }
   .at-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-top: 2rem; }
-  @media (min-width: 980px) { .at-grid { grid-template-columns: repeat(3, 1fr); align-items: start; } }
+  @media (min-width: 980px) { .at-grid { grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
 
   .atom {
     background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
@@ -647,6 +804,19 @@ const titles: Record<string, string> = {
     display: block; margin-top: 0.5rem; font-size: 0.75rem; line-height: 1.45;
     color: var(--dim-d); font-style: normal; font-weight: var(--w-body-dark);
   }
+  /* Las cuatro fotos reales, con su alt. El argumento de las imágenes deja de estar solo AFIRMADO. */
+  .atom-imgs { margin-top: 1rem; display: grid; gap: 0.8rem; list-style: none; }
+  .atom-imgs img {
+    width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; display: block;
+  }
+  .atom-alt {
+    margin-top: 0.35rem; font-size: var(--t-over); line-height: 1.5; color: var(--dim-d);
+  }
+  .atom-alt span {
+    display: inline-block; margin-right: 0.3rem; padding: 0.05rem 0.3rem; border-radius: 3px;
+    background: var(--navy-3); color: var(--blue-up); font-family: ui-monospace, monospace;
+  }
+
   .atom-why { margin-top: 0.9rem; font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d); }
 
   /* La pieza social, renderizada. Es un mockup del entregable.
@@ -690,6 +860,38 @@ const titles: Record<string, string> = {
     color: var(--amber); background: color-mix(in srgb, var(--amber) 8%, var(--navy-2));
     border: 1px solid color-mix(in srgb, var(--amber) 25%, var(--navy-2)); border-radius: 8px;
   }
+  /* EL CIERRE de la ④ — el recorrido moría acá sin darle al comité nada que HACER. */
+  .at-end { margin-top: 2.5rem; }
+  .verify {
+    margin-top: 1.5rem; padding: 1.5rem 1.6rem; border-radius: 14px;
+    background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
+  }
+  .verify-t {
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--t-node);
+    font-weight: var(--w-display); color: #fff; line-height: 1.25;
+  }
+  .verify-l { margin-top: 1rem; display: grid; gap: 0.8rem; counter-reset: v; list-style: none; }
+  .verify-l li {
+    display: grid; grid-template-columns: 1.6rem 1fr; gap: 0.2rem 0.7rem; align-items: baseline;
+    font-size: var(--t-meta); line-height: 1.6;
+  }
+  .verify-l li::before {
+    counter-increment: v; content: counter(v);
+    grid-row: span 2; justify-self: start;
+    width: 1.5rem; height: 1.5rem; display: grid; place-items: center;
+    border-radius: 999px; background: var(--blue-up); color: var(--navy);
+    font-size: var(--t-over); font-weight: var(--w-label);
+  }
+  .verify-l strong { color: #fff; font-weight: var(--w-label); }
+  .verify-l span { color: var(--dim-d); grid-column: 2; }
+  .verify-n {
+    margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--line-d);
+    font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d);
+  }
+  @media (min-width: 1080px) {
+    .verify-l li, .verify-n { font-size: var(--t-body); }
+  }
+
   .at-close {
     margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
     font-size: 1.125rem; font-weight: var(--w-body); color: var(--ink);

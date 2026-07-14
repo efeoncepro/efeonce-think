@@ -1014,7 +1014,23 @@
     "closing": "Un artículo tapa un hueco. Esta disciplina, repetida mes a mes, es la que cambia quién ocupa el resultado de búsqueda.",
     "flowNext": "Siguiente",
     "flowOf": "de",
-    "licenseNote": "Las fotografías son de Shutterstock, licenciadas por Efeonce. La búsqueda, la licencia y el costo de las imágenes están incluidos en el servicio. Ninguna fue generada con IA."
+    "licenseNote": "Las fotografías son de Shutterstock, licenciadas por Efeonce. La búsqueda, la licencia y el costo de las imágenes están incluidos en el servicio. Ninguna fue generada con IA.",
+    "verifyTitle": "No hace falta que nos crea. Compruébelo usted.",
+    "verifySteps": [
+      {
+        "what": "El hueco",
+        "how": "Escriba «carretera austral» en Google. Cuente las aerolíneas."
+      },
+      {
+        "what": "La ausencia",
+        "how": "Pregúntele a ChatGPT cómo llegar a la Carretera Austral y mire a quién cita. Nosotros lo medimos: cero citas al blog de SKY en 35 respuestas."
+      },
+      {
+        "what": "La capa técnica",
+        "how": "Copie cualquiera de los bloques de datos estructurados de la pantalla anterior y péguelo en validator.schema.org."
+      }
+    ],
+    "verifyNote": "Le señalamos el validador de Schema.org y no el Rich Results Test de Google a propósito: el de Google le diría que el FAQ está «detectado pero no es elegible para resultado enriquecido», y tendría razón — Google restringió esa cajita en 2023 a sitios de gobierno y salud. Por eso no se la prometemos. El FAQ se marca para que un motor de respuesta lo EXTRAIGA y lo cite, que es otra cosa."
   },
   "flow": [
     {
@@ -1030,7 +1046,7 @@
     {
       "step": "radiografia",
       "label": "La radiografía",
-      "next": "Pero esto no vive solo en una URL"
+      "next": "¿Y si el pasajero no está en Google?"
     },
     {
       "step": "atomizacion",
@@ -1210,7 +1226,8 @@
           "k": "Cada una",
           "v": "ALT escrito, ImageObject, crédito y licencia"
         }
-      ]
+      ],
+      "showsImages": true
     }
   ]
 }
