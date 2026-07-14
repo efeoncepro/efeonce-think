@@ -15,6 +15,8 @@ import { readFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs'
 import { spawn } from 'node:child_process'
 import { setTimeout as sleep } from 'node:timers/promises'
 
+import { assertAeoXrayScenarioIds } from './lib/aeo-xray-scenarios.mjs'
+
 const SAMPLE = process.env.XRAY_SAMPLE ?? 'sky-carretera-austral'
 // El token vive en el payload (declarado, estable, versionado). El verify lo LEE de ahí:
 // hardcodearlo acá haría que el gate y la URL real se separen en silencio.
@@ -23,6 +25,10 @@ const { token } = payloadRaw
 /* La tipografía esperada del artículo sale del PAYLOAD, no de una constante: el gate tiene que
    probar el MOTOR (la frontera cliente/Efeonce se respeta), no que SKY sigue siendo SKY. */
 const clientFamily = payloadRaw.client.font.family.split(',')[0].replace(/['"]/g, '').trim()
+const scenarios = assertAeoXrayScenarioIds(payloadRaw, SAMPLE)
+const cssAttr = (name, value) => `[${name}="${String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"]`
+const coupleSelector = id => cssAttr('data-couple', id)
+const targetSelector = id => cssAttr('data-couple-target', id)
 const SLUG = `${SAMPLE}-${token}`
 /** El FLOW: cuatro pantallas. Los gates de HTML corren sobre TODAS — un `ld+json` filtrado en
  *  la pantalla ④ es igual de grave que en la ①. El acoplamiento vive en la ③. */
@@ -275,13 +281,13 @@ try {
   await page.screenshot({ path: `${OUT}/hero-desktop.png`, fullPage: false })
   await page.screenshot({ path: `${OUT}/full-desktop.png`, fullPage: true })
 
-  const heroOn = await page.locator('[data-couple="capsule-main"][data-on]').count()
+  const heroOn = await page.locator(`${coupleSelector(scenarios.hero)}[data-on]`).count()
   check('9. El acoplamiento héroe viene pintado desde el HTML', heroOn > 0)
 
   /* El chip direccional ES la afordancia: sin él, el hover dice QUE hay algo al otro lado,
      pero no hacia dónde ni cuánto. Se mide sobre el estado héroe, ANTES de tocar nada:
      medirlo después de interactuar mediría un bloque que ya no está acoplado. */
-  const chip = await page.locator('[data-couple="capsule-main"]').first().evaluate(el => {
+  const chip = await page.locator(coupleSelector(scenarios.hero)).first().evaluate(el => {
     const st = getComputedStyle(el, '::after')
 
     return { content: st.content, opacity: st.opacity }
@@ -296,9 +302,9 @@ try {
   check('10. Sin scroll horizontal en 1440px', scrollW <= 1, `overflow ${scrollW}px`)
 
   // Acoplamiento: hover sobre la imagen -> se resalta su ImageObject/alt
-  await page.locator('[data-couple="img-hero"]').first().hover()
+  await page.locator(coupleSelector(scenarios.image)).first().hover()
   await page.waitForTimeout(250)
-  const coupled = await page.locator('[data-couple-target="img-hero"][data-on]').count()
+  const coupled = await page.locator(`${targetSelector(scenarios.image)}[data-on]`).count()
   check('11. Hover en el artículo resalta su contraparte en la capa de máquina', coupled > 0)
   await page.screenshot({ path: `${OUT}/couple-image.png` })
 
@@ -362,13 +368,13 @@ try {
    * y ese scroll es SUYO, no nuestro. Medirlo daría un falso rojo (y peor: un falso verde
    * si algún día lo "arreglamos" relajando el umbral). Acá aislamos el efecto de NUESTRO
    * código. Que `focus()` scrollee la página, en cambio, es correcto y esperado.
-   */
-  const before = await page.evaluate(() => {
-    const el = document.querySelector('[data-couple="faq"]')
+  */
+  const before = await page.evaluate(id => {
+    const el = document.querySelector(`[data-couple="${CSS.escape(id)}"]`)
     el?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
 
     return document.documentElement.scrollTop
-  })
+  }, scenarios.scrollGuard)
   await page.waitForTimeout(600)
   const after = await page.evaluate(() => document.documentElement.scrollTop)
   check('13. Al acoplar, la página NO se mueve (scrollea el panel)', Math.abs(after - before) < 5, `${before} → ${after}`)
@@ -377,23 +383,31 @@ try {
   // acoplamiento al teclado (al enfocar, la página scrollea y dispara mouseover fantasma).
   await page.mouse.move(300, 400)
   await page.keyboard.press('Tab')
-  await page.locator('[data-couple="h2-como-llegar"] [data-probe]').first().focus()
+  await page.locator(`${coupleSelector(scenarios.keyboard)} [data-probe]`).first().focus()
   await page.waitForTimeout(350)
-  const kb = await page.locator('[data-couple-target="h2-como-llegar"][aria-current="true"]').count()
+  const kb = await page.locator(`${targetSelector(scenarios.keyboard)}[aria-current="true"]`).count()
   check('12. El teclado acopla aunque el mouse esté apoyado en otra parte', kb > 0)
   await page.screenshot({ path: `${OUT}/couple-keyboard.png` })
 
   /* LOS FRAMES DE LA LÁMINA — deliberados, no accidentales.
      Con el hero editorial la correspondencia queda bajo el pliegue: la página se diseña
      para LEERSE, la lámina se captura donde ARGUMENTA. Dos frames, dos argumentos. */
-  const slide = async (couple, scroll, name) => {
+  const slide = async ({ couple, name, offset }) => {
     await page.keyboard.press('Escape')
     await page.mouse.move(10, 10)
-    await page.evaluate(y => window.scrollTo(0, y), scroll)
+    await page.evaluate(
+      ({ id, topOffset }) => {
+        const el = document.querySelector(`[data-couple="${CSS.escape(id)}"]`)
+        if (!el) return
+        const top = el.getBoundingClientRect().top + window.scrollY - topOffset
+        window.scrollTo(0, Math.max(0, top))
+      },
+      { id: couple, topOffset: offset },
+    )
     await page.waitForTimeout(250)
     await page.evaluate(id => {
       document
-        .querySelector(`[data-couple="${id}"]`)
+        .querySelector(`[data-couple="${CSS.escape(id)}"]`)
         ?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
     }, couple)
     await page.waitForTimeout(500)
@@ -401,25 +415,27 @@ try {
   }
 
   // (a) El oficio: la cápsula de respuesta ↔ el 72,4% de las páginas que ChatGPT cita.
-  await slide('capsule-main', 980, 'slide-oficio')
+  await slide({ couple: scenarios.hero, offset: 340, name: 'slide-oficio' })
   // (b) La competencia: el H2 de «cómo se llega» ↔ quién ocupa hoy ese espacio
   //     (Wikipedia · Instagram · TripAdvisor). Cero aerolíneas.
-  await slide('h2-como-llegar', 1180, 'slide-competencia')
+  await slide({ couple: scenarios.keyboard, offset: 220, name: 'slide-competencia' })
 
   /* El chip y el lector de pantalla tienen que decir EL MISMO número. Si el chip promete 9
      y el anuncio dice 10, uno de los dos miente — y el que ve el número es el evaluador. */
   await page.keyboard.press('Escape')
-  await page.evaluate(() => {
-    document.querySelector('[data-couple="h1"]')?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
-  })
+  await page.evaluate(id => {
+    document
+      .querySelector(`[data-couple="${CSS.escape(id)}"]`)
+      ?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+  }, scenarios.heading)
   await page.waitForTimeout(400)
-  const counts = await page.evaluate(() => {
-    const src = document.querySelector('[data-couple="h1"]')
-    const dom = document.querySelectorAll('[data-couple-target="h1"]').length
+  const counts = await page.evaluate(id => {
+    const src = document.querySelector(`[data-couple="${CSS.escape(id)}"]`)
+    const dom = document.querySelectorAll(`[data-couple-target="${CSS.escape(id)}"]`).length
     const chip = (src?.getAttribute('data-n') ?? '').match(/\d+/)?.[0]
 
     return { dom, chip: Number(chip) }
-  })
+  }, scenarios.heading)
   check(
     '18. El chip y el DOM cuentan lo mismo (el chip no puede mentir)',
     counts.dom === counts.chip,
@@ -595,12 +611,12 @@ try {
      simplemente NO EXISTÍA en un teléfono. Ahora el instrumento sube como hoja inferior.
      Y se mide con getBoundingClientRect, NO con isVisible(): `isVisible` solo mira el CSS
      y devolvía `true` para un nodo que estaba diez pantallas fuera de la vista. */
-  await m.locator('[data-couple="table-entradas"]').first().scrollIntoViewIfNeeded()
+  await m.locator(coupleSelector(scenarios.mobile)).first().scrollIntoViewIfNeeded()
   await m.waitForTimeout(250)
-  await m.locator('[data-couple="table-entradas"]').first().tap()
+  await m.locator(coupleSelector(scenarios.mobile)).first().tap()
   await m.waitForTimeout(800)
   const inView = await m
-    .locator('[data-couple-target="table-entradas"][data-on]')
+    .locator(`${targetSelector(scenarios.mobile)}[data-on]`)
     .first()
     .evaluate(el => {
       const r = el.getBoundingClientRect()

@@ -163,7 +163,8 @@ const requireSourceForStats = (data: unknown, ctx: z.RefinementCtx, path: (strin
  * Los asserts 40-41 cazan huérfanos y fantasmas… pero corren DESPUÉS del build, en un navegador.
  * O sea: el build de un payload con un bloque huérfano PASABA, y la promesa del doc —«un payload
  * incompleto ROMPE EL BUILD, no publica una muestra a medias»— era falsa para el invariante más
- * load-bearing de la pieza. Son 12 líneas y cierra el hueco donde vive.
+ * load-bearing de la pieza. La misma regla aplica a los átomos: si su línea de sangre apunta a un
+ * bloque que ya no existe, la ④ cierra con una genealogía falsa.
  *
  * · HUÉRFANO — bloque acoplable sin contraparte: se ilumina contra la nada. Peor que no acoplarlo.
  * · FANTASMA — nodo que apunta a un bloque que ya no existe (pasa al renombrar un `coupleId`).
@@ -196,6 +197,16 @@ const checkCoupling = (d: any, ctx: z.RefinementCtx) => {
       })
     }
   }
+
+  d.atoms.forEach((atom: any, i: number) => {
+    if (!artIds.has(atom.coupleId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['atoms', i, 'coupleId'],
+        message: `«${atom.coupleId}» rompe la línea de sangre del átomo «${atom.id}»: la atomización apunta a un bloque del artículo que ya no existe.`,
+      })
+    }
+  })
 
   /* Un KPI de portada sin su cifra grande sale VACÍO en la ① y en el instrumento. */
   d.evidence.facts.forEach((f: any, i: number) => {

@@ -17,6 +17,7 @@
     "verify:landing": "node scripts/verify-brand-visibility-landing.mjs",
     "verify:surround-discovery": "node scripts/verify-surround-discovery-landing.mjs",
     "verify:aeo-xray": "node scripts/verify-aeo-xray.mjs",
+    "verify:aeo-xray:scenarios": "node scripts/verify-aeo-xray-scenarios.mjs",
     "read:aeo-xray": "node scripts/read-aeo-xray.mjs"
   },
   "dependencies": {

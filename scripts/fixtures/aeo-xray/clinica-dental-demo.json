@@ -1,0 +1,33 @@
+{
+  "client": {
+    "name": "Clínica Dental Demo"
+  },
+  "article": {
+    "blocks": [
+      {
+        "type": "hero-image",
+        "coupleId": "foto-sonrisa-inicial"
+      },
+      {
+        "type": "h1",
+        "coupleId": "titulo-implantes-dentales"
+      },
+      {
+        "type": "answer-capsule",
+        "coupleId": "capsula-precio-implantes"
+      },
+      {
+        "type": "h2",
+        "coupleId": "h2-cuanto-cuesta-un-implante"
+      },
+      {
+        "type": "table",
+        "coupleId": "tabla-opciones-implantes"
+      },
+      {
+        "type": "faq",
+        "coupleId": "faq-implantes-dentales"
+      }
+    ]
+  }
+}

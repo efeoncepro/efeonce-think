@@ -118,7 +118,7 @@ const titles: Record<string, string> = {
 >
   {/* `data-hero` es el puente: el héroe se DERIVA del payload y viaja al script por el DOM, no por
       una constante. Así el JS del acoplamiento deja de conocer un `coupleId` del cliente. */}
-  <div class="xr" data-testid="xray-root" data-hero={HERO} style={`--client:${client.accent};--client-font:${client.font.family};--w-client-title:${client.font.titleWeight};--w-client-body:${client.font.bodyWeight}`}>
+  <div class="xr" data-testid="xray-root" data-step={step || 'hueco'} data-hero={HERO} style={`--client:${client.accent};--client-font:${client.font.family};--w-client-title:${client.font.titleWeight};--w-client-body:${client.font.bodyWeight}`}>
     <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
     <header class="xr-chrome" data-testid="disclaimer">
       <div class="xr-wrap xr-chrome-in">
@@ -200,6 +200,15 @@ const titles: Record<string, string> = {
                 <p class="g-punch-b">{gap.punchNote}</p>
               </div>
               <p class="g-aside">{gap.aside}</p>
+              {next && (
+                <a class="g-next" href={href(next.step)}>
+                  <span>
+                    <span class="xr-next-l">{ui.flowNext}: paso {i + 2} {ui.flowOf} {flow.length}</span>
+                    <span class="xr-next-t">{cur.next}</span>
+                  </span>
+                  <span class="xr-next-arrow" aria-hidden="true">→</span>
+                </a>
+              )}
             </div>
           </div>
         </section>
@@ -247,7 +256,7 @@ const titles: Record<string, string> = {
 
           <div class="at-grid">
             {atoms.map(a => (
-              <article class="atom" data-couple-target={a.coupleId} tabindex="0">
+              <article class="atom" data-featured={a.post ? 'true' : undefined} data-couple-target={a.coupleId} tabindex="0">
                 <div class="atom-h">
                   <span class="atom-k">{a.kind}</span>
                   <span class="atom-from">{a.bornFrom}</span>
@@ -346,7 +355,7 @@ const titles: Record<string, string> = {
         </section>
       )}
 
-      {next && (
+      {next && step && (
         <div class="xr-next">
           <a href={href(next.step)}>
             <span>
@@ -364,6 +373,20 @@ const titles: Record<string, string> = {
     </main>
   </div>
 </BaseLayout>
+
+<script>
+  /**
+   * En móvil el riel es horizontal. Si alguien entra por deep-link a la ④, el paso activo
+   * no puede quedar fuera de la primera mirada: el riel debe decir "estás acá".
+   */
+  const activeXrayStep = document.querySelector<HTMLElement>('.xr-step[aria-current="step"]')
+
+  if (activeXrayStep && window.matchMedia('(max-width: 719px)').matches) {
+    requestAnimationFrame(() => {
+      activeXrayStep.scrollIntoView({ block: 'nearest', inline: 'center' })
+    })
+  }
+</script>
 
 {step === 'radiografia' && (
   <script>
@@ -396,7 +419,7 @@ const titles: Record<string, string> = {
       const showAll = root.querySelector<HTMLButtonElement>('[data-show-all]')
       let pinned: string | null = null
 
-      /** MÓVIL: el instrumento vive apilado bajo el artículo. Sube como hoja al acoplar. */
+      /** MÓVIL: el instrumento espera fuera de la lectura. Sube como hoja al acoplar. */
       const sheet = () => window.matchMedia('(max-width: 1079px)').matches
       let opener: HTMLElement | null = null
       const closeSheet = () => {
@@ -734,6 +757,16 @@ const titles: Record<string, string> = {
     margin-top: 1rem; padding: 0.8rem 0.9rem; font-size: var(--t-meta); line-height: 1.55;
     color: var(--ink-2); background: var(--surf); border: 1px dashed var(--line); border-radius: 8px;
   }
+  .g-next {
+    display: flex; gap: 1rem; align-items: center; justify-content: space-between;
+    margin-top: 1rem; padding: 1rem 1.2rem; background: var(--navy);
+    color: var(--ink-d); border-radius: 12px; text-decoration: none;
+    transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .g-next:hover {
+    background: var(--navy-3); transform: translateX(3px);
+  }
+  .g-next:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 
   /* ══════════ ③ LA RADIOGRAFÍA ══════════ */
   /* EL MARCO DE LA ③. La pantalla que carga toda la revelación no puede abrir con una instrucción:
@@ -749,20 +782,17 @@ const titles: Record<string, string> = {
   .r-hint { padding-top: 1.25rem; font-size: var(--t-meta); color: var(--muted); }
   .hint-d { display: none; }
   @media (hover: hover) and (pointer: fine) { .hint-d { display: block; } .hint-m { display: none; } }
-  /* 🔴 EN UN TELÉFONO, LA ③ ERA LA ② OTRA VEZ.
-     Apilado, el grid ponía el ARTÍCULO primero y el INSTRUMENTO después: el comité llegaba a la
-     pantalla que se llama «La radiografía» y lo único que veía —durante ~10 pantallazos de scroll—
-     era el mismo artículo que acababa de leer, con unos tintes encima. El argumento entero de la
-     pieza quedaba enterrado. Y el enlace se manda por CORREO: la primera apertura es en el teléfono.
+      /* EN MÓVIL, LA ③ ES UNA LECTURA INTERROGABLE.
+     Poner el instrumento primero convertía la radiografía en una capa de máquina antes de que el
+     evaluador viera qué iba a tocar. El trabajo educativo de la pantalla no es enseñar teoría AEO:
+     es dejar que el comprador toque un bloque visible y vea qué produce.
 
-     La hoja inferior ya resolvía la INTERACCIÓN; lo que faltaba era la ARQUITECTURA DE INFORMACIÓN.
-     Ahora, apilado, el instrumento va PRIMERO (en modo mapa: «miren todo lo que hay que poner para
-     que una máquina cite esto») y el artículo debajo — que además ya se leyó en la ②. En desktop el
-     orden natural se conserva: el artículo a la izquierda, el instrumento a la derecha. */
+     Con JS, el instrumento espera cerrado y sube como hoja inferior al acoplar. Sin JS, queda después
+     del artículo como contenido estático: la pieza no promete interacción, pero sigue siendo legible. */
   .split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-width: 0; padding-top: 0.75rem; }
-  .split > :global(.inst) { order: -1; }
-  @media (min-width: 1080px) {
-    .split > :global(.inst) { order: 0; }
+  @media (max-width: 1079px) {
+    .xr[data-js='on'] .split > :global(.inst) { display: none; }
+    .xr[data-js='on'][data-sheet='open'] .split > :global(.inst) { display: block; }
   }
   @media (min-width: 1080px) {
     .split { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; }
@@ -774,13 +804,24 @@ const titles: Record<string, string> = {
 
   /* ══════════ ④ DÓNDE MÁS VIVE ══════════ */
   .at-intro { margin-top: 1rem; font-size: 1.125rem; line-height: 1.65; color: var(--ink-2); max-width: 68ch; }
-  .at-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-top: 2rem; }
-  @media (min-width: 980px) { .at-grid { grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
+  .at-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-top: 2rem; align-items: start; }
+  @media (max-width: 979px) {
+    .atom[data-featured='true'] { order: -1; }
+  }
+  @media (min-width: 980px) {
+    .at-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr); }
+    .atom[data-featured='true'] { transform: translateY(-0.35rem); }
+  }
 
   .atom {
     background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
     border-radius: 14px; padding: 1.2rem; min-width: 0; position: relative;
     outline: 2px solid transparent; scroll-margin-top: 5rem;
+  }
+  .atom[data-featured='true'] {
+    border-color: color-mix(in srgb, var(--client) 42%, var(--navy-3));
+    background: color-mix(in srgb, var(--client) 10%, var(--navy));
+    box-shadow: 0 18px 40px color-mix(in srgb, var(--navy) 18%, transparent);
   }
   .atom:focus-visible { outline: 2px solid var(--blue-up); }
   .atom-h { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.9rem; }
@@ -829,6 +870,8 @@ const titles: Record<string, string> = {
     background: linear-gradient(160deg, color-mix(in srgb, var(--client) 90%, black), color-mix(in srgb, var(--client) 55%, black));
     color: #fff; aspect-ratio: 4 / 5; display: flex; flex-direction: column; justify-content: center; gap: 0.6rem;
   }
+  .atom[data-featured='true'] .post-card { margin-top: 1.2rem; padding: 1.35rem; }
+  .atom[data-featured='true'] .pc-body { font-size: clamp(1.25rem, 1rem + 0.85vw, 1.7rem); }
   .pc-hook { font-size: var(--t-meta); font-weight: var(--w-label); text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.85; }
   .pc-body { font-family: Poppins, system-ui, sans-serif; font-size: 1.25rem; font-weight: var(--w-display); line-height: 1.3; text-wrap: balance; }
   .pc-cta { font-size: var(--t-meta); opacity: 0.9; }
