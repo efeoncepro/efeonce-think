@@ -194,6 +194,45 @@ const aeoXray = defineCollection({
       ),
     }),
 
+    /** El FLOW: cuatro pantallas, cada una con UN trabajo. Es dato: el motor no hardcodea rutas. */
+    flow: z
+      .array(z.object({ step: z.string(), label: z.string(), next: z.string() }))
+      .min(2),
+
+    /** ① El hueco. El SERP real. Hoy vivía comprimido en una cajita; es la portada y es el golpe. */
+    gap: z.object({
+      kicker: z.string(),
+      headline: z.string(),
+      serpTitle: z.string(),
+      serpNote: z.string(),
+      serp: z.array(z.object({ pos: z.number(), domain: z.string(), kind: z.string() })).min(5),
+      punch: z.string(),
+      punchNote: z.string(),
+      aside: z.string(),
+    }),
+
+    /** ④ Los átomos. Cada uno es una SUPERFICIE MÁS donde el motor puede encontrar al cliente. */
+    atomsIntro: z.string().min(40),
+    atoms: z
+      .array(
+        z.object({
+          id: z.string(),
+          /** La línea de sangre: de qué bloque del artículo nació. Se acopla de vuelta. */
+          coupleId: z.string(),
+          kind: z.string(),
+          bornFrom: z.string(),
+          stat: z.string(),
+          statNote: z.string(),
+          why: z.string().min(40),
+          /** Lo que la muestra NO puede fingir. Decirlo suma; simularlo destruye la pieza. */
+          honesty: z.string().min(20),
+          deliverable: z.array(z.object({ k: z.string(), v: z.string() })).min(2),
+          code: z.record(z.string(), z.unknown()).optional(),
+          post: z.object({ hook: z.string(), body: z.string(), cta: z.string() }).optional(),
+        }),
+      )
+      .min(2),
+
     evidence: z.object({
       intro: z.string(),
       facts: z.array(
@@ -242,6 +281,8 @@ const aeoXray = defineCollection({
       specimenChip: z.string(),
       producesLabel: z.string(),
       producesLabelOne: z.string(),
+      flowNext: z.string(),
+      flowOf: z.string(),
       srProduces: z.string(),
       closing: z.string(),
     }),

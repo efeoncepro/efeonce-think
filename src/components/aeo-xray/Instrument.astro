@@ -1,0 +1,252 @@
+---
+import type { CollectionEntry } from 'astro:content'
+
+/**
+ * EL INSTRUMENTO — navy Efeonce. Nuestro análisis habla con NUESTRA voz.
+ *
+ * ⚠️ INVARIANTE #1: el JSON-LD se renderiza como TEXTO ESCAPADO, jamás dentro de un
+ * <script type="application/ld+json">. Emitirlo declararía, en NUESTRO dominio, que Efeonce
+ * publicó un artículo del cliente — un dato estructurado falso, ingerible por crawlers, justo
+ * en la pieza cuya tesis es el rigor técnico. `verify-aeo-xray.mjs` falla si aparece uno.
+ *
+ * Tres niveles de nodo: el 1 mueve un número del diagnóstico (stat grande), el 3 es prueba de
+ * completitud —no argumento— y va callado. Sin eso, `og:title` pesa igual que `FAQPage` y todo
+ * se aplana.
+ */
+
+type Sample = CollectionEntry<'aeoXray'>['data']
+interface Props { d: Sample; hero: string }
+
+const { d, hero } = Astro.props
+const { ui, machine, evidence } = d
+
+const kpis = evidence.facts.filter(f => f.headline)
+const details = evidence.facts.filter(f => !f.headline)
+
+/** Escapa el JSON-LD para mostrarlo como TEXTO. Jamás `set:html`. */
+const asText = (code: unknown) =>
+  JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
+---
+
+<aside class="inst" aria-labelledby="in-t">
+  <div class="in-head">
+    <h2 id="in-t">{ui.instrumentTitle}</h2>
+    <p class="in-live" role="status" aria-live="polite" data-testid="live"></p>
+    {/* Solo móvil: cierra la hoja y devuelve el foco al bloque que la abrió. */}
+    <button class="sheet-x" type="button" data-close-sheet aria-label={ui.backToArticle}>✕</button>
+  </div>
+
+  <div class="in-body">
+    {/* La evidencia ABRE el instrumento: es el argumento, no el apéndice. */}
+    <div class="kpis" data-testid="kpis">
+      {kpis.map(k => (
+        <div class="kpi" data-couple-target={k.coupleId} tabindex="0">
+          <p class="kpi-n">{k.big}</p>
+          <p class="kpi-u">{k.bigUnit}</p>
+          <cite class="kpi-s">{k.source} · {k.asOf}</cite>
+        </div>
+      ))}
+    </div>
+
+    <p class="grp">Cómo está escrito</p>
+    {machine.craft.map(c => (
+      <div class={`nd t${c.tier}`} data-couple-target={c.coupleId} data-on={c.coupleId === hero ? true : undefined} tabindex="0">
+        {c.stat && <p class="stat">{c.stat} <span>{c.statNote}</span></p>}
+        <p class="nd-l">{c.label} <em>· {c.detail}</em></p>
+        <p class="why"><b>{ui.whyLabel}:</b> {c.why}</p>
+      </div>
+    ))}
+
+    <p class="grp">Datos estructurados <em>· se muestran como texto</em></p>
+    <p class="warn">{ui.schemaNote}</p>
+    {machine.jsonld.map(n => (
+      <div class={`nd t${n.tier} sch`} data-couple-target={n.coupleId} tabindex="0">
+        <div class="sch-h">
+          <span class="sch-t">{n.type}</span>
+          <span class="sch-m">{n.metric}</span>
+        </div>
+        {n.stat && <p class="stat"><span class="stat-fix">arregla</span>{n.stat} <span>{n.statNote}</span></p>}
+        {n.tier < 3 && <p class="why"><b>{ui.whyLabel}:</b> {n.why}</p>}
+        <details>
+          <summary>Ver el código</summary>
+          <pre role="region" tabindex="0" aria-label={`Datos estructurados: ${n.type}`}><code>{asText(n.code)}</code></pre>
+        </details>
+      </div>
+    ))}
+
+    <p class="grp">Metadatos</p>
+    {machine.seo.map(s => (
+      <div class={`nd t${s.tier}`} data-couple-target={s.coupleId} tabindex="0">
+        <p class="nd-l">{s.label} {s.detail && <em>· {s.detail}</em>}</p>
+        <p class="nd-v">{s.value}</p>
+        {s.tier < 3 && <p class="why"><b>{ui.whyLabel}:</b> {s.why}</p>}
+      </div>
+    ))}
+    <div class="t3wrap">
+      {machine.og.map(o => (
+        <div class="nd t3" data-couple-target={o.coupleId} tabindex="0">
+          <p class="nd-l">{o.label}</p>
+          <p class="nd-v mono">{o.value}</p>
+        </div>
+      ))}
+    </div>
+
+    <p class="grp">Estructura</p>
+    <div class="nd t2" data-couple-target={machine.headings.coupleId} tabindex="0">
+      {machine.headings.tree.map(h => (
+        <p class={`hn l${h.level}`} data-couple-target={h.coupleId} tabindex="0">
+          <span class="lv">H{h.level}</span> {h.text}
+        </p>
+      ))}
+      <p class="why"><b>{ui.whyLabel}:</b> {machine.headings.why}</p>
+    </div>
+    {machine.alts.map(a => (
+      <div class="nd t2" data-couple-target={a.coupleId} tabindex="0">
+        <p class="nd-v">“{a.alt}”</p>
+        <p class="why"><b>{ui.whyLabel}:</b> {a.why}</p>
+      </div>
+    ))}
+
+    <p class="grp">La evidencia <em>· por qué existe este artículo</em></p>
+    {details.map(f => (
+      <div class="nd t2 fct" data-couple-target={f.coupleId} tabindex="0">
+        <p class="nd-l">{f.label}</p>
+        <p class="fct-v">{f.value}</p>
+        <p class="why">{f.note}</p>
+        <cite>{ui.sourceLabel}: {f.source} · {f.asOf}</cite>
+      </div>
+    ))}
+    <div class="nd t2">
+      <p class="nd-l">{evidence.fanOut.title}</p>
+      <p class="why">{evidence.fanOut.note}</p>
+      <ul class="fan">
+        {evidence.fanOut.items.map(i => (
+          <li data-couple-target={i.coveredBy} tabindex="0">
+            <span class="ok" aria-hidden="true">{i.covered ? '✓' : '—'}</span>{i.q}
+          </li>
+        ))}
+      </ul>
+    </div>
+    <p class="hon">{evidence.honesty}</p>
+  </div>
+</aside>
+
+<style>
+  .inst {
+    background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
+    border-radius: 12px; min-width: 0;
+  }
+  .in-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--line-d); background: var(--navy-2);
+    border-radius: 12px 12px 0 0; position: sticky; top: 0; z-index: 2;
+  }
+  .in-head h2 { font-size: var(--t-body); font-weight: 600; }
+  .in-live { font-size: var(--t-over); color: var(--dim-d); text-align: right; }
+  .in-body { padding: 1rem 1rem 1rem 1.3rem; }
+
+  /* Los KPI abren el instrumento. Tabular-nums, NUNCA monoespaciada. */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.4rem; }
+  .kpi {
+    padding: 0.7rem 0.75rem; background: var(--navy-2); border: 1px solid var(--line-d);
+    border-radius: 9px; outline: 2px solid transparent;
+  }
+  .kpi-n {
+    font-size: var(--t-stat); font-weight: 700; line-height: 1; color: #fff;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+  }
+  .kpi-u { margin-top: 0.3rem; font-size: var(--t-meta); color: var(--ink-d); line-height: 1.35; }
+  .kpi-s { display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--dim-d); font-style: normal; }
+  @media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
+
+  .grp {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--blue-up); margin: 1.5rem 0 0.6rem; padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--line-d);
+  }
+  .grp em { font-style: normal; font-weight: 500; color: var(--dim-d); text-transform: none; letter-spacing: 0.04em; }
+  .warn {
+    font-size: var(--t-meta); line-height: 1.5; color: #ffd166;
+    background: color-mix(in srgb, #ffd166 10%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, #ffd166 30%, var(--navy-2));
+    border-radius: 7px; padding: 0.55rem 0.65rem; margin-bottom: 0.7rem;
+  }
+
+  .nd {
+    position: relative; margin-bottom: 0.55rem; padding: 0.7rem 0.8rem;
+    background: var(--navy-2); border: 1px solid var(--line-d); border-radius: 9px;
+    outline: 2px solid transparent; outline-offset: 1px; min-width: 0;
+    scroll-margin-top: 4rem; /* Focus Not Obscured (2.4.11): el header pegajoso no lo tapa */
+  }
+  .nd:focus-visible, .kpi:focus-visible { outline: 2px solid var(--blue-up); }
+  .t1 { border-color: color-mix(in srgb, var(--blue-up) 35%, var(--line-d)); background: var(--navy-3); }
+  .t3 { padding: 0.4rem 0.6rem; background: transparent; border-color: transparent; margin-bottom: 0.1rem; }
+  .t3wrap { padding: 0.3rem 0 0.6rem; border-left: 2px solid var(--line-d); margin-left: 0.2rem; }
+
+  .stat {
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--t-stat); font-weight: 700;
+    line-height: 1.05; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    margin-bottom: 0.15rem;
+  }
+  .stat span {
+    display: block; font-size: var(--t-meta); font-weight: 400; line-height: 1.45;
+    color: var(--dim-d); letter-spacing: 0; margin-top: 0.25rem;
+  }
+  .stat-fix {
+    display: inline-block !important; margin-right: 0.35rem; font-size: var(--t-over) !important;
+    font-weight: 700 !important; letter-spacing: 0.08em !important; text-transform: uppercase;
+    color: var(--blue-up) !important; vertical-align: middle;
+  }
+  .nd-l { font-size: var(--t-meta); font-weight: 700; color: var(--ink-d); }
+  .nd-l em { font-weight: 400; color: var(--dim-d); font-style: normal; }
+  .nd-v { font-size: var(--t-meta); margin-top: 0.2rem; color: var(--ink-d); word-break: break-word; line-height: 1.5; }
+  .nd-v.mono { font-family: ui-monospace, monospace; font-size: 0.6875rem; color: var(--dim-d); }
+  .why { font-size: var(--t-meta); line-height: 1.55; color: var(--dim-d); margin-top: 0.4rem; max-width: 62ch; }
+  .why b { color: var(--blue-up); font-weight: 600; }
+
+  .sch-h { display: flex; justify-content: space-between; gap: 0.6rem; align-items: center; margin-bottom: 0.35rem; }
+  .sch-t { font-size: var(--t-meta); font-weight: 700; font-family: ui-monospace, monospace; color: #fff; }
+  .sch-m {
+    font-size: var(--t-over); font-weight: 700; color: var(--navy); background: var(--blue-up);
+    padding: 0.12rem 0.45rem; border-radius: 999px; white-space: nowrap;
+  }
+  .sch details { margin-top: 0.5rem; }
+  .sch summary {
+    cursor: pointer; font-size: var(--t-over); font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--dim-d); padding: 0.25rem 0; list-style-position: inside;
+  }
+  .sch summary:hover { color: var(--blue-up); }
+  .sch summary:focus-visible { outline: 2px solid var(--blue-up); outline-offset: 2px; border-radius: 4px; }
+  .sch pre {
+    margin-top: 0.6rem; padding: 0.65rem; background: #04101d; color: #cfe3f5;
+    border: 1px solid var(--line-d); border-radius: 7px; font-size: 0.6875rem; line-height: 1.55;
+    overflow-x: auto; max-height: 20rem; max-width: 100%;
+  }
+
+  .hn { font-size: var(--t-meta); padding: 0.2rem 0.3rem; border-radius: 4px; outline: 2px solid transparent; scroll-margin-top: 4rem; }
+  .hn.l2 { padding-left: 1.15rem; }
+  .lv { display: inline-block; min-width: 1.7rem; font-weight: 700; color: var(--blue-up); font-size: 0.625rem; }
+
+  .fct-v { font-size: var(--t-node); font-weight: 700; color: var(--blue-up); margin: 0.15rem 0; font-variant-numeric: tabular-nums; }
+  .fct cite { display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--dim-d); font-style: normal; }
+  .fan li {
+    display: flex; gap: 0.45rem; font-size: var(--t-meta); padding: 0.28rem 0.3rem; border-radius: 4px;
+    outline: 2px solid transparent; align-items: baseline; color: var(--ink-d); scroll-margin-top: 4rem;
+  }
+  .ok { color: var(--mint); font-weight: 700; }
+  .hon {
+    margin-top: 0.8rem; padding: 0.7rem 0.8rem; font-size: var(--t-meta); line-height: 1.55;
+    color: var(--dim-d); background: var(--navy-2); border-radius: 8px; border: 1px dashed var(--line-d);
+  }
+
+  /* Solo móvil: la hoja inferior. Ver el CSS global del acoplamiento. */
+  .sheet-x { display: none; }
+  @media (max-width: 1079px) {
+    .sheet-x {
+      display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 999px;
+      border: 1px solid var(--line-d); background: var(--navy-3); color: var(--ink-d);
+      font-size: 1rem; cursor: pointer; flex-shrink: 0;
+    }
+    .sheet-x:focus-visible { outline: 2px solid var(--blue-up); outline-offset: 2px; }
+  }
+</style>

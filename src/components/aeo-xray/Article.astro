@@ -1,0 +1,390 @@
+---
+import { Image } from 'astro:assets'
+import type { CollectionEntry } from 'astro:content'
+
+/**
+ * El ESPÉCIMEN — el artículo tal como se vería publicado.
+ *
+ * Es EDITORIAL, no product UI: es el mockup de un blog real (cuerpo 18px, interlineado 1.7,
+ * medida 64ch, imágenes que respiran). Aplicarle densidad de producto fue el error que lo
+ * dejaba plano — le mostrábamos al comité un wireframe del contenido, no el contenido.
+ *
+ * `coupled=false` (pantalla ② «El artículo»): se LEE. Sin chips, sin tabindex, sin ruido.
+ * `coupled=true`  (pantalla ③ «La radiografía»): cada bloque se acopla con su capa de máquina.
+ */
+
+type Sample = CollectionEntry<'aeoXray'>['data']
+
+interface Props {
+  d: Sample
+  coupled?: boolean
+  /** Cuántos datos de máquina produce cada bloque — alimenta el chip direccional. */
+  produces?: Map<string, number>
+  hero?: string
+}
+
+const { d, coupled = false, produces = new Map(), hero } = Astro.props
+const { article, ui, machine } = d
+
+type Block = (typeof article.blocks)[number]
+type ImageBlock = Extract<Block, { type: 'image' | 'hero-image' }>
+const isImage = (b: Block): b is ImageBlock => b.type === 'image' || b.type === 'hero-image'
+
+/**
+ * La FIRMA (categoría · autor · fecha · lectura). No es adorno: el `BlogPosting` declara
+ * `author`, `datePublished` y `articleSection`, y el schema SOLO puede marcar contenido
+ * VISIBLE. Sin la firma, la muestra violaría su propia tesis.
+ */
+const words = article.blocks.reduce((n, b) => {
+  const t =
+    'text' in b ? b.text
+    : b.type === 'faq' ? b.items.map(i => `${i.q} ${i.a}`).join(' ')
+    : b.type === 'ordered-list' ? b.items.join(' ')
+    : b.type === 'table' ? b.rows.flat().join(' ')
+    : ''
+
+  return n + t.split(/\s+/).filter(Boolean).length
+}, 0)
+const readMin = Math.max(1, Math.round(words / 200))
+const published = new Date(`${article.publishedAt}T12:00:00Z`).toLocaleDateString('es-CL', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+})
+
+const attrsFor = (id: string) => {
+  if (!coupled) return {}
+  const n = produces.get(id) ?? 0
+
+  return {
+    'data-couple': id,
+    'data-on': id === hero ? true : undefined,
+    'data-n': n > 0 ? `${n} ${n === 1 ? ui.producesLabelOne : ui.producesLabel}` : undefined,
+    tabindex: 0,
+  }
+}
+const srFor = (id: string) => {
+  const n = produces.get(id) ?? 0
+
+  return coupled && n > 0 ? ui.srProduces.replace('{n}', String(n)) : null
+}
+---
+
+<section class={`sp ${coupled ? 'sp-split' : 'sp-read'}`} aria-labelledby="sp-t">
+  <div class="sp-head">
+    <div>
+      <h2 id="sp-t">{ui.paneArticleTitle}</h2>
+      <p>{ui.paneArticleSubtitle}</p>
+    </div>
+    {/* La URL propuesta, en su contexto: es el mismo valor que el instrumento declara canónico. */}
+    <span class="urlbar" title={article.proposedUrl}>
+      <span class="lock" aria-hidden="true">🔒</span>
+      <span class="url">{article.proposedUrl.replace('https://', '')}</span>
+    </span>
+  </div>
+
+  <article class="post xr-article">
+    {article.blocks.map(b => {
+      if (!('coupleId' in b)) {
+        if (b.type === 'paragraph') return <p class="para">{b.text}</p>
+
+        return null
+      }
+
+      const a = attrsFor(b.coupleId)
+      const sr = srFor(b.coupleId)
+
+      if (isImage(b))
+        return (
+          <figure class={`blk fig ${b.type === 'hero-image' ? 'hero' : ''}`} {...a}>
+            {sr && <span class="xr-sr">{sr}</span>}
+            {/* `<Image>` de astro:assets: de acá salen width/height (sin ellos, CLS), el srcset
+                (sin él un teléfono baja el hero de escritorio) y AVIF. Una pieza que argumenta
+                rigor técnico no puede reprobar su propio PageSpeed. */}
+            <Image
+              class={b.type === 'hero-image' ? 'xr-hero-img' : ''}
+              src={b.src}
+              alt={b.alt}
+              widths={b.type === 'hero-image' ? [640, 960, 1400] : [480, 720, 1000]}
+              sizes={
+                b.type === 'hero-image'
+                  ? coupled ? '(min-width: 1080px) 52vw, 100vw' : '(min-width: 820px) 800px, 100vw'
+                  : coupled ? '(min-width: 1080px) 46vw, 92vw' : '(min-width: 820px) 740px, 92vw'
+              }
+              format="avif"
+              quality={72}
+              loading={b.type === 'hero-image' ? 'eager' : 'lazy'}
+              fetchpriority={b.type === 'hero-image' ? 'high' : 'auto'}
+            />
+            <div class="fig-m">
+              {b.caption && <figcaption>{b.caption}</figcaption>}
+              <p class="credit">
+                Foto: {b.credit.author} · <a href={b.credit.url} rel="nofollow noopener">{b.credit.license}</a>
+              </p>
+            </div>
+          </figure>
+        )
+
+      if (b.type === 'h1')
+        return (
+          <div class="blk head-blk" {...a}>
+            {sr && <span class="xr-sr">{sr}</span>}
+            <p class="cat">{article.category}</p>
+            <h3 class="p-h1">{b.text}</h3>
+            <p class="byline">
+              {ui.bylineBy} <b>{article.author}</b>
+              <span class="dot" aria-hidden="true">·</span>
+              <time datetime={article.publishedAt}>{published}</time>
+              <span class="dot" aria-hidden="true">·</span>
+              {readMin} {ui.readTime}
+            </p>
+          </div>
+        )
+      if (b.type === 'h2')
+        return (
+          <div class="blk" {...a}>
+            <h4 class="p-h2">{b.text}</h4>
+            {sr && <span class="xr-sr">{sr}</span>}
+          </div>
+        )
+      if (b.type === 'answer-capsule')
+        return (
+          <div class="blk cap" {...a}>
+            <span class="cap-t">Respuesta directa</span>
+            <p>{b.text}</p>
+            {sr && <span class="xr-sr">{sr}</span>}
+          </div>
+        )
+      if (b.type === 'pull-quote')
+        return (
+          <blockquote class="blk pull" {...a}>
+            <p>{b.text}</p>
+            {sr && <span class="xr-sr">{sr}</span>}
+          </blockquote>
+        )
+      if (b.type === 'table')
+        return (
+          <div class="blk" {...a}>
+            {sr && <span class="xr-sr">{sr}</span>}
+            <div class="tw">
+              <table>
+                <caption>{b.caption}</caption>
+                <thead><tr>{b.headers.map(h => <th scope="col">{h}</th>)}</tr></thead>
+                <tbody>{b.rows.map(r => <tr>{r.map(c => <td>{c}</td>)}</tr>)}</tbody>
+              </table>
+            </div>
+          </div>
+        )
+      if (b.type === 'ordered-list')
+        return (
+          <div class="blk" {...a}>
+            <p class="blk-t">{b.title}</p>
+            <ol>{b.items.map(i => <li>{i}</li>)}</ol>
+            {sr && <span class="xr-sr">{sr}</span>}
+          </div>
+        )
+      if (b.type === 'faq')
+        return (
+          <div class="blk faq" {...a}>
+            <p class="blk-t">{b.title}</p>
+            {b.items.map(i => (
+              <div class="qa">
+                <p class="q">{i.q}</p>
+                <p class="a">{i.a}</p>
+              </div>
+            ))}
+            {sr && <span class="xr-sr">{sr}</span>}
+          </div>
+        )
+      if (b.type === 'internal-links')
+        return (
+          <div class="blk" {...a}>
+            <p class="blk-t">{b.title}</p>
+            <ul class="lnks">
+              {b.items.map(i => (
+                <li>
+                  <a href={i.href} rel="nofollow noopener">{i.text}</a>
+                  {i.note && <em> — {i.note}</em>}
+                </li>
+              ))}
+            </ul>
+            {sr && <span class="xr-sr">{sr}</span>}
+          </div>
+        )
+      if (b.type === 'sources')
+        return (
+          <div class="blk srcs" {...a}>
+            <p class="blk-t">{b.title}</p>
+            <ul>{b.items.map(i => <li><a href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
+            {sr && <span class="xr-sr">{sr}</span>}
+          </div>
+        )
+
+      return null
+    })}
+  </article>
+
+  {/* El pie de licencias no es una nota: ES la demostración del requisito 5 de las bases. */}
+  <footer class="lic" data-testid="licenses">
+    <p class="lic-t">{ui.licenseTitle}</p>
+    <ul>
+      {article.blocks.filter(isImage).map(i => (
+        <li>
+          <span class="lic-a">{i.alt}</span>
+          <span class="lic-c">{i.credit.author} · <a href={i.credit.url} rel="nofollow noopener">{i.credit.license}</a></span>
+        </li>
+      ))}
+    </ul>
+    <p class="lic-n">Todas las imágenes tienen licencia verificable y crédito visible. Ninguna fue generada con IA.</p>
+  </footer>
+</section>
+
+<style>
+  /* El espécimen es EDITORIAL. Ver la nota del frontmatter. */
+  .sp {
+    --a-body: 1.125rem;
+    --a-lead: 1.25rem;
+    --a-h1: 2.25rem;
+    --a-h2: 1.5rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    min-width: 0;
+  }
+  /* Leyendo (pantalla ②): la medida manda, no el ancho del contenedor. */
+  .sp-read { max-width: 52rem; margin-inline: auto; }
+  .sp-read { --a-h1: 2.6rem; }
+
+  .sp-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--line); background: #fbfcfd;
+    border-radius: 12px 12px 0 0;
+  }
+  .sp-head h2 { font-size: var(--t-body); font-weight: 600; }
+  .sp-head p { font-size: var(--t-meta); color: var(--muted); }
+  .urlbar {
+    display: flex; gap: 0.4rem; align-items: center; min-width: 0; max-width: 24rem;
+    font-size: var(--t-meta); color: var(--muted);
+    background: #eef2f6; border: 1px solid var(--line);
+    padding: 0.3rem 0.7rem; border-radius: 999px;
+  }
+  .lock { font-size: 0.625rem; opacity: 0.6; }
+  .url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .post { padding: 0 0 1.5rem; }
+  .post > .para { margin-inline: 1.75rem; }
+  .blk { position: relative; padding: 0.5rem 0.75rem; border-radius: 8px; border-left: 3px solid transparent; }
+  .post > .blk:not(.fig) { margin-inline: 1rem; }
+  @media (max-width: 640px) {
+    .post > .para { margin-inline: 1.15rem; }
+    .post > .blk:not(.fig) { margin-inline: 0.4rem; }
+  }
+  .blk.fig { padding: 0; border-left: 0; }
+
+  /* El hero es un HERO: a sangre, 21:9. Era un thumbnail recortado a 150px. */
+  .fig { margin: 1.75rem 0; }
+  .fig.hero { margin: 0 0 1.5rem; }
+  .fig :global(img) { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .fig.hero :global(img) { border-radius: 0; aspect-ratio: 21 / 9; object-fit: cover; }
+  .fig:not(.hero) :global(img) { aspect-ratio: 16 / 9; object-fit: cover; }
+  .fig-m { padding: 0.55rem 1.75rem 0; }
+  figcaption { font-size: 0.9375rem; line-height: 1.5; color: #4a5c6e; }
+  .credit { margin-top: 0.25rem; font-size: 0.75rem; color: #7c8fa3; }
+  .credit a { color: inherit; text-decoration: underline; }
+
+  .head-blk { padding-top: 0.25rem; }
+  .cat {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--client); margin-bottom: 0.6rem;
+  }
+  .p-h1 {
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--a-h1); font-weight: 600;
+    line-height: 1.12; letter-spacing: -0.02em; max-width: 20ch; text-wrap: balance;
+  }
+  .byline {
+    display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: baseline;
+    margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line);
+    font-size: 0.9375rem; color: var(--muted);
+  }
+  .byline b { color: var(--ink); font-weight: 600; }
+  .byline .dot { color: #cbd5e1; }
+
+  /* Ritmo editorial: mucho aire ANTES de cada H2, poco después. El ojo agrupa por proximidad. */
+  .p-h2 {
+    margin-top: 2.25rem; font-family: Poppins, system-ui, sans-serif; font-size: var(--a-h2);
+    font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; max-width: 26ch; text-wrap: balance;
+  }
+  .para { margin: 1.1rem 0; font-size: var(--a-body); line-height: 1.7; color: #2c3e50; max-width: 64ch; }
+
+  .cap {
+    margin-top: 1.1rem; padding: 1rem 1.15rem; background: var(--tint-c);
+    border-left-color: var(--client); border-radius: 0 10px 10px 0;
+  }
+  .cap p { font-size: var(--a-lead); line-height: 1.6; color: #1e2f3f; max-width: 58ch; font-weight: 450; }
+  .cap-t {
+    display: block; margin-bottom: 0.4rem; font-size: var(--t-over); font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--client);
+  }
+
+  .pull { margin-block: 2rem; padding: 0.2rem 0 0.2rem 1.4rem; border-left: 4px solid var(--client); }
+  .pull p {
+    font-family: Poppins, system-ui, sans-serif; font-size: 1.4375rem; line-height: 1.35;
+    font-weight: 500; letter-spacing: -0.01em; color: var(--ink); max-width: 30ch; text-wrap: balance;
+  }
+
+  .blk-t {
+    font-family: Poppins, system-ui, sans-serif; font-weight: 600; font-size: 1.1875rem;
+    margin-bottom: 0.7rem; letter-spacing: -0.01em;
+  }
+  .tw { overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  table { width: 100%; min-width: 32rem; border-collapse: collapse; font-size: 0.9375rem; }
+  caption {
+    text-align: left; font-family: Poppins, system-ui, sans-serif; font-weight: 600;
+    font-size: 1.1875rem; padding-bottom: 0.7rem; letter-spacing: -0.01em;
+  }
+  th, td { border-bottom: 1px solid var(--line); padding: 0.75rem 0.9rem; text-align: left; vertical-align: top; line-height: 1.5; }
+  th { background: #f7f9fb; font-weight: 600; font-size: 0.8125rem; color: #33475b; }
+  tbody tr:last-child td { border-bottom: none; }
+  td:first-child { font-weight: 600; color: var(--ink); }
+
+  ol { padding-left: 0; list-style: none; counter-reset: paso; }
+  ol li {
+    position: relative; counter-increment: paso; padding-left: 2.4rem;
+    font-size: var(--a-body); line-height: 1.65; margin: 0.75rem 0; color: #2c3e50; max-width: 60ch;
+  }
+  ol li::before {
+    content: counter(paso); position: absolute; left: 0; top: 0.1rem;
+    width: 1.7rem; height: 1.7rem; border-radius: 999px;
+    background: var(--tint-c); color: var(--client);
+    font-size: 0.8125rem; font-weight: 700; display: grid; place-items: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .faq { margin-top: 1.5rem; }
+  .faq .qa { padding: 0.9rem 0; border-top: 1px solid var(--line); }
+  .faq .q { font-family: Poppins, system-ui, sans-serif; font-weight: 600; font-size: 1.0625rem; line-height: 1.35; }
+  .faq .a { font-size: 1rem; line-height: 1.65; color: #4a5c6e; margin-top: 0.35rem; max-width: 62ch; }
+
+  .lnks li { font-size: 1rem; margin: 0.5rem 0; line-height: 1.5; }
+  .lnks a { color: var(--client); text-decoration: underline; text-underline-offset: 2px; font-weight: 500; }
+  .lnks em { color: var(--muted); font-style: normal; font-size: 0.8125rem; }
+  .srcs { border-top: 1px solid var(--line); margin-top: 2rem; padding-top: 1.1rem; }
+  .srcs ul { padding-left: 1rem; list-style: disc; }
+  .srcs li { font-size: 0.875rem; margin: 0.35rem 0; line-height: 1.5; }
+  .srcs a { color: var(--muted); text-decoration: underline; }
+
+  .lic { margin: 0 1.1rem; padding: 1.1rem 0 1.4rem; border-top: 1px solid var(--line); }
+  .lic-t {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.5rem;
+  }
+  .lic li {
+    display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: space-between;
+    font-size: var(--t-meta); padding: 0.45rem 0; border-bottom: 1px solid var(--line);
+  }
+  .lic-a { color: #33475b; max-width: 62ch; }
+  .lic-c { color: var(--muted); white-space: nowrap; }
+  .lic a { color: var(--blue); text-decoration: underline; }
+  .lic-n { margin-top: 0.8rem; font-size: var(--t-meta); font-weight: 600; color: #33475b; }
+</style>

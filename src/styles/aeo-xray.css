@@ -1,0 +1,488 @@
+/*
+ * Radiografía AEO — estilos de la superficie. TASK-1410 (greenhouse-eo).
+ *
+ * Global pero con prefijo `xr-`: cuatro pantallas comparten chrome, tipografía y tokens,
+ * y los estilos scoped de Astro no cruzan de componente. El prefijo es la frontera.
+ *
+ * ── DOS ZONAS DE MARCA ──
+ * Izquierda / el artículo = el CLIENTE (claro, su acento). Es el espécimen.
+ * Chrome + instrumento    = EFEONCE (navy + azul). Es la máquina que lo lee.
+ * El análisis es NUESTRO: no puede hablar en el color del cliente.
+ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   VIEW TRANSITIONS — cross-document, CSS puro, cero JavaScript.
+   Sin transición, cuatro pantallas se sienten como cuatro páginas sueltas.
+   La que cuenta la historia es ② → ③: el artículo que acabas de leer se ENCOGE
+   y se convierte en el espécimen bajo el instrumento. El morph es el argumento.
+   ══════════════════════════════════════════════════════════════════════════ */
+@view-transition {
+  navigation: auto;
+}
+
+/* El chrome y el riel NO se animan: son el marco estable del recorrido.
+   Si parpadean, el evaluador pierde el punto de referencia. */
+.xr-chrome {
+  view-transition-name: xr-chrome;
+}
+.xr-rail {
+  view-transition-name: xr-rail;
+}
+
+/* El artículo persiste entre ② y ③: el browser morphea su caja. */
+.xr-article {
+  view-transition-name: xr-article;
+}
+/* El hero viaja con él. */
+.xr-hero-img {
+  view-transition-name: xr-hero;
+}
+
+/* El instrumento ENTRA desde la derecha: no aparece, LLEGA. */
+::view-transition-new(xr-inst) {
+  animation: xr-slide-in 420ms cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-old(xr-inst) {
+  animation: xr-slide-out 260ms cubic-bezier(0.4, 0, 1, 1);
+}
+@keyframes xr-slide-in {
+  from {
+    transform: translateX(14%);
+    opacity: 0;
+  }
+}
+@keyframes xr-slide-out {
+  to {
+    transform: translateX(14%);
+    opacity: 0;
+  }
+}
+
+/* El contenido de cada pantalla entra con un desplazamiento corto: dirección, no espectáculo. */
+::view-transition-old(root) {
+  animation: xr-fade-out 180ms ease-in;
+}
+::view-transition-new(root) {
+  animation: xr-rise 320ms cubic-bezier(0.2, 0, 0, 1);
+}
+@keyframes xr-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes xr-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* El significado nunca estuvo en el movimiento: con `reduce` se cae la animación,
+   no la correspondencia. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TOKENS
+   ══════════════════════════════════════════════════════════════════════════ */
+.xr {
+  --navy: #001a33;
+  --navy-2: #08203a;
+  --navy-3: #0e2c4b;
+  --line-d: #1b3c5e;
+  --blue: #0375db;
+  --blue-up: #58aef5; /* el azul de marca no llega a 4.5:1 sobre navy; sobre oscuro va el levantado */
+  --ink-d: #e9f0f7;
+  --dim-d: #9db4cb;
+  --mint: #62f0df;
+
+  --ink: #0d1b2a;
+  --muted: #5a6b7d;
+  --line: #e2e8f0;
+  --tint-c: color-mix(in srgb, var(--client) 7%, white);
+
+  /* Escala desde una razón (base 16 × 1.25). Seis tamaños dentro de 4px no es una escala. */
+  --t-over: 0.6875rem;
+  --t-meta: 0.8125rem;
+  --t-body: 1rem;
+  --t-node: 1.25rem;
+  --t-sect: 1.5625rem;
+  --t-page: 1.9375rem;
+  --t-stat: 2.5rem;
+
+  --dur: 140ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  color: var(--ink);
+  font-size: var(--t-body);
+}
+
+.xr-wrap {
+  max-width: 1560px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CHROME + RIEL — la marca Efeonce es dueña del marco
+   ══════════════════════════════════════════════════════════════════════════ */
+.xr-chrome {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--navy);
+  color: var(--ink-d);
+}
+.xr-chrome-in {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-block: 0.6rem;
+}
+.xr-brand {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+.xr-brand-t {
+  font-family: Poppins, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: var(--t-meta);
+}
+.xr-rotulo {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-size: var(--t-meta);
+  line-height: 1.45;
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--line-d);
+}
+.xr-rotulo strong {
+  color: #fff;
+  white-space: nowrap;
+}
+.xr-rotulo span {
+  color: var(--dim-d);
+}
+
+/* El riel: no es solo navegación. Su trabajo es DECIR QUE LA PÁGINA TIENE MÁS. */
+.xr-rail {
+  position: sticky;
+  top: 0;
+  z-index: 29;
+  background: var(--navy-2);
+  border-bottom: 1px solid var(--line-d);
+}
+.xr-rail-in {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-block: 0.35rem;
+}
+.xr-rail-in::-webkit-scrollbar {
+  display: none;
+}
+.xr-step {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: var(--t-meta);
+  color: var(--dim-d);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.xr-step:hover {
+  background: var(--navy-3);
+  color: var(--ink-d);
+}
+.xr-step:focus-visible {
+  outline: 2px solid var(--blue-up);
+  outline-offset: 2px;
+}
+.xr-step[aria-current='step'] {
+  background: var(--blue);
+  color: #fff;
+  font-weight: 600;
+}
+.xr-step-n {
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  font-size: 0.625rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.xr-step[aria-current='step'] .xr-step-n {
+  background: rgb(255 255 255 / 0.25);
+}
+.xr-step-done {
+  color: var(--mint);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EL "SIGUIENTE" — grande, es el motor del recorrido
+   ══════════════════════════════════════════════════════════════════════════ */
+.xr-next {
+  display: flex;
+  justify-content: flex-end;
+  padding-block: 2rem 3rem;
+}
+.xr-next a {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  max-width: 40rem;
+  padding: 1rem 1.4rem;
+  background: var(--navy);
+  color: var(--ink-d);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.xr-next a:hover {
+  background: var(--navy-3);
+  transform: translateX(3px);
+}
+.xr-next a:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+.xr-next-l {
+  display: block;
+  font-size: var(--t-over);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blue-up);
+}
+.xr-next-t {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: Poppins, system-ui, sans-serif;
+  font-size: var(--t-node);
+  font-weight: 600;
+  line-height: 1.3;
+  color: #fff;
+}
+.xr-next-arrow {
+  font-size: 1.5rem;
+  color: var(--blue-up);
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .xr-next a:hover {
+    transform: none;
+  }
+}
+
+/* Solo para lectores de pantalla. Le da voz al chip direccional, que es `content` de CSS
+   y por lo tanto no existe para nadie que no vea. */
+.xr-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EL ACOPLAMIENTO — es GLOBAL a propósito: cruza el espécimen y el instrumento,
+   y los estilos scoped de Astro no cruzan de componente. Se ancla en atributos
+   `data-*`, que Astro no scopea.
+
+   ES ASIMÉTRICO. La fuente SUSURRA, el destino GRITA. Si los dos gritan igual,
+   el ojo no sabe cuál es la causa y cuál el efecto — ése era el bug.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[data-couple],
+[data-couple-target] {
+  transition: outline-color var(--dur) var(--ease), background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+[data-couple] {
+  cursor: pointer;
+}
+[data-couple]:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* LA FUENTE SUSURRA: tinte + barra lateral. Sin outline — ya la estás tocando. */
+[data-couple][data-on] {
+  background: var(--tint-c);
+  border-left-color: var(--client);
+}
+figure[data-couple][data-on] {
+  background: transparent;
+  box-shadow: inset 0 0 0 3px var(--client);
+}
+
+/* AFORDANCIA EN REPOSO: un punto en el borde derecho dice "esto se conecta con algo allá".
+   Sin ella, NADA avisa que el artículo es interactivo. */
+[data-couple][data-n]::before {
+  content: '';
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  translate: 0 -50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--client) 45%, transparent);
+  transition: opacity var(--dur) var(--ease), scale var(--dur) var(--ease);
+  z-index: 2;
+}
+[data-couple][data-n]:hover::before {
+  scale: 1.4;
+}
+[data-couple][data-on][data-n]::before {
+  opacity: 0;
+}
+
+/* EL CHIP DIRECCIONAL: apunta al destino y dice CUÁNTO hay al otro lado.
+   Apilado no hay canaleta que cruzar: apunta hacia abajo y vive adentro. */
+[data-couple][data-n]::after {
+  content: '↓ ' attr(data-n);
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  translate: 0 -50%;
+  font-size: var(--t-over);
+  font-weight: 700;
+  color: #fff;
+  background: var(--navy);
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  opacity: 0;
+  scale: 0.9;
+  pointer-events: none;
+  z-index: 3;
+  transition: opacity var(--dur) var(--ease), scale var(--dur) var(--ease);
+}
+@media (min-width: 1080px) {
+  [data-couple][data-n]::after {
+    content: '→ ' attr(data-n);
+    right: -0.5rem;
+    translate: 50% -50%;
+  }
+}
+[data-couple][data-on][data-n]::after {
+  opacity: 1;
+  scale: 1;
+}
+
+/* EL DESTINO GRITA: outline + pulso + marca de origen. */
+[data-couple-target][data-on] {
+  outline-color: var(--blue-up) !important;
+  background-color: var(--navy-3) !important;
+  animation: xr-pulse 320ms var(--ease);
+}
+[data-couple-target][data-on]::before {
+  content: '←';
+  position: absolute;
+  left: -0.6rem;
+  top: 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--blue-up);
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  box-shadow: 0 0 0 3px var(--navy);
+}
+/* Apilado, el dato viene de ARRIBA, no de la izquierda. La flecha dice la verdad. */
+@media (max-width: 1079px) {
+  [data-couple-target][data-on]::before {
+    content: '↑';
+    left: auto;
+    right: 0.5rem;
+    top: -0.6rem;
+  }
+}
+@keyframes xr-pulse {
+  0% { outline-color: transparent; }
+  40% { outline-color: #fff; }
+  100% { outline-color: var(--blue-up); }
+}
+
+/* Con un acoplamiento activo, lo NO acoplado se atenúa. Es lo que hace legibles los DIEZ
+   destinos del H1 sin que el ojo tenga que cazarlos uno por uno. */
+.inst[data-focus='true'] .nd:not([data-on]),
+.inst[data-focus='true'] .kpi:not([data-on]),
+.inst[data-focus='true'] .grp,
+.inst[data-focus='true'] .warn {
+  opacity: 0.35;
+}
+
+/* ══ MÓVIL: el instrumento sube como HOJA INFERIOR ══
+   Apilado, el instrumento queda a DIEZ PANTALLAS del artículo. Sin esto, tocabas un bloque,
+   se encendía el chip «↓ 3 datos»… y no pasaba nada más: el argumento central de la pieza
+   simplemente NO EXISTÍA en un teléfono. */
+@media (max-width: 1079px) {
+  .xr[data-sheet='open'] .inst {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 40;
+    max-height: 72vh;
+    overflow-y: auto;
+    border-radius: 16px 16px 0 0;
+    border-bottom: 0;
+    box-shadow: 0 -14px 40px rgb(0 0 0 / 0.4);
+    animation: xr-sheet-up 220ms var(--ease);
+  }
+  .xr[data-sheet='open'] .inst .in-head {
+    border-radius: 16px 16px 0 0;
+    padding-top: 1.1rem;
+  }
+  /* El pulgar necesita saber que puede cerrar: un tirador, como cualquier hoja. */
+  .xr[data-sheet='open'] .inst .in-head::before {
+    content: '';
+    position: absolute;
+    top: 0.4rem;
+    left: 50%;
+    translate: -50% 0;
+    width: 2.25rem;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--line-d);
+  }
+}
+@keyframes xr-sheet-up {
+  from { transform: translateY(100%); }
+}
+
+/* El significado nunca estuvo en el movimiento: con `reduce` se cae la animación,
+   no la correspondencia. */
+@media (prefers-reduced-motion: reduce) {
+  [data-couple],
+  [data-couple-target],
+  .xr[data-sheet='open'] .inst {
+    transition-duration: 0ms !important;
+    animation: none !important;
+  }
+}

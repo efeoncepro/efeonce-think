@@ -773,6 +773,197 @@
     "readTime": "min de lectura",
     "producesLabelOne": "dato",
     "srProduces": "Produce {n} datos en la capa de máquina.",
-    "closing": "Así se produce cada una de las 8 piezas mensuales del plan."
-  }
+    "closing": "Así se produce cada una de las 8 piezas mensuales del plan.",
+    "flowNext": "Siguiente",
+    "flowOf": "de"
+  },
+  "flow": [
+    {
+      "step": "",
+      "label": "El hueco",
+      "next": "Esta es la pieza que lo tapa"
+    },
+    {
+      "step": "articulo",
+      "label": "El artículo",
+      "next": "¿Y qué lee una máquina de esto?"
+    },
+    {
+      "step": "radiografia",
+      "label": "La radiografía",
+      "next": "Pero esto no vive solo en una URL"
+    },
+    {
+      "step": "atomizacion",
+      "label": "Dónde más vive",
+      "next": ""
+    }
+  ],
+  "gap": {
+    "kicker": "El punto de partida",
+    "headline": "«Carretera austral» mueve 18.100 búsquedas al mes. SKY no aparece.",
+    "serpTitle": "Quién ocupa hoy ese resultado de búsqueda",
+    "serpNote": "Top 12 real, medido con Semrush el 13 de julio de 2026.",
+    "serp": [
+      {
+        "pos": 1,
+        "domain": "es.wikipedia.org",
+        "kind": "Enciclopedia"
+      },
+      {
+        "pos": 2,
+        "domain": "instagram.com",
+        "kind": "Red social"
+      },
+      {
+        "pos": 3,
+        "domain": "gochile.cl",
+        "kind": "Portal de turismo"
+      },
+      {
+        "pos": 4,
+        "domain": "carretera-austral.cl",
+        "kind": "Sitio del destino"
+      },
+      {
+        "pos": 5,
+        "domain": "chile.travel",
+        "kind": "Turismo oficial"
+      },
+      {
+        "pos": 6,
+        "domain": "chileestuyo.cl",
+        "kind": "Turismo oficial"
+      },
+      {
+        "pos": 7,
+        "domain": "tur.com",
+        "kind": "Portal de turismo"
+      },
+      {
+        "pos": 8,
+        "domain": "autofact.cl",
+        "kind": "Revisión técnica de autos"
+      },
+      {
+        "pos": 9,
+        "domain": "wikiexplora.com",
+        "kind": "Wiki de montaña"
+      },
+      {
+        "pos": 10,
+        "domain": "tripadvisor.cl",
+        "kind": "Reseñas"
+      },
+      {
+        "pos": 11,
+        "domain": "visitchile.com",
+        "kind": "Portal de turismo"
+      },
+      {
+        "pos": 12,
+        "domain": "facebook.com",
+        "kind": "Red social"
+      }
+    ],
+    "punch": "Cero aerolíneas. Y SKY es la que vuela a Balmaceda, el aeropuerto de entrada.",
+    "punchNote": "Wikipedia, Instagram y TripAdvisor describen la ruta, la fotografían y la reseñan. Ninguna resuelve la logística de llegada — que es lo primero que pregunta quien de verdad va a ir. Y ninguna puede: no son la aerolínea.",
+    "aside": "SKY ya tiene una página del tema publicada, y aun así no aparece en las primeras cien posiciones."
+  },
+  "atomsIntro": "Su oferta dice, textual: «no entregamos un artículo que vive en una URL». Esto es lo que significa. Cada pieza de abajo nace del artículo que acaba de leer, y cada una abre una superficie distinta donde un motor de respuesta puede encontrar a SKY.",
+  "atoms": [
+    {
+      "id": "video",
+      "coupleId": "h2-como-llegar",
+      "kind": "Video simple",
+      "bornFrom": "Del H2 «¿Cómo se llega a la Carretera Austral?»",
+      "stat": "#1",
+      "statNote": "YouTube superó a Reddit como la plataforma social más citada por los motores de respuesta",
+      "why": "El video no es «contenido extra»: es un canal de búsqueda en sí mismo. Un video con título, descripción y transcripción es RECUPERABLE — un motor lo puede citar igual que a una página. Y es donde el pasajero busca «cómo es la Carretera Austral» antes de comprar el pasaje.",
+      "honesty": "Así se entrega el video: guion, título, descripción, miniatura y datos estructurados. La producción va en el mes 1 — esta muestra especifica el entregable, no lo simula.",
+      "deliverable": [
+        {
+          "k": "Título",
+          "v": "Carretera Austral: vuela a Balmaceda y arrienda ahí (te saltas 3 transbordadores)"
+        },
+        {
+          "k": "Duración",
+          "v": "60–90 s · vertical y horizontal"
+        },
+        {
+          "k": "Descripción",
+          "v": "La forma más rápida de empezar la Carretera Austral es volar a Balmaceda, el aeropuerto de Coyhaique, y arrendar en el mismo terminal. Te saltas los tramos más largos y los tres transbordadores del norte. Vuelos a Balmaceda con SKY."
+        },
+        {
+          "k": "Guion",
+          "v": "1) El mapa: 1.247 km entre Puerto Montt y Villa O'Higgins. 2) El problema: los tres transbordadores del tramo norte. 3) El atajo: Balmaceda, a 56 km de Coyhaique. 4) El auto en el terminal. 5) Cerro Castillo a dos horas."
+        },
+        {
+          "k": "Transcripción",
+          "v": "Se entrega completa, en es-CL, para subtítulos y para que un motor de respuesta pueda leerla."
+        }
+      ],
+      "code": {
+        "@type": "VideoObject",
+        "name": "Carretera Austral: vuela a Balmaceda y arrienda ahí",
+        "description": "La forma más rápida de empezar la Carretera Austral es volar a Balmaceda y arrendar en el terminal: te saltas los tres transbordadores del tramo norte.",
+        "uploadDate": "2026-07-15",
+        "duration": "PT1M20S",
+        "thumbnailUrl": "https://blog.skyairline.com/wp-content/uploads/carretera-austral-thumb.jpg",
+        "publisher": {
+          "@id": "https://www.skyairline.com/#organization"
+        },
+        "transcript": "— texto completo de la transcripción —"
+      }
+    },
+    {
+      "id": "social",
+      "coupleId": "pull-balmaceda",
+      "kind": "Pieza social",
+      "bornFrom": "De la cita destacada — el ángulo propio de SKY",
+      "stat": "3×",
+      "statNote": "las menciones de marca off-site correlacionan ~3× más que los backlinks con la visibilidad en IA",
+      "why": "La distribución social no se hace por alcance: se hace por ENTIDAD. Cada mención de SKY fuera de su sitio le enseña al modelo quién es SKY y de qué habla con autoridad. Es la palanca de off-page que más pesa hoy, y no es un backlink.",
+      "honesty": "Efeonce produce y entrega la pieza y el copy. La publicación queda en el equipo de SKY: no administramos sus cuentas.",
+      "post": {
+        "hook": "Nadie te dice esto de la Carretera Austral:",
+        "body": "Volar a Balmaceda no te ahorra solo kilómetros. Te ahorra los dos transbordadores que pueden desarmarte el itinerario completo.",
+        "cta": "Guía completa en el blog ↗"
+      },
+      "deliverable": [
+        {
+          "k": "Formato",
+          "v": "1080 × 1350 (feed) + 1080 × 1920 (historia)"
+        },
+        {
+          "k": "Copy",
+          "v": "Gancho + el dato + el enlace. Un solo mensaje por pieza."
+        },
+        {
+          "k": "Entrega",
+          "v": "Pieza + copy listos para publicar. SKY publica."
+        }
+      ]
+    },
+    {
+      "id": "imagenes",
+      "coupleId": "img-hero",
+      "kind": "Set de imágenes",
+      "bornFrom": "Las cuatro fotos del artículo, con su ALT y su ImageObject",
+      "stat": "4",
+      "statNote": "imágenes con licencia verificable, crédito visible y texto alternativo escrito, no rellenado",
+      "why": "La búsqueda de imágenes es la superficie más subestimada. Un `alt` que dice «paisaje» no sirve para nada; uno que dice «las agujas de roca del Cerro Castillo nevadas sobre un lago» hace que esa foto se recupere por «Cerro Castillo» — y arrastre a SKY con ella.",
+      "honesty": "Requisito 5 de las bases: imagen apta y libre de derechos, o con permisos. Cada foto de esta muestra lleva autor, licencia y enlace verificable. Ninguna fue generada con IA.",
+      "deliverable": [
+        {
+          "k": "Por artículo",
+          "v": "1 imagen principal + set de apoyo"
+        },
+        {
+          "k": "Cada una",
+          "v": "ALT escrito, ImageObject, crédito y licencia"
+        }
+      ]
+    }
+  ]
 }

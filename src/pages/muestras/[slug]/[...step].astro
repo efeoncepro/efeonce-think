@@ -1,0 +1,505 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
+import Article from '@/components/aeo-xray/Article.astro'
+import Instrument from '@/components/aeo-xray/Instrument.astro'
+import '@styles/aeo-xray.css'
+
+/**
+ * Radiografía AEO — el FLOW. TASK-1410 (greenhouse-eo).
+ *
+ * CUATRO PANTALLAS, cada una con UN trabajo. Estaba todo en una sola, y el síntoma era que
+ * el artículo «se veía plano»: nunca tuvo espacio para ser LEÍDO, porque un panel le comía el
+ * 46% de la pantalla. Le pusimos tipografía editorial a un contenedor que no lo era.
+ *
+ *   ① El hueco       — el SERP real. Wikipedia, Instagram, TripAdvisor. Y SKY no está.
+ *   ② El artículo    — a ancho completo, sin nada al lado. Acá por fin respira.
+ *   ③ La radiografía — el split con el acoplamiento. Funciona 10× mejor porque el evaluador
+ *                      YA leyó el artículo: la revelación aterriza en vez de competir.
+ *   ④ Dónde más vive — la atomización. Cada átomo es una SUPERFICIE MÁS donde el motor de
+ *                      respuesta puede encontrar al cliente.
+ *
+ * ⚠️ INVARIANTE #1: el JSON-LD se muestra como TEXTO ESCAPADO, nunca como marcado activo.
+ * Esta página NO le pasa `jsonLd` a BaseLayout. Ver Instrument.astro.
+ */
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const samples = await getCollection('aeoXray')
+
+  return samples.flatMap(sample =>
+    sample.data.flow.map(s => ({
+      // URL = `<slug legible>-<token>`: el slug porque el evaluador lee la URL antes que el H1;
+      // el token porque sin él la muestra de un cliente es adivinable desde la de otro.
+      params: { slug: `${sample.id}-${sample.data.token}`, step: s.step || undefined },
+      props: { sample, step: s.step },
+    })),
+  )
+}
+
+const { sample, step } = Astro.props
+const d = sample.data
+const { ui, machine, evidence, meta, client, flow, gap, atoms } = d
+
+const base = `/muestras/${sample.id}-${d.token}`
+const i = flow.findIndex(s => s.step === step)
+const cur = flow[i]
+const next = flow[i + 1]
+const href = (s: string) => (s ? `${base}/${s}` : base)
+
+/** El par pintado desde el HTML: sin JS, la pieza sigue argumentando. */
+const HERO = 'capsule-main'
+
+/**
+ * Cuántos datos de máquina produce cada bloque — alimenta el chip direccional («→ 3 datos»).
+ * Sin el número, el hover te dice QUE hay algo al otro lado, pero no CUÁNTO ni hacia dónde.
+ */
+const produces = new Map<string, number>()
+const bump = (id: string) => produces.set(id, (produces.get(id) ?? 0) + 1)
+machine.seo.forEach(x => bump(x.coupleId))
+machine.og.forEach(x => bump(x.coupleId))
+machine.craft.forEach(x => bump(x.coupleId))
+machine.jsonld.forEach(x => bump(x.coupleId))
+machine.alts.forEach(x => bump(x.coupleId))
+machine.headings.tree.forEach(x => bump(x.coupleId))
+bump(machine.headings.coupleId)
+evidence.facts.forEach(x => bump(x.coupleId))
+evidence.fanOut.items.forEach(x => bump(x.coveredBy))
+
+const asText = (code: unknown) =>
+  JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
+
+const titles: Record<string, string> = {
+  '': `${meta.instrument} — el hueco`,
+  articulo: `${meta.instrument} — el artículo`,
+  radiografia: `${meta.instrument} — la radiografía`,
+  atomizacion: `${meta.instrument} — dónde más vive`,
+}
+---
+
+<BaseLayout
+  title={`${titles[step ?? ''] ?? meta.instrument} · muestra de Efeonce para ${meta.sampleFor}`}
+  description="Muestra de trabajo de Efeonce: un artículo, su capa de máquina y dónde más vive."
+  noindex={true}
+>
+  <div class="xr" data-testid="xray-root" style={`--client:${client.accent}`}>
+    <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
+    <header class="xr-chrome" data-testid="disclaimer">
+      <div class="xr-wrap xr-chrome-in">
+        <a class="xr-brand" href={base}>
+          <img src="/branding/efeonce-isotipo-negative.svg" alt="Efeonce" width="26" height="26" />
+          <span class="xr-brand-t">{meta.instrument}</span>
+        </a>
+        <p class="xr-rotulo">
+          <strong>{ui.disclaimerLabel}</strong>
+          <span>{ui.disclaimerBody}</span>
+        </p>
+      </div>
+    </header>
+
+    <!-- El RIEL. Su trabajo no es navegar: es AVISAR que el recorrido tiene más pantallas. -->
+    <nav class="xr-rail" aria-label="Recorrido de la muestra">
+      <div class="xr-wrap xr-rail-in">
+        {flow.map((s, n) => (
+          <a
+            class="xr-step"
+            href={href(s.step)}
+            aria-current={n === i ? 'step' : undefined}
+          >
+            <span class={`xr-step-n ${n < i ? 'xr-step-done' : ''}`}>{n < i ? '✓' : n + 1}</span>
+            {s.label}
+          </a>
+        ))}
+      </div>
+    </nav>
+
+    <main class="xr-wrap">
+      {/* ══════════ ① EL HUECO ══════════ */}
+      {!step && (
+        <section class="gap">
+          <p class="g-kick">{gap.kicker}</p>
+          <h1 class="g-h1">{gap.headline}</h1>
+
+          <div class="g-grid">
+            <div class="g-serp">
+              <p class="g-serp-t">{gap.serpTitle}</p>
+              <ol class="g-list">
+                {gap.serp.map(r => (
+                  <li>
+                    <span class="g-pos">{r.pos}</span>
+                    <span class="g-dom">{r.domain}</span>
+                    <span class="g-kind">{r.kind}</span>
+                  </li>
+                ))}
+              </ol>
+              <p class="g-note">{gap.serpNote}</p>
+            </div>
+
+            <div class="g-side">
+              <div class="g-kpis">
+                {evidence.facts.filter(f => f.headline).map(k => (
+                  <div class="g-kpi">
+                    <p class="g-kpi-n">{k.big}</p>
+                    <p class="g-kpi-u">{k.bigUnit}</p>
+                    <cite>{k.source} · {k.asOf}</cite>
+                  </div>
+                ))}
+              </div>
+              <div class="g-punch">
+                <p class="g-punch-t">{gap.punch}</p>
+                <p class="g-punch-b">{gap.punchNote}</p>
+              </div>
+              <p class="g-aside">{gap.aside}</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══════════ ② EL ARTÍCULO — a ancho completo. Acá por fin se LEE. ══════════ */}
+      {step === 'articulo' && <Article d={d} />}
+
+      {/* ══════════ ③ LA RADIOGRAFÍA — el split con el acoplamiento ══════════ */}
+      {step === 'radiografia' && (
+        <>
+          <p class="r-hint hint-d" hidden data-hint>{ui.hintDesktop}</p>
+          <p class="r-hint hint-m" hidden data-hint data-testid="hint-m">{ui.hintMobile}</p>
+          <div class="split">
+            <Article d={d} coupled produces={produces} hero={HERO} />
+            <Instrument d={d} hero={HERO} />
+          </div>
+        </>
+      )}
+
+      {/* ══════════ ④ DÓNDE MÁS VIVE — la atomización ══════════ */}
+      {step === 'atomizacion' && (
+        <section class="at">
+          <p class="g-kick">La distribución</p>
+          <h1 class="at-h1">Este artículo no vive solo en una URL</h1>
+          <p class="at-intro">{d.atomsIntro}</p>
+
+          <div class="at-grid">
+            {atoms.map(a => (
+              <article class="atom" data-couple-target={a.coupleId} tabindex="0">
+                <div class="atom-h">
+                  <span class="atom-k">{a.kind}</span>
+                  <span class="atom-from">{a.bornFrom}</span>
+                </div>
+
+                <p class="atom-stat">{a.stat} <span>{a.statNote}</span></p>
+                <p class="atom-why">{a.why}</p>
+
+                {/* La pieza social se RENDERIZA. Es un mockup del entregable, como todo el resto. */}
+                {a.post && (
+                  <div class="post-card">
+                    <p class="pc-hook">{a.post.hook}</p>
+                    <p class="pc-body">{a.post.body}</p>
+                    <p class="pc-cta">{a.post.cta}</p>
+                    <span class="pc-brand">{client.name}</span>
+                  </div>
+                )}
+
+                <dl class="atom-d">
+                  {a.deliverable.map(x => (
+                    <>
+                      <dt>{x.k}</dt>
+                      <dd>{x.v}</dd>
+                    </>
+                  ))}
+                </dl>
+
+                {a.code && (
+                  <details class="atom-code">
+                    <summary>Ver los datos estructurados</summary>
+                    <pre role="region" tabindex="0" aria-label={`Datos estructurados: ${a.kind}`}><code>{asText(a.code)}</code></pre>
+                  </details>
+                )}
+
+                {/* Lo que la muestra NO puede fingir. Decirlo suma; simularlo la destruye. */}
+                <p class="atom-hon">⚠️ {a.honesty}</p>
+              </article>
+            ))}
+          </div>
+
+          <p class="at-close">{ui.closing}</p>
+        </section>
+      )}
+
+      {next && (
+        <div class="xr-next">
+          <a href={href(next.step)}>
+            <span>
+              <span class="xr-next-l">{ui.flowNext} · {i + 2} {ui.flowOf} {flow.length}</span>
+              <span class="xr-next-t">{cur.next}</span>
+            </span>
+            <span class="xr-next-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      )}
+
+      <footer class="xr-foot">
+        <EfeonceSlogan />
+      </footer>
+    </main>
+  </div>
+</BaseLayout>
+
+{step === 'radiografia' && (
+  <script>
+    /**
+     * Acoplamiento asimétrico artículo ↔ instrumento. CERO React: el contenido es estático;
+     * hidratarlo para conmutar un resaltado sería over-hydration. Esto solo mueve `data-on`;
+     * el CSS hace el resto. Sin JS, el par héroe ya viene pintado desde el HTML.
+     */
+    const root = document.querySelector<HTMLElement>('[data-testid="xray-root"]')
+    const live = document.querySelector<HTMLElement>('[data-testid="live"]')
+
+    // El hint promete que el hover produce algo. Sin JS no produce nada: solo aparece con JS.
+    document.querySelectorAll<HTMLElement>('[data-hint]').forEach(el => el.removeAttribute('hidden'))
+
+    if (root) {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const inst = root.querySelector<HTMLElement>('.inst')
+      let pinned: string | null = null
+
+      /** MÓVIL: el instrumento vive apilado bajo el artículo. Sube como hoja al acoplar. */
+      const sheet = () => window.matchMedia('(max-width: 1079px)').matches
+      let opener: HTMLElement | null = null
+      const closeSheet = () => {
+        root.dataset.sheet = ''
+        opener?.focus()
+        opener = null
+      }
+      root.querySelector('[data-close-sheet]')?.addEventListener('click', closeSheet)
+
+      const paint = (id: string | null) => {
+        if (inst) inst.dataset.focus = id ? 'true' : ''
+        if (sheet() && id) root.dataset.sheet = 'open'
+
+        root.querySelectorAll<HTMLElement>('[data-couple],[data-couple-target]').forEach(el => {
+          const mine = el.dataset.couple ?? el.dataset.coupleTarget
+          if (id && mine === id) {
+            el.dataset.on = 'true'
+            el.setAttribute('aria-current', 'true')
+          } else {
+            delete el.dataset.on
+            el.removeAttribute('aria-current')
+          }
+        })
+        if (!id) return
+
+        const target = root.querySelector<HTMLElement>(`[data-couple-target="${id}"]`)
+        if (!target) return
+        target.querySelector('details')?.setAttribute('open', '')
+
+        /**
+         * Scrollea SOLO el panel, y respeta el header pegajoso. Si scrolleamos al borde del
+         * panel, el header TAPA el nodo y el usuario ve medio número cortado sin entender qué
+         * se le señala: es WCAG 2.2 AA 2.4.11 (Focus Not Obscured).
+         */
+        const pane = target.closest<HTMLElement>('.inst')
+        if (pane && pane.scrollHeight > pane.clientHeight + 4) {
+          const head = pane.querySelector<HTMLElement>('.in-head')
+          const safeTop = (head?.offsetHeight ?? 0) + 12
+          const t = target.getBoundingClientRect()
+          const p = pane.getBoundingClientRect()
+          const top = t.top - p.top
+
+          if (top < safeTop || t.bottom - p.top > pane.clientHeight - 12) {
+            pane.scrollTo({ top: pane.scrollTop + top - safeTop, behavior: reduce ? 'auto' : 'smooth' })
+          }
+        }
+        if (live) {
+          const all = root.querySelectorAll(`[data-couple-target="${id}"]`).length
+          const name = target.querySelector('.nd-l,.sch-t,.kpi-u')?.textContent?.trim()
+          live.textContent = name
+            ? `${all} ${all === 1 ? 'dato resaltado' : 'datos resaltados'}. Primero: ${name}`
+            : ''
+        }
+      }
+
+      const hit = (e: Event) =>
+        (e.target as HTMLElement).closest<HTMLElement>('[data-couple],[data-couple-target]')
+
+      /**
+       * Modalidad de entrada. Sin esto, el mouse QUIETO le roba el acoplamiento al teclado: al
+       * enfocar con Tab la página scrollea, los elementos pasan bajo el cursor inmóvil y
+       * disparan `mouseover` fantasma que repinta encima de lo que el teclado seleccionó.
+       */
+      let keyboard = false
+      root.addEventListener('mousemove', () => { keyboard = false }, { passive: true })
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Tab' || e.key.startsWith('Arrow')) keyboard = true
+      })
+
+      const enter = (e: Event) => {
+        const el = hit(e)
+        if (!el || pinned) return
+        if (e.type === 'mouseover' && keyboard) return
+        paint(el.dataset.couple ?? el.dataset.coupleTarget ?? null)
+      }
+
+      root.addEventListener('mouseover', enter)
+      root.addEventListener('focusin', enter)
+      root.addEventListener('click', e => {
+        const el = hit(e)
+        if (!el) return
+        const id = el.dataset.couple ?? el.dataset.coupleTarget ?? null
+        if (sheet() && el.dataset.couple) opener = el
+        pinned = pinned === id ? null : id
+        paint(pinned ?? id)
+      })
+      document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return
+        if (root.dataset.sheet === 'open') { closeSheet(); return }
+        pinned = null
+        paint('capsule-main')
+      })
+    }
+  </script>
+)}
+
+<style>
+  /* ══════════ ① EL HUECO ══════════ */
+  .gap, .at { padding-block: 2rem 1rem; }
+  .g-kick {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .g-h1, .at-h1 {
+    margin-top: 0.6rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: clamp(1.9rem, 1.2rem + 2.4vw, 3rem); font-weight: 600; line-height: 1.1;
+    letter-spacing: -0.02em; max-width: 24ch; text-wrap: balance;
+  }
+  .g-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-top: 2rem; }
+  @media (min-width: 900px) { .g-grid { grid-template-columns: 1fr 1fr; align-items: start; } }
+
+  .g-serp { border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem 1.25rem; background: #fff; }
+  .g-serp-t {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.7rem;
+  }
+  .g-list { list-style: none; }
+  .g-list li {
+    display: grid; grid-template-columns: 1.5rem 1fr auto; gap: 0.7rem; align-items: baseline;
+    padding: 0.55rem 0; border-bottom: 1px solid var(--line); font-size: 0.9375rem;
+  }
+  .g-list li:last-child { border-bottom: 0; }
+  .g-pos { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--muted); font-size: 0.8125rem; }
+  .g-dom { font-weight: 600; color: var(--ink); }
+  .g-kind { font-size: var(--t-meta); color: var(--muted); }
+  .g-note { margin-top: 0.8rem; font-size: var(--t-meta); color: var(--muted); }
+
+  .g-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+  @media (max-width: 520px) { .g-kpis { grid-template-columns: 1fr; } }
+  .g-kpi {
+    padding: 0.85rem 0.9rem; background: var(--navy); color: var(--ink-d);
+    border-radius: 10px; border: 1px solid var(--navy-3);
+  }
+  .g-kpi-n {
+    font-size: 2.1rem; font-weight: 700; line-height: 1; color: #fff;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+  }
+  .g-kpi-u { margin-top: 0.3rem; font-size: var(--t-meta); line-height: 1.35; }
+  .g-kpi cite { display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--dim-d); font-style: normal; }
+
+  .g-punch {
+    margin-top: 1rem; padding: 1.1rem 1.2rem; background: var(--navy);
+    color: var(--ink-d); border-radius: 12px; border-left: 4px solid var(--blue-up);
+  }
+  .g-punch-t {
+    font-family: Poppins, system-ui, sans-serif; font-size: 1.375rem; font-weight: 600;
+    line-height: 1.3; color: #fff; text-wrap: balance;
+  }
+  .g-punch-b { margin-top: 0.7rem; font-size: var(--t-body); line-height: 1.6; color: var(--dim-d); max-width: 60ch; }
+  .g-aside {
+    margin-top: 1rem; padding: 0.8rem 0.9rem; font-size: var(--t-meta); line-height: 1.55;
+    color: #33475b; background: #f7f9fb; border: 1px dashed var(--line); border-radius: 8px;
+  }
+
+  /* ══════════ ③ LA RADIOGRAFÍA ══════════ */
+  .r-hint { padding-top: 1.25rem; font-size: var(--t-meta); color: var(--muted); }
+  .hint-d { display: none; }
+  @media (hover: hover) and (pointer: fine) { .hint-d { display: block; } .hint-m { display: none; } }
+  .split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-width: 0; padding-top: 0.75rem; }
+  @media (min-width: 1080px) {
+    .split { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; }
+    .split :global(.inst) {
+      position: sticky; top: 6rem; max-height: calc(100vh - 7.2rem); overflow-y: auto;
+      view-transition-name: xr-inst; /* el instrumento LLEGA desde la derecha, no aparece */
+    }
+  }
+
+  /* ══════════ ④ DÓNDE MÁS VIVE ══════════ */
+  .at-intro { margin-top: 1rem; font-size: 1.125rem; line-height: 1.65; color: #2c3e50; max-width: 68ch; }
+  .at-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-top: 2rem; }
+  @media (min-width: 980px) { .at-grid { grid-template-columns: repeat(3, 1fr); align-items: start; } }
+
+  .atom {
+    background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
+    border-radius: 14px; padding: 1.2rem; min-width: 0; position: relative;
+    outline: 2px solid transparent; scroll-margin-top: 5rem;
+  }
+  .atom:focus-visible { outline: 2px solid var(--blue-up); }
+  .atom-h { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.9rem; }
+  .atom-k {
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--t-node);
+    font-weight: 600; color: #fff;
+  }
+  /* La LÍNEA DE SANGRE: de qué bloque del artículo nació. No son entregables sueltos. */
+  .atom-from { font-size: var(--t-meta); color: var(--blue-up); }
+  .atom-stat {
+    font-family: Poppins, system-ui, sans-serif; font-size: 2.25rem; font-weight: 700;
+    line-height: 1.05; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+  }
+  .atom-stat span {
+    display: block; font-family: inherit; font-size: var(--t-meta); font-weight: 400;
+    line-height: 1.45; color: var(--dim-d); letter-spacing: 0; margin-top: 0.3rem;
+  }
+  .atom-why { margin-top: 0.9rem; font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d); }
+
+  /* La pieza social, renderizada. Es un mockup del entregable. */
+  .post-card {
+    margin-top: 1rem; padding: 1.1rem; border-radius: 12px;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--client) 90%, black), color-mix(in srgb, var(--client) 55%, black));
+    color: #fff; aspect-ratio: 4 / 5; display: flex; flex-direction: column; justify-content: center; gap: 0.6rem;
+  }
+  .pc-hook { font-size: var(--t-meta); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.85; }
+  .pc-body { font-family: Poppins, system-ui, sans-serif; font-size: 1.25rem; font-weight: 600; line-height: 1.3; text-wrap: balance; }
+  .pc-cta { font-size: var(--t-meta); opacity: 0.9; }
+  .pc-brand {
+    position: absolute; right: 1.9rem; bottom: 1.9rem; font-family: Poppins, system-ui, sans-serif;
+    font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.06em; opacity: 0.75;
+  }
+
+  .atom-d { margin-top: 1rem; display: grid; grid-template-columns: 1fr; gap: 0.15rem; }
+  .atom-d dt {
+    font-size: var(--t-over); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--blue-up); margin-top: 0.6rem;
+  }
+  .atom-d dd { font-size: var(--t-meta); line-height: 1.55; color: var(--ink-d); }
+
+  .atom-code { margin-top: 1rem; }
+  .atom-code summary {
+    cursor: pointer; font-size: var(--t-over); font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--dim-d); list-style-position: inside;
+  }
+  .atom-code summary:hover { color: var(--blue-up); }
+  .atom-code pre {
+    margin-top: 0.6rem; padding: 0.65rem; background: #04101d; color: #cfe3f5;
+    border: 1px solid var(--line-d); border-radius: 7px; font-size: 0.6875rem; line-height: 1.55;
+    overflow-x: auto; max-height: 16rem;
+  }
+  .atom-hon {
+    margin-top: 1rem; padding: 0.7rem 0.8rem; font-size: var(--t-meta); line-height: 1.55;
+    color: #ffd166; background: color-mix(in srgb, #ffd166 8%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, #ffd166 25%, var(--navy-2)); border-radius: 8px;
+  }
+  .at-close {
+    margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
+    font-size: 1.125rem; font-weight: 500; color: var(--ink);
+  }
+
+  .xr-foot { padding-block: 1.5rem 3rem; border-top: 1px solid var(--line); }
+</style>

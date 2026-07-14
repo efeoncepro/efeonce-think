@@ -20,7 +20,10 @@ const SAMPLE = process.env.XRAY_SAMPLE ?? 'sky-carretera-austral'
 // hardcodearlo acá haría que el gate y la URL real se separen en silencio.
 const { token } = JSON.parse(readFileSync(`src/content/aeo-xray/${SAMPLE}.json`, 'utf8'))
 const SLUG = `${SAMPLE}-${token}`
-const ROUTE = `/muestras/${SLUG}/`
+/** El FLOW: cuatro pantallas. Los gates de HTML corren sobre TODAS — un `ld+json` filtrado en
+ *  la pantalla ④ es igual de grave que en la ①. El acoplamiento vive en la ③. */
+const STEPS = ['', 'articulo', 'radiografia', 'atomizacion']
+const ROUTE = `/muestras/${SLUG}/radiografia/`
 const PORT = 4321
 const BASE = `http://localhost:${PORT}`
 const OUT = '.captures/aeo-xray'
@@ -38,25 +41,31 @@ if (!existsSync('dist/client')) {
 mkdirSync(OUT, { recursive: true })
 
 // ── El HTML servido, tal cual sale del build (sin JS, sin navegador) ─────────
-const htmlPath = `dist/client/muestras/${SLUG}/index.html`
-if (!existsSync(htmlPath)) {
-  console.error(`✗ No se generó ${htmlPath}`)
-  process.exit(1)
+const pageOf = step => `dist/client/muestras/${SLUG}${step ? `/${step}` : ''}/index.html`
+for (const st of STEPS) {
+  if (!existsSync(pageOf(st))) {
+    console.error(`✗ No se generó ${pageOf(st)}`)
+    process.exit(1)
+  }
 }
-const html = readFileSync(htmlPath, 'utf8')
+const pages = Object.fromEntries(STEPS.map(st => [st || 'index', readFileSync(pageOf(st), 'utf8')]))
+/** La ③ es la que lleva el acoplamiento y el instrumento; los gates puntuales van contra ella. */
+const html = pages.radiografia
+const allHtml = Object.values(pages).join('\n')
 
 console.log('\n▸ HTML servido (build estático)\n')
 
 // 1. 🔴 EL ASSERT QUE MÁS IMPORTA.
-const ldjson = html.match(/<script[^>]*type=["']application\/ld\+json["']/gi) ?? []
+const ldjson = allHtml.match(/<script[^>]*type=["']application\/ld\+json["']/gi) ?? []
 check(
-  '1. Cero <script type="application/ld+json"> en el HTML servido',
+  '1. Cero <script type="application/ld+json"> en NINGUNA de las 4 pantallas',
   ldjson.length === 0,
   `encontrados ${ldjson.length}. Publicar schema con author/publisher del cliente en nuestro dominio = dato estructurado falso.`,
 )
 
 // 2. noindex
-check('2. <meta name="robots" content="noindex"> presente', /name=["']robots["'][^>]*noindex/i.test(html))
+const noindexAll = STEPS.every(st => /name=["']robots["'][^>]*noindex/i.test(pages[st || 'index']))
+check('2. noindex en las 4 pantallas', noindexAll)
 
 // 3. Fuera del sitemap
 const sitemaps = ['dist/client/sitemap-index.xml', 'dist/client/sitemap-0.xml'].filter(existsSync)
@@ -64,7 +73,18 @@ const inSitemap = sitemaps.some(f => readFileSync(f, 'utf8').includes('/muestras
 check('3. La ruta NO aparece en el sitemap', !inSitemap, sitemaps.length ? 'aparece en el sitemap' : 'no se generó sitemap')
 
 // 4. Rótulo
-check('4. Rótulo "Ejemplo ilustrativo de Efeonce" en el HTML', html.includes('Ejemplo ilustrativo de Efeonce'))
+const rotuloAll = STEPS.every(st => pages[st || 'index'].includes('Ejemplo ilustrativo de Efeonce'))
+check('4. Rótulo "Ejemplo ilustrativo de Efeonce" en las 4 pantallas', rotuloAll)
+
+/* 31-33. EL FLOW. Cuatro pantallas, cada una con UN trabajo. La ② es la que arregla de raíz el
+   «se ve plano»: el artículo por fin tiene la pantalla entera para ser LEÍDO. */
+check('31. El artículo (②) se sirve SIN acoplamiento — ahí se lee, no se inspecciona', !pages.articulo.includes('data-couple='))
+check('32. La radiografía (③) SÍ tiene el acoplamiento', html.includes('data-couple='))
+const railAll = STEPS.every(st => (pages[st || 'index'].match(/class="xr-step"/g) ?? []).length >= 3)
+check('33. El riel avisa en las 4 pantallas que el recorrido tiene más', railAll)
+check('34. La atomización (④) declara la línea de sangre al bloque del artículo', /atom[\s\S]*data-couple-target/.test(pages.atomizacion))
+/* View transitions: sin ellas, cuatro pantallas se sienten como cuatro páginas sueltas. */
+check('35. View transitions cross-document activas (CSS puro, cero JS)', allHtml.includes('view-transition') || /@view-transition/.test(readFileSync('src/styles/aeo-xray.css', 'utf8')))
 
 // 5. Todo <img> con alt no vacío
 const imgs = html.match(/<img[^>]*>/gi) ?? []
@@ -102,7 +122,7 @@ check(
 )
 
 // 21. El chip direccional es `content` de CSS: invisible para lectores de pantalla.
-const srCount = (html.match(/class="[^"]*\bsr\b[^"]*"[^>]*>Produce \d+ datos/g) ?? []).length
+const srCount = (html.match(/class="[^"]*\bxr-sr\b[^"]*"[^>]*>Produce \d+ datos/g) ?? []).length
 check('21. Cada bloque acoplable anuncia cuántos datos produce (el chip solo existe para quien ve)', srCount >= 6, `${srCount} bloques con voz`)
 
 // 22. Una región con scroll tiene que ser alcanzable por teclado (WCAG 2.1.1).
@@ -111,7 +131,10 @@ const preAll = (html.match(/<pre/g) ?? []).length
 check('22. WCAG 2.1.1 — el <pre> scrolleable es enfocable por teclado', preAll > 0 && preTab === preAll, `${preTab}/${preAll}`)
 
 // 23. Sin JS el hover no produce nada: el copy no puede prometerlo.
-check('23. Sin JS, el hint NO promete interactividad (viene hidden)', /class="hint[^"]*"[^>]*hidden|hidden[^>]*class="hint/.test(html))
+check(
+  '23. Sin JS, el hint NO promete interactividad (viene hidden)',
+  /<p class="r-hint[^"]*"[^>]*\shidden/.test(html),
+)
 
 /* 25-27. 🔴 CORE WEB VITALS. La pieza ARGUMENTA rigor técnico: si el comité (o su área de
    TI) le corre un PageSpeed y sale mal, se cae todo lo demás. Las imágenes vivían en
@@ -262,8 +285,8 @@ try {
 
   /* El texto para lectores de pantalla NO puede verse. Si se ve, no es accesibilidad: es un
      bug visual. (Pasó: el reemplazo de CSS apuntaba a una clase que ya no existía = no-op.) */
-  const srVisible = await page.locator('.sr').first().isVisible()
-  const srBox = await page.locator('.sr').first().boundingBox()
+  const srVisible = await page.locator('.xr-sr').first().isVisible()
+  const srBox = await page.locator('.xr-sr').first().boundingBox()
   check(
     '24. El texto para lectores de pantalla es invisible (pero está en el DOM)',
     !srVisible || (srBox !== null && srBox.width <= 2 && srBox.height <= 2),
