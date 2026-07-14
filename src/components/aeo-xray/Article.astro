@@ -384,23 +384,25 @@ const probeFor = (id: string) => {
     border-radius: 12px;
     min-width: 0;
   }
-  /* Leyendo (pantalla ②): la medida manda, no el ancho del contenedor. */
+  /* Leyendo (pantalla ②): artículo editorial, no dashboard ni tarjeta gigante. */
   .sp-read {
-    --a-h1: 2.56rem;
-    --a-body: 1.15rem;
-    --a-lead: 1.24rem;
-    --read-measure: min(44rem, 100%);
-    --read-gutter: clamp(1.5rem, 5vw, 5rem);
-    --read-gap: clamp(1.35rem, 3vw, 2.75rem);
-    width: min(100%, 86rem);
+    --a-h1: clamp(2.25rem, 4vw, 3.2rem);
+    --a-h2: clamp(1.45rem, 2vw, 1.72rem);
+    --a-body: 1.125rem;
+    --a-lead: 1.22rem;
+    --article-canvas: min(100%, 90rem);
+    --article-gutter: clamp(8rem, 10vw, 11rem);
+    --article-measure: min(48rem, calc(100% - var(--article-gutter) - 1.25rem));
+    --media-width: 100%;
+    --inline-media-width: min(100%, 82rem);
+    width: var(--article-canvas);
     max-width: none;
     margin-inline: auto;
-    overflow: hidden;
-    border-color: color-mix(in srgb, var(--line) 86%, white);
-    border-radius: 14px;
-    box-shadow:
-      0 34px 90px color-mix(in srgb, var(--navy) 11%, transparent),
-      0 1px 0 rgb(255 255 255 / 0.9) inset;
+    overflow: visible;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .sp-head {
@@ -419,18 +421,16 @@ const probeFor = (id: string) => {
   .lock { font-size: 0.625rem; opacity: 0.6; }
   .url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .sp-read .sp-head {
-    padding: 0.72rem 0.9rem;
-    background: linear-gradient(180deg, #fff, var(--surf));
-    border-radius: 14px 14px 0 0;
-  }
-  .sp-read .sp-head h2 {
-    color: var(--ink-3);
-    font-size: var(--t-meta);
-  }
-  .sp-read .sp-head p { display: none; }
-  .sp-read .urlbar {
-    max-width: min(32rem, 62vw);
-    background: #fff;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 
   .xr-article {
@@ -460,29 +460,28 @@ const probeFor = (id: string) => {
   .fig.hero :global(img) { border-radius: 0; }
   .fig-m { padding: 0.55rem 1.75rem 0; }
   .sp-read .post {
-    display: grid;
-    grid-template-columns:
-      minmax(var(--read-gutter), 5rem)
-      minmax(0, var(--read-measure))
-      minmax(15rem, 1fr);
-    column-gap: var(--read-gap);
-    padding-bottom: clamp(3rem, 6vw, 5rem);
+    display: block;
+    width: 100%;
+    padding: clamp(1.35rem, 2.5vw, 2.25rem) 0 clamp(3.25rem, 6vw, 5rem);
   }
   .sp-read .post > .para,
   .sp-read .post > .blk:not(.fig),
-  .sp-read .fig-m {
-    grid-column: 2;
+  .sp-read .fig-m,
+  .sp-read .toc {
     box-sizing: border-box;
-    width: 100%;
+    width: var(--article-measure);
     max-width: none;
-    margin-inline: 0;
+    margin-inline: var(--article-gutter) auto;
   }
   .sp-read .post > .blk:not(.fig) {
     padding-inline: 0;
   }
   .sp-read .post > .fig {
-    grid-column: 2 / 4;
-    width: 100%;
+    width: var(--media-width);
+    margin-inline: auto;
+  }
+  .sp-read .post > .fig:not(.hero) {
+    width: var(--inline-media-width);
   }
   .sp-read .fig {
     display: block;
@@ -490,55 +489,49 @@ const probeFor = (id: string) => {
   .sp-read .fig :global(img) {
     width: 100%;
   }
+  .sp-read .fig :global(img),
   .sp-read .fig.hero :global(img) {
-    grid-column: auto;
+    border-radius: 10px;
   }
   .sp-read .fig.hero {
-    margin-block: 0 clamp(2.4rem, 4.8vw, 3.6rem);
+    margin-block: clamp(1.25rem, 2.4vw, 2rem) clamp(1.8rem, 3.5vw, 2.7rem);
   }
   .sp-read .fig:not(.hero) {
-    margin-block: clamp(2.4rem, 5vw, 3.8rem);
+    margin-block: clamp(1.8rem, 3.5vw, 2.65rem);
   }
   .sp-read .fig-m {
-    padding-top: clamp(0.75rem, 1.6vw, 1rem);
-    max-width: var(--read-measure);
+    padding: 0.65rem 0 0;
   }
   .sp-read .head-blk {
-    padding-top: clamp(2.3rem, 5vw, 4.25rem);
-    padding-bottom: clamp(1.35rem, 3vw, 2.25rem);
+    padding-top: 0;
+    padding-bottom: clamp(1.25rem, 2.5vw, 2rem);
   }
   .sp-read .cat {
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.8rem;
   }
   .sp-read .p-h1 {
-    max-width: min(36ch, var(--read-measure));
+    max-width: min(34ch, var(--article-measure));
   }
   .sp-read .byline {
-    max-width: var(--read-measure);
+    max-width: var(--article-measure);
     margin-top: 1.15rem;
     padding-top: 1.05rem;
     margin-bottom: 0;
   }
   .sp-read .para {
-    margin-block: 1.45rem;
-    line-height: 1.78;
+    margin-block: 1.12rem;
+    line-height: 1.72;
   }
   .sp-read .cap-read {
-    margin-block: 1.65rem 2.25rem;
+    margin-block: 1.35rem 1.45rem;
   }
   .sp-read .p-h2 {
-    margin-top: clamp(3rem, 6vw, 4.4rem);
+    margin-top: clamp(2.4rem, 4vw, 3.25rem);
   }
   .sp-read .toc {
-    grid-column: 3;
-    grid-row: 3 / span 3;
-    align-self: start;
-    position: sticky;
-    top: clamp(5rem, 9vw, 6.5rem);
-    width: 100%;
-    max-width: none;
-    margin-block: clamp(0.2rem, 1vw, 0.5rem) 0;
-    padding: clamp(1rem, 2vw, 1.35rem);
+    position: static;
+    margin-block: clamp(1.6rem, 3vw, 2.2rem);
+    padding: clamp(1rem, 2vw, 1.35rem) clamp(1rem, 2.5vw, 1.5rem);
   }
   .sp-read .para,
   .sp-read .cap-read p,
@@ -744,45 +737,16 @@ const probeFor = (id: string) => {
   .lic a { color: var(--blue); text-decoration: underline; }
   .lic-n { margin-top: 0.8rem; font-size: var(--t-meta); font-weight: var(--w-label); color: var(--ink-2); }
 
-  @media (max-width: 1120px) {
-    .sp {
-      --read-measure: min(100% - 2.3rem, 64ch);
-    }
-    .sp-read .post {
-      grid-template-columns: minmax(1.15rem, 1fr) minmax(0, var(--read-measure)) minmax(1.15rem, 1fr);
-      column-gap: 0;
-    }
-    .sp-read .post > .fig,
-    .sp-read .toc {
-      grid-column: 2;
-      grid-row: auto;
-    }
-    .sp-read .toc {
-      position: static;
-      margin-block: clamp(2.1rem, 4.8vw, 3.2rem);
-    }
-    .sp-read .fig :global(img),
-    .sp-read .fig.hero :global(img) {
-      grid-column: auto;
-    }
-  }
-
   @media (max-width: 760px) {
     .sp-read {
       --a-h1: 2.2rem;
       --a-body: 1.0625rem;
       --a-lead: 1.16rem;
-      border-radius: 12px;
-    }
-    .sp-read .sp-head {
-      display: grid;
-      align-items: start;
-      gap: 0.55rem;
-      border-radius: 12px 12px 0 0;
-    }
-    .sp-read .urlbar {
-      max-width: 100%;
-      width: 100%;
+      --article-canvas: 100%;
+      --article-gutter: 0;
+      --article-measure: min(100% - 2.35rem, 64ch);
+      --media-width: min(100% - 2.35rem, 64ch);
+      --inline-media-width: min(100% - 2.35rem, 64ch);
     }
     .sp-read .p-h1,
     .sp-read .byline {
@@ -791,20 +755,20 @@ const probeFor = (id: string) => {
     .sp-read .fig-m {
       padding-top: 0.5rem;
     }
-    .sp-read .post {
-      grid-template-columns: minmax(1.15rem, 1fr) minmax(0, var(--read-measure)) minmax(1.15rem, 1fr);
-    }
-    .sp-read .fig :global(img),
-    .sp-read .fig.hero :global(img) {
-      grid-column: 1 / -1;
+    .sp-read .post > .para,
+    .sp-read .post > .blk:not(.fig),
+    .sp-read .fig-m,
+    .sp-read .toc {
+      margin-inline: auto;
     }
   }
 
   @media (max-width: 380px) {
-    .sp {
-      --read-measure: min(100% - 1.8rem, 64ch);
-    }
     .sp-read {
+      --article-gutter: 0;
+      --article-measure: min(100% - 1.8rem, 64ch);
+      --media-width: min(100% - 1.8rem, 64ch);
+      --inline-media-width: min(100% - 1.8rem, 64ch);
       --a-h1: 2rem;
       --a-h2: 1.35rem;
     }

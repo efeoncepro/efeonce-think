@@ -980,20 +980,9 @@ const titles: Record<string, string> = {
   .read-stage {
     position: relative;
     isolation: isolate;
-    width: min(100%, 86rem);
+    width: min(100%, 90rem);
     margin-inline: auto;
-    padding-block: clamp(1rem, 3vw, 2.4rem) 1rem;
-  }
-  .read-stage::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    inset-block-start: 0;
-    inset-inline: calc(50% - 50vw);
-    height: min(34rem, 62%);
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--blue-up) 9%, white), transparent 78%),
-      linear-gradient(90deg, transparent 10%, color-mix(in srgb, var(--client) 7%, white) 50%, transparent 90%);
+    padding-block: clamp(0.75rem, 1.8vw, 1.35rem) 1rem;
   }
   @media (max-width: 720px) {
     .read-stage {
@@ -1005,7 +994,7 @@ const titles: Record<string, string> = {
   .xr[data-step='articulo'] .xr-next {
     position: static;
     inset: auto;
-    width: min(100%, 86rem);
+    width: min(100%, 90rem);
     margin-inline: auto;
     padding-block: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 2.5rem);
     pointer-events: auto;
