@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets'
 import { getCollection } from 'astro:content'
+import { FileText, Images, MessagesSquare, Play } from '@lucide/astro'
 import BaseLayout from '@layouts/BaseLayout.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import Article from '@/components/aeo-xray/Article.astro'
@@ -99,6 +100,27 @@ const imageBlocks = d.article.blocks.filter(
   (b): b is Extract<typeof b, { type: 'image' | 'hero-image' }> =>
     b.type === 'image' || b.type === 'hero-image',
 )
+
+const codeRecord = (code: unknown): Record<string, unknown> =>
+  code && typeof code === 'object' ? (code as Record<string, unknown>) : {}
+
+const codeField = (code: unknown, key: string): string => {
+  const value = codeRecord(code)[key]
+  return typeof value === 'string' ? value : ''
+}
+
+const deliverableValue = (atom: (typeof atoms)[number], pattern: RegExp): string =>
+  atom.deliverable.find(x => pattern.test(x.k))?.v ?? ''
+
+const artifactKind = (atom: (typeof atoms)[number]) => {
+  const type = codeField(atom.code, '@type')
+
+  if (atom.post) return 'social'
+  if (atom.showsImages) return 'images'
+  if (type === 'VideoObject') return 'video'
+
+  return 'asset'
+}
 
 const asText = (code: unknown) =>
   JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
@@ -254,48 +276,98 @@ const titles: Record<string, string> = {
           <h1 class="at-h1">Este artículo no vive solo en una URL</h1>
           <p class="at-intro">{d.atomsIntro}</p>
 
+          <div class="at-lineage" aria-label="Línea de sangre de la distribución">
+            <div class="at-lineage-source">
+              <span class="at-lineage-source-k"><FileText size={16} aria-hidden="true" />Artículo original</span>
+              <strong>{meta.sampleTitle}</strong>
+            </div>
+            <div class="at-lineage-bridge" aria-hidden="true">se convierte en</div>
+            <ul class="at-lineage-list">
+              {atoms.map(a => (
+                <li data-artifact={artifactKind(a)}>
+                  <span>
+                    <i class="at-channel-icon" aria-hidden="true">
+                      {artifactKind(a) === 'video' && <Play size={15} />}
+                      {artifactKind(a) === 'social' && <MessagesSquare size={15} />}
+                      {artifactKind(a) === 'images' && <Images size={15} />}
+                    </i>
+                    {a.kind}
+                  </span>
+                  <small>{a.bornFrom}</small>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <div class="at-grid">
             {atoms.map(a => (
-              <article class="atom" data-featured={a.post ? 'true' : undefined} data-couple-target={a.coupleId} tabindex="0">
+              <article class="atom" data-artifact={artifactKind(a)} data-featured={a.post ? 'true' : undefined} data-couple-target={a.coupleId} tabindex="0">
                 <div class="atom-h">
-                  <span class="atom-k">{a.kind}</span>
-                  <span class="atom-from">{a.bornFrom}</span>
+                  <span class="atom-icon" aria-hidden="true">
+                    {artifactKind(a) === 'video' && <Play size={18} />}
+                    {artifactKind(a) === 'social' && <MessagesSquare size={18} />}
+                    {artifactKind(a) === 'images' && <Images size={18} />}
+                  </span>
+                  <span class="atom-title">
+                    <span class="atom-k">{a.kind}</span>
+                    <span class="atom-from">{a.bornFrom}</span>
+                  </span>
                 </div>
 
-                {/* La cifra va CON su fuente. La ④ afirmaba tres números sin una sola cita
-                    mientras la ① y la ③ citaban todo — en la pieza cuya tesis es el rigor.
-                    Sin fuente y sin fecha, una cifra es una opinión con números. */}
-                <p class="atom-stat">{a.stat} <span>{a.statNote}</span></p>
-                <cite class="atom-cite">{a.source} · {a.asOf}</cite>
-                <p class="atom-why">{a.why}</p>
+                <div class="atom-artifact">
+                  {artifactKind(a) === 'video' && imageBlocks[0] && (
+                    <figure class="video-artifact">
+                      <div class="video-frame">
+                        <Image src={imageBlocks[0].src} alt={imageBlocks[0].alt} widths={[360, 720]} sizes="420px" format="avif" quality={70} loading="lazy" />
+                        <div class="video-caption">
+                          <span>{deliverableValue(a, /duraci/i) || 'Video recuperable'}</span>
+                          <strong>{codeField(a.code, 'name') || a.kind}</strong>
+                        </div>
+                      </div>
+                      <div class="video-script">
+                        <span>Guion + transcripción</span>
+                        <p>{deliverableValue(a, /guion/i) || codeField(a.code, 'description')}</p>
+                      </div>
+                    </figure>
+                  )}
 
-                {/* La pieza social se RENDERIZA. Es un mockup del entregable, como todo el resto. */}
-                {a.post && (
-                  <div class="post-card">
-                    <p class="pc-hook">{a.post.hook}</p>
-                    <p class="pc-body">{a.post.body}</p>
-                    <p class="pc-cta">{a.post.cta}</p>
-                    <span class="pc-brand">{client.name}</span>
-                  </div>
-                )}
+                  {/* La pieza social se RENDERIZA. Es un mockup del entregable, como todo el resto. */}
+                  {a.post && (
+                    <div class="post-card">
+                      <p class="pc-hook">{a.post.hook}</p>
+                      <p class="pc-body">{a.post.body}</p>
+                      <p class="pc-cta">{a.post.cta}</p>
+                      <span class="pc-brand">{client.name}</span>
+                    </div>
+                  )}
 
-                {/* 🔴 ASIMETRÍA DE PRUEBA: el átomo de video ESPECIFICA el entregable y el social lo
-                    RENDERIZA — pero el de imágenes, cuyo argumento textual es «un alt que dice
-                    "paisaje" no sirve para nada; uno que dice "las agujas de roca del Cerro Castillo
-                    nevadas sobre un lago" hace que esa foto se recupere», NO MOSTRABA NI UNA FOTO NI
-                    UN ALT. Dos átomos demostraban y uno solo afirmaba — en la pieza cuya regla entera
-                    es demostrar. Y de paso dejaba un hueco blanco de ~600px en la lámina de cierre.
-                    Ahora enseña las cuatro fotos reales con su alt: el argumento se ve. */}
-                {a.showsImages && (
-                  <ul class="atom-imgs">
-                    {imageBlocks.map(img => (
-                      <li>
-                        <Image src={img.src} alt={img.alt} widths={[220, 440]} sizes="200px" format="avif" quality={65} loading="lazy" />
-                        <p class="atom-alt"><span>alt</span> “{img.alt}”</p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                  {/* 🔴 ASIMETRÍA DE PRUEBA: el átomo de video ESPECIFICA el entregable y el social lo
+                      RENDERIZA — pero el de imágenes, cuyo argumento textual es «un alt que dice
+                      "paisaje" no sirve para nada; uno que dice "las agujas de roca del Cerro Castillo
+                      nevadas sobre un lago" hace que esa foto se recupere», NO MOSTRABA NI UNA FOTO NI
+                      UN ALT. Dos átomos demostraban y uno solo afirmaba — en la pieza cuya regla entera
+                      es demostrar. Y de paso dejaba un hueco blanco de ~600px en la lámina de cierre.
+                      Ahora enseña las cuatro fotos reales con su alt: el argumento se ve. */}
+                  {a.showsImages && (
+                    <ul class="atom-imgs">
+                      {imageBlocks.map(img => (
+                        <li>
+                          <Image src={img.src} alt={img.alt} widths={[180, 360]} sizes="180px" format="avif" quality={65} loading="lazy" />
+                          <p class="atom-alt"><span>alt</span> “{img.alt}”</p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div class="atom-proof">
+                  {/* La cifra va CON su fuente. La ④ afirmaba tres números sin una sola cita
+                      mientras la ① y la ③ citaban todo — en la pieza cuya tesis es el rigor.
+                      Sin fuente y sin fecha, una cifra es una opinión con números. */}
+                  <p class="atom-stat">{a.stat} <span>{a.statNote}</span></p>
+                  <cite class="atom-cite">{a.source} · {a.asOf}</cite>
+                  <p class="atom-why">{a.why}</p>
+                </div>
 
                 <dl class="atom-d">
                   {a.deliverable.map(x => (
@@ -689,9 +761,10 @@ const titles: Record<string, string> = {
   }
   .g-h1, .at-h1 {
     margin-top: 0.6rem; font-family: Poppins, system-ui, sans-serif;
-    font-size: clamp(1.9rem, 1.2rem + 2.4vw, 3rem); font-weight: var(--w-display-lg); line-height: 1.1;
-    letter-spacing: -0.02em; max-width: 24ch; text-wrap: balance;
+    font-size: 1.9rem; font-weight: var(--w-display-lg); line-height: 1.1;
+    letter-spacing: 0; max-width: 24ch; text-wrap: balance;
   }
+  @media (min-width: 900px) { .g-h1, .at-h1 { font-size: 3rem; } }
   .g-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-top: 2rem; }
   @media (min-width: 900px) { .g-grid { grid-template-columns: 1fr 1fr; align-items: start; } }
 
@@ -721,7 +794,7 @@ const titles: Record<string, string> = {
   .g-kpi-n {
     font-family: Poppins, system-ui, sans-serif;
     font-size: 2.1rem; font-weight: var(--w-display); line-height: 1; color: #fff;
-    font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums; letter-spacing: 0;
   }
   .g-kpi-u { margin-top: 0.3rem; font-size: var(--t-meta); line-height: 1.35; }
   .g-kpi cite { display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--dim-d); font-style: normal; }
@@ -774,7 +847,7 @@ const titles: Record<string, string> = {
   .r-head { max-width: 74ch; margin: 0 0 1.5rem; }
   .r-h1 {
     font-family: Poppins, system-ui, sans-serif; font-size: var(--t-sect); font-weight: var(--w-display);
-    line-height: 1.2; letter-spacing: -0.01em; color: var(--ink); margin-top: 0.3rem; text-wrap: balance;
+    line-height: 1.2; letter-spacing: 0; color: var(--ink); margin-top: 0.3rem; text-wrap: balance;
   }
   .r-h1 em { font-style: italic; color: var(--blue); }
   .r-thesis { margin-top: 0.7rem; font-size: var(--t-body); line-height: 1.65; color: var(--ink-3); }
@@ -804,11 +877,71 @@ const titles: Record<string, string> = {
 
   /* ══════════ ④ DÓNDE MÁS VIVE ══════════ */
   .at-intro { margin-top: 1rem; font-size: 1.125rem; line-height: 1.65; color: var(--ink-2); max-width: 68ch; }
-  .at-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-top: 2rem; align-items: start; }
+  .at-lineage {
+    margin-top: 1.35rem; padding: 0.75rem; border: 1px solid var(--line);
+    border-radius: 14px; background: color-mix(in srgb, var(--blue-up) 5%, white);
+    display: grid; gap: 0.55rem; align-items: center;
+  }
+  .at-lineage-source {
+    padding: 0.65rem 0.75rem; border-radius: 10px; background: #fff;
+    border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  }
+  .at-lineage-source span,
+  .at-lineage-bridge {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0; text-transform: uppercase; color: var(--muted);
+  }
+  .at-lineage-source-k {
+    display: flex; align-items: center; gap: 0.35rem;
+  }
+  .at-lineage-source-k svg { flex: 0 0 auto; color: var(--blue-up); }
+  .at-lineage-source strong {
+    display: block; margin-top: 0.2rem; font-size: var(--t-meta);
+    line-height: 1.35; color: var(--ink); font-weight: var(--w-label);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .at-lineage-bridge { text-align: center; color: var(--blue-up); }
+  .at-lineage-list {
+    list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; min-width: 0;
+  }
+  .at-lineage-list li {
+    min-width: 0; padding: 0.55rem 0.6rem; border-radius: 10px;
+    background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
+  }
+  .at-lineage-list li[data-artifact='social'] {
+    background: color-mix(in srgb, var(--client) 11%, var(--navy));
+    border-color: color-mix(in srgb, var(--client) 42%, var(--navy-3));
+  }
+  .at-lineage-list span {
+    display: flex; align-items: center; gap: 0.35rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: 0.78rem; line-height: 1.2; font-weight: var(--w-display); color: #fff;
+  }
+  .at-channel-icon {
+    width: 1.25rem; height: 1.25rem; border-radius: 999px;
+    display: inline-grid; place-items: center; flex: 0 0 auto;
+    background: color-mix(in srgb, var(--blue-up) 16%, var(--navy-2));
+    color: var(--blue-up); font-style: normal;
+  }
+  .at-lineage-list li[data-artifact='social'] .at-channel-icon {
+    background: color-mix(in srgb, var(--client) 18%, var(--navy-2));
+    color: #fff;
+  }
+  .at-lineage-list small {
+    display: none; margin-top: 0.2rem; font-size: 0.75rem;
+    line-height: 1.35; color: var(--dim-d);
+  }
+  .at-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-top: 1.35rem; align-items: start; }
   @media (max-width: 979px) {
     .atom[data-featured='true'] { order: -1; }
   }
   @media (min-width: 980px) {
+    .at-lineage { grid-template-columns: minmax(0, 1fr) auto minmax(0, 2.1fr); padding: 0.95rem; gap: 0.75rem; }
+    .at-lineage-source { padding: 0.8rem 0.9rem; }
+    .at-lineage-source strong { display: block; overflow: visible; }
+    .at-lineage-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .at-lineage-list li { padding: 0.7rem 0.8rem; }
+    .at-lineage-list span { font-size: var(--t-meta); line-height: 1.35; }
+    .at-lineage-list small { display: block; }
     .at-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr); }
     .atom[data-featured='true'] { transform: translateY(-0.35rem); }
   }
@@ -824,16 +957,34 @@ const titles: Record<string, string> = {
     box-shadow: 0 18px 40px color-mix(in srgb, var(--navy) 18%, transparent);
   }
   .atom:focus-visible { outline: 2px solid var(--blue-up); }
-  .atom-h { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.9rem; }
+  .atom-h { display: flex; align-items: flex-start; gap: 0.65rem; margin-bottom: 0.9rem; }
+  .atom-icon {
+    width: 2rem; height: 2rem; border-radius: 999px; display: inline-grid; place-items: center;
+    flex: 0 0 auto; color: var(--blue-up);
+    background: color-mix(in srgb, var(--blue-up) 12%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--blue-up) 26%, var(--navy-3));
+  }
+  .atom[data-artifact='social'] .atom-icon {
+    color: #fff; background: color-mix(in srgb, var(--client) 22%, var(--navy-2));
+    border-color: color-mix(in srgb, var(--client) 38%, var(--navy-3));
+  }
+  .atom-title { min-width: 0; display: grid; gap: 0.25rem; }
   .atom-k {
+    display: block;
     font-family: Poppins, system-ui, sans-serif; font-size: var(--t-node);
     font-weight: var(--w-display); color: #fff;
   }
   /* La LÍNEA DE SANGRE: de qué bloque del artículo nació. No son entregables sueltos. */
   .atom-from { font-size: var(--t-meta); color: var(--blue-up); }
+  .atom-artifact {
+    margin-top: 1rem; min-width: 0;
+  }
+  .atom-proof {
+    margin-top: 1rem; padding-top: 1rem; border-top: 1px solid color-mix(in srgb, var(--line-d) 72%, transparent);
+  }
   .atom-stat {
-    font-family: Poppins, system-ui, sans-serif; font-size: 2.25rem; font-weight: var(--w-display);
-    line-height: 1.05; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    font-family: Poppins, system-ui, sans-serif; font-size: 1.9rem; font-weight: var(--w-display);
+    line-height: 1.05; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: 0;
   }
   .atom-stat span {
     display: block; font-family: inherit; font-size: var(--t-meta); font-weight: var(--w-body-dark);
@@ -846,12 +997,13 @@ const titles: Record<string, string> = {
     color: var(--dim-d); font-style: normal; font-weight: var(--w-body-dark);
   }
   /* Las cuatro fotos reales, con su alt. El argumento de las imágenes deja de estar solo AFIRMADO. */
-  .atom-imgs { margin-top: 1rem; display: grid; gap: 0.8rem; list-style: none; }
+  .atom-imgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; list-style: none; }
   .atom-imgs img {
-    width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; display: block;
+    width: 100%; aspect-ratio: 1 / 0.78; object-fit: cover; border-radius: 8px; display: block;
   }
   .atom-alt {
-    margin-top: 0.35rem; font-size: var(--t-over); line-height: 1.5; color: var(--dim-d);
+    margin-top: 0.32rem; font-size: 0.66rem; line-height: 1.35; color: var(--dim-d);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   }
   .atom-alt span {
     display: inline-block; margin-right: 0.3rem; padding: 0.05rem 0.3rem; border-radius: 3px;
@@ -866,18 +1018,53 @@ const titles: Record<string, string> = {
      del todo, encima de NUESTRA nota de honestidad, como si SKY la firmara. */
   .post-card {
     position: relative;
-    margin-top: 1rem; padding: 1.1rem; border-radius: 12px;
+    padding: 1.1rem; border-radius: 12px;
     background: linear-gradient(160deg, color-mix(in srgb, var(--client) 90%, black), color-mix(in srgb, var(--client) 55%, black));
     color: #fff; aspect-ratio: 4 / 5; display: flex; flex-direction: column; justify-content: center; gap: 0.6rem;
   }
-  .atom[data-featured='true'] .post-card { margin-top: 1.2rem; padding: 1.35rem; }
-  .atom[data-featured='true'] .pc-body { font-size: clamp(1.25rem, 1rem + 0.85vw, 1.7rem); }
+  .atom[data-featured='true'] .post-card { padding: 1.35rem; }
+  .atom[data-featured='true'] .pc-body { font-size: 1.25rem; }
+  @media (min-width: 980px) { .atom[data-featured='true'] .pc-body { font-size: 1.55rem; } }
   .pc-hook { font-size: var(--t-meta); font-weight: var(--w-label); text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.85; }
   .pc-body { font-family: Poppins, system-ui, sans-serif; font-size: 1.25rem; font-weight: var(--w-display); line-height: 1.3; text-wrap: balance; }
   .pc-cta { font-size: var(--t-meta); opacity: 0.9; }
   .pc-brand {
     position: absolute; right: 1.9rem; bottom: 1.9rem; font-family: Poppins, system-ui, sans-serif;
     font-weight: var(--w-display); font-size: 0.8125rem; letter-spacing: 0.06em; opacity: 0.75;
+  }
+  .video-artifact {
+    margin: 0; display: grid; gap: 0.7rem;
+  }
+  .video-frame {
+    position: relative; overflow: hidden; border-radius: 12px; background: var(--navy-sunk);
+    border: 1px solid color-mix(in srgb, var(--blue-up) 24%, var(--navy-3));
+  }
+  .video-frame img {
+    width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; filter: saturate(1.08) contrast(1.02);
+  }
+  .video-caption {
+    position: absolute; inset: auto 0 0; padding: 2.4rem 0.85rem 0.8rem;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--navy-sunk) 92%, transparent));
+  }
+  .video-caption span {
+    display: block; font-size: 0.68rem; font-weight: var(--w-label);
+    letter-spacing: 0; text-transform: uppercase; color: var(--blue-up);
+  }
+  .video-caption strong {
+    display: block; margin-top: 0.2rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: 1rem; line-height: 1.25; color: #fff;
+  }
+  .video-script {
+    padding: 0.75rem 0.85rem; border-radius: 10px; background: color-mix(in srgb, var(--blue-up) 8%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--blue-up) 24%, var(--navy-3));
+  }
+  .video-script span {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0; text-transform: uppercase; color: var(--blue-up);
+  }
+  .video-script p {
+    margin-top: 0.35rem; font-size: var(--t-meta); line-height: 1.45; color: var(--ink-d);
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
   }
 
   .atom-d { margin-top: 1rem; display: grid; grid-template-columns: 1fr; gap: 0.15rem; }
