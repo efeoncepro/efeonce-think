@@ -111,8 +111,50 @@ const blockUnion = (image: ImageFn) =>
  *  3 — descriptivo (canónica, og:*). Prueba de completitud, NO argumento. Callado y colapsado.
  */
 const tier = z.union([z.literal(1), z.literal(2), z.literal(3)])
-/** El número que el comité recuerda. Va grande: la prosa es su nota al pie, no al revés. */
-const stat = { stat: z.string().optional(), statNote: z.string().optional() }
+/** El número que el comité recuerda. Va grande: la prosa es su nota al pie, no al revés.
+ *
+ *  🔴 `source` + `asOf` son OBLIGATORIOS en cuanto existe un `stat` — lo fuerza el `superRefine`
+ *  de la raíz, no este objeto (así ningún bloque nuevo puede escaparse por olvido).
+ *
+ *  El invariante 7 dice «cero cifras sin fuente y sin as-of», y el schema lo obligaba en
+ *  `evidence.facts` y en los átomos… pero NO acá, que es donde viven los números GRANDES del
+ *  instrumento. Resultado: la ③ —la pantalla del rigor— era la única donde las cifras flotaban.
+ *  Una auditoría externa (2026-07-14) encontró que de las 6 cifras de la pieza, 3 no resistían
+ *  verificación: el 2,3× era una razón de PREVALENCIA vendida como lift, el 72,4% iba sin citar,
+ *  y la fuente del 16% no existía con el nombre publicado. Sin fuente y sin fecha, una cifra es
+ *  una opinión con números — y en esta pieza eso es lo único que no se puede permitir. */
+const stat = {
+  stat: z.string().optional(),
+  statNote: z.string().optional(),
+  source: z.string().min(8).optional(),
+  asOf: z.string().min(4).optional(),
+}
+
+/** Recorre CUALQUIER nodo del payload y exige la cita en cuanto vea una cifra. */
+const requireSourceForStats = (data: unknown, ctx: z.RefinementCtx, path: (string | number)[] = []) => {
+  if (Array.isArray(data)) {
+    data.forEach((v, i) => requireSourceForStats(v, ctx, [...path, i]))
+
+    return
+  }
+  if (!data || typeof data !== 'object') return
+
+  const node = data as Record<string, unknown>
+
+  if (typeof node.stat === 'string' && node.stat.length > 0) {
+    for (const k of ['source', 'asOf'] as const) {
+      if (typeof node[k] !== 'string' || (node[k] as string).length < 4) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [...path, k],
+          message: `«${node.stat}» es una cifra sin ${k}. Sin fuente y sin fecha, un número es una opinión con dígitos — y esta pieza vive de no exagerar.`,
+        })
+      }
+    }
+  }
+
+  for (const [k, v] of Object.entries(node)) requireSourceForStats(v, ctx, [...path, k])
+}
 
 const aeoXray = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/aeo-xray' }),
@@ -316,7 +358,13 @@ const aeoXray = defineCollection({
       srProduces: z.string(),
       closing: z.string(),
     }),
-  }),
+  })
+    /* 🔴 EL GATE DE LAS CIFRAS. Recorre el payload ENTERO —craft, jsonld, seo, og, átomos,
+       evidencia y cualquier bloque que se invente mañana— y rompe el build en cuanto encuentre
+       un `stat` sin `source` + `asOf`. Es la única forma de que el invariante 7 sea estructural
+       y no un acuerdo de caballeros: los tres números que no resistían verificación vivían
+       justo en la familia que el schema no miraba. */
+    .superRefine((data, ctx) => requireSourceForStats(data, ctx)),
 })
 
 export const collections = { aeoXray }

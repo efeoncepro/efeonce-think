@@ -58,7 +58,12 @@ const asText = (code: unknown) =>
     <p class="grp">Cómo está escrito</p>
     {machine.craft.map(c => (
       <div class={`nd t${c.tier}`} data-couple-target={c.coupleId} data-on={c.coupleId === hero ? true : undefined} tabindex="0">
+        {/* La cifra va CON su fuente, igual que en la ① y en la ④. La ③ era la única pantalla
+            donde los números flotaban — justo la que argumenta el rigor. El schema ya lo obliga
+            (superRefine de la raíz); esto lo RENDERIZA: un dato obligatorio que no se pinta no le
+            sirve de nada al evaluador que lo quiere comprobar. */}
         {c.stat && <p class="stat">{c.stat} <span>{c.statNote}</span></p>}
+        {c.stat && c.source && <cite class="stat-src">{c.source} · {c.asOf}</cite>}
         <p class="nd-l">{c.label} <em>· {c.detail}</em></p>
         <p class="why"><b>{ui.whyLabel}:</b> {c.why}</p>
       </div>
@@ -169,6 +174,12 @@ const asText = (code: unknown) =>
   }
   .in-focus:empty { display: none; }
 
+  /* La fuente de cada cifra del instrumento. Sobre navy el texto sube un paso (--w-body-dark). */
+  .stat-src {
+    display: block; margin-top: 0.4rem; font-size: 0.75rem; line-height: 1.45;
+    color: var(--dim-d); font-style: normal; font-weight: var(--w-body-dark);
+  }
+
   /* Solo existe cuando el instrumento está enfocado: en modo mapa no hay de qué salir. */
   .in-all { display: none; }
   .inst[data-focus='true'] .in-all {
@@ -248,11 +259,17 @@ const asText = (code: unknown) =>
   .why { font-size: var(--t-meta); line-height: 1.55; color: var(--dim-d); margin-top: 0.4rem; max-width: 62ch; }
   .why b { color: var(--blue-up); font-weight: var(--w-label); }
 
-  .sch-h { display: flex; justify-content: space-between; gap: 0.6rem; align-items: center; margin-bottom: 0.35rem; }
-  .sch-t { font-size: var(--t-meta); font-weight: var(--w-label); font-family: ui-monospace, monospace; color: #fff; }
+  /* `flex-wrap` NO es cosmético: sin él, la píldora de métrica (`white-space: nowrap`) empujaba el
+     DOCUMENTO 11px a 390px. Y «Claridad de marca — 100/100» ya llegaba a 400px: el assert de scroll
+     horizontal venía pasando por UN píxel. Un badge nunca puede decidir el ancho de la página. */
+  .sch-h {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.4rem 0.6rem;
+    align-items: center; margin-bottom: 0.35rem;
+  }
+  .sch-t { font-size: var(--t-meta); font-weight: var(--w-label); font-family: ui-monospace, monospace; color: #fff; min-width: 0; }
   .sch-m {
     font-size: var(--t-over); font-weight: var(--w-label); color: var(--navy); background: var(--blue-up);
-    padding: 0.12rem 0.45rem; border-radius: 999px; white-space: nowrap;
+    padding: 0.12rem 0.45rem; border-radius: 999px; max-width: 100%;
   }
   .sch details { margin-top: 0.5rem; }
   .sch summary {

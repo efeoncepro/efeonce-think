@@ -41,7 +41,7 @@
       {
         "type": "answer-capsule",
         "coupleId": "capsule-main",
-        "text": "Hay dos formas de empezar la Carretera Austral. Una: manejar los 1.247 km desde Puerto Montt y subir el auto a dos barcazas. La otra: volar a Balmaceda, arrendar un auto en el mismo terminal y estar en la mitad de la Ruta 7 antes del almuerzo. Recorrerla toma entre 10 y 14 días."
+        "text": "Hay dos formas de empezar la Carretera Austral. Una: manejar los 1.247 km desde Puerto Montt y subir el auto a las dos barcazas del tramo norte. La otra: volar a Balmaceda, arrendar un auto en el mismo terminal y estar en la mitad de la Ruta 7 antes del almuerzo. Recorrerla toma entre 10 y 14 días."
       },
       {
         "type": "paragraph",
@@ -70,7 +70,7 @@
       },
       {
         "type": "paragraph",
-        "text": "¿Y si prefieres saltarte esa parte? Vuelas. Aterrizas en Balmaceda, retiras el auto en el mismo terminal y ya estás en el centro de la ruta: Cerro Castillo a dos horas, las Capillas de Mármol a media jornada. La tercera puerta —manejar desde Santiago— también termina en Puerto Montt, pero con dos días de Ruta 5 encima. Por lado."
+        "text": "¿Y si prefieres saltarte esa parte? Vuelas. Aterrizas y en media hora ya vas manejando: Cerro Castillo esa misma tarde, las Capillas de Mármol al día siguiente. La tercera puerta —manejar desde Santiago— también termina en Puerto Montt, pero con dos días de Ruta 5 encima. Por lado."
       },
       {
         "type": "table",
@@ -146,7 +146,7 @@
         "coupleId": "img-castillo",
         "src": "../../assets/muestras/sky-carretera-austral/cerro-castillo.jpg",
         "alt": "Las agujas de roca nevadas del Cerro Castillo recortadas contra el cielo, en el Parque Nacional Cerro Castillo",
-        "caption": "Cerro Castillo queda a dos horas de Coyhaique. Es la primera parada si entras por Balmaceda.",
+        "caption": "Cerro Castillo, la primera parada si entras por Balmaceda. El mirador queda a un desvío corto de la Ruta 7.",
         "credit": {
           "author": "Nature's Charm / Shutterstock",
           "license": "Licencia estándar",
@@ -212,7 +212,7 @@
       {
         "type": "h2",
         "coupleId": "h2-ferries",
-        "text": "Los transbordadores: la parte que no puedes improvisar",
+        "text": "¿Hay que reservar los transbordadores?",
         "anchor": "transbordadores",
         "short": "Los transbordadores: lo único que no controlas"
       },
@@ -230,13 +230,9 @@
         "text": "Un cruce que pierdes en enero te cuesta un día entero. Y ese día, si armaste bien el plan, ya lo tenías ocupado."
       },
       {
-        "type": "paragraph",
-        "text": "Si entras por Balmaceda no tocas ninguno de los dos del norte."
-      },
-      {
         "type": "pull-quote",
         "coupleId": "pull-balmaceda",
-        "text": "Volar a Balmaceda no te ahorra solo kilómetros: te ahorra la única parte del viaje que no depende de ti."
+        "text": "Volar a Balmaceda no te ahorra solo kilómetros: te ahorra los dos cruces que pueden desarmarte el itinerario completo."
       },
       {
         "type": "paragraph",
@@ -398,7 +394,7 @@
     ],
     "headings": {
       "coupleId": "h1",
-      "why": "Cada H2 es una sub-pregunta del fan-out, escrita como pregunta y autocontenida: el motor recupera PASAJES, no páginas, así que el pasaje tiene que entenderse solo. El índice, en cambio, no está escrito como pregunta sino como mapa — porque a quien sirve es al humano que escanea. Son dos lectores distintos y por eso son dos textos distintos.",
+      "why": "Cada H2 de contenido es una sub-pregunta del fan-out, escrita como pregunta y autocontenida: el motor recupera PASAJES, no páginas, así que el pasaje tiene que entenderse solo. (El H2 de «Preguntas frecuentes» es el encabezado de la sección, no una sub-pregunta: lo decimos para no declarar de más.) El índice, en cambio, no está escrito como pregunta sino como mapa — porque a quien sirve es al humano que escanea. Son dos lectores distintos y por eso son dos textos distintos.",
       "tree": [
         {
           "level": 1,
@@ -427,7 +423,7 @@
         },
         {
           "level": 2,
-          "text": "Los transbordadores: la parte que no puedes improvisar",
+          "text": "¿Hay que reservar los transbordadores?",
           "coupleId": "h2-ferries"
         },
         {
@@ -464,8 +460,8 @@
         "id": "node-website",
         "coupleId": "internal-links",
         "type": "WebSite + SearchAction",
-        "metric": "Ser accionable — 8/100",
-        "why": "Este es el nodo que ataca el 8 sobre 100 del diagnóstico. El «potentialAction» le dice a una máquina que el sitio se puede OPERAR, no solo leer: que hay una acción de búsqueda que un agente puede ejecutar. Hoy el blog de SKY no declara ninguna.",
+        "metric": "Ser accionable — 8/100 (el eje más abierto)",
+        "why": "Declara la superficie de búsqueda del sitio en el vocabulario estándar. ⚠️ Y acá va la parte que preferimos decir nosotros antes de que la encuentre usted: Google DEPRECÓ el cuadro de búsqueda de sitelinks que este nodo alimentaba (anunciado el 21 de octubre de 2024, retirado el 21 de noviembre de 2024), y NO hay evidencia pública de que ChatGPT, Perplexity o Gemini lean `potentialAction` para operar un sitio. O sea: es higiene de grafo correcta y barata, pero por sí solo NO mueve el 8/100. El 8/100 —«ser accionable»— es el eje agéntico, y se gana donde SKY de verdad tiene algo que un agente pueda EJECUTAR: el motor de reservas (`FlightReservation`), no el buscador del blog. Ese es el trabajo grande, y lo decimos como trabajo, no como casilla marcada.",
         "code": {
           "@type": "WebSite",
           "@id": "https://blog.skyairline.com/#website",
@@ -484,18 +480,20 @@
             "query-input": "required name=search_term_string"
           }
         },
-        "tier": 1,
+        "tier": 2,
         "stat": "8/100",
-        "statNote": "Ser accionable — el número más bajo del diagnóstico"
+        "statNote": "Ser accionable — el número más bajo del diagnóstico. Y el eje donde este nodo, solo, NO alcanza",
+        "source": "AI Visibility Grader de Efeonce — 5 motores de respuesta, 35 respuestas analizadas",
+        "asOf": "2026-07"
       },
       {
         "id": "node-organization",
         "coupleId": "h1",
-        "type": "Organization",
+        "type": "Airline (Organization)",
         "metric": "Claridad de marca — 100/100 (sostener)",
-        "why": "El «sameAs» es lo que permite que una cita se atribuya a SKY como entidad, y no a «un blog de viajes». Sin él, el motor puede usar tu contenido y acreditárselo a otro.",
+        "why": "El «sameAs» es lo que permite que una cita se atribuya a SKY como entidad, y no a «un blog de viajes». Sin él, el motor puede usar el contenido de SKY y acreditárselo a otro. Y el tipo es `Airline`, no `Organization` a secas: schema.org tiene el tipo exacto, con `iataCode`. Usar el genérico en el nodo de «claridad de marca» es dejar precisión de entidad sobre la mesa.",
         "code": {
-          "@type": "Organization",
+          "@type": "Airline",
           "@id": "https://www.skyairline.com/#organization",
           "name": "SKY Airline",
           "url": "https://www.skyairline.com/",
@@ -506,17 +504,43 @@
           "sameAs": [
             "https://es.wikipedia.org/wiki/SKY_Airline",
             "https://www.instagram.com/skyairline/",
-            "https://www.linkedin.com/company/sky-airline/"
-          ]
+            "https://www.linkedin.com/company/sky-airline/",
+            "https://www.wikidata.org/wiki/Q2891356"
+          ],
+          "iataCode": "H2"
         },
         "tier": 2
+      },
+      {
+        "id": "node-webpage",
+        "coupleId": "h1",
+        "type": "WebPage",
+        "metric": "Ser legible — 70/100",
+        "tier": 3,
+        "why": "El nodo que cose el grafo. Sin él, el `BlogPosting` apunta a un `#webpage` que no existe y el `BreadcrumbList` queda suelto: dos referencias colgantes que cualquier validador marca. Es higiene, no argumento — por eso va callado.",
+        "code": {
+          "@type": "WebPage",
+          "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#webpage",
+          "url": "https://blog.skyairline.com/carretera-austral-como-llegar/",
+          "name": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesitas",
+          "isPartOf": {
+            "@id": "https://blog.skyairline.com/#website"
+          },
+          "primaryImageOfPage": {
+            "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#primaryimage"
+          },
+          "breadcrumb": {
+            "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#breadcrumb"
+          },
+          "inLanguage": "es-CL"
+        }
       },
       {
         "id": "node-blogposting",
         "coupleId": "h1",
         "type": "BlogPosting",
         "metric": "Ser legible — 70/100",
-        "why": "Declara autor, fecha y sección en un formato que una máquina no tiene que adivinar. La frescura es señal de citabilidad: el contenido actualizado hace menos de dos meses recibe cerca de un 28% más de citas.",
+        "why": "Declara autor, fecha y sección en un formato que una máquina no tiene que adivinar. La frescura es señal de citabilidad: el contenido que citan los motores de respuesta es sensiblemente más fresco que el que rankea en Google. Por eso la fecha no es un adorno del pie: es un compromiso de mantención.",
         "code": {
           "@type": "BlogPosting",
           "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#article",
@@ -540,9 +564,70 @@
           },
           "mainEntityOfPage": {
             "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#webpage"
-          }
+          },
+          "about": {
+            "@type": "Place",
+            "name": "Carretera Austral",
+            "sameAs": "https://www.wikidata.org/wiki/Q1043060"
+          },
+          "mentions": [
+            {
+              "@type": "Airport",
+              "name": "Aeropuerto Balmaceda",
+              "iataCode": "BBA",
+              "sameAs": "https://www.wikidata.org/wiki/Q1430889"
+            },
+            {
+              "@type": "City",
+              "name": "Coyhaique",
+              "sameAs": "https://www.wikidata.org/wiki/Q331153"
+            },
+            {
+              "@type": "LandmarksOrHistoricalBuildings",
+              "name": "Capillas de Mármol",
+              "sameAs": "https://www.wikidata.org/wiki/Q5673786"
+            }
+          ]
         },
         "tier": 2
+      },
+      {
+        "id": "node-entities",
+        "coupleId": "h1",
+        "type": "about + mentions → Knowledge Graph",
+        "metric": "Ser encontrada — 40/100",
+        "tier": 1,
+        "stat": "40/100",
+        "statNote": "Ser encontrada — el eje que se gana con entidades, no con palabras clave",
+        "source": "AI Visibility Grader de Efeonce — 5 motores de respuesta, 35 respuestas analizadas",
+        "asOf": "2026-07",
+        "why": "Un motor de respuesta no razona con palabras clave: razona con ENTIDADES. «Balmaceda» es una cadena de texto hasta que se la ancla a un identificador que la máquina ya conoce — y ahí deja de ser ambigua y pasa a ser un aeropuerto, con su código IATA, su ciudad y su país. Este nodo enlaza la Carretera Austral, el aeropuerto de Balmaceda (BBA), Coyhaique y las Capillas de Mármol al Knowledge Graph vía Wikidata. Es lo mismo que hacen los `alt` de las fotos, pero en el lenguaje de la máquina — y hoy el blog de SKY no ancla ninguna.",
+        "code": {
+          "@type": "BlogPosting",
+          "about": {
+            "@type": "Place",
+            "name": "Carretera Austral",
+            "sameAs": "https://www.wikidata.org/wiki/Q1043060"
+          },
+          "mentions": [
+            {
+              "@type": "Airport",
+              "name": "Aeropuerto Balmaceda",
+              "iataCode": "BBA",
+              "sameAs": "https://www.wikidata.org/wiki/Q1430889"
+            },
+            {
+              "@type": "City",
+              "name": "Coyhaique",
+              "sameAs": "https://www.wikidata.org/wiki/Q331153"
+            },
+            {
+              "@type": "LandmarksOrHistoricalBuildings",
+              "name": "Capillas de Mármol",
+              "sameAs": "https://www.wikidata.org/wiki/Q5673786"
+            }
+          ]
+        }
       },
       {
         "id": "node-imageobject",
@@ -626,17 +711,35 @@
             },
             {
               "@type": "Question",
+              "name": "¿Se puede arrendar un auto en el aeropuerto de Balmaceda?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí. Hay empresas de arriendo operando en el mismo terminal, así que puedes empezar a manejar apenas aterrizas."
+              }
+            },
+            {
+              "@type": "Question",
               "name": "¿Necesito reservar los transbordadores?",
               "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "Sí, sobre todo en verano. Los cruces del tramo norte se llenan y son el punto más frágil del itinerario. Si entras por Balmaceda, no los necesitas."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Cuántos días mínimo hay que dedicarle?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Entrando por Balmaceda, con 5 a 7 días haces el tramo sur sin apuro. La ruta completa desde Puerto Montt pide entre 10 y 14 días."
               }
             }
           ]
         },
         "tier": 1,
         "stat": "37/100",
-        "statNote": "Ser correcta"
+        "statNote": "Ser correcta",
+        "source": "AI Visibility Grader de Efeonce — 5 motores de respuesta, 35 respuestas analizadas",
+        "asOf": "2026-07"
       },
       {
         "id": "node-author-gap",
@@ -658,7 +761,9 @@
           "sameAs": [
             "https://www.linkedin.com/in/…"
           ]
-        }
+        },
+        "source": "AI Visibility Grader de Efeonce — 5 motores de respuesta, 35 respuestas analizadas",
+        "asOf": "2026-07"
       }
     ],
     "craft": [
@@ -666,19 +771,23 @@
         "coupleId": "capsule-main",
         "label": "Cápsula de respuesta",
         "detail": "54 palabras",
-        "why": "Respuesta directa en 40–60 palabras bajo el título. Es el patrón presente en el 72,4% de las páginas que ChatGPT cita. Sin ella, el motor tiene que inferir la respuesta del cuerpo del texto — y muchas veces prefiere citar a otro.",
+        "why": "Respuesta directa bajo el título, autocontenida. Lo que la sostiene es el MECANISMO, y ése no necesita ninguna cifra: un motor de respuesta recupera PASAJES, no páginas — si la respuesta vive en un pasaje que se entiende solo, se puede citar; si hay que inferirla del cuerpo del texto, el motor muchas veces prefiere citar a otro. La evidencia primaria más fuerte apunta al mismo lugar por otro camino: sobre 1,4 millones de prompts, Ahrefs midió que lo que más separa a una página citada de una recuperada-y-no-citada es la relevancia semántica del TÍTULO frente a la sub-pregunta (0,656 contra 0,484). Por eso cada H2 de este artículo está escrito como la pregunta que quiere responder.",
         "tier": 1,
         "stat": "72,4%",
-        "statNote": "de las páginas que ChatGPT cita abren con este patrón"
+        "statNote": "de las entradas que ChatGPT cita tienen una cápsula de respuesta identificable. ⚠️ Es un base rate: mide las citadas, no las NO citadas — describe el patrón, no prueba el lift",
+        "source": "Search Engine Land — 15 dominios, ~7.500 referidos de ChatGPT",
+        "asOf": "2026-07"
       },
       {
         "coupleId": "table-entradas",
         "label": "Tabla",
         "detail": "3 filas × 4 columnas",
-        "why": "Las páginas con al menos una tabla y una lista numerada reciben cerca de 2,3× más citas en ChatGPT. Un dato tabulado es un dato que la máquina puede extraer sin ambigüedad.",
+        "why": "Un dato tabulado se extrae sin ambigüedad: la fila ES la respuesta. Un motor no tiene que decidir dónde empieza y dónde termina el dato. La tabla de las tres puertas de entrada responde de una sola vez «¿por dónde entro?», «¿qué me ahorro?» y «¿dónde aterrizo?» — y la lista numerada del itinerario hace lo mismo con la secuencia.",
         "tier": 1,
-        "stat": "2,3×",
-        "statNote": "más citas con al menos una tabla y una lista numerada"
+        "stat": "30%",
+        "statNote": "de las páginas que ChatGPT cita contienen una tabla, contra el 13% de las que rankean en Google. ⚠️ Es una razón de prevalencia entre dos corpus — NO un lift por agregar una tabla, y no incluye listas",
+        "source": "Nectiv — ~8.800 URLs citadas por ChatGPT vs ~25.000 rankeadas en Google, mismas consultas",
+        "asOf": "2026-07"
       },
       {
         "coupleId": "pull-balmaceda",
@@ -704,11 +813,13 @@
       {
         "coupleId": "sources",
         "label": "Fuentes enlazadas",
-        "detail": "3 · verificables",
+        "detail": "5 · verificables",
         "tier": 1,
         "stat": "+30%",
-        "statNote": "de visibilidad al citar fuentes — táctica GEO medida (Princeton/Georgia Tech, KDD 2024)",
-        "why": "Cada dato del artículo se puede rastrear hasta su fuente y el lector puede comprobarlo. Es una de las tres tácticas con lift medido, y es la que un comité puede verificar en el acto: si un enlace no sostiene el dato, se cae toda la pieza."
+        "statNote": "de visibilidad al citar fuentes — táctica GEO medida. ⚠️ Medido en 2024 sobre un motor experimental (GPT-3.5 + resultados de Google), en participación dentro de la respuesta —no en citas—, y con lift que varía por dominio.",
+        "why": "Cada dato del artículo se puede rastrear hasta su fuente y el lector puede comprobarlo. Es una de las tres tácticas con lift medido, y es la que un comité puede verificar en el acto: si un enlace no sostiene el dato, se cae toda la pieza.",
+        "source": "Aggarwal et al., «GEO: Generative Engine Optimization», KDD 2024 (Princeton / Georgia Tech), Tabla 1",
+        "asOf": "2024-08"
       },
       {
         "coupleId": "capsule-como-llegar",
@@ -723,8 +834,10 @@
         "detail": "1.247 km · 56 km · 40 min · 5 h",
         "tier": 1,
         "stat": "+32%",
-        "statNote": "de visibilidad con estadísticas — la segunda táctica GEO de mayor lift",
-        "why": "Un motor de respuesta extrae cifras, no adjetivos. «Queda cerca» no se cita; «56 km, una hora por la ruta CH-245» sí. Cada dato del artículo lleva su unidad, y su fuente está enlazada abajo."
+        "statNote": "de visibilidad al agregar estadísticas — la segunda táctica GEO de mayor lift. ⚠️ Medido en 2024 sobre un motor experimental (GPT-3.5 + resultados de Google), en participación dentro de la respuesta —no en citas—, y con lift que varía por dominio.",
+        "why": "Un motor de respuesta extrae cifras, no adjetivos. «Queda cerca» no se cita; «56 km, una hora por la ruta CH-245» sí. Cada dato del artículo lleva su unidad, y su fuente está enlazada abajo.",
+        "source": "Aggarwal et al., «GEO: Generative Engine Optimization», KDD 2024 (Princeton / Georgia Tech), Tabla 1",
+        "asOf": "2024-08"
       },
       {
         "coupleId": "toc",
@@ -737,28 +850,28 @@
         "coupleId": "capsule-dias",
         "label": "Cápsula de respuesta",
         "detail": "42 palabras · «¿Cuántos días?»",
-        "why": "El mismo patrón, repetido bajo cada H2 — no una vez. Un motor de respuesta recupera PASAJES, no páginas: esta cápsula tiene que responder «¿Cuántos días?» por sí sola, sin el resto del artículo. Es la que más se pregunta después de decidir ir.",
+        "why": "Es la pregunta que sigue a «voy a ir»: la que decide cuántos días de vacaciones pide el pasajero.",
         "tier": 2
       },
       {
         "coupleId": "capsule-epoca",
         "label": "Cápsula de respuesta",
         "detail": "44 palabras · «¿Cuál es la mejor época?»",
-        "why": "El mismo patrón, repetido bajo cada H2 — no una vez. Un motor de respuesta recupera PASAJES, no páginas: esta cápsula tiene que responder «¿Cuál es la mejor época?» por sí sola, sin el resto del artículo. Es estacional: sube en primavera austral.",
+        "why": "Estacional: se dispara en primavera austral, justo cuando se compran los pasajes de verano.",
         "tier": 2
       },
       {
         "coupleId": "capsule-ripio",
         "label": "Cápsula de respuesta",
         "detail": "46 palabras · «¿Está pavimentada? ¿4x4?»",
-        "why": "El mismo patrón, repetido bajo cada H2 — no una vez. Un motor de respuesta recupera PASAJES, no páginas: esta cápsula tiene que responder «¿Está pavimentada? ¿4x4?» por sí sola, sin el resto del artículo. Es la pregunta que decide el arriendo del auto.",
+        "why": "Es la pregunta que decide el arriendo del auto — y la que más se responde mal en ese resultado de búsqueda.",
         "tier": 2
       },
       {
         "coupleId": "capsule-ferries",
         "label": "Cápsula de respuesta",
         "detail": "53 palabras · «¿Hay que reservar los transbordadores?»",
-        "why": "El mismo patrón, repetido bajo cada H2 — no una vez. Un motor de respuesta recupera PASAJES, no páginas: esta cápsula tiene que responder «¿Hay que reservar los transbordadores?» por sí sola, sin el resto del artículo. Es la que nadie responde bien — y el ángulo de SKY.",
+        "why": "Es la que nadie resuelve en ese resultado de búsqueda. Y es el ángulo de SKY: si entra por Balmaceda, no toca ninguno de los dos cruces del norte.",
         "tier": 2
       }
     ]
@@ -792,7 +905,7 @@
         "coupleId": "h2-como-llegar",
         "label": "Quién ocupa hoy ese espacio",
         "value": "Wikipedia · Instagram · TripAdvisor",
-        "note": "Top 12 real: Wikipedia (1), Instagram (2), gochile (3), carretera-austral.cl (4), chile.travel (5), chileestuyo (6), tur.com (7), autofact (8), wikiexplora (9), TripAdvisor (10). Cero aerolíneas.",
+        "note": "Top 12 completo — 1. es.wikipedia.org · 2. instagram.com · 3. gochile.cl · 4. carretera-austral.cl · 5. chile.travel · 6. chileestuyo.cl · 7. tur.com · 8. autofact.cl · 9. wikiexplora.com · 10. tripadvisor.cl · 11. visitchile.com · 12. facebook.com. Cero aerolíneas.",
         "source": "Semrush SERP, base de datos cl",
         "asOf": "2026-07-13",
         "headline": false
@@ -883,8 +996,8 @@
     "paneArticleSubtitle": "Lo que ve el lector",
     "paneMachineTab": "Lo que lee una máquina",
     "paneEvidenceTab": "La evidencia",
-    "hintDesktop": "Pasa el cursor por el artículo y verás qué produce en la capa de máquina.",
-    "hintMobile": "Toca un elemento del artículo para ver qué produce.",
+    "hintDesktop": "Pase el cursor por cualquier elemento del artículo para ver qué produce en la capa de máquina.",
+    "hintMobile": "Toque un elemento del artículo para ver qué produce.",
     "whyLabel": "Para qué sirve",
     "schemaNote": "Este bloque se muestra como texto. No está activo en esta página: emitirlo aquí declararía que Efeonce publicó un artículo de SKY.",
     "sourceLabel": "Fuente",
@@ -898,7 +1011,7 @@
     "readTime": "min de lectura",
     "producesLabelOne": "dato",
     "srProduces": "Produce {n} datos en la capa de máquina.",
-    "closing": "Así se trabaja cada uno de los 8 artículos del mes.",
+    "closing": "Un artículo tapa un hueco. Esta disciplina, repetida mes a mes, es la que cambia quién ocupa el resultado de búsqueda.",
     "flowNext": "Siguiente",
     "flowOf": "de",
     "licenseNote": "Las fotografías son de Shutterstock, licenciadas por Efeonce. La búsqueda, la licencia y el costo de las imágenes están incluidos en el servicio. Ninguna fue generada con IA."
@@ -927,7 +1040,7 @@
   ],
   "gap": {
     "kicker": "El punto de partida",
-    "headline": "«Carretera austral» mueve 18.100 búsquedas al mes. SKY no aparece.",
+    "headline": "18.100 búsquedas al mes en este territorio. En el resultado no hay una sola aerolínea.",
     "serpTitle": "Quién ocupa hoy ese resultado de búsqueda",
     "serpNote": "Top 12 real, medido con Semrush el 13 de julio de 2026.",
     "serp": [
@@ -993,7 +1106,7 @@
       }
     ],
     "punch": "Cero aerolíneas. Y SKY es la que vuela a Balmaceda, el aeropuerto de entrada.",
-    "punchNote": "Wikipedia, Instagram y TripAdvisor describen la ruta, la fotografían y la reseñan. Ninguna resuelve la logística de llegada — que es lo primero que pregunta quien de verdad va a ir. Y ninguna puede: no son la aerolínea.",
+    "punchNote": "Wikipedia, Instagram y TripAdvisor describen la ruta, la fotografían y la reseñan. Ninguna resuelve la logística de llegada —que es lo primero que pregunta quien de verdad va a ir—. Y ninguna puede: no son la aerolínea. ⚠️ Para ser exactos: este artículo no compite por «carretera austral» (ese término es el tamaño del territorio, y su página madre ya lo ocupa). Ataca la intención de llegada, donde SKY es la única respuesta posible — y donde hoy rankea 11º con «aeropuerto balmaceda» (6.600 búsquedas/mes).",
     "aside": "SKY ya tiene una página del tema publicada, y aun así no aparece en las primeras cien posiciones. Este artículo no viene a reescribirla: responde otra pregunta —cómo llegar y cómo recorrerla— y enlaza de vuelta a ella. No compite con la página que ya existe: la apuntala."
   },
   "atomsIntro": "El pasajero no busca en un solo lugar: le pregunta a un chat, mira un video, escanea un feed. Un artículo publicado alcanza uno de esos lugares. El mismo trabajo, repartido, los alcanza todos.",
@@ -1004,9 +1117,9 @@
       "kind": "Video simple",
       "bornFrom": "Del H2 «¿Cómo se llega a la Carretera Austral?»",
       "stat": "16%",
-      "statNote": "de las respuestas con IA citan YouTube; a Reddit lo citan en el 10%. Es la plataforma social más citada — y la superó porque los motores leen la transcripción, no el video",
-      "source": "AI Platform Citation Source Index 2026 — 680 millones de citas, 6 estudios independientes (vía Adweek)",
-      "asOf": "2026-04",
+      "statNote": "de las respuestas con IA citan YouTube; a Reddit lo citan en el 10%. Es la plataforma social más citada. Y lo que un motor lee de un video es su TRANSCRIPCIÓN — por eso el guion y la transcripción SON el entregable, no un extra",
+      "source": "Adweek — dato de Bluefish; agregación de 4 firmas (Bluefish, Emberos, Goodie AI, Profound)",
+      "asOf": "2026-01",
       "why": "El video no es «contenido extra»: es un canal de búsqueda en sí mismo. Un video con título, descripción y transcripción es RECUPERABLE — un motor lo puede citar igual que a una página. Y es donde el pasajero busca «cómo es la Carretera Austral» antes de comprar el pasaje.",
       "honesty": "Así se entrega el video: guion, título, descripción, miniatura y datos estructurados. La producción va en el mes 1 — esta muestra especifica el entregable, no lo simula.",
       "deliverable": [
@@ -1024,7 +1137,7 @@
         },
         {
           "k": "Guion",
-          "v": "1) El mapa: 1.247 km entre Puerto Montt y Villa O'Higgins. 2) El problema: los dos transbordadores del tramo norte. 3) El atajo: Balmaceda, a 56 km de Coyhaique. 4) El auto en el terminal. 5) Cerro Castillo a dos horas."
+          "v": "1) El mapa: 1.247 km entre Puerto Montt y Villa O'Higgins. 2) El problema: los dos transbordadores del tramo norte. 3) El atajo: Balmaceda, a 56 km de Coyhaique. 4) El auto en el terminal. 5) Cerro Castillo, la primera parada."
         },
         {
           "k": "Transcripción",
@@ -1041,7 +1154,9 @@
         "publisher": {
           "@id": "https://www.skyairline.com/#organization"
         },
-        "transcript": "— texto completo de la transcripción —"
+        "transcript": "— texto completo de la transcripción —",
+        "contentUrl": "— URL del archivo de video, al publicarlo —",
+        "embedUrl": "— URL del reproductor incrustado, al publicarlo —"
       }
     },
     {
@@ -1051,7 +1166,7 @@
       "bornFrom": "De la cita destacada — el ángulo propio de SKY",
       "stat": "3×",
       "statNote": "las menciones de marca sin enlace correlacionan con las citas en IA (0,664) casi 3× más que los backlinks (0,218). Es correlación, no causalidad — lo advierten los propios autores",
-      "source": "Ahrefs — correlación entre señales de marca y citas en IA, sobre 75.000 marcas",
+      "source": "Ahrefs — 75.000 marcas; medido sobre AI Overviews de Google",
       "asOf": "2026-07",
       "why": "La distribución social no se hace por alcance: se hace por ENTIDAD. Cada mención de SKY fuera de su sitio le enseña al modelo quién es SKY y de qué habla con autoridad. Es la palanca de off-page que más pesa hoy, y no es un backlink.",
       "honesty": "Efeonce produce y entrega la pieza y el copy. La publicación queda en el equipo de SKY: no administramos sus cuentas.",
