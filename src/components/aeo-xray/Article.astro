@@ -366,7 +366,10 @@ const probeFor = (id: string) => {
   /* Leyendo (pantalla ②): la medida manda, no el ancho del contenedor. */
   .sp-read {
     --a-h1: 2.6rem;
-    width: min(100%, 58rem);
+    --a-body: 1.16rem;
+    --a-lead: 1.32rem;
+    --read-measure: min(78ch, calc(100% - clamp(2.5rem, 7vw, 7rem)));
+    width: min(100%, 76rem);
     max-width: none;
     margin-inline: auto;
     overflow: hidden;
@@ -434,7 +437,7 @@ const probeFor = (id: string) => {
   .fig.hero :global(img) { border-radius: 0; }
   .fig-m { padding: 0.55rem 1.75rem 0; }
   .sp-read .post {
-    padding-bottom: clamp(2rem, 5vw, 3.5rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
   }
   .sp-read .post > .para,
   .sp-read .post > .blk:not(.fig),
@@ -447,6 +450,43 @@ const probeFor = (id: string) => {
   }
   .sp-read .post > .blk:not(.fig) {
     padding-inline: 0;
+  }
+  .sp-read .fig.hero {
+    margin-bottom: clamp(2.1rem, 4vw, 3.25rem);
+  }
+  .sp-read .fig:not(.hero) {
+    margin-block: clamp(2.4rem, 5vw, 3.8rem);
+  }
+  .sp-read .fig-m {
+    padding-top: clamp(0.75rem, 1.6vw, 1rem);
+  }
+  .sp-read .head-blk {
+    padding-top: clamp(1rem, 2.5vw, 1.8rem);
+  }
+  .sp-read .cat {
+    margin-bottom: 0.85rem;
+  }
+  .sp-read .p-h1 {
+    max-width: 33ch;
+  }
+  .sp-read .byline {
+    margin-top: 1.15rem;
+    padding-top: 1.05rem;
+    margin-bottom: clamp(1.7rem, 3.6vw, 2.7rem);
+  }
+  .sp-read .para {
+    margin-block: 1.45rem;
+    line-height: 1.78;
+  }
+  .sp-read .cap-read {
+    margin-block: 1.65rem 2.25rem;
+  }
+  .sp-read .p-h2 {
+    margin-top: clamp(3rem, 6vw, 4.4rem);
+  }
+  .sp-read .toc {
+    margin-block: clamp(2.3rem, 4.8vw, 3.4rem);
+    padding: clamp(1.25rem, 2.5vw, 1.65rem) clamp(1.25rem, 3vw, 1.85rem);
   }
   .sp-read .para,
   .sp-read .cap-read p,
