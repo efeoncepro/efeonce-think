@@ -384,19 +384,27 @@ const titles: Record<string, string> = {
                   {/* La cifra va CON su fuente. La ④ afirmaba tres números sin una sola cita
                       mientras la ① y la ③ citaban todo — en la pieza cuya tesis es el rigor.
                       Sin fuente y sin fecha, una cifra es una opinión con números. */}
-                  <p class="atom-stat">{a.stat} <span>{a.statNote}</span></p>
+                  <span class="atom-section-label">Evidencia</span>
+                  <p class="atom-stat"><strong>{a.stat}</strong> <span>{a.statNote}</span></p>
                   <cite class="atom-cite">{a.source} · {a.asOf}</cite>
-                  <p class="atom-why">{a.why}</p>
                 </div>
 
-                <dl class="atom-d">
-                  {a.deliverable.map(x => (
-                    <>
-                      <dt>{x.k}</dt>
-                      <dd>{x.v}</dd>
-                    </>
-                  ))}
-                </dl>
+                <div class="atom-rationale">
+                  <span class="atom-section-label">Criterio</span>
+                  <p>{a.why}</p>
+                </div>
+
+                <div class="atom-spec">
+                  <span class="atom-section-label">Entregable</span>
+                  <dl class="atom-d">
+                    {a.deliverable.map(x => (
+                      <div class="atom-spec-row">
+                        <dt>{x.k}</dt>
+                        <dd>{x.v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
 
                 {a.code && (
                   <details class="atom-code">
@@ -406,7 +414,10 @@ const titles: Record<string, string> = {
                 )}
 
                 {/* Lo que la muestra NO puede fingir. Decirlo suma; simularlo la destruye. */}
-                <p class="atom-hon">⚠️ {a.honesty}</p>
+                <div class="atom-hon" role="note">
+                  <span>Nota de honestidad</span>
+                  <p>{a.honesty}</p>
+                </div>
               </article>
             ))}
           </div>
@@ -996,25 +1007,35 @@ const titles: Record<string, string> = {
   }
   /* La LÍNEA DE SANGRE: de qué bloque del artículo nació. No son entregables sueltos. */
   .atom-from { font-size: var(--t-meta); color: var(--blue-up); }
-  .atom-artifact {
-    margin-top: 1rem; min-width: 0;
-  }
+  .atom-artifact { margin-top: 1rem; min-width: 0; }
   .atom-proof {
-    margin-top: 1rem; padding-top: 1rem; border-top: 1px solid color-mix(in srgb, var(--line-d) 72%, transparent);
+    margin-top: 1rem; padding: 0.85rem 0.9rem; border-radius: 12px;
+    background: color-mix(in srgb, var(--blue-up) 7%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--blue-up) 20%, var(--navy-3));
+    display: grid; gap: 0.55rem;
+  }
+  .atom-section-label {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue-up);
   }
   .atom-stat {
-    font-family: Poppins, system-ui, sans-serif; font-size: 1.9rem; font-weight: var(--w-display);
-    line-height: 1.05; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: 0;
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.7rem;
+    align-items: start; margin: 0; color: var(--ink-d);
+  }
+  .atom-stat strong {
+    font-family: Poppins, system-ui, sans-serif; font-size: 2.05rem; font-weight: var(--w-display);
+    line-height: 0.95; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: 0;
   }
   .atom-stat span {
-    display: block; font-family: inherit; font-size: var(--t-meta); font-weight: var(--w-body-dark);
-    line-height: 1.45; color: var(--dim-d); letter-spacing: 0; margin-top: 0.3rem;
+    display: block; font-size: var(--t-meta); font-weight: var(--w-body-dark);
+    line-height: 1.45; color: var(--ink-d); letter-spacing: 0;
   }
   /* La fuente de la cifra. Sobre navy el texto sube un paso (--w-body-dark): el mismo peso
      sobre oscuro se rasteriza más fino. Misma voz, distinto sustrato. */
   .atom-cite {
-    display: block; margin-top: 0.5rem; font-size: 0.75rem; line-height: 1.45;
-    color: var(--dim-d); font-style: normal; font-weight: var(--w-body-dark);
+    display: block; padding-top: 0.55rem; border-top: 1px solid color-mix(in srgb, var(--line-d) 58%, transparent);
+    font-size: 0.75rem; line-height: 1.45; color: var(--dim-d);
+    font-style: normal; font-weight: var(--w-body-dark);
   }
   /* Las cuatro fotos reales, con su alt. El argumento de las imágenes deja de estar solo AFIRMADO. */
   .atom-imgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; list-style: none; }
@@ -1030,7 +1051,13 @@ const titles: Record<string, string> = {
     background: var(--navy-3); color: var(--blue-up); font-family: ui-monospace, monospace;
   }
 
-  .atom-why { margin-top: 0.9rem; font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d); }
+  .atom-rationale {
+    margin-top: 0.85rem; padding-left: 0.85rem;
+    border-left: 2px solid color-mix(in srgb, var(--blue-up) 42%, var(--navy-3));
+  }
+  .atom-rationale p {
+    margin-top: 0.35rem; font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d);
+  }
 
   /* La pieza social, renderizada. Es un mockup del entregable.
      `position: relative` NO es cosmético: `.pc-brand` es absolute, y sin este ancla se
@@ -1128,12 +1155,23 @@ const titles: Record<string, string> = {
     .reel-phone { max-width: min(14rem, 82vw); }
   }
 
-  .atom-d { margin-top: 1rem; display: grid; grid-template-columns: 1fr; gap: 0.15rem; }
-  .atom-d dt {
-    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--blue-up); margin-top: 0.6rem;
+  .atom-spec { margin-top: 0.95rem; }
+  .atom-d {
+    margin-top: 0.45rem; display: grid; grid-template-columns: 1fr; gap: 0;
+    border: 1px solid color-mix(in srgb, var(--line-d) 72%, transparent);
+    border-radius: 10px; overflow: hidden;
   }
-  .atom-d dd { font-size: var(--t-meta); line-height: 1.55; color: var(--ink-d); }
+  .atom-spec-row {
+    display: grid; grid-template-columns: minmax(6.25rem, 0.34fr) minmax(0, 1fr);
+    gap: 0.75rem; padding: 0.62rem 0.75rem;
+    background: color-mix(in srgb, var(--navy-sunk) 34%, transparent);
+  }
+  .atom-spec-row + .atom-spec-row { border-top: 1px solid color-mix(in srgb, var(--line-d) 62%, transparent); }
+  .atom-d dt {
+    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--blue-up); margin: 0.05rem 0 0;
+  }
+  .atom-d dd { font-size: var(--t-meta); line-height: 1.55; color: var(--ink-d); min-width: 0; }
 
   .atom-code { margin-top: 1rem; }
   .atom-code summary {
@@ -1147,9 +1185,21 @@ const titles: Record<string, string> = {
     overflow-x: auto; max-height: 16rem;
   }
   .atom-hon {
-    margin-top: 1rem; padding: 0.7rem 0.8rem; font-size: var(--t-meta); line-height: 1.55;
-    color: var(--amber); background: color-mix(in srgb, var(--amber) 8%, var(--navy-2));
-    border: 1px solid color-mix(in srgb, var(--amber) 25%, var(--navy-2)); border-radius: 8px;
+    margin-top: 0.9rem; padding: 0.7rem 0.8rem; border-radius: 9px;
+    background: color-mix(in srgb, var(--amber) 5%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--amber) 18%, var(--navy-3));
+  }
+  .atom-hon span {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber);
+  }
+  .atom-hon p {
+    margin-top: 0.32rem; font-size: var(--t-meta); line-height: 1.55;
+    color: var(--ink-d); font-weight: var(--w-body-dark);
+  }
+  @media (max-width: 560px) {
+    .atom-stat { grid-template-columns: 1fr; gap: 0.3rem; }
+    .atom-spec-row { grid-template-columns: 1fr; gap: 0.2rem; }
   }
   /* EL CIERRE de la ④ — el recorrido moría acá sin darle al comité nada que HACER. */
   .at-end { margin-top: 2.5rem; }
