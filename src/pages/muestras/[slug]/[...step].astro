@@ -497,10 +497,11 @@ const titles: Record<string, string> = {
 
       {next && step && (
         <div class="xr-next">
-          <a href={href(next.step)}>
+          <a href={href(next.step)} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
             <span>
-              <span class="xr-next-l">{ui.flowNext}: paso {i + 2} {ui.flowOf} {flow.length}</span>
-              <span class="xr-next-t">{cur.next}</span>
+              <span class="xr-next-l"><span class="xr-next-l-prefix">{ui.flowNext}: </span>paso {i + 2} {ui.flowOf} {flow.length}</span>
+              <span class="xr-next-t xr-next-t-full">{cur.next}</span>
+              <span class="xr-next-t xr-next-t-short">{next.label}</span>
             </span>
             <span class="xr-next-arrow" aria-hidden="true">→</span>
           </a>
@@ -995,7 +996,8 @@ const titles: Record<string, string> = {
   }
   .xr[data-step='articulo'] .xr-next {
     position: fixed;
-    right: max(1rem, calc((100vw - 64rem) / 2));
+    left: 0.75rem;
+    right: 0.75rem;
     bottom: max(1rem, env(safe-area-inset-bottom));
     z-index: 30;
     width: auto;
@@ -1005,7 +1007,9 @@ const titles: Record<string, string> = {
   }
   .xr[data-step='articulo'] .xr-next a {
     pointer-events: auto;
-    max-width: min(30rem, calc(100vw - 2rem));
+    width: min(100%, 30rem);
+    max-width: none;
+    margin-inline: auto;
     min-height: 4.35rem;
     padding: 0.85rem 1rem 0.85rem 1.15rem;
     border-radius: 10px;
@@ -1025,6 +1029,9 @@ const titles: Record<string, string> = {
     line-height: 1.18;
     text-wrap: balance;
   }
+  .xr-next-t-short {
+    display: none;
+  }
   .xr[data-step='articulo'] .xr-next-arrow {
     width: 2rem;
     height: 2rem;
@@ -1035,6 +1042,53 @@ const titles: Record<string, string> = {
   }
   .xr[data-step='articulo'] .xr-foot {
     padding-bottom: clamp(5.5rem, 9vw, 7rem);
+  }
+  @media (min-width: 1280px) {
+    .xr[data-step='articulo'] .xr-next {
+      left: calc(50% + 32rem + 1rem);
+      right: auto;
+      bottom: clamp(1rem, 2vw, 1.5rem);
+      width: min(12rem, calc(50vw - 32rem - 2rem));
+    }
+    .xr[data-step='articulo'] .xr-next a {
+      width: 100%;
+      min-height: 4rem;
+      margin-inline: 0;
+      padding: 0.72rem 0.65rem 0.72rem 0.8rem;
+      gap: 0.55rem;
+    }
+    .xr[data-step='articulo'] .xr-next-l {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+    }
+    .xr[data-step='articulo'] .xr-next-l-prefix {
+      display: none;
+    }
+    .xr[data-step='articulo'] .xr-next-t-full {
+      display: none;
+    }
+    .xr[data-step='articulo'] .xr-next-t-short {
+      display: block;
+      font-size: 1rem;
+      line-height: 1.08;
+    }
+    .xr[data-step='articulo'] .xr-next-arrow {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+  @media (min-width: 1280px) and (max-width: 1439px) {
+    .xr[data-step='articulo'] .xr-next a {
+      justify-content: center;
+      gap: 0.45rem;
+    }
+    .xr[data-step='articulo'] .xr-next-l {
+      text-align: center;
+      line-height: 1.2;
+    }
+    .xr[data-step='articulo'] .xr-next-t-short {
+      display: none;
+    }
   }
   @media (max-width: 720px) {
     .xr[data-step='articulo'] main.xr-wrap {
@@ -1050,8 +1104,8 @@ const titles: Record<string, string> = {
       width: 100%;
       max-width: none;
       justify-content: space-between;
-      min-height: 4rem;
-      padding: 0.75rem 0.85rem 0.75rem 0.95rem;
+      min-height: 3.45rem;
+      padding: 0.55rem 0.7rem 0.55rem 0.85rem;
       border-radius: 10px;
     }
     .xr[data-step='articulo'] .xr-next-l {
@@ -1059,12 +1113,12 @@ const titles: Record<string, string> = {
       letter-spacing: 0.11em;
     }
     .xr[data-step='articulo'] .xr-next-t {
-      font-size: 0.98rem;
+      font-size: 0.9rem;
       line-height: 1.18;
     }
     .xr[data-step='articulo'] .xr-next-arrow {
-      width: 1.75rem;
-      height: 1.75rem;
+      width: 1.55rem;
+      height: 1.55rem;
     }
   }
   @media (prefers-reduced-motion: reduce) {
