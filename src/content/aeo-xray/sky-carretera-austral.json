@@ -19,7 +19,7 @@
     "preparedAt": "2026-07-13",
     "preparedBy": "Efeonce"
   },
-  "thesis": "«carretera austral» mueve 18.100 búsquedas/mes en Chile y SKY no aparece entre las primeras cien posiciones. La pieza de la izquierda cubre ese hueco: llegada, días, época, ripio y transbordadores, con Balmaceda como ángulo propio de la aerolínea.",
+  "thesis": "«carretera austral» mueve 18.100 búsquedas/mes en Chile y SKY no aparece entre las primeras cien posiciones. La pieza de la izquierda cubre esa brecha: llegada, días, época, ripio y transbordadores, con Balmaceda como ángulo propio de la aerolínea.",
   "article": {
     "proposedUrl": "https://blog.skyairline.com/carretera-austral-como-llegar/",
     "category": "Datos útiles para viajeros",
@@ -953,7 +953,7 @@
     ]
   },
   "evidence": {
-    "intro": "Este artículo no se eligió por intuición. Se eligió porque el dato dijo dónde estaba el hueco.",
+    "intro": "Este artículo no se eligió por intuición. Se eligió porque el dato dijo dónde estaba la brecha.",
     "facts": [
       {
         "coupleId": "h1",
@@ -1099,7 +1099,7 @@
     "verifyTitle": "No hace falta que nos crea. Compruébelo usted.",
     "verifySteps": [
       {
-        "what": "El hueco",
+        "what": "La brecha",
         "how": "Escriba «carretera austral» en Google. Cuente las aerolíneas."
       },
       {
@@ -1116,8 +1116,8 @@
   "flow": [
     {
       "step": "",
-      "label": "El hueco",
-      "next": "Esta es la pieza que lo tapa"
+      "label": "La brecha",
+      "next": "Esta es la pieza que la cierra"
     },
     {
       "step": "articulo",
@@ -1136,7 +1136,7 @@
     }
   ],
   "gap": {
-    "kicker": "El hueco de búsqueda",
+    "kicker": "La brecha de búsqueda",
     "headline": "Hay demanda. No hay aerolíneas.",
     "lead": "18.100 búsquedas mensuales por «carretera austral». El Top 12 está ocupado por enciclopedias, redes y portales de turismo; ninguna aerolínea ocupa la intención de llegada.",
     "serpTitle": "Top 12 de Google",

@@ -19,7 +19,7 @@ import '@styles/aeo-xray.css'
  * el artículo «se veía plano»: nunca tuvo espacio para ser LEÍDO, porque un panel le comía el
  * 46% de la pantalla. Le pusimos tipografía editorial a un contenedor que no lo era.
  *
- *   ① El hueco       — el SERP real. Wikipedia, Instagram, TripAdvisor. Y SKY no está.
+ *   ① La brecha      — el SERP real. Wikipedia, Instagram, TripAdvisor. Y SKY no está.
  *   ② El artículo    — a ancho completo, sin nada al lado. Acá por fin respira.
  *   ③ La radiografía — el split con el acoplamiento. Funciona 10× mejor porque el evaluador
  *                      YA leyó el artículo: la revelación aterriza en vez de competir.
@@ -126,7 +126,7 @@ const asText = (code: unknown) =>
   JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
 
 const titles: Record<string, string> = {
-  '': `${meta.instrument} — el hueco`,
+  '': `${meta.instrument} — la brecha`,
   articulo: `${meta.instrument} — el artículo`,
   radiografia: `${meta.instrument} — la radiografía`,
   atomizacion: `${meta.instrument} — dónde más vive`,
@@ -482,7 +482,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
               exactamente donde estaba — y el competidor de fondo es la indecisión.
 
               El cierre hace dos cosas que la pieza prometía y no entregaba:
-              1. Cierra el arco contra la ① (el hueco → la disciplina que lo tapa).
+              1. Cierra el arco contra la ① (la brecha → la disciplina que la cierra).
               2. Le da al evaluador la HERRAMIENTA para verificarlo con sus propias manos. La
                  arquitectura dice, textual, que esto es «una prueba que el comité puede verificar
                  por su cuenta» — y en ninguna pantalla se le decía CÓMO. Convertir un claim en una

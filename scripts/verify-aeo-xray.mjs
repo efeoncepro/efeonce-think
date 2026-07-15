@@ -113,7 +113,7 @@ const paginasAutoref = STEPS.filter(st => autoreferencia.test(pages[st || 'index
 check(
   '34b. El copy visible NUNCA cita nuestra propia oferta (la muestra se defiende sola)',
   paginasAutoref.length === 0,
-  `pantallas que hablan de nuestro PDF: ${paginasAutoref.map(s => s || '(el hueco)').join(', ')}`,
+  `pantallas que hablan de nuestro PDF: ${paginasAutoref.map(s => s || '(la brecha)').join(', ')}`,
 )
 
 /* 42b. CADA CIFRA DE LA ④, CON SU FUENTE.
