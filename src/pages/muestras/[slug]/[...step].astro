@@ -3,7 +3,6 @@ import { Image } from 'astro:assets'
 import { getCollection } from 'astro:content'
 import { FileText, Images, MessagesSquare, Play } from '@lucide/astro'
 import BaseLayout from '@layouts/BaseLayout.astro'
-import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import Article from '@/components/aeo-xray/Article.astro'
 import Instrument from '@/components/aeo-xray/Instrument.astro'
 // Los pesos de display de la pieza. SIN estos imports la ruta solo hereda los del slogan
@@ -132,6 +131,10 @@ const titles: Record<string, string> = {
   radiografia: `${meta.instrument} — la radiografía`,
   atomizacion: `${meta.instrument} — dónde más vive`,
 }
+
+const EFEONCE_SEO_URL = 'https://efeoncepro.com/servicios/posicionamiento-seo/'
+const EFEONCE_PRIVACY_URL = 'https://efeoncepro.com/politica-de-privacidad/'
+const COPYRIGHT_YEAR = new Date().getFullYear()
 ---
 
 <BaseLayout
@@ -148,7 +151,7 @@ const titles: Record<string, string> = {
         {/* LOCKUP, no isotipo. El isotipo solo comunica a quien YA conoce la marca —
             y el comité que abre esto no la conoce. El logotipo dice QUIÉN; el nombre de
             la herramienta, QUÉ. El separador impide que se lean como una sola cosa. */}
-        <a class="xr-brand" href={base}>
+        <a class="xr-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
           <img
             class="xr-logo"
             src="/branding/efeonce-logo-negative.svg"
@@ -522,8 +525,27 @@ const titles: Record<string, string> = {
         </div>
       )}
 
-      <footer class="xr-foot">
-        <EfeonceSlogan />
+      <footer class="xr-foot" aria-label="Información legal de Efeonce">
+        <div class="xr-foot-card">
+          <a class="xr-foot-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
+            <img
+              src="/branding/efeonce-logo.svg"
+              alt="Efeonce"
+              width="112"
+              height="26"
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+          <div class="xr-foot-copy">
+            <p>© {COPYRIGHT_YEAR} Efeonce Group SpA. Radiografía AEO es una herramienta propietaria de Efeonce.</p>
+            <p>Todos los derechos reservados. Efeonce se reserva los derechos de uso, reproducción, distribución, adaptación y explotación sin autorización expresa.</p>
+          </div>
+          <nav class="xr-foot-nav" aria-label="Enlaces legales de Efeonce">
+            <a href={EFEONCE_PRIVACY_URL}>Política de privacidad</a>
+            <a href={EFEONCE_SEO_URL}>Servicios SEO/AEO</a>
+          </nav>
+        </div>
       </footer>
     </main>
   </div>
@@ -1723,5 +1745,73 @@ const titles: Record<string, string> = {
     font-size: 1.125rem; font-weight: var(--w-body); color: var(--ink);
   }
 
-  .xr-foot { padding-block: 1.5rem 3rem; border-top: 1px solid var(--line); }
+  .xr-foot {
+    margin-top: clamp(2rem, 4vw, 3.5rem);
+    padding-block: clamp(1.25rem, 3vw, 2rem) clamp(2.5rem, 5vw, 4rem);
+    border-top: 1px solid var(--line);
+  }
+  .xr-foot-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 1rem 1.35rem;
+    align-items: center;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--ax-primary-100) 28%, white), #fff 58%),
+      #fff;
+    box-shadow: 0 18px 48px color-mix(in srgb, var(--navy) 6%, transparent);
+  }
+  .xr-foot-brand {
+    display: inline-flex;
+    align-items: center;
+    width: max-content;
+  }
+  .xr-foot-brand img {
+    display: block;
+    height: 26px;
+    width: auto;
+  }
+  .xr-foot-brand:focus-visible,
+  .xr-foot-nav a:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  .xr-foot-copy {
+    min-width: 0;
+    color: var(--muted);
+    font-size: var(--t-meta);
+    line-height: 1.55;
+  }
+  .xr-foot-copy p + p {
+    margin-top: 0.18rem;
+  }
+  .xr-foot-nav {
+    display: flex;
+    gap: 0.45rem 0.9rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    font-size: var(--t-meta);
+    font-weight: var(--w-label);
+    line-height: 1.35;
+  }
+  .xr-foot-nav a {
+    color: var(--ax-primary-700);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+  .xr-foot-nav a:hover {
+    color: var(--ax-primary-800);
+  }
+  @media (max-width: 760px) {
+    .xr-foot-card {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+    .xr-foot-nav {
+      justify-content: flex-start;
+    }
+  }
 </style>
