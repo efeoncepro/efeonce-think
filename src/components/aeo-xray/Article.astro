@@ -224,7 +224,12 @@ const probeFor = (id: string) => {
         )
       if (b.type === 'toc')
         return (
-          <nav class="toc" aria-labelledby="toc-t">
+          <nav class="toc blk" id="toc" aria-labelledby="toc-t" {...a}>
+            {probe && (
+              <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
+                {probe}
+              </button>
+            )}
             <p class="toc-t" id="toc-t">{b.title}</p>
             <ol>
               {tocItems.map(h => (

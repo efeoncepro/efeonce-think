@@ -293,8 +293,7 @@ const titles: Record<string, string> = {
           <header class="r-head">
             <p class="g-kick">{ui.thesisLabel}</p>
             <h1 class="r-h1">
-              El schema solo puede marcar contenido <em>visible</em>. Por eso cada dato de la derecha
-              corresponde a algo que está en la izquierda.
+              El schema solo marca contenido <em>visible</em>. La máquina lee lo que el artículo dice.
             </h1>
             <p class="r-thesis">{thesis}</p>
           </header>
@@ -1034,17 +1033,22 @@ const titles: Record<string, string> = {
   /* ══════════ ③ LA RADIOGRAFÍA ══════════ */
   /* EL MARCO DE LA ③. La pantalla que carga toda la revelación no puede abrir con una instrucción:
      abre con el ARGUMENTO. Y si alguien entra por deep-link desde el deck, acá se defiende sola. */
-  .r-head { max-width: 74ch; margin: 0 0 1.5rem; }
+  .r-head {
+    max-width: 74ch;
+    margin: 0 0 clamp(0.9rem, 1.6vw, 1.25rem);
+    padding-top: clamp(1.35rem, 3vw, 2.4rem);
+  }
   .r-h1 {
     font-family: Poppins, system-ui, sans-serif; font-size: var(--t-sect); font-weight: var(--w-display);
-    line-height: 1.2; letter-spacing: 0; color: var(--ink); margin-top: 0.3rem; text-wrap: balance;
+    line-height: 1.16; letter-spacing: 0; color: var(--ink); margin-top: 0.3rem; max-width: 32ch; text-wrap: balance;
   }
   .r-h1 em { font-style: italic; color: var(--blue); }
-  .r-thesis { margin-top: 0.7rem; font-size: var(--t-body); line-height: 1.65; color: var(--ink-3); }
+  .r-thesis { margin-top: 0.65rem; font-size: var(--t-body); line-height: 1.58; color: var(--ink-3); max-width: 64ch; }
 
-  .r-hint { padding-top: 1.25rem; font-size: var(--t-meta); color: var(--muted); }
+  .r-hint { padding-top: 0.45rem; font-size: var(--t-meta); color: var(--muted); }
   .hint-d { display: none; }
   @media (hover: hover) and (pointer: fine) { .hint-d { display: block; } .hint-m { display: none; } }
+  @media (max-width: 720px) { .hint-d { display: none; } .hint-m { display: block; } }
       /* EN MÓVIL, LA ③ ES UNA LECTURA INTERROGABLE.
      Poner el instrumento primero convertía la radiografía en una capa de máquina antes de que el
      evaluador viera qué iba a tocar. El trabajo educativo de la pantalla no es enseñar teoría AEO:
@@ -1052,16 +1056,51 @@ const titles: Record<string, string> = {
 
      Con JS, el instrumento espera cerrado y sube como hoja inferior al acoplar. Sin JS, queda después
      del artículo como contenido estático: la pieza no promete interacción, pero sigue siendo legible. */
-  .split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-width: 0; padding-top: 0.75rem; }
+  .split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-width: 0; padding-top: 0.65rem; }
   @media (max-width: 1079px) {
     .xr[data-js='on'] .split > :global(.inst) { display: none; }
     .xr[data-js='on'][data-sheet='open'] .split > :global(.inst) { display: block; }
   }
   @media (min-width: 1080px) {
+    .r-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(20rem, 0.78fr);
+      column-gap: clamp(2rem, 4vw, 4.5rem);
+      align-items: end;
+      max-width: min(100%, 88rem);
+    }
+    .r-head .g-kick,
+    .r-h1 {
+      grid-column: 1;
+    }
+    .r-thesis {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: end;
+      margin-top: 0;
+      padding-bottom: 0.1rem;
+      font-size: 1rem;
+      line-height: 1.62;
+    }
     .split { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; }
     .split :global(.inst) {
       position: sticky; top: 6rem; max-height: calc(100vh - 7.2rem); overflow-y: auto;
       view-transition-name: xr-inst; /* el instrumento LLEGA desde la derecha, no aparece */
+    }
+  }
+
+  @media (max-width: 720px) {
+    .r-head {
+      padding-top: clamp(1rem, 5vw, 1.5rem);
+      margin-bottom: 0.9rem;
+    }
+    .r-h1 {
+      font-size: clamp(1.58rem, 6.2vw, 1.9rem);
+      line-height: 1.12;
+    }
+    .r-thesis {
+      font-size: 1rem;
+      line-height: 1.54;
     }
   }
 

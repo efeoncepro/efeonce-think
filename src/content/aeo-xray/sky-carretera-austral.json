@@ -19,7 +19,7 @@
     "preparedAt": "2026-07-13",
     "preparedBy": "Efeonce"
   },
-  "thesis": "«carretera austral» mueve 18.100 búsquedas al mes en Chile. SKY tiene una página del tema y no aparece en las primeras cien posiciones: el espacio lo ocupan Wikipedia, Instagram y TripAdvisor. Y SKY es la aerolínea que vuela a Balmaceda, el aeropuerto de entrada. Nadie en ese resultado de búsqueda puede resolver la logística de llegada. Este artículo es esa pieza.",
+  "thesis": "«carretera austral» mueve 18.100 búsquedas/mes en Chile y SKY no aparece entre las primeras cien posiciones. La pieza de la izquierda cubre ese hueco: llegada, días, época, ripio y transbordadores, con Balmaceda como ángulo propio de la aerolínea.",
   "article": {
     "proposedUrl": "https://blog.skyairline.com/carretera-austral-como-llegar/",
     "category": "Datos útiles para viajeros",
@@ -597,6 +597,77 @@
         "tier": 2
       },
       {
+        "id": "node-section-list",
+        "coupleId": "toc",
+        "type": "ItemList (secciones)",
+        "metric": "Ser legible — 70/100",
+        "why": "El índice es contenido visible; por eso se puede serializar como lista de secciones sin inventar nada. Le muestra a la máquina la cobertura del artículo como mapa explícito de sub-preguntas y anclas, no como párrafos dispersos. ⚠️ No promete sitelinks ni rich result: reduce ambigüedad y hace verificable que cada sección existe en la página.",
+        "code": {
+          "@type": "ItemList",
+          "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#toc",
+          "name": "Lo que vas a encontrar acá",
+          "itemListOrder": "https://schema.org/ItemListOrderAscending",
+          "numberOfItems": 6,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "WebPageElement",
+                "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#como-llegar",
+                "name": "Cómo llegar: las tres puertas de entrada"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "WebPageElement",
+                "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#cuantos-dias",
+                "name": "Cuántos días necesitas (y de qué están hechos)"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "WebPageElement",
+                "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#mejor-epoca",
+                "name": "La mejor época para ir"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "WebPageElement",
+                "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#ripio-4x4",
+                "name": "¿Está pavimentada? ¿Necesitas 4x4?"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "item": {
+                "@type": "WebPageElement",
+                "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#transbordadores",
+                "name": "Los transbordadores: lo único que no controlas"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 6,
+              "item": {
+                "@type": "WebPageElement",
+                "@id": "https://blog.skyairline.com/carretera-austral-como-llegar/#preguntas-frecuentes",
+                "name": "Preguntas frecuentes"
+              }
+            }
+          ]
+        },
+        "tier": 2
+      },
+      {
         "id": "node-entities",
         "coupleId": "h1",
         "type": "about + mentions → Knowledge Graph",
@@ -940,6 +1011,11 @@
       "title": "El espacio de sub-preguntas (query fan-out)",
       "note": "Un motor de respuesta descompone una consulta en 8–12 sub-preguntas y recupera pasajes para cada una. Escribir solo para el término principal te deja fuera de casi todas. Estas son las que este artículo cubre, y con qué sección.",
       "items": [
+        {
+          "q": "¿Qué sub-preguntas cubre el artículo completo?",
+          "coveredBy": "toc",
+          "covered": true
+        },
         {
           "q": "¿Cómo llego a la Carretera Austral?",
           "coveredBy": "h2-como-llegar",
