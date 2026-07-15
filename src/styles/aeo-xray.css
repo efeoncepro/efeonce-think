@@ -302,10 +302,12 @@
   display: flex;
   gap: 0.25rem;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x proximity;
   scrollbar-width: none;
   padding-block: 0.35rem;
-  scroll-padding-inline: 1rem;
-  mask-image: linear-gradient(to right, black calc(100% - 2.5rem), transparent);
+  scroll-padding-inline: 1.25rem;
+  mask-image: linear-gradient(to right, transparent, black 1.25rem, black calc(100% - 2.5rem), transparent);
 }
 @media (min-width: 720px) {
   /* En pantallas donde caben los cuatro pasos, la máscara sobra. */
@@ -320,6 +322,7 @@
   display: flex;
   gap: 0.45rem;
   align-items: center;
+  scroll-snap-align: center;
   padding: 0.4rem 0.75rem;
   border-radius: 8px;
   font-size: var(--t-meta);
@@ -630,12 +633,15 @@ figure[data-couple][data-on] {
     position: fixed;
     inset: auto 0 0 0;
     z-index: 40;
-    max-height: 72vh;
+    max-height: min(76vh, calc(100dvh - 4.5rem));
     overflow-y: auto;
     border-radius: 16px 16px 0 0;
     border-bottom: 0;
     box-shadow: 0 -14px 40px rgb(0 0 0 / 0.4);
     animation: xr-sheet-up 220ms var(--ease);
+  }
+  .xr[data-sheet='open'] [data-couple-target][data-on]::before {
+    display: none;
   }
   .xr[data-sheet='open'] .inst .in-head {
     border-radius: 16px 16px 0 0;

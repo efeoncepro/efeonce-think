@@ -209,12 +209,21 @@ const asText = (code: unknown) =>
      así el foco sobrevive al clic. Mínimo 24×24 (WCAG 2.2 · 2.5.8). */
   .in-all {
     padding: 0.45rem 0.7rem; min-height: 24px; border-radius: 999px; cursor: pointer;
-    border: 1px solid var(--line-d); background: transparent; color: var(--dim-d);
+    border: 1px solid var(--line-d); background: color-mix(in srgb, #fff 4%, transparent); color: var(--dim-d);
     font: inherit; font-size: var(--t-over); font-weight: var(--w-label);
+  }
+  .in-all:not(:disabled) {
+    color: var(--blue-up);
+    border-color: color-mix(in srgb, var(--blue-up) 58%, var(--line-d));
+    background: color-mix(in srgb, var(--blue-up) 7%, transparent);
   }
   .in-all:hover:not(:disabled) { color: #fff; border-color: var(--blue-up); }
   .in-all:focus-visible { outline: 2px solid var(--blue-up); outline-offset: 2px; }
-  .in-all:disabled { opacity: 0.35; cursor: default; }
+  .in-all:disabled {
+    opacity: 1;
+    cursor: default;
+    color: color-mix(in srgb, var(--dim-d) 74%, var(--ink-d));
+  }
 
   /* Si la pila enfocada desborda (el H1 produce ONCE datos y en pantalla caben cuatro), se avisa.
      Un degradado al pie dice «hay más abajo» sin robarle una línea al panel. */
@@ -351,6 +360,23 @@ const asText = (code: unknown) =>
   /* Solo móvil: la hoja inferior. Ver el CSS global del acoplamiento. */
   .sheet-x { display: none; }
   @media (max-width: 1079px) {
+    .in-head {
+      align-items: flex-start;
+      gap: 0.5rem 0.7rem;
+    }
+    .in-head h2 {
+      flex: 1 1 12rem;
+      line-height: 1.25;
+    }
+    .in-focus {
+      order: 3;
+      flex-basis: 100%;
+      margin-left: 0;
+      line-height: 1.35;
+    }
+    .in-all {
+      order: 2;
+    }
     .sheet-x {
       display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 999px;
       border: 1px solid var(--line-d); background: var(--navy-3); color: var(--ink-d);
