@@ -405,14 +405,28 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
                     </figure>
                   )}
 
-                  {/* La pieza social se RENDERIZA. Es un mockup del entregable, como todo el resto. */}
+                  {/* La pieza social se RENDERIZA. Si el payload trae arte final, se muestra el arte. */}
                   {a.post && (
-                    <div class="post-card">
-                      <p class="pc-hook">{a.post.hook}</p>
-                      <p class="pc-body">{a.post.body}</p>
-                      <p class="pc-cta">{a.post.cta}</p>
-                      <span class="pc-brand">{client.name}</span>
-                    </div>
+                    a.post.image ? (
+                      <figure class="post-artifact">
+                        <Image
+                          src={a.post.image}
+                          alt={a.post.alt || `${a.kind} de ${client.name}`}
+                          widths={[360, 540, 720, 1080]}
+                          sizes="(min-width: 980px) 34rem, 100vw"
+                          format="avif"
+                          quality={76}
+                          loading="lazy"
+                        />
+                      </figure>
+                    ) : (
+                      <div class="post-card">
+                        <p class="pc-hook">{a.post.hook}</p>
+                        <p class="pc-body">{a.post.body}</p>
+                        <p class="pc-cta">{a.post.cta}</p>
+                        <span class="pc-brand">{client.name}</span>
+                      </div>
+                    )
                   )}
 
                   {/* 🔴 ASIMETRÍA DE PRUEBA: el átomo de video ESPECIFICA el entregable y el social lo
@@ -1585,6 +1599,20 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
   .pc-brand {
     position: absolute; right: 1.9rem; bottom: 1.9rem; font-family: Poppins, system-ui, sans-serif;
     font-weight: var(--w-display); font-size: 0.8125rem; letter-spacing: 0.06em; opacity: 0.75;
+  }
+  .post-artifact {
+    margin: 0 auto;
+    width: min(100%, 34rem);
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: #fff;
+    box-shadow: 0 24px 70px color-mix(in srgb, var(--navy) 15%, transparent);
+  }
+  .post-artifact :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
   }
   .video-artifact {
     margin: 0; display: grid; gap: 0.7rem;

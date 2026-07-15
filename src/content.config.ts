@@ -450,7 +450,19 @@ const aeoXray = defineCollection({
              del payload — el motor no puede saber cuál es «el de imágenes» sin conocer al cliente. */
           showsImages: z.boolean().optional(),
           code: z.record(z.string(), z.unknown()).optional(),
-          post: z.object({ hook: z.string(), body: z.string(), cta: z.string() }).optional(),
+          post: z
+            .object({
+              hook: z.string(),
+              body: z.string(),
+              cta: z.string(),
+              image: image().optional(),
+              alt: z.string().min(10).optional(),
+            })
+            .refine((post) => !post.image || post.alt, {
+              path: ['alt'],
+              message: 'Si el post trae imagen, tambien trae alt: el arte social es contenido.',
+            })
+            .optional(),
         }),
       )
       .min(2),
