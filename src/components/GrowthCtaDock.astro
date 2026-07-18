@@ -1,0 +1,57 @@
+---
+/**
+ * TASK-1340 (greenhouse-eo) — Dock del CTA gobernado `<greenhouse-cta>`.
+ *
+ * Monta el renderer portable del motor Growth CTA (mismo patrón que los FormDock):
+ * script `is:inline defer` del bundle pineado servido por Greenhouse + custom
+ * element. El contrato llega YA ARBITRADO server-side (Greenhouse decide qué se
+ * muestra en esta surface+ruta); fail-closed: sin contrato/flag OFF ⇒ no se pinta
+ * nada (el element queda display:none, cero layout).
+ *
+ * Config: `GREENHOUSE_CTA_SURFACE_ID` (binding de Think registrado en Greenhouse)
+ * + `GREENHOUSE_CTA_EMBED_KEY` (credencial de la SURFACE — autentica el host, no
+ * al visitante; se setea en el env de Vercel, NUNCA se committea). Sin embed key
+ * configurada el dock no emite nada (evita 403 inútiles).
+ */
+import { GREENHOUSE_API_BASE, GREENHOUSE_CTA_SURFACE_ID, GREENHOUSE_CTA_EMBED_KEY } from 'astro:env/server'
+
+interface Props {
+  /** Slug del CTA a montar (filtra el resultado arbitrado). */
+  cta?: string
+  /** Ubicación semántica para medición (param cta_location). */
+  ctaLocation?: string
+  /** Surface del Growth Form que abre open_growth_form (binding de forms de Think). */
+  formSurface?: string
+}
+
+const { cta, ctaLocation = 'report_followup', formSurface = 'fhsf-ai-visibility-grader' } = Astro.props
+
+const greenhouseBase = GREENHOUSE_API_BASE.replace(/\/$/, '')
+const rendererSrc = `${greenhouseBase}/growth-cta/renderer-latest.js`
+const enabled = GREENHOUSE_CTA_SURFACE_ID.length > 0 && GREENHOUSE_CTA_EMBED_KEY.length > 0
+---
+
+{
+  enabled && (
+    <div class="growth-cta-dock" data-capture="cta-card-host">
+      <script is:inline defer src={rendererSrc} />
+      <greenhouse-cta
+        surface={GREENHOUSE_CTA_SURFACE_ID}
+        embed-key={GREENHOUSE_CTA_EMBED_KEY}
+        base-url={greenhouseBase}
+        cta={cta}
+        cta-location={ctaLocation}
+        form-surface={formSurface}
+        locale="es-CL"
+        color-scheme="light"
+      />
+    </div>
+  )
+}
+
+<style>
+  .growth-cta-dock {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+</style>
