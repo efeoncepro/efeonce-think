@@ -31,6 +31,19 @@ export default defineConfig({
         access: 'secret',
         default: 'https://greenhouse.efeoncepro.com',
       }),
+      // TASK-1340 (greenhouse-eo) — motor Growth CTA: binding de la surface Think +
+      // credencial per-surface (autentica el HOST; se setea en Vercel env, nunca en git).
+      // Sin embed key configurada, GrowthCtaDock no emite nada (fail-closed).
+      GREENHOUSE_CTA_SURFACE_ID: envField.string({
+        context: 'server',
+        access: 'secret',
+        default: 'csur-4170287c-0a81-4baa-8de3-b6050f8173ee',
+      }),
+      GREENHOUSE_CTA_EMBED_KEY: envField.string({
+        context: 'server',
+        access: 'secret',
+        default: '',
+      }),
     },
   },
 

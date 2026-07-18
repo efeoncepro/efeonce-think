@@ -11,6 +11,7 @@ import EngineAvatarGroup from '@/components/primitives/EngineAvatarGroup.astro'
 import ReportIcon from '@/components/primitives/ReportIcon.astro'
 import MaturityLadder from '@/components/primitives/MaturityLadder.astro'
 import CompetitiveBenchmark from '@/components/CompetitiveBenchmark.astro'
+import GrowthCtaDock from '@/components/GrowthCtaDock.astro'
 import { fetchPublicReport } from '@lib/report'
 import { buildCopyrightNotice } from '@lib/legal'
 import { axis, severityMeta, LEVEL_COPY } from '@lib/report-tokens'
@@ -1479,6 +1480,11 @@ const sectionNumbers = Object.fromEntries(
             </p>
           </div>
         </aside>
+
+        {/* ══ CTA GOBERNADO (motor Growth CTA, TASK-1340) — fail-closed: sin contrato no pinta nada ══ */}
+        <div class="mt-8 px-6">
+          <GrowthCtaDock cta="ai-visibility-report-followup" ctaLocation="report_followup" />
+        </div>
 
         {/* ══ CTA DE CONVERSIÓN (navy, bookend del hero) ══ */}
         <section
