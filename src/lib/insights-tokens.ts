@@ -28,7 +28,7 @@ export const orbita = {
  */
 export const dataRoles = {
   current: orbita.navy,
-  previous: orbita.accentLight,
+  previous: '#1f9e94', // --axis-deck-role-dataPriorOnPaper (--axis-deck-teal-650); gráfico ≥ 3:1, nunca texto chico
   currentOnNavy: orbita.accentDark,
   previousOnNavy: '#8aa8d8', // --axis-deck-role-dataPriorOnNavy (--axis-deck-blue-310)
 } as const
