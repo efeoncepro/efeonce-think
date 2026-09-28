@@ -103,3 +103,79 @@ import StatusScreen from '@/components/primitives/StatusScreen.astro'
 Props: `kind` (obligatorio: `not_found` | `gone` | `rate_limited` | `error`), y overrides opcionales
 `eyebrow` / `title` / `body` / `ctaLabel` / `ctaHref`. El copy canónico por estado vive en el contrato
 (`STATUS_CONTENT`); los assets del personaje viven en `public/characters/nexa-<pose>.webp`.
+
+## Componentes del informe de Insights — `src/components/insights/`
+
+No son primitivas en sentido estricto: conocen el contrato `InsightWebModelV1` de Greenhouse (tipos copiados en
+`@lib/insights`) en vez de un contrato propio vía adapter. Se documentan acá porque son el catálogo de UI del informe
+compartido (`/insights/r/[token]`, TASK-1875 en greenhouse-eo) y porque el próximo informe de datos del hub debería
+partir de ellos. Mismas reglas que arriba: presentación pura, tokens (desde `@lib/insights-tokens`, no
+`report-tokens`), primer paint completo sin JS y motion con fail-safe.
+
+| Componente | Qué es |
+|---|---|
+| **`ChartFigure`** | Un `ChartSpecV1` explorable, dibujado en el servidor sin librería de gráficos. |
+| **`ModuleScene`** | La escena de un capítulo (módulo) del informe: gráfico principal narrado + resto compacto. |
+| **`FactMark`** | Marca de procedencia de una cifra: «Medido» o «Estimado». |
+
+Nota sobre nombres: el plan original hablaba de `EditionMasthead` y `FactCallout`. No existen como componentes. La
+portada (masthead) es markup propio de la página (`<header class="ins-hero">` en `[token].astro`), y el callout de
+procedencia quedó como `FactMark` (dentro de la fila de procedencia de cada escena).
+
+### ChartFigure
+
+Dibuja las **15 familias** de Insights. Series: `bar`, `bar_grouped`, `bar_stacked`, `line`, `pie`, `donut`,
+`scatter`. Datos propios (`spec.data.kind`): `bullet`, `gauge`, `waterfall`, `funnel`, `heatmap`, `waffle`, `venn_two`,
+`upset`.
+
+Props:
+
+| Prop | Tipo | Nota |
+|---|---|---|
+| `spec` | `ChartSpecV1` | Obligatorio. Familia, series, dimensiones, escala y `data` propia. |
+| `table` | `{ columns, rows }` | Obligatorio. La misma lectura en tabla (celda `null` → copy de ausencia). |
+| `facts` | `Record<string, InsightWebFactV1>` | Obligatorio. Toda cifra impresa sale de `fact.display`; nunca se formatea localmente. |
+| `locale` | `string` | Obligatorio. Sólo para las marcas del eje (`Intl.NumberFormat`). |
+| `uid` | `string` | Obligatorio. `id` de la figura (lo usa el interruptor y el enlace directo). |
+| `theme` | `'dark' \| 'light'` | Default `light`. Cambia los roles de dato actual/anterior. |
+| `compact` | `boolean` | Default `false`. Versión reducida para los *beats* de una escena. |
+| `derived` | `{ funnelStepRates? }` | Modelo 1.1: tasas de paso del embudo calculadas por Greenhouse; se muestran bajo cada etapa. |
+| `copy` | `InsightsCopy` | Diccionario del chrome (es-CL o en-US). Default es-CL. |
+
+Comportamiento:
+
+- **Gráfico ↔ tabla**: un interruptor (`aria-pressed`) alterna entre ambos. Sin JS se ven los dos.
+- **Detalle**: cada grupo de barras es un `<button>` con `aria-label` completo y un tooltip visual al pasar o enfocar;
+  los puntos de dispersión son enfocables. Las figuras SVG llevan `role="img"` con la lectura en `aria-label`.
+- **Embudo**: ancho relativo a la primera etapa (piso 2 %) y, si viene `derived.funnelStepRates`, la tasa de paso.
+- **Narrable**: expone `data-step` para que `ModuleScene` cambie su estado por paso; sin JS queda en estado final.
+- **Geometría** en `src/lib/insights-chart-geometry.ts`, con las mismas convenciones que
+  `src/lib/artifact-composer/chart-geometry.ts` de greenhouse-eo (la fuente de los PDF): barras con origen cero, escala
+  «redonda» de ~4 tramos, torta/dona hasta 3 partes, medidor de 270° abierto, heatmap por intensidad (luminancia, nunca
+  tono), waffle de 100 celdas por restos mayores, Venn de áreas proporcionales. Sólo produce posiciones y tamaños.
+
+```astro
+<ChartFigure spec={chart.spec} table={chart.table} derived={chart.derived} facts={model.facts}
+  locale={model.locale} copy={C} uid={`fig-${chart.spec.chartId}`} />
+```
+
+### ModuleScene
+
+Props: `chapter` (`InsightWebChapterV1`), `index` (número del capítulo, se imprime `01`, `02`…), `facts`, `locale`,
+`copy`.
+
+- **Gráfico principal**: el primero que tiene lectura (`readings`), o el primero del capítulo. Queda fijo mientras
+  avanzan los pasos de su lectura, en orden: `key` (cifra principal con count-up que termina en el `display` exacto),
+  `conclusion`, `meaning` (qué significa), `next` (próximo paso). Bajo el gráfico, la fila de procedencia: unidad,
+  fuentes, fecha de corte y `FactMark` (estimado si alguna cifra lo es).
+- **Demás gráficos**: como *beats* compactos alternados (texto + figura), cada uno con su propia lectura si la trae.
+- **Hechos sueltos**: los citados por afirmaciones que no aparecen en ningún gráfico se muestran como fichas; un valor
+  `null` se muestra como ausencia con su razón, nunca como cero.
+- **Límites** del capítulo al final; capítulo vacío → estado vacío honesto.
+- Sin JS se lee de corrido; con movimiento reducido, sin animar.
+
+### FactMark
+
+Props: `observation` (`'observed' | 'estimated'`), `copy`. Anillo de trazo lleno = «Medido»; anillo punteado =
+«Estimado». El estado se comunica con la forma y el texto, nunca con color de semáforo ni con una esfera (regla de
+«La órbita»).

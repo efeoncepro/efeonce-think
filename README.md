@@ -22,6 +22,7 @@ renderiza el modelo que el backend entrega.
 | `/` | Landing del hub | pendiente | sí |
 | `/brand-visibility` | Landing de la herramienta + embed del form (TASK-1327) | pendiente | sí |
 | `/brand-visibility/r/[token]` | Informe per-lead (SSR, token-gated) | **live, enterprise** | **noindex** |
+| `/insights/r/[token]` | Informe compartido de Efeonce Insights (SSR por request, token-gated). Ver sección abajo | construido y verificado en local; **sin desplegar** | **noindex** |
 
 ## Contrato que consume
 
@@ -92,6 +93,8 @@ pnpm type-check
 | Var | Contexto | Default | Descripción |
 |---|---|---|---|
 | `GREENHOUSE_API_BASE` | server | `https://greenhouse.efeoncepro.com` | Base del backend headless de Greenhouse. |
+| `GREENHOUSE_THINK_KEY` | server (secret) | vacío | Llave de Think ante `/api/public/**` de Greenhouse (header `x-efeonce-think-key`): el Firewall exceptúa del límite por IP sólo a quien la presenta. Vacía = funciona igual, sin holgura. |
+| `GREENHOUSE_API_BYPASS` | server (secret) | vacío | Sólo para apuntar a staging (SSO de Vercel): se envía como `x-vercel-protection-bypass`. Vacío en producción. |
 
 ## Stack
 
@@ -104,6 +107,35 @@ para converger sin fricción.
 Auto-deploy en cada push a `main` (Vercel, team `efeonce-7670142f` — **NUNCA** scope personal).
 Proyecto `efeonce-think` (`prj_F4gvS8jmWjvdJ8cTwM6k60R1XydV`). Gobernable desde Greenhouse vía
 `greenhouse.repo.json` (cableado del control plane multi-repo = TASK-1326).
+
+## Efeonce Insights — informe compartido (`/insights/r/<token>`)
+
+Render tonto de `InsightWebModelV1` (modelVersion `1.x`; `1.1` es aditivo) que Greenhouse sirve en
+`GET /api/public/insights/shared/{token}`. Owner: `TASK-1875` (greenhouse-eo). Resolución por request, sin cache:
+revocar en Greenhouse revoca en la lectura siguiente. Estados `404`/`410`/`429`/`502` con `StatusScreen`.
+
+- Página: `src/pages/insights/r/[token].astro`. Componentes: `src/components/insights/` (ver
+  `src/components/primitives/README.md`). Interacción: `src/scripts/insights-report.ts`. Estilos: `src/styles/insights.css`.
+- Único lugar con valores de marca: `src/lib/insights-tokens.ts` (La órbita, copiada de AXIS). Copy del chrome
+  es-CL/en-US por `model.locale`: `src/lib/insights-copy.ts`.
+- El token nunca aparece en el HTML: descargas por `?descargar=report_pdf|deck_pdf` y logo del cliente por `?logo=1`
+  sobre la misma URL (Greenhouse revalida el grant). Sin GTM; `Cache-Control: private, no-store`,
+  `X-Robots-Tag: noindex, nofollow`, `Referrer-Policy: no-referrer`.
+- Assets: `public/branding/insights/*` (de `@efeoncepro/axis-brand-assets` 0.4.0); OG genérica sin datos del informe,
+  generada con `node scripts/build-insights-og.mjs`.
+- Fixtures sólo en `astro dev` con tokens `fixture-*` (`src/lib/insights-fixtures.ts`).
+
+Verificación (con `pnpm dev --port 4331` corriendo):
+
+```bash
+pnpm test:insights                                 # 14 pruebas de vista y geometría
+node scripts/verify-insights-report.mjs            # estados, cabeceras, token fuera del HTML, overflow, cifras, motion reducido
+node scripts/audit-insights-a11y.mjs               # contraste AA + recorrido con Tab en 1440 y 390
+node scripts/capture-insights-report.mjs <dir>     # dossier visual desktop/mobile, presentación y motion reducido
+```
+
+Estado: construido y verificado en local (verify «Todo verde», a11y AA en 1440/390, 14 pruebas). **Sin desplegar**:
+`main` publica producción automáticamente, así que el push queda pendiente del operador.
 
 ## Radiografía AEO — muestras de trabajo (`/muestras/<slug>`)
 

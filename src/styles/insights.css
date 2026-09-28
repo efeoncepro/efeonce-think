@@ -655,19 +655,19 @@
 /* ── Impresión: el informe completo, en papel y sin interacción ─────────── */
 @media print {
   @page { size: A4; margin: 14mm; }
-  .ins-page { --ins-ground: #ffffff; background: #ffffff; }
+  .ins-page { --ins-ground: var(--ins-surface); background: var(--ins-surface); }
   .ins-page { color: var(--ins-navy); }
   .ins-topbar, .ins-dock, .ins-toast, .ins-hero__cue, .ins-skip, .ins-present, .ins-switch, .ins-tile__plus, .ins-tile__actions, .ins-textbtn, .ins-orbit { display: none !important; }
-  .ins-hero, .ins-findings, .ins-footer { background: #ffffff !important; color: var(--ins-navy) !important; min-height: 0 !important; padding: 0 0 24px !important; }
+  .ins-hero, .ins-findings, .ins-footer { background: var(--ins-surface) !important; color: var(--ins-navy) !important; min-height: 0 !important; padding: 0 0 24px !important; }
   .ins-dark, .ins-dark * { color: var(--ins-navy) !important; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
   .ins-screen-only { display: none !important; }
   .ins-print-only { display: block !important; }
   .ins-hero__body { max-width: none; padding-top: 16px; }
-  .ins-tile { break-inside: avoid; background: #ffffff !important; border-color: var(--ins-rule-light) !important; }
+  .ins-tile { break-inside: avoid; background: var(--ins-surface) !important; border-color: var(--ins-rule-light) !important; }
   .ins-js .ins-chart .ins-chart__table { display: block !important; }
   .ins-chart--dark { --ink: var(--ins-navy); --soft: var(--ins-ink-soft-light); --grid: color-mix(in srgb, var(--ins-navy) 10%, transparent); --base: color-mix(in srgb, var(--ins-navy) 45%, transparent); }
-  .ins-decision, .ins-panel, .ins-step__card, .ins-beat__next, .ins-plan__terms > div, .ins-tile__reading > div { background: #ffffff !important; border: 1.5px solid var(--ins-navy); }
+  .ins-decision, .ins-panel, .ins-step__card, .ins-beat__next, .ins-plan__terms > div, .ins-tile__reading > div { background: var(--ins-surface) !important; border: 1.5px solid var(--ins-navy); }
   .ins-story { grid-template-columns: minmax(0, 1fr); }
   .ins-story__stage { position: static; }
   .ins-step, .ins-step:first-child, .ins-step:last-child { min-height: 0; padding: 8px 0; }
