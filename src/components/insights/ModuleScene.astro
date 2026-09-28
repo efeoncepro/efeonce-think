@@ -1,0 +1,145 @@
+---
+/**
+ * Escena de un módulo del informe de Insights (TASK-1875, dirección «tablero de respuestas»).
+ *
+ * La figura principal (la primera con lectura) se narra: el gráfico queda fijo mientras los pasos avanzan —cifra
+ * principal, conclusión, lo que significa, próximo paso— y el gráfico cambia de estado con cada uno. Las demás
+ * figuras, las afirmaciones, los hechos sueltos y los límites siguen debajo, compactos. Sin JS se lee de corrido.
+ */
+import ChartFigure from './ChartFigure.astro'
+import FactMark from './FactMark.astro'
+import type { InsightWebChapterV1, InsightWebFactV1 } from '@lib/insights'
+import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+
+interface Props {
+  chapter: InsightWebChapterV1
+  index: number
+  facts: Record<string, InsightWebFactV1>
+  locale: string
+}
+
+const { chapter, index, facts, locale } = Astro.props
+const number = String(index).padStart(2, '0')
+const shortDate = (iso: string | null) => (iso ? iso.slice(0, 10).split('-').reverse().join('-') : null)
+
+const mainIndex = chapter.charts.findIndex((chart) => chapter.readings?.some((r) => r.chartId === chart.spec.chartId))
+const main = mainIndex >= 0 ? chapter.charts[mainIndex] : chapter.charts[0]
+const mainReading = main ? chapter.readings?.find((r) => r.chartId === main.spec.chartId) : undefined
+const others = chapter.charts.filter((chart) => chart !== main)
+const mainKeyFact = mainReading?.keyFigure ? facts[mainReading.keyFigure.factId] : undefined
+
+const steps = [
+  mainReading?.keyFigure && { kind: 'key' as const, state: 0 },
+  mainReading?.conclusion && { kind: 'conclusion' as const, state: 1 },
+  mainReading?.meaning && { kind: 'meaning' as const, state: 2 },
+  mainReading?.nextStep && { kind: 'next' as const, state: 3 },
+].filter(Boolean) as Array<{ kind: 'key' | 'conclusion' | 'meaning' | 'next'; state: number }>
+
+const provenance = (factIds: string[]) => {
+  const list = factIds.map((id) => facts[id]).filter(Boolean)
+  return {
+    sources: [...new Set(list.map((f) => f.source))].join(' y '),
+    asOf: shortDate(list.map((f) => f.asOf).filter((d): d is string => !!d).sort().at(-1) ?? null),
+    estimated: list.some((f) => f.observation === 'estimated'),
+  }
+}
+
+const shownFacts = new Set([...chapter.charts.flatMap((c) => c.spec.series.flatMap((s) => s.factIds)), mainReading?.keyFigure?.factId])
+const looseFacts = [...new Set(chapter.claims.flatMap((claim) => claim.factIds))].filter((id) => !shownFacts.has(id)).map((id) => facts[id]).filter(Boolean)
+const isEmpty = chapter.charts.length === 0 && chapter.claims.length === 0 && chapter.tables.length === 0
+const mainProv = main ? provenance(main.spec.series.flatMap((s) => s.factIds)) : null
+---
+
+<section class="ins-scene" id={`cap-${number}`} data-section data-module={chapter.module} data-capture={`chapter-${chapter.module}`} aria-labelledby={`cap-${number}-title`}>
+  <header class="ins-scene__head" data-reveal>
+    <span class="ins-chip ins-num">{number} · {C.moduleLabel[chapter.module] ?? chapter.module}</span>
+    <h2 class="ins-scene__title" id={`cap-${number}-title`} tabindex="-1">{chapter.title}</h2>
+    {chapter.opening && <p class="ins-lead">{chapter.opening.text}</p>}
+  </header>
+
+  {isEmpty && <div class="ins-empty" data-reveal><p>{C.chapterEmpty}</p></div>}
+
+  {main && (
+    <div class:list={['ins-story', { 'ins-story--plain': steps.length === 0 }]} data-story>
+      <div class="ins-story__stage">
+        <ChartFigure spec={main.spec} table={main.table} facts={facts} locale={locale} uid={`fig-${chapter.chapterId}`} />
+        {mainProv && (
+          <div class="ins-provrow">
+            <span><b>{C.provenanceUnit}</b>{main.spec.unit}</span>
+            <span><b>{C.provenanceSource}</b>{mainProv.sources}</span>
+            {mainProv.asOf && <span class="ins-num"><b>{C.asOf}</b>{mainProv.asOf}</span>}
+            <FactMark observation={mainProv.estimated ? 'estimated' : 'observed'} />
+          </div>
+        )}
+      </div>
+      {steps.length > 0 && (
+        <ol class="ins-story__steps">
+          {steps.map((step) => (
+            <li class="ins-step" data-step={step.state}>
+              {step.kind === 'key' && mainReading?.keyFigure && (
+                <div class="ins-step__key">
+                  <span class="ins-figure-lg" data-countup={mainKeyFact?.value ?? undefined} data-display={mainReading.keyFigure.value}>{mainReading.keyFigure.value}</span>
+                  <p>{mainReading.keyFigure.caption.text}</p>
+                </div>
+              )}
+              {step.kind === 'conclusion' && <h3 class="ins-h3">{mainReading?.conclusion?.text}</h3>}
+              {step.kind === 'meaning' && (
+                <div class="ins-step__card"><span class="ins-label">{C.meaningTitle}</span><p>{mainReading?.meaning?.text}</p></div>
+              )}
+              {step.kind === 'next' && (
+                <div class="ins-step__card ins-step__card--next"><span class="ins-label">{C.nextStepTitle}</span><p>{mainReading?.nextStep?.text}</p></div>
+              )}
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  )}
+
+  {others.map((chart) => {
+    const reading = chapter.readings?.find((r) => r.chartId === chart.spec.chartId)
+    return (
+      <div class="ins-more" data-reveal>
+        {reading?.conclusion && <h3 class="ins-h3">{reading.conclusion.text}</h3>}
+        <ChartFigure spec={chart.spec} table={chart.table} facts={facts} locale={locale} uid={`fig-${chart.spec.chartId}`} compact />
+      </div>
+    )
+  })}
+
+  {(chapter.claims.length > 0 || looseFacts.length > 0) && (
+    <div class="ins-more">
+      {chapter.claims.length > 0 && <ul class="ins-claims" data-stagger>{chapter.claims.map((claim) => <li>{claim.text}</li>)}</ul>}
+      {looseFacts.length > 0 && (
+        <div class="ins-facts" data-stagger>
+          {looseFacts.map((fact) => (
+            <div class="ins-fact">
+              <span class="ins-label">{fact.label}</span>
+              {fact.value === null ? (
+                <>
+                  <span class="ins-fact__absent" role="img" aria-label={C.absent} />
+                  <span class="ins-prov"><span class="ins-mark">{C.absent}</span><span>{C.absentReason}</span></span>
+                </>
+              ) : (
+                <>
+                  <span class="ins-figure-md" data-countup={fact.value} data-display={fact.display}>{fact.display}</span>
+                  <span class="ins-prov"><FactMark observation={fact.observation} /><span>{fact.source}</span></span>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )}
+
+  {chapter.limits.length > 0 && (
+    <div class="ins-limits" data-capture="limits">
+      <span class="ins-label">{C.limitsTitle}</span>
+      <ul>
+        {chapter.limits.map((limit) => (
+          <li><svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.4 2" /></svg>{limit}</li>
+        ))}
+      </ul>
+    </div>
+  )}
+</section>

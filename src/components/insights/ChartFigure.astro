@@ -1,32 +1,39 @@
 ---
 /**
- * ChartFigure — dibuja un `ChartSpecV1` del informe de Insights (TASK-1875) en el servidor: primer paint completo y
- * determinista, sin librería de gráficos. Barras (simples y agrupadas) en HTML/CSS para que las etiquetas conserven su
- * tamaño real en 390 px; líneas en SVG con trazo no escalado. Las familias que el hub todavía no dibuja se leen en su
- * tabla equivalente (fidelidad semántica: mismos hechos, mismas unidades, nunca una cifra inventada).
+ * ChartFigure — un `ChartSpecV1` del informe de Insights, explorable (TASK-1875, dirección «tablero de respuestas»).
  *
- * Toda cifra impresa sale de `fact.display`. Lo único que se calcula es geometría (alturas y marcas del eje).
+ * - Primer paint completo en el servidor (HTML/CSS para barras, SVG para líneas), sin librería de gráficos.
+ * - Cada grupo es un botón: al pasar o enfocar muestra el detalle de sus series; con teclado se recorre con Tab.
+ * - Gráfico y tabla son el mismo componente con un interruptor (sin JS se ven los dos).
+ * - `data-step` permite narrarlo por pasos (escena): 0 = sólo la referencia, 1 = el período, 2 = foco en el último
+ *   grupo. Sin JS o con movimiento reducido queda en su estado final.
+ *
+ * Toda cifra impresa sale de `fact.display`; lo único que se calcula es geometría (alturas y marcas del eje).
  */
 import type { ChartSpecV1, InsightWebFactV1 } from '@lib/insights'
 import { INSIGHTS_COPY as C } from '@lib/insights-copy'
 
 interface Props {
   spec: ChartSpecV1
+  table: { columns: string[]; rows: Array<Array<string | null>> }
   facts: Record<string, InsightWebFactV1>
   locale: string
+  theme?: 'dark' | 'light'
+  uid: string
+  compact?: boolean
 }
 
-const { spec, facts, locale } = Astro.props
-const DRAWN = ['bar', 'bar_grouped', 'line']
-const drawn = DRAWN.includes(spec.family) && spec.series.length > 0
+const { spec, table, facts, locale, theme = 'light', uid, compact = false } = Astro.props
+const drawn = ['bar', 'bar_grouped', 'line'].includes(spec.family) && spec.series.length > 0
 
-const seriesColor = (index: number) =>
-  index === 0 ? 'var(--ins-data-current)' : index === 1 ? 'var(--ins-data-previous)' : 'color-mix(in srgb, var(--ins-data-current) 55%, transparent)'
+const seriesColor = (index: number) => {
+  const current = theme === 'dark' ? 'var(--ins-data-current-dark)' : 'var(--ins-data-current)'
+  const previous = theme === 'dark' ? 'var(--ins-data-previous-dark)' : 'var(--ins-data-previous)'
+  return index === 0 ? current : index === 1 ? previous : `color-mix(in srgb, ${current} 55%, transparent)`
+}
 
 const values = spec.series.flatMap((series) => series.factIds.map((id) => facts[id]?.value).filter((v): v is number => typeof v === 'number'))
 const max = values.length ? Math.max(...values) : 0
-
-// Marca del eje "redonda" (1, 2, 2,5 o 5 × 10^k) para cuatro tramos aprox.; el techo siempre cubre el máximo.
 const niceStep = (raw: number) => {
   if (raw <= 0) return 1
   const exp = Math.pow(10, Math.floor(Math.log10(raw)))
@@ -43,78 +50,90 @@ const groups = spec.dimensionLabels.map((label, i) => ({
   label,
   bars: spec.series.map((series, s) => {
     const fact = facts[series.factIds[i]]
-    return { s, series: series.label, fact, value: typeof fact?.value === 'number' ? fact.value : null }
+    return { s, label: series.label, fact, value: typeof fact?.value === 'number' ? fact.value : null }
   }),
 }))
-
-const ariaLabel = `${spec.title}. ${spec.series
-  .map((series, s) => `${series.label}: ${groups.map((g) => `${g.label} ${g.bars[s].fact?.display ?? C.absent}`).join(', ')}`)
-  .join('. ')}.`
+const groupLabel = (g: (typeof groups)[number]) => `${g.label}: ${g.bars.map((b) => `${b.label} ${b.fact?.display ?? C.absent}`).join(', ')}`
 
 const linePaths = spec.series.map((series, s) => {
   const points = series.factIds.map((id, i) => {
     const v = facts[id]?.value
     return typeof v === 'number' ? { x: ((i + 0.5) / series.factIds.length) * 100, y: 100 - (v / top) * 100 } : null
   })
-  const d = points
-    .map((p, i) => (p ? `${i === 0 || !points[i - 1] ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}` : ''))
-    .join(' ')
+  const d = points.map((p, i) => (p ? `${i === 0 || !points[i - 1] ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}` : '')).join(' ')
   return { s, d, points }
 })
 ---
 
-<figure class="ins-chart" data-chart>
+<figure class:list={['ins-chart', `ins-chart--${theme}`, { 'ins-chart--compact': compact }]} data-chart data-view="chart" data-series={spec.series.length} id={uid}>
   <div class="ins-chart__top">
     <figcaption class="ins-chart__title">{spec.title}</figcaption>
-    {spec.series.length > 1 && (
-      <ul class="ins-legend">
-        {spec.series.map((series, s) => (
-          <li><span class="ins-swatch" style={`background:${seriesColor(s)}`} />{series.label}</li>
-        ))}
-      </ul>
+    <div class="ins-chart__tools">
+      {spec.series.length > 1 && (
+        <ul class="ins-legend">
+          {spec.series.map((series, s) => <li><span class="ins-swatch" style={`background:${seriesColor(s)}`} />{series.label}</li>)}
+        </ul>
+      )}
+      <div class="ins-switch" role="group" aria-label={C.viewSwitch}>
+        <button type="button" data-view-btn="chart" aria-pressed="true">{C.viewChart}</button>
+        <button type="button" data-view-btn="table" aria-pressed="false">{C.viewTable}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ins-chart__graphic">
+    {drawn ? (
+      <>
+        <div class="ins-plot">
+          <div class="ins-grid" aria-hidden="true">
+            {ticks.map((t) => <span style={`bottom:${pct(t)}`} data-zero={t === 0 ? '' : undefined}><em>{tickFormat.format(t)}</em></span>)}
+          </div>
+          {spec.family === 'line' ? (
+            <>
+              <svg class="ins-line" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label={spec.title}>
+                {linePaths.map((line) => <path d={line.d} style={`stroke:${seriesColor(line.s)}`} pathLength="400" />)}
+              </svg>
+              {linePaths.map((line) => line.points.map((p) => p && <span class="ins-dot" aria-hidden="true" style={`left:${p.x}%;bottom:${100 - p.y}%;--c:${seriesColor(line.s)}`} />))}
+            </>
+          ) : (
+            <div class="ins-groups">
+              {groups.map((group, gi) => (
+                <button type="button" class="ins-group" data-group={gi} data-last={gi === groups.length - 1 ? '' : undefined} aria-label={groupLabel(group)}>
+                  {group.bars.map((bar) =>
+                    bar.value === null ? (
+                      <span class="ins-bar ins-bar--absent" data-series={bar.s}><span class="ins-bar__val">{C.absent}</span></span>
+                    ) : (
+                      <span class="ins-bar" data-series={bar.s} style={`--h:${pct(bar.value)};--c:${seriesColor(bar.s)}`}>
+                        <span class="ins-bar__val">{bar.fact?.display}</span>
+                      </span>
+                    ),
+                  )}
+                  <span class="ins-tip" aria-hidden="true">
+                    <b>{group.label}</b>
+                    {group.bars.map((bar) => (
+                      <span><i style={`background:${seriesColor(bar.s)}`} />{bar.label}<em>{bar.fact?.display ?? C.absent}</em></span>
+                    ))}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div class="ins-xlabels" aria-hidden="true">{spec.dimensionLabels.map((label) => <span>{label}</span>)}</div>
+        {spec.scale.baseline === 0 && spec.family !== 'line' && <p class="ins-note">{C.chartBaseline}</p>}
+      </>
+    ) : (
+      <p class="ins-note">{C.chartTableOnly}</p>
     )}
   </div>
 
-  {drawn ? (
-    <>
-      <div class="ins-plot" role="img" aria-label={ariaLabel}>
-        <div class="ins-grid" aria-hidden="true">
-          {ticks.map((t) => (
-            <span style={`bottom:${pct(t)}`} data-zero={t === 0 ? '' : undefined}><em>{tickFormat.format(t)}</em></span>
-          ))}
-        </div>
-
-        {spec.family === 'line' ? (
-          <>
-            <svg class="ins-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              {linePaths.map((line) => <path d={line.d} style={`stroke:${seriesColor(line.s)}`} pathLength="400" />)}
-            </svg>
-            {linePaths.map((line) =>
-              line.points.map((p) => p && <span class="ins-dot" aria-hidden="true" style={`left:${p.x}%;bottom:${100 - p.y}%;--c:${seriesColor(line.s)}`} />),
-            )}
-          </>
-        ) : (
-          <div class="ins-groups" aria-hidden="true">
-            {groups.map((group) => (
-              <div class="ins-group">
-                {group.bars.map((bar) =>
-                  bar.value === null ? (
-                    <div class="ins-bar ins-bar--absent" data-series={bar.s}><span class="ins-bar__val">{C.absent}</span></div>
-                  ) : (
-                    <div class="ins-bar" data-series={bar.s} style={`--h:${pct(bar.value)};--c:${seriesColor(bar.s)}`}>
-                      <span class="ins-bar__val">{bar.fact?.display}</span>
-                    </div>
-                  ),
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      <div class="ins-xlabels" aria-hidden="true">{spec.dimensionLabels.map((label) => <span>{label}</span>)}</div>
-      {spec.scale.baseline === 0 && spec.family !== 'line' && <p class="ins-note">{C.chartBaseline}</p>}
-    </>
-  ) : (
-    <p class="ins-note">{C.chartTableOnly}</p>
-  )}
+  <div class="ins-chart__table">
+    <table>
+      <caption>{spec.title}</caption>
+      <thead><tr>{table.columns.map((col) => <th scope="col">{col}</th>)}</tr></thead>
+      <tbody>
+        {table.rows.map((row) => <tr>{row.map((cell, c) => (c === 0 ? <th scope="row">{cell ?? C.absent}</th> : <td>{cell ?? C.absent}</td>))}</tr>)}
+      </tbody>
+    </table>
+  </div>
 </figure>

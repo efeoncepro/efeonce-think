@@ -2,9 +2,13 @@
 /**
  * Informe compartido de Efeonce Insights — `think.efeoncepro.com/insights/r/<token>` (TASK-1875, greenhouse-eo).
  *
- * Render tonto de `InsightWebModelV1` (TASK-1848). Resolución por request, sin pre-render ni cache: revocar revoca en
- * la lectura siguiente. El token vive sólo en la URL y en el fetch SSR: nunca en el HTML (canonical genérico, descargas
- * por query relativa), ni en analytics (sin GTM) ni en el Referer (`no-referrer`).
+ * Dirección «tablero de respuestas» (aprobada por el operador 2026-09-28): no es el PDF animado. Abre con la
+ * respuesta; los hallazgos se exploran y se expanden en su lugar; la barra fija filtra por módulo y su órbita marca el
+ * avance de la lectura; el gráfico principal de cada módulo se narra en escena.
+ *
+ * Render tonto de `InsightWebModelV1` (TASK-1848). Resolución por request, sin cache: revocar revoca en la lectura
+ * siguiente. El token vive sólo en la URL y en el fetch SSR: nunca en el HTML (canonical genérico, descargas por query
+ * relativa, enlaces copiados desde `location`), ni en analytics (sin GTM) ni en el Referer (`no-referrer`).
  */
 export const prerender = false
 
@@ -21,9 +25,11 @@ import '@styles/insights.css'
 
 import BaseLayout from '@layouts/BaseLayout.astro'
 import StatusScreen from '@/components/primitives/StatusScreen.astro'
-import InsightsChapter from '@/components/insights/InsightsChapter.astro'
+import ModuleScene from '@/components/insights/ModuleScene.astro'
+import ChartFigure from '@/components/insights/ChartFigure.astro'
 import FactMark from '@/components/insights/FactMark.astro'
 import { fetchSharedInsightEdition, fetchSharedInsightOutput, type InsightOutput } from '@lib/insights'
+import { buildFindings, buildModules, splitSummary } from '@lib/insights-view'
 import { INSIGHTS_COPY as C } from '@lib/insights-copy'
 import { insightsCssVars, orbitMeasure, motion } from '@lib/insights-tokens'
 
@@ -61,48 +67,48 @@ const header = edition?.header
 const model = edition?.model
 const locale = model?.locale ?? 'es-CL'
 
-// ── Presentación (sin datos nuevos: fechas del header y geometría) ────────────
+// ── Presentación: fechas del header y geometría; ningún dato nuevo ───────────
 const civil = (iso: string) => iso.slice(0, 10)
 const dayBefore = (iso: string) => new Date(Date.parse(`${civil(iso)}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10)
-const longDate = (iso: string, timeZone = 'UTC') =>
-  new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone }).format(new Date(iso.length === 10 ? `${iso}T12:00:00Z` : iso))
+const toDate = (iso: string) => new Date(iso.length === 10 ? `${iso}T12:00:00Z` : iso)
+const longDate = (iso: string, timeZone = 'UTC') => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone }).format(toDate(iso))
+const dayMonth = (iso: string, timeZone = 'UTC') => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', timeZone }).format(toDate(iso))
 
 const partial = !!header?.asOfMax && civil(header.asOfMax) < dayBefore(header.periodEndExclusive)
-const asOfLabel = header?.asOfMax ? longDate(header.asOfMax) : null
-const expiresLabel = edition ? longDate(edition.expiresAt, header?.timeZone) : null
+const asOfShort = header?.asOfMax ? dayMonth(header.asOfMax) : null
+const expiresShort = edition ? dayMonth(edition.expiresAt, header?.timeZone) : null
+const expiresLong = edition ? longDate(edition.expiresAt, header?.timeZone) : null
 
-// Índice: resumen, capítulos, plan, metodología, descargas.
-const sections: Array<{ id: string; label: string; number?: string }> = model
-  ? [
-      { id: 'resumen', label: C.summaryTitle },
-      ...model.chapters.map((chapter, i) => ({ id: `cap-${String(i + 1).padStart(2, '0')}`, label: chapter.title, number: String(i + 1).padStart(2, '0') })),
-      ...(model.actions.length ? [{ id: 'plan', label: C.planTitle }] : []),
-      { id: 'metodologia', label: C.methodologyTitle.split(' y ')[0] },
-      { id: 'descargas', label: C.downloadsTitle },
-    ]
-  : []
+const findings = model ? buildFindings(model) : []
+const modules = model ? buildModules(model) : []
+const summary = model ? splitSummary(model) : null
+const downloads = edition?.downloads.filter((d) => d.output !== 'web') ?? []
+const primaryDownload = downloads.find((d) => d.status === 'available')
 
-// Órbita de la portada: de acento (`trajectory.accent`), no una medida — el modelo no declara una cifra de portada y el
-// arco nunca decora un número. Arco de 50° desde arriba a la izquierda, esfera en la punta, halo detrás.
-const R = 312
+// Órbita de la portada: de acento (`trajectory.accent`), no una medida: el modelo no declara una cifra de portada y el
+// arco nunca decora un número. Arco de 50°, esfera en la punta con su anillo «en vivo», halo detrás.
+const R = 450
 const size = R * 2
-const scale = size / 624 // unidades del viewBox = px a 1440
-const w = (px: number) => (px * (1440 / orbitMeasure.base.widthPx) * scale).toFixed(2)
+const w = (px: number) => (px * (1440 / orbitMeasure.base.widthPx)).toFixed(2)
 const polar = (deg: number) => {
   const a = ((deg - 90) * Math.PI) / 180
   return { x: R + R * Math.cos(a), y: R + R * Math.sin(a) }
 }
-const ARC_START = 290
+const ARC_START = 250
 const ARC_SWEEP = orbitMeasure.trailDeg
 const arcFrom = polar(ARC_START)
 const arcTo = polar(ARC_START + ARC_SWEEP)
 const arcPath = `M ${arcFrom.x.toFixed(2)} ${arcFrom.y.toFixed(2)} A ${R} ${R} 0 0 1 ${arcTo.x.toFixed(2)} ${arcTo.y.toFixed(2)}`
 const haloR = (R * orbitMeasure.haloRadiusRatio).toFixed(1)
 
-const firstFact = (factIds: string[]) => (model ? factIds.map((id) => model.facts[id]).find(Boolean) : undefined)
+const moduleOf = (factIds: string[]) => (model ? factIds.map((id) => model.facts[id]?.module).find(Boolean) : undefined)
 const short = (iso: string | null) => (iso ? iso.slice(0, 10).split('-').reverse().join('-') : null)
 const cssVars = Object.entries(insightsCssVars).map(([name, value]) => `--${name}:${value}`).join(';')
 const statusCopy = result.status !== 'ok' ? C.states[result.status] : null
+
+const downloadIcon = '<svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v9M5 8l4 4 4-4M3 15h12"/></svg>'
+const linkIcon = '<svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 10.5l3-3M6 8L4.6 9.4a2.8 2.8 0 004 4L10 12M12 10l1.4-1.4a2.8 2.8 0 00-4-4L8 6"/></svg>'
+const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>'
 ---
 
 <BaseLayout
@@ -122,34 +128,23 @@ const statusCopy = result.status !== 'ok' ? C.states[result.status] : null
         {...(result.status === 'not_found' || result.status === 'gone' ? { ctaLabel: C.contactCta, ctaHref: 'mailto:sales@efeoncepro.com' } : {})}
       />
     </main>
-  ) : header && model && edition && (
-    <div class="ins-page" style={cssVars}>
-      {/* Antes del primer paint: prepara el motion sólo si el usuario lo acepta. Si el módulo no llega a montar en 3 s,
-          se retira y la página queda completa (el motion nunca condiciona el contenido). */}
+  ) : header && model && edition && summary && (
+    <div class="ins-page" style={cssVars} data-filter="all">
+      {/* Antes del primer paint: marca que hay JS y prepara el motion sólo si el usuario lo acepta. Si el módulo no
+          monta en 3 s, se retira todo y la página queda completa: el motion nunca condiciona el contenido. */}
       <script is:inline>
-        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          document.documentElement.classList.add('ins-motion')
-          setTimeout(function () { if (!window.__insMounted) document.documentElement.classList.remove('ins-motion') }, 3000)
-        }
+        document.documentElement.classList.add('ins-js')
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('ins-motion')
+        setTimeout(function () { if (!window.__insMounted) document.documentElement.classList.remove('ins-motion', 'ins-js') }, 3000)
       </script>
-      <a class="ins-skip" href="#contenido">{C.skipLink}</a>
+      <a class="ins-skip" href="#hallazgos">{C.skipLink}</a>
 
-      <header class="ins-masthead ins-dark" data-capture="masthead" data-masthead>
-        <div
-          class="ins-orbit"
-          aria-hidden="true"
-          data-orbit
-          data-r={R}
-          data-start={ARC_START}
-          data-sweep={ARC_SWEEP}
-          data-ms={motion.orbitMs.travel}
-          data-delay={motion.orbitMs.travelDelay}
-          style="width:clamp(234px, 43vw, 624px);aspect-ratio:1;right:clamp(-40px, 4vw, 110px);top:clamp(72px, 9vw, 78px)"
-        >
+      <header class="ins-hero ins-dark" data-capture="masthead" data-hero>
+        <div class="ins-orbit" aria-hidden="true" data-orbit data-r={R} data-start={ARC_START} data-sweep={ARC_SWEEP} data-ms={motion.orbitMs.travel} data-delay={motion.orbitMs.travelDelay}>
           <svg viewBox={`0 0 ${size} ${size}`}>
             <defs>
               <radialGradient id="ins-halo" cx={R} cy={R} r={haloR} gradientUnits="userSpaceOnUse">
-                <stop offset="0" stop-color="var(--ins-halo)" stop-opacity="0.13" />
+                <stop offset="0" stop-color="var(--ins-halo)" stop-opacity="0.14" />
                 <stop offset="0.54" stop-color="var(--ins-halo)" stop-opacity="0.05" />
                 <stop offset="1" stop-color="var(--ins-halo)" stop-opacity="0" />
               </radialGradient>
@@ -157,28 +152,33 @@ const statusCopy = result.status !== 'ok' ? C.states[result.status] : null
             <circle class="ins-orbit__halo" cx={R} cy={R} r={haloR} fill="url(#ins-halo)" />
             <circle class="ins-orbit__ring" cx={R} cy={R} r={R} fill="none" stroke="var(--ins-halo)" stroke-opacity={orbitMeasure.ringOpacity} stroke-width={w(orbitMeasure.base.ringStrokePx)} />
             <path class="ins-orbit__arc" d={arcPath} fill="none" stroke="var(--ins-accent-dark)" stroke-width={w(orbitMeasure.base.trailStrokePx)} stroke-linecap="round" />
+            <circle class="ins-orbit__live" cx={arcTo.x.toFixed(2)} cy={arcTo.y.toFixed(2)} r={w(orbitMeasure.base.sphereRadiusPx)} fill="none" stroke="var(--ins-accent-dark)" stroke-width="1.5" />
             <circle class="ins-orbit__sphere" cx={arcTo.x.toFixed(2)} cy={arcTo.y.toFixed(2)} r={w(orbitMeasure.base.sphereRadiusPx)} fill="var(--ins-accent-dark)" />
           </svg>
         </div>
 
-        <div class="ins-masthead__bar">
+        <div class="ins-hero__bar">
           <img class="ins-lockup" src="/branding/insights/insights-lockup-negative.svg" alt="Efeonce Insights" width="277" height="32" />
-          <span class="ins-label ins-masthead__code ins-num">{C.editionValue(header.reportCode, header.editionVersion)}</span>
+          <ul class="ins-status" aria-label="Estado del enlace">
+            <li><span class="ins-status__dot" aria-hidden="true" />{C.linkActive}</li>
+            {expiresShort && <li class="ins-num">{C.expiresShort(expiresShort)}</li>}
+          </ul>
         </div>
 
-        <div class="ins-masthead__body">
-          <span class="ins-label">{C.brandEyebrow}</span>
-          <h1 class="ins-title" id="informe-titulo">{header.reportTitle}</h1>
-          {model.scopeLines && model.scopeLines.length > 0 && (
-            <ul class="ins-scope" aria-label={C.scopeTitle}>{model.scopeLines.map((line) => <li>{line}</li>)}</ul>
-          )}
-          <dl class="ins-meta">
-            <div><dt>{C.preparedFor}</dt><dd>{header.organizationName}</dd></div>
-            <div><dt>{C.period}</dt><dd>{header.periodLabel}</dd></div>
-            <div><dt>{C.edition}</dt><dd class="ins-num">{C.editionValue(header.reportCode, header.editionVersion)}</dd></div>
-            {asOfLabel && <div><dt>{C.asOf}</dt><dd class="ins-num">{asOfLabel}</dd></div>}
-          </dl>
+        <div class="ins-hero__body">
+          <p class="ins-hero__kicker"><span>{header.reportTitle}</span><span class="ins-num">{header.periodLabel}</span></p>
+          <h1 class="ins-hero__answer">{summary.headline?.text ?? header.reportTitle}</h1>
+          {summary.rest.map((claim) => <p class="ins-hero__lead">{claim.text}</p>)}
+          <p class="ins-hero__meta ins-num">
+            <span>{C.preparedFor} <b>{header.organizationName}</b></span>
+            <span>{C.editionValue(header.reportCode, header.editionVersion)}</span>
+            {asOfShort && <span>{C.dataAsOf(asOfShort)}</span>}
+          </p>
         </div>
+
+        <a class="ins-hero__cue" href="#hallazgos" aria-label={C.findingsTitle}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
+        </a>
       </header>
 
       {partial && (
@@ -189,140 +189,163 @@ const statusCopy = result.status !== 'ok' ? C.states[result.status] : null
         </div>
       )}
 
-      <div class="ins-body">
-        <aside class="ins-rail">
-          <div class="ins-rail__inner">
-            <div class="ins-progress" data-progress aria-hidden="true">
-              <svg viewBox="0 0 44 44">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="var(--ins-navy)" stroke-opacity="0.16" stroke-width="1.5" />
-                <circle class="ins-progress__arc" cx="22" cy="22" r="18" fill="none" stroke="var(--ins-accent-light)" stroke-width="2.5" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" transform="rotate(-90 22 22)" />
-                <g class="ins-progress__sphere"><circle cx="22" cy="4" r="3.5" fill="var(--ins-accent-light)" /></g>
-              </svg>
-              <span class="ins-progress__text ins-num" data-progress-text data-template={C.progressLabel(0, sections.length)}></span>
-            </div>
-            <nav class="ins-toc" aria-label={C.indexToggle}>
-              <div class="ins-rail__desktop">
-                <span class="ins-label">{C.indexTitle}</span>
-                <ol class="ins-toc" style="margin-top:18px">
-                  {sections.map((section, i) => (
-                    <li><a href={`#${section.id}`} data-toc={section.id} aria-current={i === 0 ? 'true' : undefined}>{section.number && <span class="ins-num">{section.number}</span>}{section.label}</a></li>
-                  ))}
-                </ol>
-              </div>
-              <details>
-                <summary><span>{C.indexTitle}</span><span class="ins-label" style="letter-spacing:0;text-transform:none;font-weight:400">{C.indexSections(sections.length)}</span></summary>
-                <ol>
-                  {sections.map((section) => (
-                    <li><a href={`#${section.id}`}>{section.number && <span class="ins-num">{section.number}</span>}{section.label}</a></li>
-                  ))}
-                </ol>
-              </details>
-            </nav>
+      <nav class="ins-topbar" data-bar aria-label={C.filtersLabel}>
+        <div class="ins-topbar__inner">
+          <span class="ins-topbar__orbit" aria-hidden="true" data-progress>
+            <svg viewBox="0 0 32 32">
+              <circle cx="16" cy="16" r="12" fill="none" stroke="var(--ins-halo)" stroke-opacity="0.28" stroke-width="1.5" />
+              <circle class="ins-topbar__arc" cx="16" cy="16" r="12" fill="none" stroke="var(--ins-accent-dark)" stroke-width="2.2" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="96" transform="rotate(-90 16 16)" />
+              <g class="ins-topbar__sphere"><circle cx="16" cy="4" r="3" fill="var(--ins-accent-dark)" /></g>
+            </svg>
+          </span>
+          <div class="ins-filters" role="group" aria-label={C.filtersLabel}>
+            <button type="button" data-filter-btn="all" aria-pressed="true">{C.filterAll}</button>
+            {modules.map((m) => <button type="button" data-filter-btn={m.module} aria-pressed="false">{C.moduleLabel[m.module] ?? m.title}</button>)}
           </div>
-        </aside>
+          <div class="ins-topbar__actions">
+            {model.actions.length > 0 && <a class="ins-topbar__link" href="#plan">{C.filterPlan}</a>}
+            <button type="button" class="ins-iconbtn" data-copy-link aria-label={C.copyLink} set:html={linkIcon} />
+            {primaryDownload && (
+              <a class="ins-btn ins-btn--small" href={`?descargar=${primaryDownload.output}`} download><Fragment set:html={downloadIcon} /><span>{C.downloadShort}</span></a>
+            )}
+          </div>
+        </div>
+      </nav>
 
-        <main class="ins-main" id="contenido">
-          <section class="ins-section" id="resumen" data-section data-capture="summary" aria-labelledby="resumen-title">
-            <div style="display:flex;flex-direction:column;gap:20px" data-reveal>
-              <span class="ins-label">{C.summaryTitle}</span>
-              <h2 class="ins-h2" id="resumen-title" tabindex="-1">{model.executiveSummary[0]?.text ?? C.summaryTitle}</h2>
-              {model.executiveSummary.slice(1).map((claim) => <p class="ins-lead">{claim.text}</p>)}
-            </div>
+      <section class="ins-findings ins-dark" id="hallazgos" data-section data-capture="summary" aria-labelledby="hallazgos-title">
+        <div class="ins-findings__head" data-reveal>
+          <h2 class="ins-findings__title" id="hallazgos-title" tabindex="-1">{C.findingsTitle}</h2>
+          <p class="ins-findings__lead">{C.findingsLead}</p>
+        </div>
+        <div class="ins-tiles" data-stagger>
+          {findings.map((finding, i) => (
+            <article class:list={['ins-tile', { 'ins-tile--lead': i === 0 }]} id={finding.id} data-module={finding.module ?? 'all'} data-finding>
+              <button type="button" class="ins-tile__hit" aria-expanded="false" aria-controls={`${finding.id}-ev`}>
+                <span class="ins-tile__top">
+                  <span class="ins-chip ins-chip--dark">{finding.module ? C.moduleLabel[finding.module] : C.filterAll}</span>
+                  <span class="ins-tile__plus" aria-hidden="true" set:html={plusIcon} />
+                </span>
+                {finding.fact && (
+                  <span class="ins-tile__figure" data-countup={finding.fact.value ?? undefined} data-display={finding.fact.display}>
+                    {finding.fact.value === null ? C.absent : finding.fact.display}
+                  </span>
+                )}
+                <span class="ins-tile__claim">{finding.claim.text}</span>
+                {finding.fact && (
+                  <span class="ins-tile__prov">
+                    {finding.fact.value === null ? <span class="ins-mark">{C.absent}</span> : <FactMark observation={finding.fact.observation} />}
+                    <span>{finding.fact.source}</span>
+                  </span>
+                )}
+                <span class="ins-visually-hidden">{C.findingOpen}</span>
+              </button>
 
-            {model.essentials && model.essentials.length > 0 && (
-              <div>
-                <span class="ins-label" style="display:block;padding-bottom:14px">{C.essentialsTitle}</span>
-                <div class="ins-essentials" data-stagger>
-                  {model.essentials.map((claim) => {
-                    const fact = firstFact(claim.factIds)
-                    return (
-                      <div class="ins-essential">
-                        <span class="ins-figure-md" data-countup={fact?.value ?? undefined} data-display={fact?.display}>{fact ? (fact.value === null ? C.absent : fact.display) : ''}</span>
-                        <p>{claim.text}</p>
-                        {fact && (
-                          <div class="ins-prov">
-                            {fact.value === null ? <span class="ins-mark">{C.absent}</span> : <FactMark observation={fact.observation} />}
-                            <span>{fact.source}</span>
-                            {fact.asOf && <span class="ins-num">{C.asOf} {short(fact.asOf)}</span>}
-                          </div>
-                        )}
+              <div class="ins-tile__evidence" id={`${finding.id}-ev`} role="region" aria-label={`${C.findingOpen}: ${finding.fact?.label ?? finding.claim.text}`}>
+                {finding.evidence ? (
+                  <>
+                    {finding.evidence.reading?.conclusion && <p class="ins-tile__conclusion">{finding.evidence.reading.conclusion.text}</p>}
+                    <ChartFigure spec={finding.evidence.chart.spec} table={finding.evidence.chart.table} facts={model.facts} locale={locale} theme="dark" uid={`ev-${finding.id}`} compact />
+                    {(finding.evidence.reading?.meaning || finding.evidence.reading?.nextStep) && (
+                      <div class="ins-tile__reading">
+                        {finding.evidence.reading?.meaning && <div><span class="ins-label">{C.meaningTitle}</span><p>{finding.evidence.reading.meaning.text}</p></div>}
+                        {finding.evidence.reading?.nextStep && <div><span class="ins-label">{C.nextStepTitle}</span><p>{finding.evidence.reading.nextStep.text}</p></div>}
                       </div>
-                    )
-                  })}
+                    )}
+                  </>
+                ) : (
+                  <p class="ins-tile__conclusion ins-tile__conclusion--muted">{C.noEvidenceChart}</p>
+                )}
+                {finding.fact && (
+                  <dl class="ins-tile__facts">
+                    <div><dt>{finding.fact.label}</dt><dd class="ins-num">{finding.fact.value === null ? C.absent : finding.fact.display}</dd></div>
+                    <div><dt>{C.provenanceSource}</dt><dd>{finding.fact.source}</dd></div>
+                    {finding.fact.asOf && <div><dt>{C.asOf}</dt><dd class="ins-num">{short(finding.fact.asOf)}</dd></div>}
+                  </dl>
+                )}
+                <div class="ins-tile__actions">
+                  <button type="button" class="ins-textbtn" data-copy-link={finding.id}><Fragment set:html={linkIcon} />{C.copyFindingLink}</button>
+                  <button type="button" class="ins-textbtn" data-close>{C.findingClose}</button>
                 </div>
               </div>
-            )}
-
-            {model.decision && (
-              <div class="ins-panel" data-reveal style="grid-template-columns:1fr">
-                <div>
-                  <span class="ins-label">{C.decisionTitle}</span>
-                  <p style="font-size:1.3125rem;line-height:1.45">{model.decision.text}</p>
-                  <span style="font-size:0.875rem;color:var(--ins-ink-soft-dark)">{C.decisionFooter}</span>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {model.chapters.map((chapter, i) => (
-            <InsightsChapter chapter={chapter} index={i + 1} facts={model.facts} locale={locale} />
+            </article>
           ))}
+        </div>
 
-          {model.actions.length > 0 && (
-            <section class="ins-section" id="plan" data-section aria-labelledby="plan-title">
-              <span class="ins-label">{C.planTitle}</span>
-              <div class="ins-plan__head" data-reveal>
-                <span class="ins-figure-xl" data-countup={model.actions.length} data-display={String(model.actions.length)}>{model.actions.length}</span>
-                <div style="display:flex;flex-direction:column;gap:12px">
-                  <h2 class="ins-h2" id="plan-title" tabindex="-1">{C.actionsTitle}</h2>
-                  <p class="ins-lead">{C.planLead}</p>
-                </div>
+        {model.decision && (
+          <div class="ins-decision" data-reveal>
+            <span class="ins-label">{C.decisionTitle}</span>
+            <p>{model.decision.text}</p>
+            {model.actions.length > 0 && <a class="ins-decision__link" href="#plan">{C.planTitle} <span aria-hidden="true">→</span></a>}
+          </div>
+        )}
+      </section>
+
+      <main class="ins-main" id="contenido">
+        {model.chapters.map((chapter, i) => <ModuleScene chapter={chapter} index={i + 1} facts={model.facts} locale={locale} />)}
+
+        {model.actions.length > 0 && (
+          <section class="ins-plan" id="plan" data-section aria-labelledby="plan-title">
+            <div class="ins-plan__head" data-reveal>
+              <span class="ins-plan__count" data-countup={model.actions.length} data-display={String(model.actions.length)}>{model.actions.length}</span>
+              <div>
+                <span class="ins-label">{C.planTitle}</span>
+                <h2 class="ins-plan__title" id="plan-title" tabindex="-1">{C.planLead}</h2>
               </div>
-              <ol class="ins-actions" data-stagger>{model.actions.map((action) => <li>{action.text}</li>)}</ol>
-            </section>
-          )}
-
-          <section class="ins-section" id="metodologia" data-section data-capture="methodology" aria-labelledby="metodologia-title">
-            <div style="display:flex;flex-direction:column;gap:12px">
-              <span class="ins-label">{C.methodologyTitle}</span>
-              <h2 class="ins-h2" id="metodologia-title" tabindex="-1" style="font-size:clamp(1.75rem,2.6vw,2.25rem)">{C.methodologyHeading}</h2>
             </div>
-            {model.methodology.length > 0 && <ul class="ins-method" data-stagger>{model.methodology.map((line) => <li>{line}</li>)}</ul>}
-            <div class="ins-twocol">
-              {model.limits.length > 0 && (
-                <div><span class="ins-label">{C.editionLimits}</span>{model.limits.map((limit) => <p>{limit}</p>)}</div>
-              )}
-              {model.references.length > 0 && (
-                <div><span class="ins-label">{C.references}</span><ol>{model.references.map((ref) => <li>{ref.label}</li>)}</ol></div>
-              )}
-            </div>
+            <ol class="ins-actions" data-stagger>
+              {model.actions.map((action) => {
+                const module = moduleOf(action.factIds)
+                return (
+                  <li>
+                    <span class="ins-actions__text">{action.text}</span>
+                    {module && <span class="ins-chip">{C.moduleLabel[module]}</span>}
+                  </li>
+                )
+              })}
+            </ol>
           </section>
+        )}
 
-          <section class="ins-section" id="descargas" data-section data-capture="downloads" aria-labelledby="descargas-title">
-            <h2 class="ins-label" id="descargas-title" tabindex="-1">{C.downloadsTitle}</h2>
-            <div class="ins-downloads">
-              {edition.downloads.filter((download) => download.output !== 'web').map((download) => (
-                <div class="ins-download">
-                  <div class="ins-download__name"><b>{C.downloadLabel[download.output]}</b><span>{C.downloadFormat[download.output]}</span></div>
-                  {download.status === 'available' ? (
-                    <a class="ins-btn" href={`?descargar=${download.output}`} download>
-                      <svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v9M5 8l4 4 4-4M3 15h12" /></svg>
-                      {C.downloadCta}
-                    </a>
-                  ) : (
-                    <span class="ins-download__na">{C.downloadUnavailable}</span>
-                  )}
-                </div>
-              ))}
+        <section class="ins-how" id="metodologia" data-section data-capture="methodology" aria-labelledby="metodologia-title">
+          <details class="ins-how__details">
+            <summary>
+              <span>
+                <span class="ins-how__title" id="metodologia-title">{C.howMeasured}</span>
+                <span class="ins-how__lead">{C.howMeasuredLead}</span>
+              </span>
+              <span class="ins-tile__plus" aria-hidden="true" set:html={plusIcon} />
+            </summary>
+            <div class="ins-how__body">
+              {model.methodology.length > 0 && <ul class="ins-method">{model.methodology.map((line) => <li>{line}</li>)}</ul>}
+              <div class="ins-twocol">
+                {model.limits.length > 0 && <div><span class="ins-label">{C.editionLimits}</span>{model.limits.map((limit) => <p>{limit}</p>)}</div>}
+                {model.references.length > 0 && <div><span class="ins-label">{C.references}</span><ol>{model.references.map((ref) => <li>{ref.label}</li>)}</ol></div>}
+              </div>
             </div>
-          </section>
-        </main>
-      </div>
+          </details>
+        </section>
+
+        <section class="ins-downloads" id="descargas" data-capture="downloads" aria-labelledby="descargas-title">
+          <h2 class="ins-label" id="descargas-title">{C.downloadsTitle}</h2>
+          <div class="ins-downloads__row">
+            {downloads.map((download) => (
+              <div class="ins-download">
+                <div class="ins-download__name"><b>{C.downloadLabel[download.output]}</b><span>{C.downloadFormat[download.output]}</span></div>
+                {download.status === 'available' ? (
+                  <a class="ins-btn" href={`?descargar=${download.output}`} download><Fragment set:html={downloadIcon} />{C.downloadCta}</a>
+                ) : (
+                  <span class="ins-download__na">{C.downloadUnavailable}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
 
       <footer class="ins-footer ins-dark" data-capture="footer">
         <p class="ins-footer__notice">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-          <span>{C.linkNotice} {expiresLabel && C.linkExpires(expiresLabel)}</span>
+          <span class="ins-status__dot" aria-hidden="true" />
+          <span>{C.linkNotice} {expiresLong && C.linkExpires(expiresLong)}</span>
         </p>
         <div class="ins-signature">
           <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" width="440" height="103" />
@@ -336,6 +359,13 @@ const statusCopy = result.status !== 'ok' ? C.states[result.status] : null
         </div>
         <p class="ins-legal">{C.confidential(header.organizationName, header.reportCode, header.editionVersion)}</p>
       </footer>
+
+      <div class="ins-dock" aria-label="Acciones del informe">
+        <button type="button" class="ins-dock__btn" data-copy-link><Fragment set:html={linkIcon} />{C.copyLink}</button>
+        {primaryDownload && <a class="ins-dock__btn ins-dock__btn--primary" href={`?descargar=${primaryDownload.output}`} download><Fragment set:html={downloadIcon} />{C.downloadShort}</a>}
+      </div>
+
+      <div class="ins-toast" role="status" aria-live="polite" data-toast data-text={C.linkCopied}></div>
     </div>
   )}
 </BaseLayout>

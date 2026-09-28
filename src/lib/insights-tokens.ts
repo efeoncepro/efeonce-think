@@ -22,10 +22,15 @@ export const orbita = {
   sloganLeadDark: '#e2e2e2', // «Empower your» sobre oscuro
 } as const
 
-/** Roles de dato (mismos que los PDF de TASK-1889): actual y anterior se distinguen también por luminosidad. */
+/**
+ * Roles de dato (mismos que los PDF de TASK-1889, `--axis-deck-role-data*` del catálogo insights-deck): actual y
+ * anterior se distinguen también por luminosidad. En navy: actual = teal, anterior = periwinkle.
+ */
 export const dataRoles = {
   current: orbita.navy,
   previous: orbita.accentLight,
+  currentOnNavy: orbita.accentDark,
+  previousOnNavy: '#8aa8d8', // --axis-deck-role-dataPriorOnNavy (--axis-deck-blue-310)
 } as const
 
 /** Anatomía de la órbita que mide (`efeonceGraphicLine.trajectory.measure` + `lens.anatomy`, escalada por ancho). */
@@ -63,6 +68,8 @@ export const insightsCssVars = {
   'ins-slogan-lead-dark': orbita.sloganLeadDark,
   'ins-data-current': dataRoles.current,
   'ins-data-previous': dataRoles.previous,
+  'ins-data-current-dark': dataRoles.currentOnNavy,
+  'ins-data-previous-dark': dataRoles.previousOnNavy,
   'ins-ease-emphasized': motion.easeEmphasized,
   'ins-ease-standard': motion.easeStandard,
   'ins-duration-short': motion.durationShort,
