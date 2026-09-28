@@ -22,7 +22,8 @@ renderiza el modelo que el backend entrega.
 | `/` | Landing del hub | pendiente | sí |
 | `/brand-visibility` | Landing de la herramienta + embed del form (TASK-1327) | pendiente | sí |
 | `/brand-visibility/r/[token]` | Informe per-lead (SSR, token-gated) | **live, enterprise** | **noindex** |
-| `/insights/r/[token]` | Informe compartido de Efeonce Insights (SSR por request, token-gated). Ver sección abajo | construido y verificado en local; **sin desplegar** | **noindex** |
+| `/insights/r/[token]` | Informe compartido de Efeonce Insights (SSR por request, token-gated). Ver sección abajo | en producción (2026-09-28) | **noindex** |
+| `/insights/muestra` | Muestra pública del informe de Insights para clientes: mismo render (`InsightReport`), datos de ejemplo y marca ficticia | en producción (2026-09-28) | **noindex**, fuera del sitemap |
 
 ## Contrato que consume
 
