@@ -49,7 +49,7 @@ export const motion = {
   easeStandard: 'cubic-bezier(0.4, 0, 0.2, 1)',
   durationShort: '150ms',
   durationMedium: '300ms',
-  /** La órbita sola: aparece el anillo, recorre la esfera con su estela, asienta y sube el halo (2,0 s). */
+  /** La órbita sola: aparece el anillo, recorre la esfera con su estela, asienta y sube el halo (≈2,1 s: 200 + 1100 + 800). */
   orbitMs: { ring: 350, travel: 1100, travelDelay: 200, halo: 800 },
 } as const
 
