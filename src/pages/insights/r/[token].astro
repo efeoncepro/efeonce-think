@@ -343,21 +343,22 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       </main>
 
       <footer class="ins-footer ins-dark" data-capture="footer">
-        <p class="ins-footer__notice">
-          <span class="ins-status__dot" aria-hidden="true" />
-          <span>{C.linkNotice} {expiresLong && C.linkExpires(expiresLong)}</span>
-        </p>
-        <div class="ins-signature">
-          <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" width="440" height="103" />
-          <p class="ins-slogan"><span class="e">Empower</span> <span class="y">your</span> <span class="g">Growth</span></p>
+        <div class="ins-footer__inner">
+          <div class="ins-signature">
+            <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" width="200" height="47" />
+            <p class="ins-slogan"><span class="e">Empower</span> <span class="y">your</span> <span class="g">Growth</span></p>
+          </div>
+          <ul class="ins-contact">
+            <li><a href="mailto:sales@efeoncepro.com">sales@efeoncepro.com</a></li>
+            <li>Chile +56 9 3732 3064</li>
+            <li>Estados Unidos +1 (239) 235-2073</li>
+            <li>Providencia, Chile</li>
+          </ul>
+          <div class="ins-footer__base">
+            <p class="ins-footer__notice"><span class="ins-status__dot" aria-hidden="true" /><span>{C.linkNotice} {expiresLong && C.linkExpires(expiresLong)}</span></p>
+            <p class="ins-legal">{C.confidential(header.organizationName, header.reportCode, header.editionVersion)}</p>
+          </div>
         </div>
-        <div class="ins-contact">
-          <a href="mailto:sales@efeoncepro.com">sales@efeoncepro.com</a>
-          <span>Chile +56 9 3732 3064</span>
-          <span>Estados Unidos +1 (239) 235-2073</span>
-          <span>Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span>
-        </div>
-        <p class="ins-legal">{C.confidential(header.organizationName, header.reportCode, header.editionVersion)}</p>
       </footer>
 
       <div class="ins-dock" aria-label="Acciones del informe">

@@ -503,17 +503,23 @@
 .ins-download__name span, .ins-download__na { font-size: 0.875rem; color: var(--ins-ink-soft-light); }
 
 /* Cierre */
-.ins-footer { display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 96px var(--ins-gutter) 64px; background: var(--ins-ground); color: var(--ins-ink); text-align: center; }
-.ins-footer__notice { margin: 0; display: flex; align-items: center; gap: 12px; font-size: 0.9375rem; color: var(--ins-ink-soft-dark); }
-.ins-signature { display: flex; flex-direction: column; align-items: center; gap: 32px; padding: 24px 0; }
-.ins-signature img { width: min(440px, 72vw); height: auto; display: block; }
-.ins-slogan { margin: 0; font-family: var(--ins-structure); font-size: 1.5rem; line-height: 1; letter-spacing: -0.025em; color: var(--ins-slogan-lead-dark); }
+.ins-footer { background: var(--ins-ground); color: var(--ins-ink); padding: 64px var(--ins-gutter) 28px; }
+.ins-footer__inner { max-width: var(--ins-max); margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; }
+/* Bloque oficial del eslogan: logo arriba; eslogan debajo al 64 % del ancho del logo, separado 1,35 veces su cuerpo.
+   A 12 px la palabra final va en blanco (el acento nunca bajo 24 px). */
+.ins-signature { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.ins-signature img { width: 200px; height: auto; display: block; }
+.ins-slogan { margin: 0; font-family: var(--ins-structure); font-size: 0.75rem; line-height: 1; letter-spacing: -0.025em; color: var(--ins-slogan-lead-dark); white-space: nowrap; }
 .ins-slogan .e { font-weight: 800; font-style: italic; }
 .ins-slogan .y { font-weight: 800; }
-.ins-slogan .g { font-weight: 900; font-style: italic; color: var(--ins-accent-dark); }
-.ins-contact { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px; font-size: 0.875rem; color: var(--ins-ink-soft-dark); font-variant-numeric: tabular-nums; }
-.ins-contact a { color: inherit; }
-.ins-legal { margin: 0; max-width: 820px; font-size: 0.75rem; line-height: 1.6; color: var(--ins-ink-soft-dark); }
+.ins-slogan .g { font-weight: 900; font-style: italic; color: var(--ins-ink); }
+.ins-contact { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 0; font-size: 0.8125rem; color: var(--ins-ink-soft-dark); font-variant-numeric: tabular-nums; }
+.ins-contact li + li::before { content: '·'; margin: 0 12px; opacity: 0.5; }
+.ins-contact a { color: inherit; text-decoration: none; }
+.ins-contact a:hover { color: var(--ins-ink); text-decoration: underline; text-underline-offset: 3px; }
+.ins-footer__base { width: 100%; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--ins-rule-dark); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; text-align: left; }
+.ins-footer__notice { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: var(--ins-ink-soft-dark); }
+.ins-legal { margin: 0; font-size: 0.75rem; line-height: 1.5; color: color-mix(in srgb, var(--ins-ink-soft-dark) 75%, transparent); }
 
 /* Acciones móviles y aviso */
 .ins-dock { display: none; }
@@ -552,6 +558,11 @@
   .ins-step__card, .ins-step__key { position: relative; z-index: 3; }
 }
 @media (max-width: 720px) {
+  .ins-footer { padding-top: 48px; }
+  .ins-contact { flex-direction: column; gap: 6px; }
+  .ins-contact li + li::before { content: none; }
+  .ins-footer__base { flex-direction: column; justify-content: center; text-align: center; }
+  .ins-footer__notice { justify-content: center; align-items: flex-start; text-align: left; }
   .ins-bullet { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .ins-funnel li { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .ins-funnel__bar { justify-self: start; }
