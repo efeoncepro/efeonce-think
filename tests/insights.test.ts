@@ -6,7 +6,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { resolveInsightFixture } from '../src/lib/insights-fixtures.ts'
-import { buildFindings, chartFactIds, findEvidence, splitSummary } from '../src/lib/insights-view.ts'
+import { buildFindings, chartFactIds, findEvidence, splitLead, splitSummary } from '../src/lib/insights-view.ts'
 import { bulletScale, gaugeAngle, GAUGE_START, GAUGE_SWEEP, heatmapIntensity, niceScale, slices, vennTwo, waffleCells, waterfallBars } from '../src/lib/insights-chart-geometry.ts'
 
 const model = (token: string) => {
@@ -129,4 +129,15 @@ test('venn: áreas proporcionales a cada conjunto y a la intersección', () => {
   const lens = a * Math.acos((d * d + a - b) / (2 * d * rA)) + b * Math.acos((d * d + b - a) / (2 * d * rB)) - 0.5 * Math.sqrt((-d + rA + rB) * (d + rA - rB) * (d - rA + rB) * (d + rA + rB))
   assert.ok(Math.abs(lens - 15) < 1e-6)
   assert.equal(vennTwo(10, 10, 0).d, vennTwo(10, 10, 0).rA + vennTwo(10, 10, 0).rB)
+})
+
+test('la decisión se parte en lo que se pide y su lectura, sin perder ni cambiar texto', () => {
+  const text = 'Aprobar el plan de septiembre: cinco acciones para convertir mejor el tráfico que ya llega. Las dos primeras pueden estar en producción en dos semanas.'
+  const colon = splitLead(text)
+  assert.equal(colon.lead, 'Aprobar el plan de septiembre')
+  assert.equal(`${colon.lead}${colon.joiner}${colon.rest}`, text)
+  const sentence = splitLead('Mover el presupuesto a búsqueda de marca. El CPC bajó a la mitad y la conversión se duplicó.')
+  assert.equal(sentence.lead, 'Mover el presupuesto a búsqueda de marca.')
+  assert.equal(`${sentence.lead}${sentence.joiner}${sentence.rest}`, 'Mover el presupuesto a búsqueda de marca. El CPC bajó a la mitad y la conversión se duplicó.')
+  assert.equal(splitLead('Aprobar el plan.').rest, null)
 })

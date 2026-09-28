@@ -89,3 +89,20 @@ export const chartFactIds = (spec: ChartSpecV1): string[] => {
     case 'upset': return [...ids, ...data.intersections.map((it) => it.factId)]
   }
 }
+
+/**
+ * Jerarquía de un texto largo del modelo (la decisión): lo que se pide, a lo grande, y el resto como lectura. Parte en
+ * los dos puntos si la petición es corta; si no, en la primera oración. Nunca reescribe: las dos partes, unidas, son el
+ * texto original (en la partición por dos puntos, la cabeza los omite: el layout ya une petición y lectura, y
+ * `joiner` los devuelve). Si ninguna partición deja una cabeza legible, todo va como cabeza.
+ */
+export const splitLead = (text: string): { lead: string; rest: string | null; joiner: string } => {
+  const clean = text.trim()
+  const colon = clean.indexOf(':')
+  if (colon >= 12 && colon <= 80 && clean.length - colon > 20) {
+    return { lead: clean.slice(0, colon), rest: clean.slice(colon + 1).trim(), joiner: ': ' }
+  }
+  const sentence = /^(.{12,110}?[.!?])\s+(\S[\s\S]*)$/.exec(clean)
+  if (sentence) return { lead: sentence[1]!, rest: sentence[2]!, joiner: ' ' }
+  return { lead: clean, rest: null, joiner: '' }
+}

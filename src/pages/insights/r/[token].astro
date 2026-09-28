@@ -27,7 +27,7 @@ import ModuleScene from '@/components/insights/ModuleScene.astro'
 import ChartFigure from '@/components/insights/ChartFigure.astro'
 import FactMark from '@/components/insights/FactMark.astro'
 import { fetchSharedInsightEdition, fetchSharedInsightLogo, fetchSharedInsightOutput, type InsightOutput } from '@lib/insights'
-import { buildFindings, buildModules, splitSummary } from '@lib/insights-view'
+import { buildFindings, buildModules, splitLead, splitSummary } from '@lib/insights-view'
 import { getInsightsCopy } from '@lib/insights-copy'
 import { insightsCssVars, orbitMeasure, motion } from '@lib/insights-tokens'
 
@@ -91,6 +91,7 @@ const expiresLong = edition ? longDate(edition.expiresAt, header?.timeZone) : nu
 const findings = model ? buildFindings(model) : []
 const modules = model ? buildModules(model) : []
 const summary = model ? splitSummary(model) : null
+const decision = model?.decision ? splitLead(model.decision.text) : null
 const downloads = edition?.downloads.filter((d) => d.output !== 'web') ?? []
 const primaryDownload = downloads.find((d) => d.status === 'available')
 
@@ -298,7 +299,8 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
         {model.decision && (
           <div class="ins-decision" data-reveal>
             <span class="ins-label">{C.decisionTitle}</span>
-            <p>{model.decision.text}</p>
+            <p class="ins-decision__lead">{decision!.lead}</p>
+            {decision!.rest && <p class="ins-decision__rest">{decision!.rest}</p>}
             {model.actions.length > 0 && <a class="ins-decision__link" href="#plan">{C.planTitle} <span aria-hidden="true">→</span></a>}
           </div>
         )}
@@ -418,7 +420,8 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
           {model.decision && (
             <section class="ins-slide ins-slide--decision" data-slide>
               <span class="ins-label">{C.decisionTitle}</span>
-              <p class="ins-slide__decision">{model.decision.text}</p>
+              <p class="ins-slide__decision">{decision!.lead}</p>
+              {decision!.rest && <p class="ins-slide__claim">{decision!.rest}</p>}
             </section>
           )}
           {model.actions.length > 0 && (

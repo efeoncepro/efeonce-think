@@ -218,7 +218,11 @@
 .ins-textbtn:hover { background: color-mix(in srgb, var(--ins-ink) 10%, transparent); }
 
 .ins-decision { margin-top: 56px; display: flex; flex-direction: column; gap: 16px; padding: clamp(28px, 4vw, 48px); border-radius: 24px; background: var(--ins-navy); }
-.ins-decision p { margin: 0; max-width: 960px; font-family: var(--ins-idea); font-size: clamp(1.75rem, 3.4vw, 3rem); line-height: 1.05; font-weight: 640; letter-spacing: -0.025em; text-wrap: balance; }
+.ins-decision p { margin: 0; }
+.ins-decision__lead { max-width: 900px; font-family: var(--ins-idea); font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1; font-weight: 680; letter-spacing: -0.03em; text-wrap: balance; }
+.ins-decision__rest { max-width: 640px; font-size: clamp(1.0625rem, 1.3vw, 1.25rem); line-height: 1.5; font-weight: 400; color: var(--ins-ink-soft-dark); text-wrap: pretty; }
+.ins-decision__rest::first-letter { text-transform: uppercase; }
+.ins-decision__link { margin-top: 8px; }
 .ins-decision__link { align-self: flex-start; display: inline-flex; gap: 10px; align-items: center; height: 44px; padding: 0 20px; border-radius: 9999px; background: var(--ins-ink); color: var(--ins-ground); font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: gap var(--ins-duration-medium) var(--ins-ease-emphasized), background var(--ins-duration-short) var(--ins-ease-standard); }
 .ins-decision__link:hover { gap: 16px; background: var(--ins-accent-dark); }
 
@@ -554,6 +558,7 @@
 .ins-slide__meta, .ins-slide__source { margin: 0; font-size: 1rem; color: var(--ins-ink-soft-dark); }
 .ins-slide__figure { font-family: var(--ins-idea); font-size: clamp(6rem, 17vw, 16rem); line-height: 0.8; font-weight: 760; letter-spacing: -0.05em; color: var(--ins-ink); }
 .ins-slide--finding.is-lead .ins-slide__figure { color: var(--ins-accent-dark); }
+.ins-slide--decision .ins-slide__claim::first-letter { text-transform: uppercase; }
 .ins-slide__claim { margin: 0; max-width: 980px; font-family: var(--ins-idea); font-size: clamp(1.5rem, 3vw, 2.75rem); line-height: 1.12; font-weight: 580; letter-spacing: -0.02em; text-wrap: balance; }
 .ins-slide__next { margin: 0; max-width: 760px; display: flex; flex-direction: column; gap: 6px; padding: 18px 22px; border-radius: 16px; background: var(--ins-navy); font-size: 1.125rem; line-height: 1.45; font-weight: 500; }
 .ins-slide__decision { margin: 0; max-width: 1100px; font-family: var(--ins-idea); font-size: clamp(2rem, 4.6vw, 4.5rem); line-height: 1.02; font-weight: 660; letter-spacing: -0.03em; text-wrap: balance; }
