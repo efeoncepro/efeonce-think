@@ -284,7 +284,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       </section>
     )}
 
-    <section class="ins-how" id="metodologia" data-section data-capture="methodology" aria-labelledby="metodologia-title">
+    <section class="ins-how" id="metodologia" data-reveal data-section data-capture="methodology" aria-labelledby="metodologia-title">
       <details class="ins-how__details">
         <summary>
           <span>
@@ -310,7 +310,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       <a class="ins-decision__link" href="mailto:sales@efeoncepro.com?subject=Efeonce%20Insights">{C.sampleCtaButton} <span aria-hidden="true">→</span></a>
     </section>
     ) : (
-    <section class="ins-downloads" id="descargas" data-capture="downloads" aria-labelledby="descargas-title">
+    <section class="ins-downloads" id="descargas" data-reveal data-capture="downloads" aria-labelledby="descargas-title">
       <h2 class="ins-label" id="descargas-title">{C.downloadsTitle}</h2>
       <div class="ins-downloads__row">
         {downloads.map((download) => (
@@ -329,7 +329,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
   </main>
 
   <footer class="ins-footer ins-dark" data-capture="footer">
-    <div class="ins-footer__inner">
+    <div class="ins-footer__inner" data-reveal>
       <div class="ins-signature">
         <img class="ins-screen-only" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" width="200" height="47" />
         <img class="ins-print-only" src="/branding/efeonce-logo.svg" alt="" width="200" height="47" />

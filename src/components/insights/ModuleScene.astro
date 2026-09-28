@@ -64,10 +64,10 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
 
   {main && (
     <div class:list={['ins-story', { 'ins-story--plain': steps.length === 0 }]} data-story>
-      <div class="ins-story__stage">
+      <div class="ins-story__stage" data-reveal>
         <ChartFigure spec={main.spec} table={main.table} derived={main.derived} copy={C} facts={facts} locale={locale} uid={`fig-${chapter.chapterId}`} />
         {mainProv && (
-          <div class="ins-provrow">
+          <div class="ins-provrow" data-reveal>
             <span><b>{C.provenanceUnit}</b>{main.spec.unit}</span>
             <span><b>{C.provenanceSource}</b>{mainProv.sources}</span>
             {mainProv.asOf && <span class="ins-num"><b>{C.asOf}</b>{mainProv.asOf}</span>}
@@ -127,7 +127,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
   )}
 
   {(chapter.claims.length > 0 || looseFacts.length > 0) && (
-    <div class="ins-more">
+    <div class="ins-more" data-reveal>
       {chapter.claims.length > 0 && <ul class="ins-claims" data-stagger>{chapter.claims.map((claim) => <li>{claim.text}</li>)}</ul>}
       {looseFacts.length > 0 && (
         <div class="ins-facts" data-stagger>
@@ -153,7 +153,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
   )}
 
   {chapter.limits.length > 0 && (
-    <div class="ins-limits" data-capture="limits">
+    <div class="ins-limits" data-capture="limits" data-reveal>
       <span class="ins-label">{C.limitsTitle}</span>
       <ul>
         {chapter.limits.map((limit) => (
