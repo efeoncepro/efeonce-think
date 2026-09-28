@@ -48,7 +48,11 @@ try {
 
     await page.goto(`${base}/insights/r/fixture-parcial`, { waitUntil: 'networkidle' })
     await page.addStyleTag({ content: 'astro-dev-toolbar { display: none !important; }' })
-    await page.screenshot({ path: await shot('partial-first-fold') })
+    // La nota de datos parciales va justo bajo la portada: se centra en pantalla para que quede en el cuadro.
+    await hideChrome()
+    await page.$eval('.ins-partial', (el) => el.scrollIntoView({ block: 'center' }))
+    await page.waitForTimeout(200)
+    await page.screenshot({ path: await shot('partial-note') })
     await element('limits', '[data-capture="chapter-ico"]')
 
     await page.goto(`${base}/insights/r/fixture-sin-descargas`, { waitUntil: 'networkidle' })
