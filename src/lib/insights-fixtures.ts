@@ -500,3 +500,13 @@ export const resolveInsightFixture = (token: string): SharedInsightResult | null
       return { status: 'not_found' }
   }
 }
+
+/**
+ * Muestra pública del producto (`/insights/muestra`): el fixture completo con una marca ficticia, sin logo de cliente
+ * ni descargas. Es un ejemplo para mostrar a clientes, no una edición: sus cifras no corresponden a ninguna marca real.
+ */
+export const insightSampleEdition = (organizationName: string): InsightSharedEditionResponseV1 => {
+  const edition = base('muestra')
+  const { clientLogo: _logo, ...header } = edition.header
+  return { ...edition, header: { ...header, organizationName }, downloads: [] }
+}

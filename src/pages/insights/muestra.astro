@@ -1,0 +1,28 @@
+---
+/**
+ * Muestra pública de Efeonce Insights — `think.efeoncepro.com/insights/muestra` (TASK-1875, greenhouse-eo).
+ *
+ * El mismo render que el informe compartido por token (`InsightReport`), con datos de ejemplo y una marca ficticia,
+ * para mostrar a clientes cómo se ve el producto. No llama a Greenhouse, no tiene token ni descargas, y se genera en el
+ * build. Aviso visible en la portada y el pie: las cifras no corresponden a ninguna marca real.
+ */
+export const prerender = true
+
+import BaseLayout from '@layouts/BaseLayout.astro'
+import InsightReport from '@/components/insights/InsightReport.astro'
+import { insightSampleEdition } from '@lib/insights-fixtures'
+import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+
+const edition = insightSampleEdition(C.sampleOrg)
+---
+
+<BaseLayout
+  title={C.sampleTitle}
+  description={C.sampleDescription}
+  noindex
+  canonical="/insights/muestra"
+  ogImage="/branding/insights/og-insights.png"
+  ogImageAlt="Efeonce Insights"
+>
+  <InsightReport edition={edition} mode="sample" />
+</BaseLayout>

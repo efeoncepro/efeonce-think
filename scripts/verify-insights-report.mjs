@@ -51,6 +51,13 @@ check(logo.status === 200 && (logo.headers.get('content-type') ?? '').startsWith
 const logoMissing = await fetch(`${base}/insights/r/fixture-no-existe?logo=1`)
 check(logoMissing.status === 404, `logo con enlace inexistente: 404 (HTTP ${logoMissing.status})`)
 
+const sample = await fetch(`${base}/insights/muestra`)
+const sampleHtml = await sample.text()
+check(sample.status === 200, `muestra: HTTP ${sample.status}`)
+check(sampleHtml.includes('Muestra con datos de ejemplo') && sampleHtml.includes('Marca de ejemplo') && sampleHtml.includes('no corresponden a ninguna marca real'), 'muestra: aviso de datos de ejemplo en portada y pie, con marca ficticia')
+check(!sampleHtml.includes('Greenhouse Demo') && !sampleHtml.includes('?descargar=') && !sampleHtml.includes('?logo=1') && !sampleHtml.includes('/api/public/'), 'muestra: sin organización real, descargas, logo ni rutas de Greenhouse')
+check(sampleHtml.includes('mailto:sales@efeoncepro.com') && sampleHtml.includes('Conversemos'), 'muestra: invitación a conversar en lugar de descargas')
+
 const download = await fetch(`${base}/insights/r/fixture-completo?descargar=report_pdf`, { redirect: 'manual' })
 check(download.status === 303, `descarga sin archivo: vuelve al informe (HTTP ${download.status})`)
 

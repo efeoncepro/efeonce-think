@@ -4,13 +4,14 @@
 import { chromium } from 'playwright'
 
 const base = (process.argv[2] ?? 'http://localhost:4331').replace(/\/+$/, '')
-const token = process.argv[3] ?? 'fixture-completo'
+const target = process.argv[3] ?? 'fixture-completo'
+const path = target.startsWith('/') ? target : `/insights/r/${target}`
 const browser = await chromium.launch()
 let failures = 0
 try {
   for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
     const page = await (await browser.newContext({ viewport, reducedMotion: 'reduce' })).newPage()
-    await page.goto(`${base}/insights/r/${token}`, { waitUntil: 'networkidle' })
+    await page.goto(`${base}${path}`, { waitUntil: 'networkidle' })
     const low = await page.evaluate(() => {
       const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true })
       const rgba = (css) => { probe.clearRect(0, 0, 1, 1); probe.fillStyle = '#000'; probe.fillStyle = css; probe.fillRect(0, 0, 1, 1); const [r, g, b, a] = probe.getImageData(0, 0, 1, 1).data; return [r, g, b, a / 255] }
