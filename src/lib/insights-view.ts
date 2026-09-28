@@ -26,7 +26,7 @@ export interface ModuleView {
   title: string
 }
 
-const chartHasFact = (spec: ChartSpecV1, factId: string) => spec.series.some((series) => series.factIds.includes(factId))
+const chartHasFact = (spec: ChartSpecV1, factId: string) => chartFactIds(spec).includes(factId)
 
 /** Evidencia de un hecho: primero la figura cuya cifra principal ES ese hecho; si no, la figura que lo dibuja. */
 export const findEvidence = (model: InsightWebModelV1, factId: string): FindingEvidence | undefined => {
@@ -72,3 +72,20 @@ export const splitSummary = (model: InsightWebModelV1) => ({
   headline: model.executiveSummary[0],
   rest: model.executiveSummary.slice(1),
 })
+
+/** Todos los hechos que dibuja una figura: los de sus series y los de sus datos propios (TASK-1888). */
+export const chartFactIds = (spec: ChartSpecV1): string[] => {
+  const ids = spec.series.flatMap((series) => series.factIds)
+  const data = spec.data
+  if (!data) return ids
+  switch (data.kind) {
+    case 'bullet': return [...ids, ...data.items.flatMap((it) => [it.valueFactId, it.targetFactId, ...(it.bandFactId ? [it.bandFactId] : [])])]
+    case 'gauge': return [...ids, data.valueFactId, data.previousFactId, ...(data.targetFactId ? [data.targetFactId] : [])]
+    case 'waterfall': return [...ids, ...data.steps.map((st) => st.factId)]
+    case 'funnel': return [...ids, ...data.stages.map((st) => st.factId)]
+    case 'heatmap': return [...ids, ...data.cells.flat().filter((id): id is string => !!id)]
+    case 'waffle': return [...ids, ...data.parts.map((p) => p.factId), ...(data.totalFactId ? [data.totalFactId] : [])]
+    case 'venn_two': return [...ids, data.onlyAFactId, data.onlyBFactId, data.bothFactId]
+    case 'upset': return [...ids, ...data.intersections.map((it) => it.factId)]
+  }
+}

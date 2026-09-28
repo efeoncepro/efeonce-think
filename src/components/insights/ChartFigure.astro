@@ -2,16 +2,31 @@
 /**
  * ChartFigure — un `ChartSpecV1` del informe de Insights, explorable (TASK-1875, dirección «tablero de respuestas»).
  *
- * - Primer paint completo en el servidor (HTML/CSS para barras, SVG para líneas), sin librería de gráficos.
- * - Cada grupo es un botón: al pasar o enfocar muestra el detalle de sus series; con teclado se recorre con Tab.
- * - Gráfico y tabla son el mismo componente con un interruptor (sin JS se ven los dos).
- * - `data-step` permite narrarlo por pasos (escena): 0 = sólo la referencia, 1 = el período, 2 = foco en el último
- *   grupo. Sin JS o con movimiento reducido queda en su estado final.
+ * Dibuja las 15 familias de Insights (TASK-1845 + TASK-1888) en el servidor, sin librería de gráficos:
+ * series → barras, agrupadas, apiladas, línea, torta, dona y dispersión; datos propios → bullet, medidor, cascada,
+ * embudo, heatmap, waffle, Venn de dos conjuntos y UpSet. Geometría en `insights-chart-geometry.ts` (mismas
+ * convenciones que los PDF); toda cifra impresa sale de `fact.display`.
  *
- * Toda cifra impresa sale de `fact.display`; lo único que se calcula es geometría (alturas y marcas del eje).
+ * - Cada grupo de barras es un botón con su detalle al pasar o enfocar.
+ * - Gráfico y tabla son el mismo componente con un interruptor (sin JS se ven los dos).
+ * - `data-step` permite narrarlo por pasos en una escena; sin JS queda en su estado final.
  */
 import type { ChartSpecV1, InsightWebFactV1 } from '@lib/insights'
 import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+import {
+  GAUGE_START,
+  GAUGE_SWEEP,
+  arcPath,
+  bulletScale,
+  gaugeAngle,
+  gaugePoint,
+  heatmapIntensity,
+  niceScale,
+  slices,
+  vennTwo,
+  waffleCells,
+  waterfallBars,
+} from '@lib/insights-chart-geometry'
 
 interface Props {
   spec: ChartSpecV1
@@ -24,54 +39,174 @@ interface Props {
 }
 
 const { spec, table, facts, locale, theme = 'light', uid, compact = false } = Astro.props
-const drawn = ['bar', 'bar_grouped', 'line'].includes(spec.family) && spec.series.length > 0
+const data = spec.data
+const family = spec.family
+const fv = (id: string | null | undefined) => (id ? facts[id] : undefined)
+const num = (id: string | null | undefined) => (typeof fv(id)?.value === 'number' ? (fv(id)!.value as number) : null)
+const disp = (id: string | null | undefined) => fv(id)?.display ?? C.absent
 
-const seriesColor = (index: number) => {
+const color = (index: number) => {
   const current = theme === 'dark' ? 'var(--ins-data-current-dark)' : 'var(--ins-data-current)'
   const previous = theme === 'dark' ? 'var(--ins-data-previous-dark)' : 'var(--ins-data-previous)'
-  return index === 0 ? current : index === 1 ? previous : `color-mix(in srgb, ${current} 55%, transparent)`
+  return index === 0 ? current : index === 1 ? previous : `color-mix(in srgb, ${current} 45%, transparent)`
 }
+const tickFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 })
 
-const values = spec.series.flatMap((series) => series.factIds.map((id) => facts[id]?.value).filter((v): v is number => typeof v === 'number'))
-const max = values.length ? Math.max(...values) : 0
-const niceStep = (raw: number) => {
-  if (raw <= 0) return 1
-  const exp = Math.pow(10, Math.floor(Math.log10(raw)))
-  const f = raw / exp
-  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * exp
-}
-const step = niceStep(max / 4)
-const top = Math.max(step, Math.ceil(max / step) * step)
-const ticks = Array.from({ length: Math.round(top / step) + 1 }, (_, i) => i * step)
-const tickFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 })
-const pct = (v: number) => `${((v / top) * 100).toFixed(2)}%`
-
+// ── Series: barras, agrupadas, apiladas, línea ─────────────────────────────
+const seriesValues = spec.series.flatMap((s) => s.factIds.map(num).filter((v): v is number => v !== null))
+const stackedTotals = spec.dimensionLabels.map((_, i) => spec.series.reduce((sum, s) => sum + (num(s.factIds[i]) ?? 0), 0))
+const barScale = niceScale(family === 'bar_stacked' ? Math.max(0, ...stackedTotals) : Math.max(0, ...seriesValues))
+const lineScale = spec.scale.baseline === 0 ? barScale : niceScale(Math.max(...seriesValues, 0), seriesValues.length ? Math.min(...seriesValues) : 0)
 const groups = spec.dimensionLabels.map((label, i) => ({
   label,
-  bars: spec.series.map((series, s) => {
-    const fact = facts[series.factIds[i]]
-    return { s, label: series.label, fact, value: typeof fact?.value === 'number' ? fact.value : null }
-  }),
+  bars: spec.series.map((series, s) => ({ s, label: series.label, fact: fv(series.factIds[i]), value: num(series.factIds[i]) })),
 }))
 const groupLabel = (g: (typeof groups)[number]) => `${g.label}: ${g.bars.map((b) => `${b.label} ${b.fact?.display ?? C.absent}`).join(', ')}`
-
-const linePaths = spec.series.map((series, s) => {
+const lines = spec.series.map((series, s) => {
   const points = series.factIds.map((id, i) => {
-    const v = facts[id]?.value
-    return typeof v === 'number' ? { x: ((i + 0.5) / series.factIds.length) * 100, y: 100 - (v / top) * 100 } : null
+    const v = num(id)
+    return v === null ? null : { x: ((i + 0.5) / series.factIds.length) * 100, y: 100 - lineScale.pct(v), display: disp(id) }
   })
   const d = points.map((p, i) => (p ? `${i === 0 || !points[i - 1] ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}` : '')).join(' ')
   return { s, d, points }
 })
+
+// ── Torta y dona ────────────────────────────────────────────────────────────
+const composition = (family === 'pie' || family === 'donut') && spec.series[0]
+  ? spec.series[0].factIds.map((id, i) => ({ label: spec.dimensionLabels[i], fact: fv(id), value: num(id) ?? 0 }))
+  : []
+const R = 110
+const pieSlices = composition.length ? slices(composition.map((p) => p.value), R, family === 'donut' ? R * 0.62 : 0) : []
+
+// ── Dispersión: dos series pareadas (x, y) ──────────────────────────────────
+const scatter = family === 'scatter' && spec.series.length >= 2
+  ? (() => {
+      const xs = spec.series[0].factIds.map(num)
+      const ys = spec.series[1].factIds.map(num)
+      const xScale = niceScale(Math.max(...(xs.filter((v) => v !== null) as number[])), 0)
+      const yScale = niceScale(Math.max(...(ys.filter((v) => v !== null) as number[])), 0)
+      return {
+        xScale,
+        yScale,
+        xLabel: spec.series[0].label,
+        yLabel: spec.series[1].label,
+        points: spec.dimensionLabels.map((label, i) =>
+          xs[i] === null || ys[i] === null ? null : { label, x: xScale.pct(xs[i]!), y: yScale.pct(ys[i]!), xd: disp(spec.series[0].factIds[i]), yd: disp(spec.series[1].factIds[i]) },
+        ),
+      }
+    })()
+  : null
+
+// ── Datos propios ───────────────────────────────────────────────────────────
+const bullet = data?.kind === 'bullet'
+  ? (() => {
+      const all = data.items.flatMap((it) => [num(it.valueFactId), num(it.targetFactId), num(it.bandFactId)]).filter((v): v is number => v !== null)
+      const pos = bulletScale(all)
+      return data.items.map((it) => {
+        const value = num(it.valueFactId)
+        const target = num(it.targetFactId)
+        const band = num(it.bandFactId)
+        const reached = value !== null && target !== null ? (data.direction === 'higher_is_better' ? value >= target : value <= target) : null
+        return { ...it, value, target, band, reached, valuePct: value === null ? 0 : pos(value), targetPct: target === null ? null : pos(target), bandFrom: band === null || target === null ? null : pos(Math.min(band, target)), bandTo: band === null || target === null ? null : pos(Math.max(band, target)) }
+      })
+    })()
+  : null
+
+const gauge = data?.kind === 'gauge'
+  ? (() => {
+      const value = num(data.valueFactId)
+      const previous = num(data.previousFactId)
+      const target = num(data.targetFactId)
+      const G = 120
+      const r = 96
+      return {
+        G, r,
+        track: arcPath(G, G, r, GAUGE_START, GAUGE_START + GAUGE_SWEEP),
+        valueArc: value === null ? null : arcPath(G, G, r, GAUGE_START, gaugeAngle(value, data.min, data.max)),
+        previousMark: previous === null ? null : [gaugePoint(G, G, r - 16, gaugeAngle(previous, data.min, data.max)), gaugePoint(G, G, r + 16, gaugeAngle(previous, data.min, data.max))],
+        targetMark: target === null ? null : [gaugePoint(G, G, r - 18, gaugeAngle(target, data.min, data.max)), gaugePoint(G, G, r + 18, gaugeAngle(target, data.min, data.max))],
+        display: disp(data.valueFactId),
+        previousDisplay: previous === null ? null : disp(data.previousFactId),
+        targetDisplay: target === null ? null : disp(data.targetFactId),
+      }
+    })()
+  : null
+
+const waterfall = data?.kind === 'waterfall'
+  ? (() => {
+      const steps = data.steps.map((st) => ({ ...st, value: num(st.factId) ?? 0 }))
+      const geo = waterfallBars(steps)
+      return { scale: geo.scale, steps: steps.map((st, i) => ({ ...st, ...geo.bars[i], display: disp(st.factId) })) }
+    })()
+  : null
+
+const funnel = data?.kind === 'funnel'
+  ? (() => {
+      const first = num(data.stages[0]?.factId) || 1
+      return data.stages.map((st) => ({ ...st, widthPct: Math.max(2, ((num(st.factId) ?? 0) / first) * 100), display: disp(st.factId) }))
+    })()
+  : null
+
+const heatmap = data?.kind === 'heatmap'
+  ? (() => {
+      const intensity = heatmapIntensity(data.cells.flat().map(num))
+      return { ...data, grid: data.cells.map((row) => row.map((id) => ({ id, value: num(id), display: id ? disp(id) : C.absent, intensity: intensity(num(id)) }))) }
+    })()
+  : null
+
+const waffle = data?.kind === 'waffle'
+  ? (() => {
+      const values = data.parts.map((p) => num(p.factId) ?? 0)
+      const total = num(data.totalFactId) ?? undefined
+      return { parts: data.parts.map((p, i) => ({ ...p, display: disp(p.factId), i })), cells: waffleCells(values, total), totalDisplay: data.totalFactId ? disp(data.totalFactId) : null }
+    })()
+  : null
+
+const venn = data?.kind === 'venn_two'
+  ? (() => {
+      const a = num(data.onlyAFactId) ?? 0
+      const b = num(data.onlyBFactId) ?? 0
+      const both = num(data.bothFactId) ?? 0
+      const g = vennTwo(a, b, both)
+      const W = 360
+      const H = 220
+      const k = (H * 0.44) / Math.max(g.rA, g.rB)
+      const rA = g.rA * k
+      const rB = g.rB * k
+      const d = g.d * k
+      const cx = W / 2
+      const ax = cx - d / 2
+      const bx = cx + d / 2
+      return { W, H, rA, rB, ax, bx, cy: H / 2, setA: data.setA.label, setB: data.setB.label, onlyA: disp(data.onlyAFactId), onlyB: disp(data.onlyBFactId), both: disp(data.bothFactId), mid: (ax + rA + bx - rB) / 2 }
+    })()
+  : null
+
+const upset = data?.kind === 'upset'
+  ? (() => {
+      const max = Math.max(...data.intersections.map((it) => num(it.factId) ?? 0), 1)
+      const scale = niceScale(max)
+      return { sets: data.sets, columns: data.intersections.map((it) => ({ ...it, heightPct: scale.pct(num(it.factId) ?? 0), display: disp(it.factId) })) }
+    })()
+  : null
+
+const SERIES_FAMILIES = ['bar', 'bar_grouped', 'bar_stacked', 'line']
+const drawn = (SERIES_FAMILIES.includes(family) && spec.series.length > 0) || pieSlices.length > 0 || !!scatter || !!bullet || !!gauge || !!waterfall || !!funnel || !!heatmap || !!waffle || !!venn || !!upset
+const legend = SERIES_FAMILIES.includes(family) && spec.series.length > 1
+  ? spec.series.map((s, i) => ({ label: s.label, color: color(i) }))
+  : waffle
+    ? waffle.parts.map((p) => ({ label: p.label, color: color(p.i), value: p.display }))
+    : composition.length
+      ? composition.map((p, i) => ({ label: p.label, color: color(i), value: p.fact?.display }))
+      : []
 ---
 
-<figure class:list={['ins-chart', `ins-chart--${theme}`, { 'ins-chart--compact': compact }]} data-chart data-view="chart" data-series={spec.series.length} id={uid}>
+<figure class:list={['ins-chart', `ins-chart--${theme}`, `ins-chart--f-${family}`, { 'ins-chart--compact': compact }]} data-chart data-view="chart" data-series={spec.series.length} id={uid}>
   <div class="ins-chart__top">
     <figcaption class="ins-chart__title">{spec.title}</figcaption>
     <div class="ins-chart__tools">
-      {spec.series.length > 1 && (
+      {legend.length > 0 && (
         <ul class="ins-legend">
-          {spec.series.map((series, s) => <li><span class="ins-swatch" style={`background:${seriesColor(s)}`} />{series.label}</li>)}
+          {legend.map((item) => <li><span class="ins-swatch" style={`background:${item.color}`} />{item.label}{'value' in item && item.value && <b class="ins-num">{item.value}</b>}</li>)}
         </ul>
       )}
       <div class="ins-switch" role="group" aria-label={C.viewSwitch}>
@@ -82,48 +217,212 @@ const linePaths = spec.series.map((series, s) => {
   </div>
 
   <div class="ins-chart__graphic">
-    {drawn ? (
+    {!drawn && <p class="ins-note">{C.chartTableOnly}</p>}
+
+    {/* Barras y agrupadas */}
+    {(family === 'bar' || family === 'bar_grouped') && spec.series.length > 0 && (
       <>
         <div class="ins-plot">
-          <div class="ins-grid" aria-hidden="true">
-            {ticks.map((t) => <span style={`bottom:${pct(t)}`} data-zero={t === 0 ? '' : undefined}><em>{tickFormat.format(t)}</em></span>)}
+          <div class="ins-grid" aria-hidden="true">{barScale.ticks.map((t) => <span style={`bottom:${barScale.pct(t)}%`} data-zero={t === 0 ? '' : undefined}><em>{tickFormat.format(t)}</em></span>)}</div>
+          <div class="ins-groups">
+            {groups.map((group, gi) => (
+              <button type="button" class="ins-group" data-group={gi} data-last={gi === groups.length - 1 ? '' : undefined} aria-label={groupLabel(group)}>
+                {group.bars.map((bar) => bar.value === null
+                  ? <span class="ins-bar ins-bar--absent" data-series={bar.s}><span class="ins-bar__val">{C.absent}</span></span>
+                  : <span class="ins-bar" data-series={bar.s} style={`--h:${barScale.pct(bar.value)}%;--c:${color(bar.s)}`}><span class="ins-bar__val">{bar.fact?.display}</span></span>)}
+                <span class="ins-tip" aria-hidden="true"><b>{group.label}</b>{group.bars.map((bar) => <span><i style={`background:${color(bar.s)}`} />{bar.label}<em>{bar.fact?.display ?? C.absent}</em></span>)}</span>
+              </button>
+            ))}
           </div>
-          {spec.family === 'line' ? (
-            <>
-              <svg class="ins-line" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label={spec.title}>
-                {linePaths.map((line) => <path d={line.d} style={`stroke:${seriesColor(line.s)}`} pathLength="400" />)}
-              </svg>
-              {linePaths.map((line) => line.points.map((p) => p && <span class="ins-dot" aria-hidden="true" style={`left:${p.x}%;bottom:${100 - p.y}%;--c:${seriesColor(line.s)}`} />))}
-            </>
-          ) : (
-            <div class="ins-groups">
-              {groups.map((group, gi) => (
-                <button type="button" class="ins-group" data-group={gi} data-last={gi === groups.length - 1 ? '' : undefined} aria-label={groupLabel(group)}>
-                  {group.bars.map((bar) =>
-                    bar.value === null ? (
-                      <span class="ins-bar ins-bar--absent" data-series={bar.s}><span class="ins-bar__val">{C.absent}</span></span>
-                    ) : (
-                      <span class="ins-bar" data-series={bar.s} style={`--h:${pct(bar.value)};--c:${seriesColor(bar.s)}`}>
-                        <span class="ins-bar__val">{bar.fact?.display}</span>
-                      </span>
-                    ),
-                  )}
-                  <span class="ins-tip" aria-hidden="true">
-                    <b>{group.label}</b>
-                    {group.bars.map((bar) => (
-                      <span><i style={`background:${seriesColor(bar.s)}`} />{bar.label}<em>{bar.fact?.display ?? C.absent}</em></span>
-                    ))}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
-        <div class="ins-xlabels" aria-hidden="true">{spec.dimensionLabels.map((label) => <span>{label}</span>)}</div>
-        {spec.scale.baseline === 0 && spec.family !== 'line' && <p class="ins-note">{C.chartBaseline}</p>}
+        <div class="ins-xlabels" aria-hidden="true">{spec.dimensionLabels.map((l) => <span>{l}</span>)}</div>
+        <p class="ins-note">{C.chartBaseline}</p>
       </>
-    ) : (
-      <p class="ins-note">{C.chartTableOnly}</p>
+    )}
+
+    {/* Apiladas: cada columna suma sus partes; el detalle va en la ficha */}
+    {family === 'bar_stacked' && spec.series.length > 0 && (
+      <>
+        <div class="ins-plot">
+          <div class="ins-grid" aria-hidden="true">{barScale.ticks.map((t) => <span style={`bottom:${barScale.pct(t)}%`} data-zero={t === 0 ? '' : undefined}><em>{tickFormat.format(t)}</em></span>)}</div>
+          <div class="ins-groups">
+            {groups.map((group, gi) => (
+              <button type="button" class="ins-group ins-group--stack" data-group={gi} data-last={gi === groups.length - 1 ? '' : undefined} aria-label={groupLabel(group)}>
+                <span class="ins-stack" style={`--h:${barScale.pct(stackedTotals[gi])}%`}>
+                  {group.bars.map((bar) => bar.value !== null && <span class="ins-stack__seg" style={`flex-grow:${bar.value};--c:${color(bar.s)}`}><span>{bar.fact?.display}</span></span>)}
+                </span>
+                <span class="ins-tip" aria-hidden="true"><b>{group.label}</b>{group.bars.map((bar) => <span><i style={`background:${color(bar.s)}`} />{bar.label}<em>{bar.fact?.display ?? C.absent}</em></span>)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div class="ins-xlabels" aria-hidden="true">{spec.dimensionLabels.map((l) => <span>{l}</span>)}</div>
+        <p class="ins-note">{C.chartBaseline}</p>
+      </>
+    )}
+
+    {/* Línea */}
+    {family === 'line' && spec.series.length > 0 && (
+      <>
+        <div class="ins-plot">
+          <div class="ins-grid" aria-hidden="true">{lineScale.ticks.map((t) => <span style={`bottom:${lineScale.pct(t)}%`} data-zero={t === lineScale.min ? '' : undefined}><em>{tickFormat.format(t)}</em></span>)}</div>
+          <svg class="ins-line" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label={spec.title}>
+            {lines.map((line) => <path d={line.d} style={`stroke:${color(line.s)}`} />)}
+          </svg>
+          {lines.map((line) => line.points.map((p) => p && (
+            <span class="ins-dot" style={`left:${p.x}%;bottom:${100 - p.y}%;--c:${color(line.s)}`}><span class="ins-dot__val">{p.display}</span></span>
+          )))}
+        </div>
+        <div class="ins-xlabels" aria-hidden="true">{spec.dimensionLabels.map((l) => <span>{l}</span>)}</div>
+        {spec.scale.baseline === null && <p class="ins-note">{C.chartAutoScale}</p>}
+      </>
+    )}
+
+    {/* Torta y dona */}
+    {pieSlices.length > 0 && (
+      <div class="ins-pie">
+        <svg viewBox={`0 0 ${R * 2} ${R * 2}`} role="img" aria-label={`${spec.title}. ${composition.map((p) => `${p.label} ${p.fact?.display}`).join(', ')}`}>
+          {pieSlices.map((slice, i) => <path class="ins-pie__slice" d={slice.d} style={`fill:${color(i)}`} />)}
+        </svg>
+      </div>
+    )}
+
+    {/* Dispersión */}
+    {scatter && (
+      <>
+        <div class="ins-plot ins-plot--scatter">
+          <div class="ins-grid" aria-hidden="true">{scatter.yScale.ticks.map((t) => <span style={`bottom:${scatter.yScale.pct(t)}%`} data-zero={t === 0 ? '' : undefined}><em>{tickFormat.format(t)}</em></span>)}</div>
+          {scatter.points.map((p) => p && (
+            <span class="ins-point" style={`left:${p.x}%;bottom:${p.y}%;--c:${color(0)}`} tabindex="0" aria-label={`${p.label}: ${scatter.xLabel} ${p.xd}, ${scatter.yLabel} ${p.yd}`}>
+              <span class="ins-point__label">{p.label}</span>
+            </span>
+          ))}
+        </div>
+        <div class="ins-xticks" aria-hidden="true">{scatter.xScale.ticks.map((t) => <span style={`left:${scatter.xScale.pct(t)}%`}>{tickFormat.format(t)}</span>)}</div>
+        <p class="ins-note">{C.scatterAxes(scatter.xLabel, scatter.yLabel)}</p>
+      </>
+    )}
+
+    {/* Bullet: valor contra meta, con la banda «cerca de la meta» */}
+    {bullet && (
+      <ul class="ins-bullets">
+        {bullet.map((it) => (
+          <li class="ins-bullet">
+            <span class="ins-bullet__label">{it.label}</span>
+            <span class="ins-bullet__track">
+              {it.bandFrom !== null && <span class="ins-bullet__band" style={`left:${it.bandFrom}%;width:${(it.bandTo ?? 0) - it.bandFrom}%`} />}
+              <span class="ins-bullet__bar" style={`--w:${it.valuePct}%`} />
+              {it.targetPct !== null && <span class="ins-bullet__target" style={`left:${it.targetPct}%`} />}
+            </span>
+            <span class="ins-bullet__val ins-num">
+              <b>{disp(it.valueFactId)}</b>
+              <span>{C.targetLabel} {disp(it.targetFactId)}</span>
+              {it.reached !== null && <span class="ins-bullet__state">{it.reached ? C.targetReached : C.targetMissed}</span>}
+            </span>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {/* Medidor de 270° */}
+    {gauge && (
+      <div class="ins-gauge">
+        <svg viewBox={`0 0 ${gauge.G * 2} ${gauge.G * 2}`} role="img" aria-label={`${spec.title}: ${gauge.display}`}>
+          <path d={gauge.track} class="ins-gauge__track" />
+          {gauge.valueArc && <path d={gauge.valueArc} class="ins-gauge__value" pathLength="100" style={`stroke:${color(0)}`} />}
+          {gauge.previousMark && <line x1={gauge.previousMark[0].x} y1={gauge.previousMark[0].y} x2={gauge.previousMark[1].x} y2={gauge.previousMark[1].y} class="ins-gauge__prev" style={`stroke:${color(1)}`} />}
+          {gauge.targetMark && <line x1={gauge.targetMark[0].x} y1={gauge.targetMark[0].y} x2={gauge.targetMark[1].x} y2={gauge.targetMark[1].y} class="ins-gauge__target" />}
+        </svg>
+        <div class="ins-gauge__center"><span class="ins-gauge__value-text ins-num">{gauge.display}</span></div>
+        <ul class="ins-gauge__keys">
+          {gauge.previousDisplay && <li><i style={`background:${color(1)}`} />{C.previousLabel} <b class="ins-num">{gauge.previousDisplay}</b></li>}
+          {gauge.targetDisplay && <li><i class="ins-gauge__target-key" />{C.targetLabel} <b class="ins-num">{gauge.targetDisplay}</b></li>}
+        </ul>
+      </div>
+    )}
+
+    {/* Cascada */}
+    {waterfall && (
+      <>
+        <div class="ins-plot">
+          <div class="ins-grid" aria-hidden="true">{waterfall.scale.ticks.map((t) => <span style={`bottom:${waterfall.scale.pct(t)}%`} data-zero={t === 0 ? '' : undefined}><em>{tickFormat.format(t)}</em></span>)}</div>
+          <div class="ins-groups">
+            {waterfall.steps.map((st, i) => (
+              <div class="ins-wf" data-last={i === waterfall.steps.length - 1 ? '' : undefined}>
+                <span class:list={['ins-wf__bar', { 'is-total': st.isTotal, 'is-neg': st.negative }]} style={`bottom:${st.bottomPct}%;height:${Math.max(st.heightPct, 0.6)}%;--c:${st.isTotal ? color(0) : st.negative ? color(1) : color(2)}`}>
+                  <span class="ins-bar__val">{st.display}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div class="ins-xlabels" aria-hidden="true">{waterfall.steps.map((st) => <span>{st.label}</span>)}</div>
+      </>
+    )}
+
+    {/* Embudo */}
+    {funnel && (
+      <ol class="ins-funnel">
+        {funnel.map((st) => (
+          <li><span class="ins-funnel__label">{st.label}</span><span class="ins-funnel__bar" style={`--w:${st.widthPct}%;--c:${color(0)}`}><b class="ins-num">{st.display}</b></span></li>
+        ))}
+      </ol>
+    )}
+
+    {/* Heatmap: intensidad por luminancia y la cifra impresa en la celda */}
+    {heatmap && (
+      <div class="ins-heat" style={`--cols:${heatmap.columnLabels.length}`}>
+        <span />
+        {heatmap.columnLabels.map((c) => <span class="ins-heat__col">{c}</span>)}
+        {heatmap.grid.map((row, r) => (
+          <>
+            <span class="ins-heat__row">{heatmap.rowLabels[r]}</span>
+            {row.map((cell) => cell.intensity === null
+              ? <span class="ins-heat__cell is-absent">{C.absent}</span>
+              : <span class:list={['ins-heat__cell', { 'is-strong': cell.intensity > 55 }]} style={`--i:${Math.round(12 + cell.intensity * 0.88)}%;--c:${color(0)}`}>{cell.display}</span>)}
+          </>
+        ))}
+      </div>
+    )}
+
+    {/* Waffle: 100 celdas */}
+    {waffle && (
+      <div class="ins-waffle" role="img" aria-label={`${spec.title}. ${waffle.parts.map((p) => `${p.label} ${p.display}`).join(', ')}`}>
+        {waffle.cells.map((part, i) => <span class="ins-waffle__cell" style={`--c:${part === null ? 'transparent' : color(part)};--d:${i * 6}ms`} data-empty={part === null ? '' : undefined} />)}
+      </div>
+    )}
+
+    {/* Venn de dos conjuntos, áreas proporcionales */}
+    {venn && (
+      <div class="ins-venn">
+        <svg viewBox={`0 0 ${venn.W} ${venn.H}`} role="img" aria-label={`${venn.setA}: sólo ${venn.onlyA}. ${venn.setB}: sólo ${venn.onlyB}. Ambos: ${venn.both}.`}>
+          <circle cx={venn.ax} cy={venn.cy} r={venn.rA} class="ins-venn__a" style={`fill:${color(0)};stroke:${color(0)}`} />
+          <circle cx={venn.bx} cy={venn.cy} r={venn.rB} class="ins-venn__b" style={`fill:${color(1)};stroke:${color(1)}`} />
+          <text x={venn.ax - venn.rA * 0.45} y={venn.cy + 8} class="ins-venn__num" text-anchor="middle">{venn.onlyA}</text>
+          <text x={venn.mid} y={venn.cy + 8} class="ins-venn__num" text-anchor="middle">{venn.both}</text>
+          <text x={venn.bx + venn.rB * 0.45} y={venn.cy + 8} class="ins-venn__num" text-anchor="middle">{venn.onlyB}</text>
+        </svg>
+        <ul class="ins-legend ins-venn__keys">
+          <li><span class="ins-swatch" style={`background:${color(0)}`} />{venn.setA}</li>
+          <li><span class="ins-swatch" style={`background:${color(1)}`} />{venn.setB}</li>
+        </ul>
+      </div>
+    )}
+
+    {/* UpSet: tamaño de cada intersección y su pertenencia */}
+    {upset && (
+      <div class="ins-upset" style={`--cols:${upset.columns.length}`}>
+        <span />
+        {upset.columns.map((col) => (
+          <span class="ins-upset__barcell"><span class="ins-upset__bar" style={`--h:${col.heightPct}%;--c:${color(0)}`}><b class="ins-num">{col.display}</b></span></span>
+        ))}
+        {upset.sets.map((set) => (
+          <>
+            <span class="ins-upset__set">{set.label}</span>
+            {upset.columns.map((col) => <span class="ins-upset__dot" data-on={col.setIds.includes(set.setId) ? '' : undefined} style={`--c:${color(0)}`} />)}
+          </>
+        ))}
+      </div>
     )}
   </div>
 
@@ -131,9 +430,7 @@ const linePaths = spec.series.map((series, s) => {
     <table>
       <caption>{spec.title}</caption>
       <thead><tr>{table.columns.map((col) => <th scope="col">{col}</th>)}</tr></thead>
-      <tbody>
-        {table.rows.map((row) => <tr>{row.map((cell, c) => (c === 0 ? <th scope="row">{cell ?? C.absent}</th> : <td>{cell ?? C.absent}</td>))}</tr>)}
-      </tbody>
+      <tbody>{table.rows.map((row) => <tr>{row.map((cell, c) => (c === 0 ? <th scope="row">{cell ?? C.absent}</th> : <td>{cell ?? C.absent}</td>))}</tr>)}</tbody>
     </table>
   </div>
 </figure>

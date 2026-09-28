@@ -43,6 +43,17 @@ export interface ChartSeriesV1 {
   unit: string
 }
 
+/** Datos propios de las familias de TASK-1888 (cada número es un `factId` del modelo). */
+export type ChartFamilyDataV1 =
+  | { kind: 'bullet'; direction: 'higher_is_better' | 'lower_is_better'; items: Array<{ itemId: string; label: string; valueFactId: string; targetFactId: string; bandFactId?: string }> }
+  | { kind: 'gauge'; valueFactId: string; previousFactId: string; targetFactId: string | null; min: number; max: number }
+  | { kind: 'waterfall'; steps: Array<{ stepId: string; label: string; factId: string; isTotal: boolean }> }
+  | { kind: 'funnel'; stages: Array<{ stageId: string; label: string; factId: string }> }
+  | { kind: 'heatmap'; rowLabels: string[]; columnLabels: string[]; cells: Array<Array<string | null>> }
+  | { kind: 'waffle'; parts: Array<{ partId: string; label: string; factId: string }>; totalFactId: string | null }
+  | { kind: 'venn_two'; setA: { label: string }; setB: { label: string }; onlyAFactId: string; onlyBFactId: string; bothFactId: string }
+  | { kind: 'upset'; sets: Array<{ setId: string; label: string }>; intersections: Array<{ intersectionId: string; setIds: string[]; factId: string }> }
+
 export interface ChartSpecV1 {
   chartId: string
   family: string
@@ -53,6 +64,8 @@ export interface ChartSpecV1 {
   unit: string
   scale: { kind: 'linear'; baseline: 0 | null }
   references: Array<{ label: string; factId: string | null; value: number | null }>
+  /** v2 — obligatorio en las familias de datos propios; ausente en las de series. */
+  data?: ChartFamilyDataV1
 }
 
 /** v2 — lectura de una figura: cifra principal, conclusión, «Lo que significa» y «Próximo paso». */

@@ -10,6 +10,7 @@ import ChartFigure from './ChartFigure.astro'
 import FactMark from './FactMark.astro'
 import type { InsightWebChapterV1, InsightWebFactV1 } from '@lib/insights'
 import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+import { chartFactIds } from '@lib/insights-view'
 
 interface Props {
   chapter: InsightWebChapterV1
@@ -44,10 +45,10 @@ const provenance = (factIds: string[]) => {
   }
 }
 
-const shownFacts = new Set([...chapter.charts.flatMap((c) => c.spec.series.flatMap((s) => s.factIds)), mainReading?.keyFigure?.factId])
+const shownFacts = new Set([...chapter.charts.flatMap((c) => chartFactIds(c.spec)), mainReading?.keyFigure?.factId])
 const looseFacts = [...new Set(chapter.claims.flatMap((claim) => claim.factIds))].filter((id) => !shownFacts.has(id)).map((id) => facts[id]).filter(Boolean)
 const isEmpty = chapter.charts.length === 0 && chapter.claims.length === 0 && chapter.tables.length === 0
-const mainProv = main ? provenance(main.spec.series.flatMap((s) => s.factIds)) : null
+const mainProv = main ? provenance(chartFactIds(main.spec)) : null
 ---
 
 <section class="ins-scene" id={`cap-${number}`} data-section data-module={chapter.module} data-capture={`chapter-${chapter.module}`} aria-labelledby={`cap-${number}-title`}>
@@ -96,15 +97,32 @@ const mainProv = main ? provenance(main.spec.series.flatMap((s) => s.factIds)) :
     </div>
   )}
 
-  {others.map((chart) => {
-    const reading = chapter.readings?.find((r) => r.chartId === chart.spec.chartId)
-    return (
-      <div class="ins-more" data-reveal>
-        {reading?.conclusion && <h3 class="ins-h3">{reading.conclusion.text}</h3>}
-        <ChartFigure spec={chart.spec} table={chart.table} facts={facts} locale={locale} uid={`fig-${chart.spec.chartId}`} compact />
-      </div>
-    )
-  })}
+  {others.length > 0 && (
+    <div class="ins-chain">
+      {others.map((chart, i) => {
+        const reading = chapter.readings?.find((r) => r.chartId === chart.spec.chartId)
+        const keyFact = reading?.keyFigure ? facts[reading.keyFigure.factId] : undefined
+        return (
+          <article class:list={['ins-beat', { 'ins-beat--flip': i % 2 === 1 }]} data-reveal>
+            <div class="ins-beat__text">
+              <span class="ins-beat__kind">{C.familyLabel[chart.spec.family] ?? chart.spec.family}</span>
+              {reading?.keyFigure && (
+                <span class="ins-figure-md" data-countup={keyFact?.value ?? undefined} data-display={reading.keyFigure.value}>{reading.keyFigure.value}</span>
+              )}
+              <h3 class="ins-h3">{reading?.conclusion?.text ?? chart.spec.title}</h3>
+              {reading?.meaning && <p class="ins-beat__meaning">{reading.meaning.text}</p>}
+              {reading?.nextStep && (
+                <p class="ins-beat__next"><span class="ins-label">{C.nextStepTitle}</span>{reading.nextStep.text}</p>
+              )}
+            </div>
+            <div class="ins-beat__figure">
+              <ChartFigure spec={chart.spec} table={chart.table} facts={facts} locale={locale} uid={`fig-${chart.spec.chartId}`} compact />
+            </div>
+          </article>
+        )
+      })}
+    </div>
+  )}
 
   {(chapter.claims.length > 0 || looseFacts.length > 0) && (
     <div class="ins-more">
