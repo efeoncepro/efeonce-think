@@ -162,8 +162,7 @@ const heatmap = data?.kind === 'heatmap'
 const waffle = data?.kind === 'waffle'
   ? (() => {
       const values = data.parts.map((p) => num(p.factId) ?? 0)
-      const total = num(data.totalFactId) ?? undefined
-      return { parts: data.parts.map((p, i) => ({ ...p, display: disp(p.factId), i })), cells: waffleCells(values, total), totalDisplay: data.totalFactId ? disp(data.totalFactId) : null }
+      return { parts: data.parts.map((p, i) => ({ ...p, display: disp(p.factId), i })), cells: waffleCells(values), totalDisplay: data.totalFactId ? disp(data.totalFactId) : null }
     })()
   : null
 
@@ -254,7 +253,13 @@ const legend = SERIES_FAMILIES.includes(family) && spec.series.length > 1
             {groups.map((group, gi) => (
               <button type="button" class="ins-group ins-group--stack" data-group={gi} data-last={gi === groups.length - 1 ? '' : undefined} aria-label={groupLabel(group)}>
                 <span class="ins-stack" style={`--h:${barScale.pct(stackedTotals[gi])}%`}>
-                  {group.bars.map((bar) => bar.value !== null && <span class="ins-stack__seg" style={`flex-grow:${bar.value};--c:${color(bar.s)}`}><span>{bar.fact?.display}</span></span>)}
+                  {group.bars.map((bar) => bar.value !== null && <span class="ins-stack__seg" style={`flex-grow:${bar.value};--c:${color(bar.s)}`}>{bar.s === 0 && <span>{bar.fact?.display}</span>}</span>)}
+                  {(() => {
+                    // Sólo la serie actual (relleno oscuro) lleva la cifra adentro con contraste AA; la del segmento
+                    // superior, si es otra serie, va arriba de la columna. Las intermedias quedan en tooltip y tabla.
+                    const top = group.bars.filter((bar) => bar.value !== null).at(-1)
+                    return top && top.s !== 0 && <span class="ins-bar__val ins-stack__top">{top.fact?.display}</span>
+                  })()}
                 </span>
                 <span class="ins-tip" aria-hidden="true"><b>{group.label}</b>{group.bars.map((bar) => <span><i style={`background:${color(bar.s)}`} />{bar.label}<em>{bar.fact?.display ?? C.absent}</em></span>)}</span>
               </button>

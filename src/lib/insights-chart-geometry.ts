@@ -97,10 +97,14 @@ export const heatmapIntensity = (values: Array<number | null>) => {
   return (v: number | null) => (v === null ? null : span === 0 ? 100 : round(((v - lo) / span) * 100, 1))
 }
 
-/** Waffle: 100 celdas repartidas por restos mayores (la suma siempre da 100). */
+/**
+ * Waffle: 100 celdas repartidas por restos mayores sobre la SUMA de las partes (la suma siempre da 100), igual que
+ * `waffleGeometry` de los PDF. El total declarado no entra: Greenhouse rechaza el plan si las partes no lo suman
+ * (`waffle_parts_sum_total`), así que usarlo acá sólo podría desalinear la web del PDF.
+ */
 export const WAFFLE_CELLS = 100
-export const waffleCells = (values: number[], total?: number) => {
-  const sum = total ?? values.reduce((a, b) => a + b, 0)
+export const waffleCells = (values: number[]) => {
+  const sum = values.reduce((a, b) => a + b, 0)
   const exact = values.map((v, i) => ({ i, exact: sum ? (v / sum) * WAFFLE_CELLS : 0 }))
   const floors = exact.map((e) => ({ ...e, cells: Math.floor(e.exact), rest: e.exact - Math.floor(e.exact) }))
   let remaining = WAFFLE_CELLS - floors.reduce((a, f) => a + f.cells, 0)
