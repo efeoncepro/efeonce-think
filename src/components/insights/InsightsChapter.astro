@@ -1,0 +1,158 @@
+---
+/**
+ * Capítulo del informe compartido de Insights (TASK-1875): apertura, una lectura por figura (cifra principal,
+ * conclusión, gráfico, procedencia, tabla equivalente y «Lo que significa / Próximo paso»), los hechos sueltos de sus
+ * afirmaciones y los límites. Un capítulo sin cifras muestra su ausencia con el motivo del modelo, nunca un cero.
+ */
+import ChartFigure from './ChartFigure.astro'
+import FactMark from './FactMark.astro'
+import type { InsightWebChapterV1, InsightWebFactV1 } from '@lib/insights'
+import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+
+interface Props {
+  chapter: InsightWebChapterV1
+  index: number
+  facts: Record<string, InsightWebFactV1>
+  locale: string
+}
+
+const { chapter, index, facts, locale } = Astro.props
+const number = String(index).padStart(2, '0')
+const shortDate = (iso: string | null) => (iso ? iso.slice(0, 10).split('-').reverse().join('-') : null)
+
+const chartFacts = new Set(chapter.charts.flatMap((chart) => chart.spec.series.flatMap((series) => series.factIds)))
+const keyFacts = new Set((chapter.readings ?? []).map((reading) => reading.keyFigure?.factId).filter(Boolean))
+const looseFacts = [...new Set(chapter.claims.flatMap((claim) => claim.factIds))]
+  .filter((id) => !chartFacts.has(id) && !keyFacts.has(id))
+  .map((id) => facts[id])
+  .filter(Boolean)
+
+const provenance = (factIds: string[]) => {
+  const list = factIds.map((id) => facts[id]).filter(Boolean)
+  const sources = [...new Set(list.map((f) => f.source))]
+  const asOf = list.map((f) => f.asOf).filter((d): d is string => !!d).sort().at(-1) ?? null
+  const estimated = list.some((f) => f.observation === 'estimated')
+  return { sources, asOf: shortDate(asOf), estimated }
+}
+
+const isEmpty = chapter.charts.length === 0 && chapter.claims.length === 0 && chapter.tables.length === 0
+---
+
+<section class="ins-section" id={`cap-${number}`} data-section data-capture={`chapter-${chapter.module}`} aria-labelledby={`cap-${number}-title`}>
+  <header class="ins-chapter__head" data-reveal>
+    <span class="ins-chapter__num" aria-hidden="true">{number}</span>
+    <span class="ins-label">{C.chapterEyebrow(index)} · {C.moduleLabel[chapter.module] ?? chapter.module}</span>
+    <h2 class="ins-h2 ins-chapter__title" id={`cap-${number}-title`} tabindex="-1">{chapter.title}</h2>
+    {chapter.opening && <p class="ins-lead">{chapter.opening.text}</p>}
+  </header>
+
+  {isEmpty && (
+    <div class="ins-empty" data-reveal><p>{C.chapterEmpty}</p></div>
+  )}
+
+  {chapter.charts.map((chart) => {
+    const reading = chapter.readings?.find((r) => r.chartId === chart.spec.chartId)
+    const factIds = chart.spec.series.flatMap((series) => series.factIds)
+    const prov = provenance(factIds)
+    const keyFact = reading?.keyFigure ? facts[reading.keyFigure.factId] : undefined
+    return (
+      <article class="ins-reading">
+        {reading?.keyFigure && (
+          <div class="ins-keyfigure" data-reveal>
+            <span class="ins-figure-lg" data-countup={keyFact?.value ?? undefined} data-display={reading.keyFigure.value}>{reading.keyFigure.value}</span>
+            <p>{reading.keyFigure.caption.text}</p>
+          </div>
+        )}
+        <h3 class="ins-h3" data-reveal>{reading?.conclusion?.text ?? chart.spec.title}</h3>
+        <ChartFigure spec={chart.spec} facts={facts} locale={locale} />
+        <div class="ins-provrow">
+          <span><b>{C.provenanceUnit}</b>{chart.spec.unit}</span>
+          <span><b>{C.provenanceSource}</b>{prov.sources.join(' y ')}</span>
+          {prov.asOf && <span class="ins-num"><b>{C.asOf}</b>{prov.asOf}</span>}
+          <FactMark observation={prov.estimated ? 'estimated' : 'observed'} />
+        </div>
+        <details class="ins-table" data-table>
+          <summary>
+            <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5" /></svg>
+            <span data-show={C.tableShow} data-hide={C.tableHide}>{C.tableShow}</span>
+          </summary>
+          <div class="ins-table__scroll">
+            <table>
+              <caption>{chart.spec.title}</caption>
+              <thead><tr>{chart.table.columns.map((col) => <th scope="col">{col}</th>)}</tr></thead>
+              <tbody>
+                {chart.table.rows.map((row) => (
+                  <tr>{row.map((cell, c) => (c === 0 ? <th scope="row">{cell ?? C.absent}</th> : <td>{cell ?? C.absent}</td>))}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+        {(reading?.meaning || reading?.nextStep) && (
+          <div class="ins-panel" data-reveal>
+            {reading?.meaning && (
+              <div><span class="ins-label">{C.meaningTitle}</span><p>{reading.meaning.text}</p></div>
+            )}
+            {reading?.nextStep && (
+              <div><span class="ins-label">{C.nextStepTitle}</span><p>{reading.nextStep.text}</p></div>
+            )}
+          </div>
+        )}
+      </article>
+    )
+  })}
+
+  {chapter.claims.length > 0 && (
+    <ul class="ins-claims" data-stagger>
+      {chapter.claims.map((claim) => <li>{claim.text}</li>)}
+    </ul>
+  )}
+
+  {looseFacts.length > 0 && (
+    <div class="ins-facts" data-stagger>
+      {looseFacts.map((fact) => (
+        <div class="ins-fact">
+          <span class="ins-label">{fact.label}</span>
+          {fact.value === null ? (
+            <>
+              <span class="ins-fact__absent" role="img" aria-label={C.absent} />
+              <span class="ins-prov"><span class="ins-mark">{C.absent}</span><span>{C.absentReason}</span></span>
+            </>
+          ) : (
+            <>
+              <span class="ins-figure-md" data-countup={fact.value} data-display={fact.display}>{fact.display}</span>
+              <span class="ins-prov"><FactMark observation={fact.observation} /><span>{fact.source}</span></span>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
+  )}
+
+  {chapter.tables.map((table) => (
+    <details class="ins-table" data-table open>
+      <summary><span>{table.title}</span></summary>
+      <div class="ins-table__scroll">
+        <table>
+          <caption>{table.title}</caption>
+          <thead><tr>{table.columns.map((col) => <th scope="col">{col}</th>)}</tr></thead>
+          <tbody>{table.rows.map((row) => <tr>{row.map((cell, c) => (c === 0 ? <th scope="row">{cell ?? C.absent}</th> : <td>{cell ?? C.absent}</td>))}</tr>)}</tbody>
+        </table>
+      </div>
+    </details>
+  ))}
+
+  {chapter.limits.length > 0 && (
+    <div class="ins-limits" data-capture="limits" data-reveal>
+      <span class="ins-label">{C.limitsTitle}</span>
+      <ul>
+        {chapter.limits.map((limit) => (
+          <li>
+            <svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.4 2" /></svg>
+            {limit}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</section>

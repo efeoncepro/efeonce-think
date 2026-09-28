@@ -1,0 +1,21 @@
+---
+/**
+ * Marca de procedencia de una cifra (TASK-1875): «Medido» con anillo lleno de trazo, «Estimado» con anillo
+ * punteado. Estado con la forma, nunca con semáforo (La órbita: `StateMarker`); nunca una esfera.
+ */
+import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+
+interface Props {
+  observation: 'observed' | 'estimated'
+}
+
+const { observation } = Astro.props
+const estimated = observation === 'estimated'
+---
+
+<span class="ins-mark">
+  <svg viewBox="0 0 12 12" aria-hidden="true">
+    <circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray={estimated ? '2.4 2' : undefined} />
+  </svg>
+  {estimated ? C.estimated : C.observed}
+</span>

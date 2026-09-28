@@ -20,6 +20,9 @@ importers:
       '@astrojs/vercel':
         specifier: ^11.0.2
         version: 11.0.2(astro@7.0.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@24.13.2)(@vercel/functions@3.7.5)(jiti@2.7.0)(yaml@2.9.0))(react@19.2.7)
+      '@fontsource-variable/bricolage-grotesque':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource-variable/geist':
         specifier: ^5.2.9
         version: 5.2.9
@@ -533,6 +536,9 @@ packages:
 
   '@fontsource-variable/assistant@5.2.9':
     resolution: {integrity: sha512-O7ipeZX2h3kd+gFYo+qcmUi/PjIbgDKkVT7/ZhFKlt9XH++Nr0fPpkmZq2fPOWQazjZG6exdW2K5x8rAIhZuTA==}
+
+  '@fontsource-variable/bricolage-grotesque@5.3.0':
+    resolution: {integrity: sha512-TLi9Q4hJjS2UvoTMRSS2nHu6c4R56lAw60NR9QYtVRCHn0XtsFpiEhNffZ8Glsoxu6wEEwLKBP8lb94J52PNBA==}
 
   '@fontsource-variable/geist@5.2.9':
     resolution: {integrity: sha512-TP+QSBG3wxKGPE33CbMy/L0Nu3qvJ6Fy81Yc4LnQ95xH+i+cfEp8fyU8/kfV14YwszxIFPhnoMTbjL71waVpyQ==}
@@ -2906,6 +2912,8 @@ snapshots:
     optional: true
 
   '@fontsource-variable/assistant@5.2.9': {}
+
+  '@fontsource-variable/bricolage-grotesque@5.3.0': {}
 
   '@fontsource-variable/geist@5.2.9': {}
 

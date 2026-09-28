@@ -1,0 +1,346 @@
+---
+/**
+ * Informe compartido de Efeonce Insights — `think.efeoncepro.com/insights/r/<token>` (TASK-1875, greenhouse-eo).
+ *
+ * Render tonto de `InsightWebModelV1` (TASK-1848). Resolución por request, sin pre-render ni cache: revocar revoca en
+ * la lectura siguiente. El token vive sólo en la URL y en el fetch SSR: nunca en el HTML (canonical genérico, descargas
+ * por query relativa), ni en analytics (sin GTM) ni en el Referer (`no-referrer`).
+ */
+export const prerender = false
+
+import '@fontsource-variable/bricolage-grotesque/opsz.css'
+import '@fontsource/poppins/300.css'
+import '@fontsource/poppins/400.css'
+import '@fontsource/poppins/500.css'
+import '@fontsource/poppins/600.css'
+import '@fontsource/poppins/700.css'
+import '@fontsource/poppins/800.css'
+import '@fontsource/poppins/800-italic.css'
+import '@fontsource/poppins/900-italic.css'
+import '@styles/insights.css'
+
+import BaseLayout from '@layouts/BaseLayout.astro'
+import StatusScreen from '@/components/primitives/StatusScreen.astro'
+import InsightsChapter from '@/components/insights/InsightsChapter.astro'
+import FactMark from '@/components/insights/FactMark.astro'
+import { fetchSharedInsightEdition, fetchSharedInsightOutput, type InsightOutput } from '@lib/insights'
+import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+import { insightsCssVars, orbitMeasure, motion } from '@lib/insights-tokens'
+
+const token = Astro.params.token ?? ''
+
+Astro.response.headers.set('Cache-Control', 'private, no-store')
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+Astro.response.headers.set('Referrer-Policy', 'no-referrer')
+
+// Descarga: `?descargar=<output>` en la MISMA URL, así el HTML nunca escribe el token. Greenhouse revalida el grant.
+const requested = Astro.url.searchParams.get('descargar')
+if (requested === 'report_pdf' || requested === 'deck_pdf') {
+  const upstream = await fetchSharedInsightOutput(token, requested as InsightOutput)
+  if (upstream.ok && upstream.body) {
+    const headers = new Headers({ 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'no-referrer' })
+    for (const name of ['content-type', 'content-disposition', 'content-length']) {
+      const value = upstream.headers.get(name)
+      if (value) headers.set(name, value)
+    }
+    return new Response(upstream.body, { status: 200, headers })
+  }
+  // Sin archivo (revocado, expirado, aún no generado): de vuelta al informe, que muestra el estado real.
+  return Astro.redirect(Astro.url.pathname, 303)
+}
+
+const result = token ? await fetchSharedInsightEdition(token) : ({ status: 'not_found' } as const)
+
+if (result.status === 'not_found') Astro.response.status = 404
+if (result.status === 'gone') Astro.response.status = 410
+if (result.status === 'rate_limited') Astro.response.status = 429
+if (result.status === 'error') Astro.response.status = 502
+
+const edition = result.status === 'ok' ? result.edition : null
+const header = edition?.header
+const model = edition?.model
+const locale = model?.locale ?? 'es-CL'
+
+// ── Presentación (sin datos nuevos: fechas del header y geometría) ────────────
+const civil = (iso: string) => iso.slice(0, 10)
+const dayBefore = (iso: string) => new Date(Date.parse(`${civil(iso)}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10)
+const longDate = (iso: string, timeZone = 'UTC') =>
+  new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone }).format(new Date(iso.length === 10 ? `${iso}T12:00:00Z` : iso))
+
+const partial = !!header?.asOfMax && civil(header.asOfMax) < dayBefore(header.periodEndExclusive)
+const asOfLabel = header?.asOfMax ? longDate(header.asOfMax) : null
+const expiresLabel = edition ? longDate(edition.expiresAt, header?.timeZone) : null
+
+// Índice: resumen, capítulos, plan, metodología, descargas.
+const sections: Array<{ id: string; label: string; number?: string }> = model
+  ? [
+      { id: 'resumen', label: C.summaryTitle },
+      ...model.chapters.map((chapter, i) => ({ id: `cap-${String(i + 1).padStart(2, '0')}`, label: chapter.title, number: String(i + 1).padStart(2, '0') })),
+      ...(model.actions.length ? [{ id: 'plan', label: C.planTitle }] : []),
+      { id: 'metodologia', label: C.methodologyTitle.split(' y ')[0] },
+      { id: 'descargas', label: C.downloadsTitle },
+    ]
+  : []
+
+// Órbita de la portada: de acento (`trajectory.accent`), no una medida — el modelo no declara una cifra de portada y el
+// arco nunca decora un número. Arco de 50° desde arriba a la izquierda, esfera en la punta, halo detrás.
+const R = 312
+const size = R * 2
+const scale = size / 624 // unidades del viewBox = px a 1440
+const w = (px: number) => (px * (1440 / orbitMeasure.base.widthPx) * scale).toFixed(2)
+const polar = (deg: number) => {
+  const a = ((deg - 90) * Math.PI) / 180
+  return { x: R + R * Math.cos(a), y: R + R * Math.sin(a) }
+}
+const ARC_START = 290
+const ARC_SWEEP = orbitMeasure.trailDeg
+const arcFrom = polar(ARC_START)
+const arcTo = polar(ARC_START + ARC_SWEEP)
+const arcPath = `M ${arcFrom.x.toFixed(2)} ${arcFrom.y.toFixed(2)} A ${R} ${R} 0 0 1 ${arcTo.x.toFixed(2)} ${arcTo.y.toFixed(2)}`
+const haloR = (R * orbitMeasure.haloRadiusRatio).toFixed(1)
+
+const firstFact = (factIds: string[]) => (model ? factIds.map((id) => model.facts[id]).find(Boolean) : undefined)
+const short = (iso: string | null) => (iso ? iso.slice(0, 10).split('-').reverse().join('-') : null)
+const cssVars = Object.entries(insightsCssVars).map(([name, value]) => `--${name}:${value}`).join(';')
+const statusCopy = result.status !== 'ok' ? C.states[result.status] : null
+---
+
+<BaseLayout
+  title={header ? `${header.reportTitle} · Efeonce Insights` : 'Efeonce Insights'}
+  description="Informe compartido de Efeonce Insights."
+  noindex
+  canonical="/insights"
+  analytics={false}
+>
+  {statusCopy ? (
+    <main>
+      <StatusScreen
+        kind={result.status as 'not_found' | 'gone' | 'rate_limited' | 'error'}
+        eyebrow={statusCopy.eyebrow}
+        title={statusCopy.title}
+        body={statusCopy.body}
+        {...(result.status === 'not_found' || result.status === 'gone' ? { ctaLabel: C.contactCta, ctaHref: 'mailto:sales@efeoncepro.com' } : {})}
+      />
+    </main>
+  ) : header && model && edition && (
+    <div class="ins-page" style={cssVars}>
+      {/* Antes del primer paint: prepara el motion sólo si el usuario lo acepta. Si el módulo no llega a montar en 3 s,
+          se retira y la página queda completa (el motion nunca condiciona el contenido). */}
+      <script is:inline>
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.classList.add('ins-motion')
+          setTimeout(function () { if (!window.__insMounted) document.documentElement.classList.remove('ins-motion') }, 3000)
+        }
+      </script>
+      <a class="ins-skip" href="#contenido">{C.skipLink}</a>
+
+      <header class="ins-masthead ins-dark" data-capture="masthead" data-masthead>
+        <div
+          class="ins-orbit"
+          aria-hidden="true"
+          data-orbit
+          data-r={R}
+          data-start={ARC_START}
+          data-sweep={ARC_SWEEP}
+          data-ms={motion.orbitMs.travel}
+          data-delay={motion.orbitMs.travelDelay}
+          style="width:clamp(234px, 43vw, 624px);aspect-ratio:1;right:clamp(-40px, 4vw, 110px);top:clamp(72px, 9vw, 78px)"
+        >
+          <svg viewBox={`0 0 ${size} ${size}`}>
+            <defs>
+              <radialGradient id="ins-halo" cx={R} cy={R} r={haloR} gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="var(--ins-halo)" stop-opacity="0.13" />
+                <stop offset="0.54" stop-color="var(--ins-halo)" stop-opacity="0.05" />
+                <stop offset="1" stop-color="var(--ins-halo)" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <circle class="ins-orbit__halo" cx={R} cy={R} r={haloR} fill="url(#ins-halo)" />
+            <circle class="ins-orbit__ring" cx={R} cy={R} r={R} fill="none" stroke="var(--ins-halo)" stroke-opacity={orbitMeasure.ringOpacity} stroke-width={w(orbitMeasure.base.ringStrokePx)} />
+            <path class="ins-orbit__arc" d={arcPath} fill="none" stroke="var(--ins-accent-dark)" stroke-width={w(orbitMeasure.base.trailStrokePx)} stroke-linecap="round" />
+            <circle class="ins-orbit__sphere" cx={arcTo.x.toFixed(2)} cy={arcTo.y.toFixed(2)} r={w(orbitMeasure.base.sphereRadiusPx)} fill="var(--ins-accent-dark)" />
+          </svg>
+        </div>
+
+        <div class="ins-masthead__bar">
+          <img class="ins-lockup" src="/branding/insights/insights-lockup-negative.svg" alt="Efeonce Insights" width="277" height="32" />
+          <span class="ins-label ins-masthead__code ins-num">{C.editionValue(header.reportCode, header.editionVersion)}</span>
+        </div>
+
+        <div class="ins-masthead__body">
+          <span class="ins-label">{C.brandEyebrow}</span>
+          <h1 class="ins-title" id="informe-titulo">{header.reportTitle}</h1>
+          {model.scopeLines && model.scopeLines.length > 0 && (
+            <ul class="ins-scope" aria-label={C.scopeTitle}>{model.scopeLines.map((line) => <li>{line}</li>)}</ul>
+          )}
+          <dl class="ins-meta">
+            <div><dt>{C.preparedFor}</dt><dd>{header.organizationName}</dd></div>
+            <div><dt>{C.period}</dt><dd>{header.periodLabel}</dd></div>
+            <div><dt>{C.edition}</dt><dd class="ins-num">{C.editionValue(header.reportCode, header.editionVersion)}</dd></div>
+            {asOfLabel && <div><dt>{C.asOf}</dt><dd class="ins-num">{asOfLabel}</dd></div>}
+          </dl>
+        </div>
+      </header>
+
+      {partial && (
+        <div class="ins-partial" role="note">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3" /></svg>
+          <strong>{C.periodPartial}</strong>
+          <span>{C.periodPartialDetail}</span>
+        </div>
+      )}
+
+      <div class="ins-body">
+        <aside class="ins-rail">
+          <div class="ins-rail__inner">
+            <div class="ins-progress" data-progress aria-hidden="true">
+              <svg viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="18" fill="none" stroke="var(--ins-navy)" stroke-opacity="0.16" stroke-width="1.5" />
+                <circle class="ins-progress__arc" cx="22" cy="22" r="18" fill="none" stroke="var(--ins-accent-light)" stroke-width="2.5" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" transform="rotate(-90 22 22)" />
+                <g class="ins-progress__sphere"><circle cx="22" cy="4" r="3.5" fill="var(--ins-accent-light)" /></g>
+              </svg>
+              <span class="ins-progress__text ins-num" data-progress-text data-template={C.progressLabel(0, sections.length)}></span>
+            </div>
+            <nav class="ins-toc" aria-label={C.indexToggle}>
+              <div class="ins-rail__desktop">
+                <span class="ins-label">{C.indexTitle}</span>
+                <ol class="ins-toc" style="margin-top:18px">
+                  {sections.map((section, i) => (
+                    <li><a href={`#${section.id}`} data-toc={section.id} aria-current={i === 0 ? 'true' : undefined}>{section.number && <span class="ins-num">{section.number}</span>}{section.label}</a></li>
+                  ))}
+                </ol>
+              </div>
+              <details>
+                <summary><span>{C.indexTitle}</span><span class="ins-label" style="letter-spacing:0;text-transform:none;font-weight:400">{C.indexSections(sections.length)}</span></summary>
+                <ol>
+                  {sections.map((section) => (
+                    <li><a href={`#${section.id}`}>{section.number && <span class="ins-num">{section.number}</span>}{section.label}</a></li>
+                  ))}
+                </ol>
+              </details>
+            </nav>
+          </div>
+        </aside>
+
+        <main class="ins-main" id="contenido">
+          <section class="ins-section" id="resumen" data-section data-capture="summary" aria-labelledby="resumen-title">
+            <div style="display:flex;flex-direction:column;gap:20px" data-reveal>
+              <span class="ins-label">{C.summaryTitle}</span>
+              <h2 class="ins-h2" id="resumen-title" tabindex="-1">{model.executiveSummary[0]?.text ?? C.summaryTitle}</h2>
+              {model.executiveSummary.slice(1).map((claim) => <p class="ins-lead">{claim.text}</p>)}
+            </div>
+
+            {model.essentials && model.essentials.length > 0 && (
+              <div>
+                <span class="ins-label" style="display:block;padding-bottom:14px">{C.essentialsTitle}</span>
+                <div class="ins-essentials" data-stagger>
+                  {model.essentials.map((claim) => {
+                    const fact = firstFact(claim.factIds)
+                    return (
+                      <div class="ins-essential">
+                        <span class="ins-figure-md" data-countup={fact?.value ?? undefined} data-display={fact?.display}>{fact ? (fact.value === null ? C.absent : fact.display) : ''}</span>
+                        <p>{claim.text}</p>
+                        {fact && (
+                          <div class="ins-prov">
+                            {fact.value === null ? <span class="ins-mark">{C.absent}</span> : <FactMark observation={fact.observation} />}
+                            <span>{fact.source}</span>
+                            {fact.asOf && <span class="ins-num">{C.asOf} {short(fact.asOf)}</span>}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {model.decision && (
+              <div class="ins-panel" data-reveal style="grid-template-columns:1fr">
+                <div>
+                  <span class="ins-label">{C.decisionTitle}</span>
+                  <p style="font-size:1.3125rem;line-height:1.45">{model.decision.text}</p>
+                  <span style="font-size:0.875rem;color:var(--ins-ink-soft-dark)">{C.decisionFooter}</span>
+                </div>
+              </div>
+            )}
+          </section>
+
+          {model.chapters.map((chapter, i) => (
+            <InsightsChapter chapter={chapter} index={i + 1} facts={model.facts} locale={locale} />
+          ))}
+
+          {model.actions.length > 0 && (
+            <section class="ins-section" id="plan" data-section aria-labelledby="plan-title">
+              <span class="ins-label">{C.planTitle}</span>
+              <div class="ins-plan__head" data-reveal>
+                <span class="ins-figure-xl" data-countup={model.actions.length} data-display={String(model.actions.length)}>{model.actions.length}</span>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <h2 class="ins-h2" id="plan-title" tabindex="-1">{C.actionsTitle}</h2>
+                  <p class="ins-lead">{C.planLead}</p>
+                </div>
+              </div>
+              <ol class="ins-actions" data-stagger>{model.actions.map((action) => <li>{action.text}</li>)}</ol>
+            </section>
+          )}
+
+          <section class="ins-section" id="metodologia" data-section data-capture="methodology" aria-labelledby="metodologia-title">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <span class="ins-label">{C.methodologyTitle}</span>
+              <h2 class="ins-h2" id="metodologia-title" tabindex="-1" style="font-size:clamp(1.75rem,2.6vw,2.25rem)">{C.methodologyHeading}</h2>
+            </div>
+            {model.methodology.length > 0 && <ul class="ins-method" data-stagger>{model.methodology.map((line) => <li>{line}</li>)}</ul>}
+            <div class="ins-twocol">
+              {model.limits.length > 0 && (
+                <div><span class="ins-label">{C.editionLimits}</span>{model.limits.map((limit) => <p>{limit}</p>)}</div>
+              )}
+              {model.references.length > 0 && (
+                <div><span class="ins-label">{C.references}</span><ol>{model.references.map((ref) => <li>{ref.label}</li>)}</ol></div>
+              )}
+            </div>
+          </section>
+
+          <section class="ins-section" id="descargas" data-section data-capture="downloads" aria-labelledby="descargas-title">
+            <h2 class="ins-label" id="descargas-title" tabindex="-1">{C.downloadsTitle}</h2>
+            <div class="ins-downloads">
+              {edition.downloads.filter((download) => download.output !== 'web').map((download) => (
+                <div class="ins-download">
+                  <div class="ins-download__name"><b>{C.downloadLabel[download.output]}</b><span>{C.downloadFormat[download.output]}</span></div>
+                  {download.status === 'available' ? (
+                    <a class="ins-btn" href={`?descargar=${download.output}`} download>
+                      <svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v9M5 8l4 4 4-4M3 15h12" /></svg>
+                      {C.downloadCta}
+                    </a>
+                  ) : (
+                    <span class="ins-download__na">{C.downloadUnavailable}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <footer class="ins-footer ins-dark" data-capture="footer">
+        <p class="ins-footer__notice">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+          <span>{C.linkNotice} {expiresLabel && C.linkExpires(expiresLabel)}</span>
+        </p>
+        <div class="ins-signature">
+          <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" width="440" height="103" />
+          <p class="ins-slogan"><span class="e">Empower</span> <span class="y">your</span> <span class="g">Growth</span></p>
+        </div>
+        <div class="ins-contact">
+          <a href="mailto:sales@efeoncepro.com">sales@efeoncepro.com</a>
+          <span>Chile +56 9 3732 3064</span>
+          <span>Estados Unidos +1 (239) 235-2073</span>
+          <span>Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span>
+        </div>
+        <p class="ins-legal">{C.confidential(header.organizationName, header.reportCode, header.editionVersion)}</p>
+      </footer>
+    </div>
+  )}
+</BaseLayout>
+
+<script>
+  import { mountInsightsReport } from '@/scripts/insights-report'
+  mountInsightsReport()
+</script>
