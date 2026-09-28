@@ -486,6 +486,9 @@ export const resolveInsightFixture = (token: string): SharedInsightResult | null
       return { status: 'ok', edition: { ...base(token), downloads: base(token).downloads.map((download) => ({ output: download.output, status: 'unavailable' as const })) } }
     case 'fixture-extremo':
       return { status: 'ok', edition: extreme(token) }
+    case 'fixture-version-2':
+      // Un major que Think no entiende: debe terminar en `error` (502), nunca en un render parcial.
+      return { status: 'ok', edition: { ...base(token), modelVersion: '2.0' } }
     case 'fixture-en':
       return { status: 'ok', edition: { ...base(token), model: { ...base(token).model, locale: 'en-US' } } }
     case 'fixture-no-existe':

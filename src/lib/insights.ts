@@ -1,4 +1,5 @@
 import { GREENHOUSE_API_BASE, GREENHOUSE_API_BYPASS, GREENHOUSE_THINK_KEY } from 'astro:env/server'
+import { acceptSharedEdition } from './insights-accept'
 
 /**
  * Cliente headless del informe compartido de Efeonce Insights (TASK-1875, greenhouse-eo).
@@ -155,7 +156,7 @@ export type SharedInsightResult =
   | { status: 'error' }
 
 /** Versiones del modelo que este render sabe dibujar: la mayor 1 es aditiva (un campo nuevo no rompe). */
-export const isSupportedModelVersion = (version: unknown): boolean => typeof version === 'string' && /^1\.\d+$/.test(version)
+export { isSupportedModelVersion } from './insights-accept'
 
 const apiBase = () => (GREENHOUSE_API_BASE || 'https://greenhouse.efeoncepro.com').replace(/\/+$/, '')
 
@@ -174,8 +175,10 @@ const serverHeaders = (accept: string): Record<string, string> => ({
 const devFixture = async (token: string): Promise<SharedInsightResult | null> => {
   if (!import.meta.env.DEV || !token.startsWith('fixture-')) return null
   const { resolveInsightFixture } = await import('./insights-fixtures')
+  const result = resolveInsightFixture(token)
 
-  return resolveInsightFixture(token)
+  // Un fixture pasa por la MISMA aceptación que la respuesta real (así se prueba el major no soportado).
+  return result?.status === 'ok' ? acceptSharedEdition(result.edition) : result
 }
 
 export async function fetchSharedInsightEdition(token: string): Promise<SharedInsightResult> {
@@ -205,13 +208,7 @@ export async function fetchSharedInsightEdition(token: string): Promise<SharedIn
   }
 
   try {
-    const edition = (await res.json()) as InsightSharedEditionResponseV1
-    if (!isSupportedModelVersion(edition?.modelVersion) || !edition.model || !edition.header) {
-      console.error('[insights] unsupported model', String(edition?.modelVersion))
-      return { status: 'error' }
-    }
-
-    return { status: 'ok', edition }
+    return acceptSharedEdition(await res.json())
   } catch {
     return { status: 'error' }
   }

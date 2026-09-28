@@ -11,7 +11,7 @@ const base = (process.argv[2] ?? 'http://localhost:4331').replace(/\/+$/, '')
 const failures = []
 const check = (cond, msg) => { if (!cond) failures.push(msg); console.log(`${cond ? 'ok  ' : 'FAIL'} ${msg}`) }
 
-const expectStatus = { 'fixture-completo': 200, 'fixture-extremo': 200, 'fixture-en': 200, 'fixture-parcial': 200, 'fixture-v1': 200, 'fixture-sin-descargas': 200, 'fixture-no-existe': 404, 'fixture-retirado': 410, 'fixture-limite': 429, 'fixture-error': 502 }
+const expectStatus = { 'fixture-completo': 200, 'fixture-extremo': 200, 'fixture-en': 200, 'fixture-parcial': 200, 'fixture-v1': 200, 'fixture-sin-descargas': 200, 'fixture-no-existe': 404, 'fixture-retirado': 410, 'fixture-limite': 429, 'fixture-error': 502, 'fixture-version-2': 502 }
 
 for (const [token, status] of Object.entries(expectStatus)) {
   const res = await fetch(`${base}/insights/r/${token}`, { redirect: 'manual' })
@@ -23,6 +23,9 @@ for (const [token, status] of Object.entries(expectStatus)) {
   check(!html.includes(token), `${token}: el HTML no contiene el token`)
   check(!html.includes('googletagmanager'), `${token}: sin GTM`)
 }
+
+const v2 = await (await fetch(`${base}/insights/r/fixture-version-2`)).text()
+check(!v2.includes('class="ins-page"') && !v2.includes('EO-INS-') && !v2.includes('Greenhouse Demo'), 'major no soportado: pantalla de error, sin render parcial ni datos de la edición')
 
 const complete = await (await fetch(`${base}/insights/r/fixture-completo`)).text()
 for (const display of ['16,5 %', '60,1 %', '62,0 %', '5,9 %', '1.284', '1.102', '372', '#7,4']) check(complete.includes(display), `completo: imprime «${display}» del modelo`)

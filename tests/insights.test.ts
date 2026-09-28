@@ -6,6 +6,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { resolveInsightFixture } from '../src/lib/insights-fixtures.ts'
+import { acceptSharedEdition, isSupportedModelVersion } from '../src/lib/insights-accept.ts'
 import { buildFindings, chartFactIds, findEvidence, splitLead, splitSummary } from '../src/lib/insights-view.ts'
 import { bulletScale, gaugeAngle, GAUGE_START, GAUGE_SWEEP, heatmapIntensity, niceScale, slices, vennTwo, waffleCells, waterfallBars } from '../src/lib/insights-chart-geometry.ts'
 
@@ -140,4 +141,22 @@ test('la decisión se parte en lo que se pide y su lectura, sin perder ni cambia
   assert.equal(sentence.lead, 'Mover el presupuesto a búsqueda de marca.')
   assert.equal(`${sentence.lead}${sentence.joiner}${sentence.rest}`, 'Mover el presupuesto a búsqueda de marca. El CPC bajó a la mitad y la conversión se duplicó.')
   assert.equal(splitLead('Aprobar el plan.').rest, null)
+})
+
+test('sólo la familia 1.x del modelo llega al render; otro major o un payload incompleto es error', () => {
+  for (const v of ['1.0', '1.1', '1.12']) assert.equal(isSupportedModelVersion(v), true, v)
+  for (const v of ['2.0', '0.9', '1', '1.x', 1.1, null, undefined]) assert.equal(isSupportedModelVersion(v), false, String(v))
+  const ok = resolveInsightFixture('fixture-completo')
+  assert.equal(ok?.status, 'ok')
+  const edition = (ok as Extract<typeof ok, { status: 'ok' }>).edition
+  const silence = console.error
+  console.error = () => {}
+  try {
+    assert.equal(acceptSharedEdition(edition).status, 'ok')
+    assert.equal(acceptSharedEdition({ ...edition, modelVersion: '2.0' }).status, 'error')
+    assert.equal(acceptSharedEdition({ ...edition, model: undefined }).status, 'error')
+    assert.equal(acceptSharedEdition(null).status, 'error')
+  } finally {
+    console.error = silence
+  }
 })
