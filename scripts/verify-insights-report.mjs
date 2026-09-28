@@ -64,6 +64,8 @@ try {
       const tag = `${viewport.width}px ${reducedMotion}`
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
       check(overflow === 0, `${tag}: sin scroll horizontal (${overflow}px)`)
+      const printOnlyShown = await page.evaluate(() => [...document.querySelectorAll('.ins-print-only')].filter((el) => getComputedStyle(el).display !== 'none').length)
+      check(printOnlyShown === 0, `${tag}: los logos de impresión no se ven en pantalla (${printOnlyShown})`)
       if (reducedMotion === 'reduce') {
         const hidden = await page.evaluate(() => [...document.querySelectorAll('[data-reveal], .ins-chart .ins-bar')].filter((el) => getComputedStyle(el).opacity === '0' || getComputedStyle(el).transform.includes('matrix(1, 0, 0, 0')).length)
         check(hidden === 0, `${tag}: nada queda oculto ni sin crecer (${hidden})`)
