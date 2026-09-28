@@ -42,6 +42,8 @@ check(v1.includes('Visibilidad orgánica') && !v1.includes('Más clics con menos
 const none = await (await fetch(`${base}/insights/r/fixture-sin-descargas`)).text()
 check(!none.includes('?descargar='), 'sin descargas: ningún botón inerte')
 
+check(complete.includes('Qué mide este informe') && complete.includes('Respuestas de ChatGPT, Gemini y Perplexity'), 'completo: alcance del modelo 1.1 (scopeLines) en «Cómo se midió»')
+check(!v1.includes('Qué mide este informe'), 'v1: sin alcance cuando el modelo no lo trae')
 check(complete.includes('pasa el 53,7 %') && complete.includes('pasa el 43,9 %'), 'completo: tasas de paso del embudo (modelo 1.1)')
 check(/property="og:image" content="[^"]*og-insights\.png"/.test(complete), 'completo: imagen para compartir sin datos del informe')
 check(!complete.includes('/api/public/insights/shared/'), 'completo: el logo del cliente sale por la misma URL, nunca por la ruta con token')

@@ -497,6 +497,7 @@
 .ins-how__lead { font-size: 0.9375rem; color: var(--ins-ink-soft-light); }
 .ins-how__details .ins-tile__plus { border-color: var(--ins-rule-light); color: var(--ins-navy); }
 .ins-how__details[open] .ins-tile__plus { transform: rotate(45deg); }
+.ins-scope ul { margin: 8px 0 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 6px; }
 .ins-how__body { display: flex; flex-direction: column; gap: 28px; padding: 0 28px 28px; }
 .ins-method { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px 28px; }
 .ins-method li { padding-top: 14px; border-top: 2px solid var(--ins-navy); font-size: 0.9375rem; line-height: 1.6; color: var(--ins-ink-soft-light); }

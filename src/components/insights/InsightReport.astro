@@ -93,7 +93,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
   <a class="ins-skip" href="#hallazgos">{C.skipLink}</a>
 
   <header class="ins-hero ins-dark" data-capture="masthead" data-hero>
-    <div class="ins-orbit" aria-hidden="true" data-orbit data-r={R} data-start={ARC_START} data-sweep={ARC_SWEEP} data-ms={motion.orbitMs.travel} data-delay={motion.orbitMs.travelDelay}>
+    <div class="ins-orbit" aria-hidden="true" data-orbit data-r={R} data-start={ARC_START} data-sweep={ARC_SWEEP} data-ms={motion.orbitMs.travel} data-delay={motion.orbitMs.travelDelay} data-ring={motion.orbitMs.ring} data-halo={motion.orbitMs.halo} data-ease={motion.easeStandard}>
       <svg viewBox={`0 0 ${size} ${size}`}>
         <defs>
           <radialGradient id="ins-halo" cx={R} cy={R} r={haloR} gradientUnits="userSpaceOnUse">
@@ -294,6 +294,9 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
           <span class="ins-tile__plus" aria-hidden="true" set:html={plusIcon} />
         </summary>
         <div class="ins-how__body">
+          {model.scopeLines && model.scopeLines.length > 0 && (
+            <div class="ins-scope"><span class="ins-label">{C.scopeTitle}</span><ul>{model.scopeLines.map((line) => <li>{line}</li>)}</ul></div>
+          )}
           {model.methodology.length > 0 && <ul class="ins-method">{model.methodology.map((line) => <li>{line}</li>)}</ul>}
           <div class="ins-twocol">
             {model.limits.length > 0 && <div><span class="ins-label">{C.editionLimits}</span>{model.limits.map((limit) => <p>{limit}</p>)}</div>}

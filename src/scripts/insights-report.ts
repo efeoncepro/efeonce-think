@@ -45,6 +45,10 @@ function mountOrbit(animate: boolean) {
   const sweep = Number(host.dataset.sweep)
   const duration = Number(host.dataset.ms)
   const delay = Number(host.dataset.delay)
+  // Tiempos del anillo y del halo desde los tokens (`motion.orbitMs`), nunca escritos a mano en el script.
+  const ringMs = Number(host.dataset.ring)
+  const haloMs = Number(host.dataset.halo)
+  const ease = host.dataset.ease ?? 'ease'
   const polar = (deg: number) => {
     const a = ((deg - 90) * Math.PI) / 180
     return { x: R + R * Math.cos(a), y: R + R * Math.sin(a) }
@@ -52,8 +56,8 @@ function mountOrbit(animate: boolean) {
 
   ring.style.opacity = '0'
   halo.style.opacity = '0'
-  ring.style.transition = 'opacity 350ms cubic-bezier(0.4, 0, 0.2, 1)'
-  halo.style.transition = 'opacity 900ms cubic-bezier(0.4, 0, 0.2, 1)'
+  ring.style.transition = `opacity ${ringMs}ms ${ease}`
+  halo.style.transition = `opacity ${haloMs}ms ${ease}`
   const from = polar(start)
   sphere.setAttribute('cx', from.x.toFixed(2))
   sphere.setAttribute('cy', from.y.toFixed(2))
