@@ -19,6 +19,8 @@ interface Props {
    * `no-referrer` evita que viaje en el Referer de un enlace saliente.
    */
   analytics?: boolean
+  /** Idioma del documento (por defecto es-CL); el informe de Insights usa el de su edición. */
+  lang?: string
 }
 
 const {
@@ -32,6 +34,7 @@ const {
   ogImageAlt = ogTitle,
   jsonLd,
   analytics = true,
+  lang = 'es-CL',
 } = Astro.props
 const site = Astro.site ?? new URL('https://think.efeoncepro.com')
 const canonicalUrl = new URL(canonical ?? Astro.url.pathname, site).toString()
@@ -41,7 +44,7 @@ const safeJsonLd = (value: Record<string, unknown>) => JSON.stringify(value).rep
 ---
 
 <!doctype html>
-<html lang="es-CL">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

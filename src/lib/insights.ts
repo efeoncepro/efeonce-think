@@ -1,4 +1,4 @@
-import { GREENHOUSE_API_BASE } from 'astro:env/server'
+import { GREENHOUSE_API_BASE, GREENHOUSE_API_BYPASS, GREENHOUSE_THINK_KEY } from 'astro:env/server'
 
 /**
  * Cliente headless del informe compartido de Efeonce Insights (TASK-1875, greenhouse-eo).
@@ -7,8 +7,8 @@ import { GREENHOUSE_API_BASE } from 'astro:env/server'
  * render tonto: no calcula, no compara, no interpola. El fetch es SERVER-SIDE y SIN CACHE (revocar debe revocar en la
  * lectura siguiente, a diferencia del Grader); el token nunca se escribe en logs, HTML ni analytics.
  *
- * Los tipos son copia del contrato de Greenhouse (`src/lib/efeonce-insights/contracts/web-model.ts`). Los campos
- * marcados «v2» vienen del contrato editorial de TASK-1888 y son OPCIONALES: un modelo sin ellos se dibuja igual.
+ * Los tipos son copia del contrato de Greenhouse (`src/lib/efeonce-insights/contracts/web-model.ts`, modelVersion 1.1).
+ * Los campos marcados «v2» (editorial de TASK-1888) y «1.1» son OPCIONALES: un modelo 1.0 se dibuja igual.
  */
 
 export type InsightModule = 'seo' | 'aeo' | 'ico'
@@ -77,12 +77,17 @@ export interface InsightWebReadingV1 {
   nextStep: InsightWebClaimV1 | null
 }
 
+/** 1.1 — cifras que Greenhouse deriva con la geometría de los PDF (el render nunca las calcula). */
+export interface InsightWebChartDerivedV1 {
+  funnelStepRates?: Array<{ stageId: string; display: string | null }>
+}
+
 export interface InsightWebChapterV1 {
   chapterId: string
   module: InsightModule
   title: string
   claims: InsightWebClaimV1[]
-  charts: Array<{ spec: ChartSpecV1; table: { columns: string[]; rows: Array<Array<string | null>> } }>
+  charts: Array<{ spec: ChartSpecV1; table: { columns: string[]; rows: Array<Array<string | null>> }; derived?: InsightWebChartDerivedV1 }>
   tables: Array<{ tableId: string; title: string; columns: string[]; rows: Array<Array<string | null>> }>
   limits: string[]
   /** v2 */
@@ -107,6 +112,10 @@ export interface InsightWebModelV1 {
   decision?: InsightWebClaimV1
   /** v2 — «Qué mide este informe». */
   scopeLines?: string[]
+  /** v2 — «Cómo lo mediremos». */
+  measurement?: InsightWebClaimV1
+  /** v2 — «Qué necesitamos de ustedes». */
+  ask?: InsightWebClaimV1
 }
 
 export interface InsightSharedHeaderV1 {
@@ -120,6 +129,8 @@ export interface InsightSharedHeaderV1 {
   timeZone: string
   issuedAt: string
   asOfMax: string | null
+  /** 1.1 — logo del cliente por el proxy de Greenhouse; `variant` dice sobre qué fondo se diseñó. */
+  clientLogo?: { href: string; variant: 'on_dark' | 'default' }
 }
 
 export interface InsightSharedDownloadV1 {
@@ -148,6 +159,13 @@ export const isSupportedModelVersion = (version: unknown): boolean => typeof ver
 
 const apiBase = () => (GREENHOUSE_API_BASE || 'https://greenhouse.efeoncepro.com').replace(/\/+$/, '')
 
+/** Cabeceras server-side hacia Greenhouse: la llave de Think (excepción del Firewall) y, sólo en staging, el bypass. */
+const serverHeaders = (accept: string): Record<string, string> => ({
+  accept,
+  ...(GREENHOUSE_THINK_KEY ? { 'x-efeonce-think-key': GREENHOUSE_THINK_KEY } : {}),
+  ...(GREENHOUSE_API_BYPASS ? { 'x-vercel-protection-bypass': GREENHOUSE_API_BYPASS } : {}),
+})
+
 /**
  * Fixtures del modelo para ver el informe en `astro dev` sin Greenhouse. Sólo en desarrollo: en un build de
  * producción `import.meta.env.DEV` es false y el bloque ni siquiera se evalúa, así que un token `fixture-*` real
@@ -167,7 +185,7 @@ export async function fetchSharedInsightEdition(token: string): Promise<SharedIn
   let res: Response
   try {
     res = await fetch(`${apiBase()}/api/public/insights/shared/${encodeURIComponent(token)}`, {
-      headers: { accept: 'application/json' },
+      headers: serverHeaders('application/json'),
       cache: 'no-store',
     })
   } catch (e) {
@@ -208,12 +226,31 @@ export async function fetchSharedInsightOutput(token: string, output: InsightOut
 
   try {
     const res = await fetch(`${apiBase()}/api/public/insights/shared/${encodeURIComponent(token)}/outputs/${encodeURIComponent(output)}`, {
+      headers: serverHeaders('application/pdf'),
       cache: 'no-store',
     })
 
     return res
   } catch (e) {
     console.error('[insights] output fetch threw', (e as Error).name)
+    return new Response(null, { status: 502 })
+  }
+}
+
+/** 1.1 — logo del cliente por el proxy de Greenhouse (mismo gate del token: revocar corta el logo). */
+export async function fetchSharedInsightLogo(token: string): Promise<Response> {
+  if (import.meta.env.DEV && token.startsWith('fixture-')) {
+    const { fixtureLogoResponse } = await import('./insights-fixtures')
+    return fixtureLogoResponse(token)
+  }
+
+  try {
+    return await fetch(`${apiBase()}/api/public/insights/shared/${encodeURIComponent(token)}/logo`, {
+      headers: serverHeaders('image/*'),
+      cache: 'no-store',
+    })
+  } catch (e) {
+    console.error('[insights] logo fetch threw', (e as Error).name)
     return new Response(null, { status: 502 })
   }
 }

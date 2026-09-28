@@ -9,7 +9,7 @@
 import ChartFigure from './ChartFigure.astro'
 import FactMark from './FactMark.astro'
 import type { InsightWebChapterV1, InsightWebFactV1 } from '@lib/insights'
-import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+import { INSIGHTS_COPY, type InsightsCopy } from '@lib/insights-copy'
 import { chartFactIds } from '@lib/insights-view'
 
 interface Props {
@@ -17,9 +17,11 @@ interface Props {
   index: number
   facts: Record<string, InsightWebFactV1>
   locale: string
+  copy?: InsightsCopy
 }
 
-const { chapter, index, facts, locale } = Astro.props
+const { chapter, index, facts, locale, copy } = Astro.props
+const C = copy ?? INSIGHTS_COPY
 const number = String(index).padStart(2, '0')
 const shortDate = (iso: string | null) => (iso ? iso.slice(0, 10).split('-').reverse().join('-') : null)
 
@@ -63,13 +65,13 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
   {main && (
     <div class:list={['ins-story', { 'ins-story--plain': steps.length === 0 }]} data-story>
       <div class="ins-story__stage">
-        <ChartFigure spec={main.spec} table={main.table} facts={facts} locale={locale} uid={`fig-${chapter.chapterId}`} />
+        <ChartFigure spec={main.spec} table={main.table} derived={main.derived} copy={C} facts={facts} locale={locale} uid={`fig-${chapter.chapterId}`} />
         {mainProv && (
           <div class="ins-provrow">
             <span><b>{C.provenanceUnit}</b>{main.spec.unit}</span>
             <span><b>{C.provenanceSource}</b>{mainProv.sources}</span>
             {mainProv.asOf && <span class="ins-num"><b>{C.asOf}</b>{mainProv.asOf}</span>}
-            <FactMark observation={mainProv.estimated ? 'estimated' : 'observed'} />
+            <FactMark copy={C} observation={mainProv.estimated ? 'estimated' : 'observed'} />
           </div>
         )}
       </div>
@@ -116,7 +118,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
               )}
             </div>
             <div class="ins-beat__figure">
-              <ChartFigure spec={chart.spec} table={chart.table} facts={facts} locale={locale} uid={`fig-${chart.spec.chartId}`} compact />
+              <ChartFigure spec={chart.spec} table={chart.table} derived={chart.derived} copy={C} facts={facts} locale={locale} uid={`fig-${chart.spec.chartId}`} compact />
             </div>
           </article>
         )
@@ -140,7 +142,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
               ) : (
                 <>
                   <span class="ins-figure-md" data-countup={fact.value} data-display={fact.display}>{fact.display}</span>
-                  <span class="ins-prov"><FactMark observation={fact.observation} /><span>{fact.source}</span></span>
+                  <span class="ins-prov"><FactMark copy={C} observation={fact.observation} /><span>{fact.source}</span></span>
                 </>
               )}
             </div>

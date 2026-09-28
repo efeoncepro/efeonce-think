@@ -39,6 +39,19 @@ export default defineConfig({
         access: 'secret',
         default: 'csur-4170287c-0a81-4baa-8de3-b6050f8173ee',
       }),
+      // TASK-1875 (greenhouse-eo) — llave de servidor de Think ante /api/public/** de Greenhouse: el Firewall
+      // exceptúa del límite por IP sólo a quien la presenta. Vacía = sin excepción (funciona igual, sin holgura).
+      GREENHOUSE_THINK_KEY: envField.string({
+        context: 'server',
+        access: 'secret',
+        default: '',
+      }),
+      // Sólo para apuntar a staging (protegido por SSO de Vercel): bypass de automatización. Vacío en producción.
+      GREENHOUSE_API_BYPASS: envField.string({
+        context: 'server',
+        access: 'secret',
+        default: '',
+      }),
       GREENHOUSE_CTA_EMBED_KEY: envField.string({
         context: 'server',
         access: 'secret',

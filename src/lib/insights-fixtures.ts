@@ -168,6 +168,8 @@ const SEO_EXTRA: { charts: Chart[]; readings: Reading[] } = {
           { stageId: 'f4', label: 'Oportunidades calificadas', factId: 'seo.f_sql' },
         ] } }),
       table: { columns: ['Etapa', 'Personas'], rows: [['Clics desde Google', d('seo.f_clicks')], ['Visitas con interacción', d('seo.f_engaged')], ['Formularios', d('seo.f_forms')], ['Oportunidades calificadas', d('seo.f_sql')]] },
+      // 1.1: Greenhouse deriva las tasas con la misma geometría de los PDF (funnelGeometry) y las formatea.
+      derived: { funnelStepRates: [{ stageId: 'f1', display: null }, { stageId: 'f2', display: '53,7 %' }, { stageId: 'f3', display: '5,9 %' }, { stageId: 'f4', display: '43,9 %' }] },
     },
     {
       spec: spec({ chartId: 'seo-scatter', family: 'scatter', relation: 'correlation', title: 'Posición frente a CTR, por página', unit: '%',
@@ -273,6 +275,8 @@ const model: InsightWebModelV1 = {
     claim('ess-5', 'La base técnica acompaña: velocidad y rastreo están sanos; sólo las imágenes del blog quedan bajo la meta.', ['seo.tech_score']),
   ],
   decision: claim('dec', 'Aprobar el plan de septiembre: cinco acciones para convertir mejor el tráfico que ya llega. Las dos primeras pueden estar en producción en dos semanas.'),
+  measurement: claim('meas', 'Contra la línea base de agosto, en el informe de septiembre.'),
+  ask: claim('ask', 'Aprobar el plan y dar acceso de edición a /precios y /servicios.'),
   scopeLines: ['Visibilidad orgánica en Google', 'Respuestas de ChatGPT, Gemini y Perplexity', 'Entrega creativa: plazos, rondas y aprobación'],
   chapters: [
     {
@@ -413,6 +417,7 @@ const base = (token: string): InsightSharedEditionResponseV1 => ({
     timeZone: 'America/Santiago',
     issuedAt: '2026-09-02T12:00:00-03:00',
     asOfMax: '2026-08-31',
+    clientLogo: { href: `/api/public/insights/shared/${token}/logo`, variant: 'default' },
   },
   model,
   downloads: [
@@ -434,6 +439,32 @@ const withoutV2 = (edition: InsightSharedEditionResponseV1): InsightSharedEditio
   },
 })
 
+/** Logo de ejemplo del cliente (sólo dev): una marca de palabra neutra, sin parecerse a ninguna real. */
+/** Logo del fixture con el MISMO gate que Greenhouse: sólo si el enlace existe y la edición trae logo. */
+export const fixtureLogoResponse = (token: string): Response => {
+  const result = resolveInsightFixture(token)
+  if (result?.status !== 'ok' || !result.edition.header.clientLogo) {
+    return new Response(null, { status: result?.status === 'gone' ? 410 : 404 })
+  }
+  return new Response(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48"><rect width="240" height="48" rx="10" fill="#1d4d3a"/><circle cx="26" cy="24" r="10" fill="#9fe0b7"/><text x="46" y="31" font-family="Georgia, serif" font-size="20" fill="#ffffff">Greenhouse Demo</text></svg>`,
+    { headers: { 'content-type': 'image/svg+xml' } },
+  )
+}
+
+/** Contenido extremo: muchos hallazgos, nombres y cifras largas, un capítulo con muchas figuras. */
+const extreme = (token: string): InsightSharedEditionResponseV1 => {
+  const edition = base(token)
+  const longClaims = Array.from({ length: 9 }, (_, i) =>
+    claim(`x-${i}`, `${['Más clics', 'Más audiencia nueva', 'La IA nombra la marca', 'Fuga en el contacto', 'Base técnica', 'CTR al alza', 'Posición media', 'Citas con enlace', 'Oportunidades calificadas'][i]}: una afirmación deliberadamente larga para probar cómo se acomoda el texto cuando el plan trae frases de más de dos líneas en la grilla de hallazgos.`, [['seo.clicks_change', 'seo.nonbrand_share', 'aeo.mention_rate', 'seo.contact_rate', 'seo.tech_score', 'seo.ctr_aug', 'seo.position_aug', 'aeo.cited_links', 'seo.f_sql'][i]]),
+  )
+  return {
+    ...edition,
+    header: { ...edition.header, organizationName: 'Compañía Sudamericana de Distribución y Servicios Integrados de Consumo Masivo S.A.', reportTitle: 'Visibilidad orgánica, respuestas de inteligencia artificial, conversión comercial y entrega creativa del trimestre' },
+    model: { ...edition.model, essentials: longClaims, facts: { ...edition.model.facts, 'seo.clicks_aug': { ...edition.model.facts['seo.clicks_aug'], display: '1.284.567.890' } } },
+  }
+}
+
 export const resolveInsightFixture = (token: string): SharedInsightResult | null => {
   switch (token) {
     case 'fixture-completo':
@@ -453,6 +484,10 @@ export const resolveInsightFixture = (token: string): SharedInsightResult | null
       return { status: 'ok', edition: withoutV2(base(token)) }
     case 'fixture-sin-descargas':
       return { status: 'ok', edition: { ...base(token), downloads: base(token).downloads.map((download) => ({ output: download.output, status: 'unavailable' as const })) } }
+    case 'fixture-extremo':
+      return { status: 'ok', edition: extreme(token) }
+    case 'fixture-en':
+      return { status: 'ok', edition: { ...base(token), model: { ...base(token).model, locale: 'en-US' } } }
     case 'fixture-no-existe':
       return { status: 'not_found' }
     case 'fixture-retirado':

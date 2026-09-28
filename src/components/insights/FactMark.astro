@@ -3,13 +3,15 @@
  * Marca de procedencia de una cifra (TASK-1875): «Medido» con anillo lleno de trazo, «Estimado» con anillo
  * punteado. Estado con la forma, nunca con semáforo (La órbita: `StateMarker`); nunca una esfera.
  */
-import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+import { INSIGHTS_COPY, type InsightsCopy } from '@lib/insights-copy'
 
 interface Props {
   observation: 'observed' | 'estimated'
+  copy?: InsightsCopy
 }
 
-const { observation } = Astro.props
+const { observation, copy } = Astro.props
+const C = copy ?? INSIGHTS_COPY
 const estimated = observation === 'estimated'
 ---
 

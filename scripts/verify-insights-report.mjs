@@ -11,7 +11,7 @@ const base = (process.argv[2] ?? 'http://localhost:4331').replace(/\/+$/, '')
 const failures = []
 const check = (cond, msg) => { if (!cond) failures.push(msg); console.log(`${cond ? 'ok  ' : 'FAIL'} ${msg}`) }
 
-const expectStatus = { 'fixture-completo': 200, 'fixture-parcial': 200, 'fixture-v1': 200, 'fixture-sin-descargas': 200, 'fixture-no-existe': 404, 'fixture-retirado': 410, 'fixture-limite': 429, 'fixture-error': 502 }
+const expectStatus = { 'fixture-completo': 200, 'fixture-extremo': 200, 'fixture-en': 200, 'fixture-parcial': 200, 'fixture-v1': 200, 'fixture-sin-descargas': 200, 'fixture-no-existe': 404, 'fixture-retirado': 410, 'fixture-limite': 429, 'fixture-error': 502 }
 
 for (const [token, status] of Object.entries(expectStatus)) {
   const res = await fetch(`${base}/insights/r/${token}`, { redirect: 'manual' })
@@ -38,6 +38,18 @@ check(v1.includes('Visibilidad orgánica') && !v1.includes('Más clics con menos
 
 const none = await (await fetch(`${base}/insights/r/fixture-sin-descargas`)).text()
 check(!none.includes('?descargar='), 'sin descargas: ningún botón inerte')
+
+check(complete.includes('pasa el 53,7 %') && complete.includes('pasa el 43,9 %'), 'completo: tasas de paso del embudo (modelo 1.1)')
+check(/property="og:image" content="[^"]*og-insights\.png"/.test(complete), 'completo: imagen para compartir sin datos del informe')
+check(!complete.includes('/api/public/insights/shared/'), 'completo: el logo del cliente sale por la misma URL, nunca por la ruta con token')
+
+const en = await (await fetch(`${base}/insights/r/fixture-en`)).text()
+check(en.includes('<html lang="en-US"') && en.includes('>Present<') && !en.includes('Descargar PDF'), 'en-US: idioma del documento y chrome en inglés')
+
+const logo = await fetch(`${base}/insights/r/fixture-completo?logo=1`)
+check(logo.status === 200 && (logo.headers.get('content-type') ?? '').startsWith('image/') && logo.headers.get('cache-control') === 'private, no-store', `logo del cliente: imagen privada no-store (HTTP ${logo.status})`)
+const logoMissing = await fetch(`${base}/insights/r/fixture-no-existe?logo=1`)
+check(logoMissing.status === 404, `logo con enlace inexistente: 404 (HTTP ${logoMissing.status})`)
 
 const download = await fetch(`${base}/insights/r/fixture-completo?descargar=report_pdf`, { redirect: 'manual' })
 check(download.status === 303, `descarga sin archivo: vuelve al informe (HTTP ${download.status})`)
@@ -77,6 +89,57 @@ try {
       check(overflowAfter === 0, `${tag}: sin scroll horizontal tras interactuar (${overflowAfter}px)`)
       await context.close()
     }
+  }
+
+  // Caso extremo (textos y cifras largas, nueve hallazgos): nada desborda.
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    const context = await browser.newContext({ viewport, reducedMotion: 'reduce' })
+    const page = await context.newPage()
+    await page.goto(`${base}/insights/r/fixture-extremo`, { waitUntil: 'networkidle' })
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    check(overflow === 0, `extremo ${viewport.width}px: sin scroll horizontal (${overflow}px)`)
+    await context.close()
+  }
+
+  // Modo presentación: abre con el primer lámina, avanza con teclado, Esc cierra y devuelve el foco.
+  {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+    const page = await context.newPage()
+    await page.goto(`${base}/insights/r/fixture-completo`, { waitUntil: 'networkidle' })
+    await page.focus('[data-present-open]')
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(300)
+    const first = await page.textContent('[data-present-count]')
+    await page.keyboard.press('ArrowRight')
+    const second = await page.textContent('[data-present-count]')
+    check(/^1 de \d+$/.test(first ?? '') && /^2 de \d+$/.test(second ?? ''), `presentación: contador ${first} → ${second}`)
+    const visible = await page.evaluate(() => [...document.querySelectorAll('[data-slide]')].filter((s) => s.classList.contains('is-current')).length)
+    check(visible === 1, 'presentación: una sola lámina a la vez')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(200)
+    const closed = await page.evaluate(() => document.querySelector('[data-present]').hidden && document.activeElement?.hasAttribute('data-present-open'))
+    check(closed, 'presentación: Esc cierra y devuelve el foco al botón')
+    await context.close()
+  }
+
+  // Impresión: sin barra ni controles, hallazgos visibles, logos en positivo, tablas abiertas, sin desborde.
+  {
+    const context = await browser.newContext({ viewport: { width: 794, height: 1123 } })
+    const page = await context.newPage()
+    await page.goto(`${base}/insights/r/fixture-completo`, { waitUntil: 'networkidle' })
+    await page.emulateMedia({ media: 'print' })
+    const state = await page.evaluate(() => ({
+      topbar: getComputedStyle(document.querySelector('.ins-topbar')).display,
+      heroHidden: [...document.querySelectorAll('.ins-hero__body > *')].filter((el) => getComputedStyle(el).opacity !== '1').length,
+      whiteText: [...document.querySelectorAll('.ins-main p, .ins-main h2, .ins-main h3')].filter((el) => el.offsetParent && getComputedStyle(el).color === 'rgb(255, 255, 255)').length,
+      tilesHidden: [...document.querySelectorAll('.ins-tile')].filter((el) => getComputedStyle(el).opacity !== '1').length,
+      positiveLogo: getComputedStyle(document.querySelector('.ins-lockup.ins-print-only')).display !== 'none',
+      tables: [...document.querySelectorAll('.ins-chart__table')].filter((el) => getComputedStyle(el).display === 'none').length,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    }))
+    check(state.topbar === 'none' && state.heroHidden === 0 && state.whiteText === 0 && state.tilesHidden === 0 && state.positiveLogo && state.tables === 0 && state.overflow === 0, `impresión: ${JSON.stringify(state)}`)
+    await page.pdf({ path: '/tmp/insights-print-check.pdf', format: 'A4', printBackground: true })
+    await context.close()
   }
 } finally {
   await browser.close()

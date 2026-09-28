@@ -12,7 +12,7 @@
  * - `data-step` permite narrarlo por pasos en una escena; sin JS queda en su estado final.
  */
 import type { ChartSpecV1, InsightWebFactV1 } from '@lib/insights'
-import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+import { INSIGHTS_COPY, type InsightsCopy } from '@lib/insights-copy'
 import {
   GAUGE_START,
   GAUGE_SWEEP,
@@ -36,9 +36,13 @@ interface Props {
   theme?: 'dark' | 'light'
   uid: string
   compact?: boolean
+  /** 1.1 — cifras derivadas por Greenhouse (tasas del embudo). */
+  derived?: { funnelStepRates?: Array<{ stageId: string; display: string | null }> }
+  copy?: InsightsCopy
 }
 
-const { spec, table, facts, locale, theme = 'light', uid, compact = false } = Astro.props
+const { spec, table, facts, locale, theme = 'light', uid, compact = false, derived, copy } = Astro.props
+const C = copy ?? INSIGHTS_COPY
 const data = spec.data
 const family = spec.family
 const fv = (id: string | null | undefined) => (id ? facts[id] : undefined)
@@ -143,7 +147,8 @@ const waterfall = data?.kind === 'waterfall'
 const funnel = data?.kind === 'funnel'
   ? (() => {
       const first = num(data.stages[0]?.factId) || 1
-      return data.stages.map((st) => ({ ...st, widthPct: Math.max(2, ((num(st.factId) ?? 0) / first) * 100), display: disp(st.factId) }))
+      const rates = new Map((derived?.funnelStepRates ?? []).map((r) => [r.stageId, r.display]))
+      return data.stages.map((st) => ({ ...st, widthPct: Math.max(2, ((num(st.factId) ?? 0) / first) * 100), display: disp(st.factId), rate: rates.get(st.stageId) ?? null }))
     })()
   : null
 
@@ -364,7 +369,10 @@ const legend = SERIES_FAMILIES.includes(family) && spec.series.length > 1
     {funnel && (
       <ol class="ins-funnel">
         {funnel.map((st) => (
-          <li><span class="ins-funnel__label">{st.label}</span><span class="ins-funnel__bar" style={`--w:${st.widthPct}%;--c:${color(0)}`}><b class="ins-num">{st.display}</b></span></li>
+          <li>
+            {st.rate && <span class="ins-funnel__rate ins-num"><svg viewBox="0 0 12 12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v8M3 7l3 3 3-3" /></svg>{C.funnelRate(st.rate)}</span>}
+            <span class="ins-funnel__label">{st.label}</span><span class="ins-funnel__bar" style={`--w:${st.widthPct}%;--c:${color(0)}`}><b class="ins-num">{st.display}</b></span>
+          </li>
         ))}
       </ol>
     )}

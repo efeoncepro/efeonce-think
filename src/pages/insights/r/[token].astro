@@ -28,9 +28,9 @@ import StatusScreen from '@/components/primitives/StatusScreen.astro'
 import ModuleScene from '@/components/insights/ModuleScene.astro'
 import ChartFigure from '@/components/insights/ChartFigure.astro'
 import FactMark from '@/components/insights/FactMark.astro'
-import { fetchSharedInsightEdition, fetchSharedInsightOutput, type InsightOutput } from '@lib/insights'
+import { fetchSharedInsightEdition, fetchSharedInsightLogo, fetchSharedInsightOutput, type InsightOutput } from '@lib/insights'
 import { buildFindings, buildModules, splitSummary } from '@lib/insights-view'
-import { INSIGHTS_COPY as C } from '@lib/insights-copy'
+import { getInsightsCopy } from '@lib/insights-copy'
 import { insightsCssVars, orbitMeasure, motion } from '@lib/insights-tokens'
 
 const token = Astro.params.token ?? ''
@@ -38,6 +38,16 @@ const token = Astro.params.token ?? ''
 Astro.response.headers.set('Cache-Control', 'private, no-store')
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow')
 Astro.response.headers.set('Referrer-Policy', 'no-referrer')
+
+// Logo del cliente (1.1): `?logo=1` en la MISMA URL; Greenhouse aplica el mismo gate del token.
+if (Astro.url.searchParams.get('logo') === '1') {
+  const upstream = await fetchSharedInsightLogo(token)
+  if (upstream.ok && upstream.body) {
+    const type = upstream.headers.get('content-type') ?? 'image/png'
+    return new Response(upstream.body, { status: 200, headers: { 'Content-Type': type, 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'no-referrer', 'X-Content-Type-Options': 'nosniff' } })
+  }
+  return new Response(null, { status: 404, headers: { 'Cache-Control': 'private, no-store' } })
+}
 
 // Descarga: `?descargar=<output>` en la MISMA URL, así el HTML nunca escribe el token. Greenhouse revalida el grant.
 const requested = Astro.url.searchParams.get('descargar')
@@ -66,6 +76,7 @@ const edition = result.status === 'ok' ? result.edition : null
 const header = edition?.header
 const model = edition?.model
 const locale = model?.locale ?? 'es-CL'
+const C = getInsightsCopy(model?.locale)
 
 // ── Presentación: fechas del header y geometría; ningún dato nuevo ───────────
 const civil = (iso: string) => iso.slice(0, 10)
@@ -113,10 +124,13 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
 
 <BaseLayout
   title={header ? `${header.reportTitle} · Efeonce Insights` : 'Efeonce Insights'}
-  description="Informe compartido de Efeonce Insights."
+  description={C.ogDescription}
   noindex
   canonical="/insights"
   analytics={false}
+  lang={locale}
+  ogImage="/branding/insights/og-insights.png"
+  ogImageAlt="Efeonce Insights"
 >
   {statusCopy ? (
     <main>
@@ -158,8 +172,9 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
         </div>
 
         <div class="ins-hero__bar">
-          <img class="ins-lockup" src="/branding/insights/insights-lockup-negative.svg" alt="Efeonce Insights" width="277" height="32" />
-          <ul class="ins-status" aria-label="Estado del enlace">
+          <img class="ins-lockup ins-screen-only" src="/branding/insights/insights-lockup-negative.svg" alt="Efeonce Insights" width="277" height="32" />
+          <img class="ins-lockup ins-print-only" src="/branding/insights/insights-lockup-positive.svg" alt="" width="277" height="32" />
+          <ul class="ins-status" aria-label={C.statusLabel}>
             <li><span class="ins-status__dot" aria-hidden="true" />{C.linkActive}</li>
             {expiresShort && <li class="ins-num">{C.expiresShort(expiresShort)}</li>}
           </ul>
@@ -169,6 +184,14 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
           <p class="ins-hero__kicker"><span>{header.reportTitle}</span><span class="ins-num">{header.periodLabel}</span></p>
           <h1 class="ins-hero__answer">{summary.headline?.text ?? header.reportTitle}</h1>
           {summary.rest.map((claim) => <p class="ins-hero__lead">{claim.text}</p>)}
+          {header.clientLogo && (
+            <p class="ins-hero__client">
+              <span>{C.preparedFor}</span>
+              <span class:list={['ins-hero__logo', { 'ins-hero__logo--plate': header.clientLogo.variant === 'default' }]}>
+                <img src="?logo=1" alt={C.clientLogoAlt(header.organizationName)} height="32" />
+              </span>
+            </p>
+          )}
           <p class="ins-hero__meta ins-num">
             <span>{C.preparedFor} <b>{header.organizationName}</b></span>
             <span>{C.editionValue(header.reportCode, header.editionVersion)}</span>
@@ -204,6 +227,9 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
           </div>
           <div class="ins-topbar__actions">
             {model.actions.length > 0 && <a class="ins-topbar__link" href="#plan">{C.filterPlan}</a>}
+            <button type="button" class="ins-topbar__link ins-present-open" data-present-open aria-haspopup="dialog">
+              <svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.5h13v9h-13zM9 12.5v3M6 15.5h6M7.5 6.3l3.5 1.7-3.5 1.7z" /></svg>{C.present}
+            </button>
             <button type="button" class="ins-iconbtn" data-copy-link aria-label={C.copyLink} set:html={linkIcon} />
             {primaryDownload && (
               <a class="ins-btn ins-btn--small" href={`?descargar=${primaryDownload.output}`} download><Fragment set:html={downloadIcon} /><span>{C.downloadShort}</span></a>
@@ -233,7 +259,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
                 <span class="ins-tile__claim">{finding.claim.text}</span>
                 {finding.fact && (
                   <span class="ins-tile__prov">
-                    {finding.fact.value === null ? <span class="ins-mark">{C.absent}</span> : <FactMark observation={finding.fact.observation} />}
+                    {finding.fact.value === null ? <span class="ins-mark">{C.absent}</span> : <FactMark copy={C} observation={finding.fact.observation} />}
                     <span>{finding.fact.source}</span>
                   </span>
                 )}
@@ -244,7 +270,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
                 {finding.evidence ? (
                   <>
                     {finding.evidence.reading?.conclusion && <p class="ins-tile__conclusion">{finding.evidence.reading.conclusion.text}</p>}
-                    <ChartFigure spec={finding.evidence.chart.spec} table={finding.evidence.chart.table} facts={model.facts} locale={locale} theme="dark" uid={`ev-${finding.id}`} compact />
+                    <ChartFigure copy={C} derived={finding.evidence.chart.derived} spec={finding.evidence.chart.spec} table={finding.evidence.chart.table} facts={model.facts} locale={locale} theme="dark" uid={`ev-${finding.id}`} compact />
                     {(finding.evidence.reading?.meaning || finding.evidence.reading?.nextStep) && (
                       <div class="ins-tile__reading">
                         {finding.evidence.reading?.meaning && <div><span class="ins-label">{C.meaningTitle}</span><p>{finding.evidence.reading.meaning.text}</p></div>}
@@ -281,7 +307,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       </section>
 
       <main class="ins-main" id="contenido">
-        {model.chapters.map((chapter, i) => <ModuleScene chapter={chapter} index={i + 1} facts={model.facts} locale={locale} />)}
+        {model.chapters.map((chapter, i) => <ModuleScene chapter={chapter} index={i + 1} facts={model.facts} locale={locale} copy={C} />)}
 
         {model.actions.length > 0 && (
           <section class="ins-plan" id="plan" data-section aria-labelledby="plan-title">
@@ -292,6 +318,12 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
                 <h2 class="ins-plan__title" id="plan-title" tabindex="-1">{C.planLead}</h2>
               </div>
             </div>
+            {(model.measurement || model.ask) && (
+              <div class="ins-plan__terms" data-reveal>
+                {model.measurement && <div><span class="ins-label">{C.measurementTitle}</span><p>{model.measurement.text}</p></div>}
+                {model.ask && <div><span class="ins-label">{C.askTitle}</span><p>{model.ask.text}</p></div>}
+              </div>
+            )}
             <ol class="ins-actions" data-stagger>
               {model.actions.map((action) => {
                 const module = moduleOf(action.factIds)
@@ -345,7 +377,8 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       <footer class="ins-footer ins-dark" data-capture="footer">
         <div class="ins-footer__inner">
           <div class="ins-signature">
-            <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" width="200" height="47" />
+            <img class="ins-screen-only" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" width="200" height="47" />
+            <img class="ins-print-only" src="/branding/efeonce-logo.svg" alt="" width="200" height="47" />
             <p class="ins-slogan"><span class="e">Empower</span> <span class="y">your</span> <span class="g">Growth</span></p>
           </div>
           <ul class="ins-contact">
@@ -361,9 +394,56 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
         </div>
       </footer>
 
-      <div class="ins-dock" aria-label="Acciones del informe">
+      <div class="ins-dock" aria-label={C.dockLabel}>
         <button type="button" class="ins-dock__btn" data-copy-link><Fragment set:html={linkIcon} />{C.copyLink}</button>
         {primaryDownload && <a class="ins-dock__btn ins-dock__btn--primary" href={`?descargar=${primaryDownload.output}`} download><Fragment set:html={downloadIcon} />{C.downloadShort}</a>}
+      </div>
+
+      {/* Modo presentación: el informe como diapositivas para mostrarlo en la reunión (flechas, Esc). */}
+      <div class="ins-present ins-dark" data-present hidden role="dialog" aria-modal="true" aria-label={C.presentLabel} tabindex="-1">
+        <div class="ins-present__stage">
+          <section class="ins-slide ins-slide--cover" data-slide>
+            <img class="ins-slide__lockup" src="/branding/insights/insights-lockup-negative.svg" alt="Efeonce Insights" width="277" height="32" />
+            <p class="ins-slide__kicker">{header.reportTitle} · {header.periodLabel}</p>
+            <h2 class="ins-slide__headline">{summary.headline?.text ?? header.reportTitle}</h2>
+            <p class="ins-slide__meta">{C.preparedFor} {header.organizationName}</p>
+          </section>
+          {findings.map((finding, i) => (
+            <section class:list={['ins-slide', 'ins-slide--finding', { 'is-lead': i === 0 }]} data-slide>
+              <span class="ins-chip ins-chip--dark">{finding.module ? C.moduleLabel[finding.module] : C.filterAll}</span>
+              {finding.fact && <span class="ins-slide__figure ins-num">{finding.fact.value === null ? C.absent : finding.fact.display}</span>}
+              <p class="ins-slide__claim">{finding.claim.text}</p>
+              {finding.evidence?.reading?.nextStep && <p class="ins-slide__next"><span class="ins-label">{C.nextStepTitle}</span>{finding.evidence.reading.nextStep.text}</p>}
+              {finding.fact && <p class="ins-slide__source">{finding.fact.source}</p>}
+            </section>
+          ))}
+          {model.decision && (
+            <section class="ins-slide ins-slide--decision" data-slide>
+              <span class="ins-label">{C.decisionTitle}</span>
+              <p class="ins-slide__decision">{model.decision.text}</p>
+            </section>
+          )}
+          {model.actions.length > 0 && (
+            <section class="ins-slide ins-slide--plan" data-slide>
+              <span class="ins-label">{C.planTitle}</span>
+              <ol class="ins-slide__actions">{model.actions.slice(0, 5).map((action) => <li>{action.text}</li>)}</ol>
+            </section>
+          )}
+          <section class="ins-slide ins-slide--close" data-slide>
+            <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" width="320" height="75" />
+            <p class="ins-slogan ins-slogan--close"><span class="e">Empower</span> <span class="y">your</span> <span class="g">Growth</span></p>
+          </section>
+        </div>
+        <div class="ins-present__bar">
+          <span class="ins-present__hint">{C.presentHint}</span>
+          <div class="ins-present__nav">
+            <button type="button" class="ins-iconbtn" data-present-prev aria-label={C.presentPrev}><svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4L6 9l5 5" /></svg></button>
+            <span class="ins-present__count ins-num" data-present-count data-template={C.presentCounter('{n}', '{t}')} aria-live="polite"></span>
+            <button type="button" class="ins-iconbtn" data-present-next aria-label={C.presentNext}><svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l5 5-5 5" /></svg></button>
+          </div>
+          <button type="button" class="ins-textbtn" data-present-close>{C.presentExit}</button>
+        </div>
+        <div class="ins-present__progress" aria-hidden="true"><span data-present-progress></span></div>
       </div>
 
       <div class="ins-toast" role="status" aria-live="polite" data-toast data-text={C.linkCopied}></div>

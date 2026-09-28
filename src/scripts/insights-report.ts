@@ -292,6 +292,92 @@ function mountCopyLinks() {
   )
 }
 
+/**
+ * Modo presentación: el mismo modelo en láminas a pantalla completa, para mostrarlo en una reunión. Teclado
+ * (flechas, espacio, Re Pág/Av Pág, Inicio/Fin, Esc), foco atrapado en el diálogo y devuelto al botón al salir.
+ * Nunca crea contenido: las láminas ya vienen renderizadas en el HTML.
+ */
+function mountPresentation() {
+  const found = document.querySelector<HTMLElement>('[data-present]')
+  const openers = document.querySelectorAll<HTMLElement>('[data-present-open]')
+  if (!found || openers.length === 0) return
+  const root: HTMLElement = found
+  const slides = [...root.querySelectorAll<HTMLElement>('[data-slide]')]
+  const count = root.querySelector<HTMLElement>('[data-present-count]')
+  const progress = root.querySelector<HTMLElement>('[data-present-progress]')
+  const template = count?.dataset.template ?? '{n} / {t}'
+  let current = 0
+  let returnFocus: HTMLElement | null = null
+
+  const show = (index: number) => {
+    current = Math.max(0, Math.min(slides.length - 1, index))
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('is-current', i === current)
+      slide.classList.toggle('is-before', i < current)
+      slide.setAttribute('aria-hidden', String(i !== current))
+      slide.inert = i !== current
+    })
+    if (count) count.textContent = template.replace('{n}', String(current + 1)).replace('{t}', String(slides.length))
+    if (progress) progress.style.width = `${((current + 1) / slides.length) * 100}%`
+  }
+
+  const focusables = () =>
+    [...root.querySelectorAll<HTMLElement>('button, a[href], [tabindex]:not([tabindex="-1"])')].filter((el) => !el.closest('[inert]'))
+
+  const onKey = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') { event.preventDefault(); close(); return }
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); show(current + 1); return }
+    if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key)) { event.preventDefault(); show(current - 1); return }
+    if (event.key === 'Home') { event.preventDefault(); show(0); return }
+    if (event.key === 'End') { event.preventDefault(); show(slides.length - 1); return }
+    if (event.key === 'Tab') {
+      const list = focusables()
+      if (list.length === 0) return
+      const first = list[0]!
+      const last = list[list.length - 1]!
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+    }
+  }
+
+  const open = (from: HTMLElement) => {
+    returnFocus = from
+    root.hidden = false
+    document.documentElement.classList.add('ins-presenting')
+    show(0)
+    root.focus()
+    document.addEventListener('keydown', onKey)
+    if (!reducedMotion() && root.requestFullscreen && window.matchMedia('(min-width: 900px)').matches) {
+      root.requestFullscreen().catch(() => undefined)
+    }
+  }
+
+  function close() {
+    document.removeEventListener('keydown', onKey)
+    if (document.fullscreenElement === root) document.exitFullscreen().catch(() => undefined)
+    root.hidden = true
+    document.documentElement.classList.remove('ins-presenting')
+    // Al salir de pantalla completa el navegador reubica el foco después del evento: se devuelve dos cuadros más tarde.
+    const restore = () => returnFocus?.focus({ preventScroll: true })
+    restore()
+    requestAnimationFrame(() => requestAnimationFrame(restore))
+  }
+
+  // Salir de pantalla completa con el sistema (Esc nativo) también cierra la presentación.
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && !root.hidden) close()
+  })
+
+  openers.forEach((btn) => btn.addEventListener('click', () => open(btn)))
+  root.querySelector('[data-present-next]')?.addEventListener('click', () => show(current + 1))
+  root.querySelector('[data-present-prev]')?.addEventListener('click', () => show(current - 1))
+  root.querySelector('[data-present-close]')?.addEventListener('click', () => close())
+  root.querySelector('.ins-present__stage')?.addEventListener('click', (event) => {
+    if ((event.target as HTMLElement).closest('a, button')) return
+    show(current + 1)
+  })
+}
+
 export function mountInsightsReport() {
   if (!document.querySelector('.ins-page')) return
   ;(window as Win).__insMounted = true
@@ -305,6 +391,7 @@ export function mountInsightsReport() {
   mountChartSwitches()
   mountProgress()
   mountCopyLinks()
+  mountPresentation()
   if (animate) {
     mountReveals()
     mountStories()
