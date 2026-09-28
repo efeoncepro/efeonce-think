@@ -66,11 +66,12 @@ export default defineConfig({
       // `/muestras/*` = Radiografía AEO (TASK-1410): muestras de trabajo con la marca de un
       // cliente. Son `noindex` por diseño y NO deben entrar al sitemap: son piezas comerciales
       // que se entregan por enlace, no contenido del hub. Una versión genérica sin marca de
-      // cliente sí podría indexarse, pero sería otra ruta.
+      // cliente sí podría indexarse, pero sería otra ruta. `/insights/*`: la muestra de Insights (datos de ejemplo) y
+      // los informes por token son `noindex` y se entregan por enlace (TASK-1875).
       filter: (page) => {
         const { pathname } = new URL(page)
 
-        return !pathname.startsWith('/preview/') && !pathname.startsWith('/muestras/')
+        return !pathname.startsWith('/preview/') && !pathname.startsWith('/muestras/') && !pathname.startsWith('/insights/')
       },
     }),
   ],
