@@ -71,8 +71,9 @@ const logo=model.assets.find(asset=>asset.id===model.brand?.logoAssetId)
       if(reduced.matches){finish();return}
       document.dispatchEvent(new CustomEvent('xray:curtain-opening'))
       const style=getComputedStyle(root)
-      const duration=parseFloat(style.getPropertyValue('--xr-motion-open'))
-      const easing=style.getPropertyValue('--xr-motion-ease').trim()
+      // A viewport curtain needs a deliberate arc, not the fast-out UI morph.
+      const duration=parseFloat(style.getPropertyValue('--xr-motion-curtain'))
+      const easing=style.getPropertyValue('--xr-motion-curtain-ease').trim()
       const timing={duration,easing,fill:'both' as FillMode}
       const lift=dialog.animate([{transform:'translateY(0)'},{transform:'translateY(-100%)'}],timing)
       animations.push(lift)

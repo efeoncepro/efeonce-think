@@ -29,6 +29,9 @@
   --xr-motion-morph: 620ms;
   --xr-motion-open: 820ms;
   --xr-motion-return: 700ms;
+  --xr-motion-control: 300ms;
+  --xr-motion-curtain: 1400ms;
+  --xr-motion-curtain-ease: cubic-bezier(0.65, 0, 0.35, 1);
   --xr-motion-ease: cubic-bezier(0.2, 0, 0, 1);
   --xr-morph-duration: var(--xr-motion-morph);
 }
@@ -153,6 +156,16 @@ html[data-xray-direction='artifact'] .xr :is(.op-preview, .sp, .landing, .xr-her
 
 /* The shell is a fixed reference; only its progress line changes length. */
 .xr-artifacts { view-transition-name: xr-artifacts; }
+/* The selector's background is one continuous control, not a content morph. */
+::view-transition-group(xr-artifact-selection){animation-duration:var(--xr-motion-control);animation-timing-function:var(--xr-motion-ease)}
+::view-transition-old(xr-artifact-selection),::view-transition-new(xr-artifact-selection){animation:none;mix-blend-mode:normal}
+::view-transition-old(xr-artifact-selection){opacity:0}
+::view-transition-new(xr-artifact-selection){opacity:1}
+/* Keep the labels above the separately captured sliding selection. */
+::view-transition-group(.xr-artifact-option){z-index:2;animation-duration:var(--xr-motion-control)}
+::view-transition-old(.xr-artifact-option),::view-transition-new(.xr-artifact-option){animation:none;mix-blend-mode:normal}
+::view-transition-old(.xr-artifact-option){opacity:0}
+::view-transition-new(.xr-artifact-option){opacity:1}
 .xr-route-progress {
   position: absolute;
   bottom: -1px;

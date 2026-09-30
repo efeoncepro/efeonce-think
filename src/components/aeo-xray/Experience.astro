@@ -1,7 +1,7 @@
 ---
 import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
 import type { RenderSample } from '@/lib/aeo-xray/render-model'
-import { ArrowRight, ArrowUpRight, FileText, Images, MessagesSquare, Play, ScanLine } from '@lucide/astro'
+import { ArrowRight, ArrowUpRight, FileText, Images, MessagesSquare, PanelsTopLeft, Play, ScanLine } from '@lucide/astro'
 import Article from '@/components/aeo-xray/Article.astro'
 import Instrument from '@/components/aeo-xray/Instrument.astro'
 // Los pesos de display de la pieza. SIN estos imports la ruta solo hereda los del slogan
@@ -146,7 +146,13 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
         <span class="xr-edition-name">X-Ray</span>
         <span class="xr-edition-description">El contenido, por dentro</span>
       </div>
-      {artifactChoices.length > 1 && <nav class="xr-artifact-links" aria-label="Piezas de la demostración">{artifactChoices.map(choice => <a data-astro-prefetch="false" href={choice.href} aria-current={choice.active ? 'page' : undefined}>{choice.label}</a>)}</nav>}
+      {artifactChoices.length > 1 && <nav class="xr-artifact-links" aria-label="Piezas de la demostración" style={`--artifact-count:${artifactChoices.length};--artifact-active:${Math.max(0,artifactChoices.findIndex(choice=>choice.active))}`}>
+        <span class="xr-artifact-selection" aria-hidden="true"></span>
+        {artifactChoices.map((choice,index) => {
+          const Icon=composition?.model.artifacts.find(artifact=>artifact.id===choice.id)?.kind==='landing'?PanelsTopLeft:FileText
+          return <a class="xr-artifact-option" style={`view-transition-name:xr-artifact-option-${index}`} data-astro-prefetch="false" href={choice.href} aria-current={choice.active ? 'page' : undefined}><Icon size={17} stroke-width={1.6} aria-hidden="true" focusable="false"/><span>{choice.label}</span></a>
+        })}
+      </nav>}
     </div>
     <!-- El RIEL. Su trabajo no es navegar: es AVISAR que el recorrido tiene más pantallas. -->
     <nav class="xr-rail" aria-label="Recorrido de la muestra" style={`--xr-step-progress:${((i + 1) / flow.length) * 100}%`}>
@@ -838,10 +844,12 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
   .xr-edition>svg{color:var(--blue-up);flex-shrink:0}
   .xr-edition-name{font-family:var(--font-display);font-size:1.3rem;font-weight:500;letter-spacing:-.04em;white-space:nowrap}
   .xr-edition-description{margin-left:.3rem;padding-left:1rem;border-left:1px solid var(--line-d);font-size:.78rem;color:var(--dim-d)}
-  .xr-artifact-links{display:flex;gap:.25rem;padding:.2rem;border:1px solid var(--line-d);border-radius:.4rem}
-  @media(max-width:680px){.xr-artifacts{gap:.75rem;padding-inline:1.25rem}.xr-edition{gap:.45rem}.xr-edition>svg{width:21px;height:21px}.xr-edition-name{font-size:1.1rem}.xr-edition-description{display:none}.xr-artifact-links{gap:.15rem}}
-  .xr-artifacts a{padding:.35rem .8rem;border:1px solid transparent;border-radius:var(--r-sm);text-decoration:none;font-size:var(--t-meta)}
-  .xr-artifacts a[aria-current]{background:var(--blue);color:white}
+  .xr-artifact-links{--selector-inset:4px;position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(var(--artifact-count),minmax(0,1fr));flex-shrink:0;padding:var(--selector-inset);border-radius:999px;background:var(--navy-sunk);box-shadow:inset 0 0 0 1px var(--line-d)}
+  .xr-artifact-selection{position:absolute;inset-block:var(--selector-inset);inset-inline-start:var(--selector-inset);width:calc((100% - 2 * var(--selector-inset))/var(--artifact-count));transform:translateX(calc(var(--artifact-active) * 100%));border-radius:999px;background:var(--ink-d);pointer-events:none;view-transition-name:xr-artifact-selection}
+  .xr-artifact-option{position:relative;view-transition-class:xr-artifact-option;display:flex;align-items:center;justify-content:center;gap:.5rem;min-height:40px;padding:.5rem 1.1rem;border-radius:999px;text-decoration:none;font-size:.8rem;font-weight:500;line-height:1;color:var(--dim-d);white-space:nowrap;transition:color var(--xr-motion-control) var(--xr-motion-ease)}
+  .xr-artifact-option>svg{flex-shrink:0}.xr-artifact-option:hover{color:var(--ink-d)}.xr-artifact-option[aria-current]{color:var(--navy);font-weight:600}.xr-artifact-option:focus-visible{outline:2px solid var(--blue-up);outline-offset:2px}
+  @media(max-width:680px){.xr-artifacts{gap:.75rem;padding-inline:1.25rem}.xr-edition{gap:.45rem}.xr-edition>svg{width:21px;height:21px}.xr-edition-name{font-size:1.1rem}.xr-edition-description{display:none}.xr-artifact-option{gap:.35rem;padding-inline:.65rem;font-size:.75rem}.xr-artifact-option>svg{width:15px;height:15px}}
+  @media(prefers-reduced-motion:reduce){.xr-artifact-option{transition:none}}
 
   /* ══════════ ① EL HUECO ══════════ */
   .gap, .at { padding-block: 2rem 1rem; }

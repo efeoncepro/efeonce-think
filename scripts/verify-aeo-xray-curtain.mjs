@@ -22,6 +22,7 @@ try{
   await page.locator('[data-xray-curtain] button').click()
   await page.waitForTimeout(180)
   check(name+' curtain actually moves upward',await page.locator('[data-xray-curtain]').evaluate(d=>{const r=d.getBoundingClientRect();return r.top<0&&r.bottom>0}))
+  check(name+' opening is gradual rather than a fast dismissal',await page.locator('[data-xray-curtain]').evaluate(d=>{const r=d.getBoundingClientRect();return r.bottom>r.height*.65}))
   check(name+' search is ready to begin without a visible reset',await page.locator('[data-op-demo]').evaluate(d=>d.dataset.phase==='query'&&getComputedStyle(d.querySelector('.op-response')).opacity==='0'))
   await page.screenshot({path:`${out}/${name}-lifting.png`,animations:'allow'})
   await page.locator('[data-xray-curtain][open]').waitFor({state:'hidden'})
