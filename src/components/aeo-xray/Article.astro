@@ -1,6 +1,9 @@
 ---
 import Image from './SampleImage.astro'
 import SpecimenHeader from './SpecimenHeader.astro'
+import SectionIcon from './SectionIcon.astro'
+import {ArrowUpRight, Clock3, LockKeyhole} from '@lucide/astro'
+import {sectionRoleFor,type SpecimenPresentation} from './section-icons'
 import {xrayCopy as C} from '@/lib/aeo-xray/copy'
 import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
 import {experienceHref} from '@/lib/aeo-xray/experience-adapter'
@@ -32,9 +35,10 @@ interface Props {
   hero?: string
   semantic?: boolean
   composition?: unknown
+  presentation?: SpecimenPresentation
 }
 
-const { d, coupled = false, produces = new Map(), hero, semantic = false } = Astro.props
+const { d, coupled = false, produces = new Map(), hero, semantic = false, presentation } = Astro.props
 const composition=Astro.props.composition as {artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest}|undefined
 const richRead=!!composition&&!coupled
 const H1Tag=semantic?'h1':'h3'
@@ -101,7 +105,7 @@ const published = new Date(`${article.publishedAt}T12:00:00Z`).toLocaleDateStrin
    El FAQ es una sección más: el árbol de encabezados lo declara como H2 y cubre dos preguntas
    del fan-out. Dejarlo fuera lo volvía la única sección sin ancla y sin entrada en el índice. */
 const tocItems = article.blocks.flatMap(b =>
-  b.type === 'h2' || b.type === 'faq' ? [{ anchor: b.anchor, short: b.short }] : [],
+  b.type === 'h2' || b.type === 'faq' ? [{ anchor: b.anchor, short: b.short, role: sectionRoleFor(b,article.blocks,presentation) }] : [],
 )
 
 /**
@@ -142,7 +146,7 @@ const probeFor = (id: string) => {
 ---
 
 <section class={`sp ${richRead ? 'sp-editorial' : ''} ${coupled ? 'sp-split' : 'sp-read'}`} aria-labelledby="sp-t">
-  {richRead&&<SpecimenHeader name={d.client.name} model={composition?.model} links={[{text:'Contenido',href:'#article-index'},{text:'Preguntas',href:`#${article.blocks.find(b=>b.type==='faq')?.anchor??''}`}]} action={related?{text:related.label,href:experienceHref(related.toArtifactId,'articulo')}:undefined}/>}
+  {richRead&&<SpecimenHeader name={d.client.name} model={composition?.model} links={[{text:'Contenido',href:'#article-index',role:'contents'},{text:'Preguntas',role:'questions',href:`#${article.blocks.find(b=>b.type==='faq')?.anchor??''}`}]} action={related?{text:related.label,href:experienceHref(related.toArtifactId,'articulo')}:undefined}/>}
   <div class="sp-head">
     <div>
       <h2 id="sp-t">{ui.paneArticleTitle}</h2>
@@ -150,7 +154,7 @@ const probeFor = (id: string) => {
     </div>
     {/* La URL propuesta, en su contexto: es el mismo valor que el instrumento declara canónico. */}
     <span class="urlbar" title={article.proposedUrl}>
-      <span class="lock" aria-hidden="true">🔒</span>
+      <LockKeyhole size={13} stroke-width={1.7} aria-hidden="true" focusable="false"/>
       <span class="url">{article.proposedUrl.replace('https://', '')}</span>
     </span>
   </div>
@@ -220,7 +224,7 @@ const probeFor = (id: string) => {
               <span class="dot" aria-hidden="true">·</span>
               <time datetime={article.publishedAt}>{published}</time>
               <span class="dot" aria-hidden="true">·</span>
-              {readMin} {ui.readTime}
+              <span class="read-time"><Clock3 size={15} stroke-width={1.7} aria-hidden="true" focusable="false"/>{readMin} {ui.readTime}</span>
             </p>
             {composition && <p class="editorial-review">{article.reviewer ? <>{C.reviewedBy} <b>{article.reviewer}</b></> : C.review}</p>}
           </div>
@@ -231,7 +235,7 @@ const probeFor = (id: string) => {
           <div class="blk" {...a}>
             {/* `scroll-margin-top` en el CSS: sin él, el ancla deja el título BAJO el
                 header pegajoso. Es el mismo WCAG 2.4.11 que ya nos mordió una vez. */}
-            <Fragment>{b.headingLevel === 3 ? <H3Tag class="p-h2" id={b.anchor}>{b.text}</H3Tag> : <H2Tag class="p-h2" id={b.anchor}>{b.text}</H2Tag>}</Fragment>
+            <Fragment>{b.headingLevel === 3 ? <H3Tag class="p-h2 icon-heading" id={b.anchor}><SectionIcon role={sectionRoleFor(b,article.blocks,presentation)} size={25}/><span>{b.text}</span></H3Tag> : <H2Tag class="p-h2 icon-heading" id={b.anchor}><SectionIcon role={sectionRoleFor(b,article.blocks,presentation)} size={25}/><span>{b.text}</span></H2Tag>}</Fragment>
             {probe && (
               <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
                 {probe}
@@ -248,11 +252,11 @@ const probeFor = (id: string) => {
                 {probe}
               </button>
             )}
-            <p class="toc-t" id="toc-t">{b.title}</p>
+            <p class="toc-t icon-label" id="toc-t"><SectionIcon role="contents" size={18}/>{b.title}</p>
             <ol>
               {tocItems.map(h => (
                 <li>
-                  <a data-astro-prefetch="false" href={`#${h.anchor}`}>{h.short}</a>
+                  <a class="index-link" data-astro-prefetch="false" href={`#${h.anchor}`}><SectionIcon role={h.role} size={18}/><span class="index-text">{h.short}</span></a>
                 </li>
               ))}
             </ol>
@@ -307,7 +311,7 @@ const probeFor = (id: string) => {
       if (b.type === 'ordered-list')
         return (
           <div class="blk" {...a}>
-            <p class="blk-t">{b.title}</p>
+            <p class="blk-t icon-label"><SectionIcon role={sectionRoleFor(b,article.blocks,presentation)} size={20}/><span>{b.title}</span></p>
             {b.ordered === false ? <ul>{b.items.map(i => <li>{i}</li>)}</ul> : <ol>{b.items.map(i => <li>{i}</li>)}</ol>}
             {probe && (
               <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
@@ -323,7 +327,7 @@ const probeFor = (id: string) => {
                 El árbol de la capa de máquina lo declara como H2 y aquí cubre dos preguntas
                 del fan-out: si renderiza como <p>, el instrumento declara un encabezado que
                 la página no tiene. Mismo `p-h2` + ancla que el resto (WCAG 2.4.11 incluido). */}
-            <H2Tag class="p-h2" id={b.anchor}>{b.title}</H2Tag>
+            <H2Tag class="p-h2 icon-heading" id={b.anchor}><SectionIcon role={sectionRoleFor(b,article.blocks,presentation)} size={25}/><span>{b.title}</span></H2Tag>
             {b.items.map(i => (
               <div class="qa">
                 <p class="q">{i.q}</p>
@@ -340,7 +344,7 @@ const probeFor = (id: string) => {
       if (b.type === 'internal-links')
         return (
           <div class="blk" {...a}>
-            <p class="blk-t">{b.title}</p>
+            <p class="blk-t icon-label"><SectionIcon role={sectionRoleFor(b,article.blocks,presentation)} size={20}/><span>{b.title}</span></p>
             <ul class="lnks">
               {b.items.map(i => (
                 <li>
@@ -359,7 +363,7 @@ const probeFor = (id: string) => {
       if (b.type === 'sources')
         return (
           <div class="blk srcs" {...a}>
-            <p class="blk-t">{b.title}</p>
+            <p class="blk-t icon-label"><SectionIcon role={sectionRoleFor(b,article.blocks,presentation)} size={20}/><span>{b.title}</span></p>
             <ul>{b.items.map(i => <li><a data-astro-prefetch="false" href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
             {probe && (
               <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
@@ -372,7 +376,17 @@ const probeFor = (id: string) => {
       return null
     })}
   </article>
-  {richRead&&<aside class="editorial-aside" id="article-index"><details class="mobile-index"><summary>En esta guía</summary><ul>{tocItems.map(t=><li><a data-astro-prefetch="false" href={`#${t.anchor}`}>{t.short}</a></li>)}</ul></details><nav aria-label="Contenido del artículo"><p>En esta guía</p><ol>{tocItems.map(t=><li><a data-astro-prefetch="false" href={`#${t.anchor}`}>{t.short}</a></li>)}</ol></nav>{related&&<a data-astro-prefetch="false" class="editorial-related" href={experienceHref(related.toArtifactId,'articulo')}>{related.label}<span aria-hidden="true"> ↗</span></a>}</aside>}
+  {richRead&&<aside class="editorial-aside" id="article-index">
+    <details class="mobile-index">
+      <summary><span class="icon-label"><SectionIcon role="contents" size={19}/>En esta guía</span></summary>
+      <ul>{tocItems.map(t=><li><a class="index-link" data-astro-prefetch="false" href={`#${t.anchor}`}><SectionIcon role={t.role} size={18}/><span class="index-text">{t.short}</span></a></li>)}</ul>
+    </details>
+    <nav aria-label="Contenido del artículo">
+      <p class="icon-label"><SectionIcon role="contents" size={19}/>En esta guía</p>
+      <ol>{tocItems.map(t=><li><a class="index-link" data-astro-prefetch="false" href={`#${t.anchor}`}><SectionIcon role={t.role} size={18}/><span class="index-text">{t.short}</span></a></li>)}</ol>
+    </nav>
+    {related&&<a data-astro-prefetch="false" class="editorial-related" href={experienceHref(related.toArtifactId,'articulo')}><span>{related.label}</span><ArrowUpRight size={19} stroke-width={1.7} aria-hidden="true" focusable="false"/></a>}
+  </aside>}
   </div>
 
   {/* El pie de licencias ES la demostración del requisito 5 de las bases — pero es NUESTRA
@@ -397,6 +411,7 @@ const probeFor = (id: string) => {
 </section>
 
 <style>
+.icon-label,.index-link,.read-time{display:inline-flex;align-items:center;gap:.55rem}.icon-heading{display:flex;align-items:flex-start;gap:.65rem}.icon-heading :global(.section-icon){margin-top:.14em;color:var(--client)}.icon-heading>span{min-width:0}.index-link{display:grid;grid-template-columns:18px minmax(0,1fr);align-items:start}.index-text{grid-column:2}.index-link :global(.section-icon){grid-column:1;grid-row:1}.index-link :global(.section-icon){margin-top:.12em;color:var(--client)}.editorial-related{align-items:center;justify-content:space-between;gap:1rem}.editorial-related :global(svg),.urlbar :global(svg){flex-shrink:0}.mobile-index summary>.icon-label{vertical-align:middle}.read-time{gap:.35rem;white-space:nowrap}
 @media(max-width:900px){.sp.sp-editorial .post>*{width:100%;max-width:none;margin-inline:0}.sp.sp-editorial .post>.blk{padding-inline:0;border-left:0}.sp.sp-editorial .post>.head-blk .p-h1{width:100%;max-width:none}}
 .sp.sp-editorial{--article-canvas:min(100%,1160px);--article-measure:100%;--media-width:100%;--inline-media-width:100%}.sp.sp-editorial :global(.specimen-nav){padding-inline:1.5rem}
 .mobile-index{display:none}@media(max-width:900px){.sp.sp-editorial .post{display:contents}.sp.sp-editorial .post>:nth-child(-n+3){order:-2}.sp.sp-editorial .editorial-aside{order:-1;width:100%}.editorial-aside>nav{display:none}.mobile-index{display:block;font-size:.875rem}.mobile-index summary{font-weight:650;cursor:pointer;padding:.75rem 0}.mobile-index ul{display:block;padding:0;list-style:none}.mobile-index li{margin:0;padding:.5rem 0}}
@@ -404,7 +419,7 @@ const probeFor = (id: string) => {
 @media(min-width:901px){.sp.sp-editorial .post{display:contents}.sp.sp-editorial .post>:nth-child(-n+3){grid-column:1/-1;width:100%;max-width:none;margin-inline:0}.sp.sp-editorial .post>:nth-child(n+4){grid-column:1;min-width:0}.sp.sp-editorial .editorial-aside{grid-column:2;grid-row:4/span var(--editorial-body-rows)}.sp.sp-editorial .post>.head-blk .p-h1{max-width:1040px;width:100%;font-weight:650;color:var(--client)}.sp.sp-editorial .post>.head-blk .byline{max-width:none}.sp.sp-editorial .editorial-layout{row-gap:1.5rem}.sp.sp-editorial :global(.specimen-nav){padding-inline:0}}
 
 .sp.sp-editorial .editorial-aside li,.sp.sp-editorial .editorial-aside a{font-size:.85rem;line-height:1.5}.sp.sp-editorial .editorial-aside li::before{display:none}.sp.sp-editorial .editorial-aside li{padding-left:0}
-.sp.sp-editorial .sp-head{display:none}.editorial-layout{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:3rem;max-width:1160px;margin:0 auto;padding:3rem 1.5rem}.sp.sp-editorial .post{padding:0;max-width:none}.sp.sp-editorial .p-h1{font-size:clamp(2.2rem,3.8vw,3.25rem);line-height:1.14;letter-spacing:-.025em}.sp.sp-editorial .post :global(.xr-hero-img){aspect-ratio:2.1;object-fit:cover;width:100%}.editorial-aside{position:sticky;top:160px;align-self:start;border-left:1px solid var(--line);padding-left:1.5rem;font-family:var(--client-body-font);color:var(--ink-2);font-size:.85rem}.editorial-aside nav>p{font-weight:700;color:var(--client);font-size:1rem;margin-bottom:1rem}.editorial-aside ol{padding:0;list-style:none}.editorial-aside li{margin-bottom:1rem;line-height:1.5}.editorial-aside a{text-decoration:none}.editorial-related{display:block;padding:1.1rem;margin-top:2rem;background:var(--landing-action);color:var(--landing-action-ink);font-weight:700;border-radius:.3rem}@media(max-width:900px){.editorial-layout{display:flex;flex-direction:column;gap:1.5rem;padding:2rem 1.5rem}.editorial-aside{position:static;order:-1;border-left:0;border-bottom:1px solid var(--line);padding:0 0 1rem}.editorial-aside ol{display:flex;gap:1rem;overflow:auto}.editorial-aside li{min-width:130px}.editorial-related{display:none}.sp.sp-editorial .p-h1{font-size:2.2rem}}
+.sp.sp-editorial .sp-head{display:none}.editorial-layout{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:3rem;max-width:1160px;margin:0 auto;padding:3rem 1.5rem}.sp.sp-editorial .post{padding:0;max-width:none}.sp.sp-editorial .p-h1{font-size:clamp(2.2rem,3.8vw,3.25rem);line-height:1.14;letter-spacing:-.025em}.sp.sp-editorial .post :global(.xr-hero-img){aspect-ratio:2.1;object-fit:cover;width:100%}.editorial-aside{position:sticky;top:160px;align-self:start;border-left:1px solid var(--line);padding-left:1.5rem;font-family:var(--client-body-font);color:var(--ink-2);font-size:.85rem}.editorial-aside nav>p{font-weight:700;color:var(--client);font-size:1rem;margin-bottom:1rem}.editorial-aside ol{padding:0;list-style:none}.editorial-aside li{margin-bottom:1rem;line-height:1.5}.editorial-aside a{text-decoration:none}.editorial-related{display:flex;padding:1.1rem;margin-top:2rem;background:var(--landing-action);color:var(--landing-action-ink);font-weight:700;border-radius:.3rem}@media(max-width:900px){.editorial-layout{display:flex;flex-direction:column;gap:1.5rem;padding:2rem 1.5rem}.editorial-aside{position:static;order:-1;border-left:0;border-bottom:1px solid var(--line);padding:0 0 1rem}.editorial-aside ol{display:flex;gap:1rem;overflow:auto}.editorial-aside li{min-width:130px}.editorial-related{display:none}.sp.sp-editorial .p-h1{font-size:2.2rem}}
 
 .p-h1,.p-h2 {font-family:var(--client-font)}
   /* El espécimen es EDITORIAL. Ver la nota del frontmatter. */
@@ -452,7 +467,6 @@ const probeFor = (id: string) => {
     background: var(--surf-2); border: 1px solid var(--line);
     padding: 0.3rem 0.7rem; border-radius: 999px;
   }
-  .lock { font-size: 0.625rem; opacity: 0.6; }
   .url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .sp-read .sp-head {
     position: absolute;

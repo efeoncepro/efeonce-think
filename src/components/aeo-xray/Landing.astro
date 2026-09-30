@@ -2,11 +2,13 @@
 import LandingModules from './LandingModules.astro'
 import SpecimenHeader from './SpecimenHeader.astro'
 import Image from './SampleImage.astro'
+import {ArrowRight} from '@lucide/astro'
+import {sectionRoleFor,type SpecimenPresentation} from './section-icons'
 import type {RenderSample} from '@/lib/aeo-xray/render-model'
 import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
 import {experienceHref} from '@/lib/aeo-xray/experience-adapter'
-interface Props {d:RenderSample;landing?:unknown;coupled?:boolean;produces?:Map<string,number>;hero?:string}
-const {d,coupled=false,produces=new Map(),hero}=Astro.props
+interface Props {d:RenderSample;landing?:unknown;coupled?:boolean;produces?:Map<string,number>;hero?:string;presentation?:SpecimenPresentation}
+const {d,coupled=false,produces=new Map(),hero,presentation}=Astro.props
 const context=Astro.props.landing as {artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest}|undefined
 const headline=d.article.blocks.find(b=>b.type==='h1')
 const photo=d.article.blocks.find(b=>b.type==='hero-image')
@@ -20,14 +22,14 @@ const action=marketing?.kind==='hero'?marketing.cta:undefined
 const href=action?.artifactId?experienceHref(action.artifactId,'articulo',action.blockId):action?.href
 ---
 <div class:list={['landing',{'landing-split':coupled}]} style={`--landing-action:${context?.model.brand?.action??context?.model.tokens.shell.accent??d.client.accent};--landing-action-ink:${context?.model.brand?.actionText??context?.model.tokens.shell.ink??'white'}`}>
-  <SpecimenHeader name={d.client.name} model={context?.model} links={[...sections.slice(0,2),...sections.filter(b=>b.type==='faq')].map(b=>({text:b.short,href:`#${'anchor'in b?b.anchor:''}`}))} action={action&&href?{text:action.label,href}:undefined}/>
+  <SpecimenHeader name={d.client.name} model={context?.model} links={[...sections.slice(0,2),...sections.filter(b=>b.type==='faq')].map(b=>({text:b.short,href:`#${'anchor'in b?b.anchor:''}`,role:sectionRoleFor(b,d.article.blocks,presentation)}))} action={action&&href?{text:action.label,href}:undefined}/>
   <section id="specimen-top" class="landing-hero sp" aria-label="Propuesta de landing">
     <div class="landing-copy blk" {...attrs(id)}>
 
       {marketing?.kind==='hero'&&marketing.eyebrow&&marketing.eyebrow!==marketing.title&&<p class="landing-eyebrow">{marketing.eyebrow}</p>}
       <h1>{headline&&'text'in headline?headline.text:d.meta.sampleTitle}</h1>
       {marketing?.kind==='hero'&&<p class="landing-lead">{marketing.text}</p>}
-      {action&&<a data-astro-prefetch="false" class="landing-action" href={href}>{action.label}<span aria-hidden="true"> →</span></a>}
+      {action&&<a data-astro-prefetch="false" class="landing-action" href={href}>{action.label}<ArrowRight size={20} stroke-width={1.7} aria-hidden="true" focusable="false"/></a>}
 
       {coupled&&count>0&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{d.ui.srProduces.replace('{n}',String(count))}</button>}
     </div>
@@ -37,10 +39,11 @@ const href=action?.artifactId?experienceHref(action.artifactId,'articulo',action
       <figcaption>{photo.credit.author}</figcaption>
     </figure>}
   </section>
-  <LandingModules d={body} coupled={coupled} produces={produces} hero={hero} context={context}/>
+  <LandingModules d={body} coupled={coupled} produces={produces} hero={hero} context={context} presentation={presentation}/>
 </div>
 <style>
 .landing .blk{position:relative}
+.landing-action :global(svg){flex-shrink:0}
 
 .landing{view-transition-name:xr-article;min-width:0;background:white;color:var(--ink)}
 .landing-hero{position:relative;display:block;min-height:536px;overflow:hidden;border-radius:var(--r);background:white}

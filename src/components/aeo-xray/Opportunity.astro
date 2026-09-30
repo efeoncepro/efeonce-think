@@ -1,0 +1,108 @@
+---
+import {Search, ArrowRight, ArrowUpRight, FileText, Quote, RotateCcw, ChevronDown, Check, ScanLine} from '@lucide/astro'
+import type {RenderSample} from '@/lib/aeo-xray/render-model'
+import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
+import {assetHref} from '@/lib/aeo-xray/view'
+import {xrayCopy as C} from '@/lib/aeo-xray/copy'
+interface Props {d:RenderSample;artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest;href:string}
+const {d,artifact,model,href}=Astro.props
+const {gap}=d
+const O=C.opportunity
+const question=d.evidence.fanOut.items[0]
+const answer=artifact.blocks.find(b=>b.id===question?.coveredBy)
+const hero=artifact.blocks.find(b=>b.kind==='hero')
+const imageBlock=artifact.blocks.find(b=>b.kind==='image'&&b.role==='hero')
+const coverId=hero?.assetId??(imageBlock?.kind==='image'?imageBlock.assetId:undefined)
+const cover=model.assets.find(a=>a.id===coverId)
+const headline=hero?.title??artifact.title
+const sourceIds=answer?.sourceIds??[]
+const answerSources=model.sources.filter(s=>sourceIds.includes(s.id))
+---
+<section class="opportunity" data-opportunity data-capture="aeo-xray-opportunity">
+  <div class="op-stage">
+    <header class="op-intro">
+      <p class="op-eyebrow"><ScanLine size={17} aria-hidden="true"/>{O.eyebrow}</p>
+      <h1>{gap.headline}</h1>
+      <p class="op-lead">{gap.lead}</p>
+      <div class="op-thesis"><span>{O.proposal}</span><p>{gap.punch}</p></div>
+      <a href={href} data-astro-prefetch="false" class="op-cta">{O.open}<ArrowRight size={19} aria-hidden="true"/></a>
+      <p class="op-scope">{O.scope}</p>
+    </header>
+
+    <div class="op-demo" data-op-demo data-phase="complete">
+      <div class="op-demo-head"><span><Search size={17} aria-hidden="true"/>{O.demoTitle}</span><button type="button" class="op-replay" data-op-replay hidden aria-label={O.replay}><RotateCcw size={16} aria-hidden="true"/><span>{O.replay}</span></button></div>
+      <p class="op-demo-note">{O.demoNote}</p>
+      <ol class="op-sequence" aria-label={O.sequence}>
+        <li data-op-phase="query"><span>01</span>{O.query}</li>
+        <li data-op-phase="answer"><span>02</span>{O.answer}</li>
+        <li data-op-phase="source"><span>03</span>{O.source}</li>
+      </ol>
+      <div class="op-query"><Search size={19} aria-hidden="true"/><p>{question?.q??headline}</p><span class="op-query-caret" aria-hidden="true"></span></div>
+      <div class="op-response" data-op-answer>
+        <p class="op-label"><Quote size={17} aria-hidden="true"/>{O.answerLabel}</p>
+        {answer?.kind==='table'?<div class="op-table"><table><thead><tr>{answer.columns.map(c=><th scope="col">{c}</th>)}</tr></thead><tbody>{answer.rows.map(row=><tr>{row.map(cell=><td>{cell}</td>)}</tr>)}</tbody></table><p class="op-caption">{answer.caption}</p></div>:answer&&'text'in answer?<p class="op-answer-text">{answer.text}</p>:<p class="op-answer-text">{artifact.summary}</p>}
+        {answerSources.length>0&&<p class="op-answer-sources"><Check size={14} aria-hidden="true"/>{O.conditions} {answerSources.map(s=>s.label).join(' · ')}</p>}
+      </div>
+      <div class="op-source" data-op-source>
+        <p class="op-label op-source-label"><FileText size={16} aria-hidden="true"/>{O.contentSource}</p>
+        <a class="op-preview" data-op-open href={href} data-astro-prefetch="false" data-artifact-id={artifact.id}>
+          {cover&&<img class:list={['op-cover',{'xr-hero-img':artifact.kind==='article'}]} src={assetHref(cover)} alt={cover.alt} width={cover.width} height={cover.height} loading="eager" decoding="async"/>}
+          <div class="op-preview-copy"><span>{artifact.kind==='landing'?C.landing:C.article} <span aria-hidden="true">·</span> {model.preparedFor}</span><h2>{headline}</h2><p>{O.explorePiece}<ArrowUpRight size={18} aria-hidden="true"/></p></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <section class="op-evidence" aria-labelledby="op-evidence-title">
+    <header><p class="op-eyebrow">{O.observed}</p><h2 id="op-evidence-title">{O.evidenceTitle}</h2><p>{gap.serpSummary}</p></header>
+    <div class="op-evidence-content">
+      <div class="op-observation"><span class="op-market">{gap.serpBadge} <span aria-hidden="true">·</span> <time datetime={model.preparedAt.slice(0,10)}>{model.preparedAt.slice(0,10)}</time></span><h3>{gap.serpTitle}</h3><ol>{gap.serp.map(r=><li><span class="op-rank">{r.pos}</span><strong>{r.domain}</strong><span>{r.kind}</span></li>)}</ol><details><summary>{O.method}<ChevronDown size={16} aria-hidden="true"/></summary><p>{gap.serpNote}</p><p>{gap.aside}</p></details></div>
+      <div class="op-reading"><p class="op-label">{O.reading}</p><h3>{gap.punch}</h3><p>{gap.punchNote}</p><p>{gap.punchWhy}</p><div><ArrowRight size={20} aria-hidden="true"/><p>{gap.punchOpportunity}</p></div></div>
+    </div>
+  </section>
+</section>
+<script>
+  function initOpportunity(){
+    document.querySelectorAll<HTMLElement>('[data-op-demo]:not([data-op-ready])').forEach(root=>{
+      root.dataset.opReady='true'
+      const button=root.querySelector<HTMLButtonElement>('[data-op-replay]')!
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)')
+      const controller=new AbortController(),{signal}=controller
+      let timers:ReturnType<typeof setTimeout>[]=[]
+      const finish=()=>{timers.forEach(clearTimeout);timers=[];root.dataset.phase='complete';button.disabled=false}
+      const play=()=>{
+        finish()
+        if(reduced.matches||document.hidden)return
+        root.dataset.phase='query';button.disabled=true
+        timers=[setTimeout(()=>root.dataset.phase='answer',850),setTimeout(()=>root.dataset.phase='source',1800),setTimeout(finish,2700)]
+      }
+      button.hidden=reduced.matches
+      button.addEventListener('click',play,{signal})
+      root.addEventListener('focusin',finish,{signal})
+      reduced.addEventListener('change',()=>{finish();button.hidden=reduced.matches},{signal})
+      document.addEventListener('visibilitychange',()=>{if(document.hidden)finish()},{signal})
+      document.addEventListener('astro:before-preparation',finish,{signal})
+      document.addEventListener('astro:before-swap',()=>{finish();controller.abort()},{once:true})
+      // Keep the returning shared card visible; replay remains available by choice.
+      if(document.documentElement.dataset.xrayRoute==='piece-opportunity')return
+      // No JS/reduced motion is complete HTML. Autoplay once, when the scene enters view.
+      const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)){observer.disconnect();play()}},{threshold:.25})
+      observer.observe(root);signal.addEventListener('abort',()=>observer.disconnect(),{once:true})
+    })
+  }
+  initOpportunity();document.addEventListener('astro:page-load',initOpportunity)
+</script>
+<style>
+.opportunity{--op-display:Poppins,system-ui,sans-serif;--op-body:'Geist Variable',system-ui,sans-serif;--op-paper:var(--color-white,white);--op-radius:12px;--op-reveal-duration:480ms;--op-ease:var(--ease);padding-block:1.5rem 3rem;color:var(--ink);font-family:var(--op-body)}
+.op-stage{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(2rem,4vw,4rem);padding:clamp(1.5rem,3vw,3rem);background:var(--navy);border-radius:var(--op-radius);color:var(--ink-d);align-items:center}
+.op-intro{min-width:0}.op-eyebrow{display:flex;gap:.65rem;align-items:center;font-size:var(--t-over);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-up);margin:0 0 1.3rem}.op-intro h1{font:500 clamp(2rem,3.1vw,3rem)/1.16 var(--op-display);letter-spacing:-.025em;text-wrap:balance;max-width:19ch;margin:0}.op-lead{font-size:1rem;line-height:1.8;color:var(--dim-d);margin:1.3rem 0 2rem;max-width:46ch}.op-thesis{border-top:1px solid var(--line-d);padding-top:1.3rem;max-width:44ch}.op-thesis>span{color:var(--blue-up);font-size:var(--t-over);text-transform:uppercase;letter-spacing:.07em;font-weight:600}.op-thesis p{font:500 1.2rem/1.6 var(--op-display);margin:.5rem 0 1.5rem}.op-cta{display:inline-flex;align-items:center;justify-content:space-between;gap:2rem;border-radius:var(--op-radius);padding:.9rem 1.15rem;background:var(--ink-d);color:var(--navy);font-size:.9rem;font-weight:600;text-decoration:none}.op-cta:hover{background:var(--blue-up)}.op-scope{font-size:.73rem;line-height:1.7;max-width:46ch;color:var(--dim-d);margin:1rem 0 0}
+.op-demo{min-width:0;background:var(--surf);color:var(--ink);border:1px solid var(--line);border-radius:var(--op-radius);padding:1.5rem;box-shadow:0 20px 48px color-mix(in srgb,var(--navy-sunk) 24%,transparent)}.op-demo-head{display:flex;justify-content:space-between;align-items:center;gap:.5rem}.op-demo-head>span{display:flex;align-items:center;gap:.5rem;font-size:.84rem;font-weight:600}.op-demo-note{font-size:.68rem;color:var(--ink-3);margin:.5rem 0 1rem;line-height:1.6}.op-replay{display:flex;align-items:center;gap:.35rem;border:0;background:none;color:var(--ink-3);cursor:pointer;font:500 .68rem var(--op-body);min-height:32px;padding:.25rem}.op-replay[hidden]{display:none}.op-replay:disabled{opacity:.45;cursor:default}.op-sequence{display:flex;list-style:none;gap:.8rem;padding:0;margin:0 0 1.3rem}.op-sequence li{display:flex;align-items:center;gap:.45rem;font-size:.65rem;color:var(--ink-3);flex:1;padding:.5rem 0;border-top:2px solid var(--line-2);transition:border-color var(--op-reveal-duration) var(--op-ease)}.op-sequence li>span{font-variant-numeric:tabular-nums;font-size:.6rem;color:var(--ink-3)}
+.op-query{display:flex;align-items:center;gap:.6rem;border:1px solid var(--line-2);background:var(--op-paper);border-radius:var(--op-radius);padding:.9rem 1rem;min-height:64px}.op-query svg{flex-shrink:0;color:var(--blue)}.op-query p{font-size:.92rem;line-height:1.5;font-weight:500;margin:0}.op-query-caret{display:none;height:1rem;border-left:2px solid var(--blue)}
+.op-response{padding:1.2rem 0 1.25rem;min-width:0}.op-label{display:flex;align-items:center;gap:.45rem;color:var(--ink-3);font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:0 0 .7rem}.op-label svg{flex-shrink:0;color:var(--blue)}.op-answer-text{font-size:.88rem;line-height:1.8;margin:0}.op-answer-sources{display:flex;align-items:flex-start;gap:.4rem;font-size:.64rem;line-height:1.65;color:var(--ink-3);margin:.85rem 0 0}.op-answer-sources svg{flex-shrink:0;margin-top:.2rem}.op-table{overflow-x:auto}.op-table table{border-collapse:collapse;width:100%;font-size:.72rem;line-height:1.5}.op-table :is(td,th){padding:.55rem .3rem;border-bottom:1px solid var(--line-2);text-align:left}.op-table th{font-weight:600}.op-caption{font-size:.64rem;line-height:1.65;color:var(--ink-3);margin:.65rem 0 0}.op-source-label{margin-bottom:.6rem}
+.op-preview{display:grid;grid-template-columns:100px minmax(0,1fr);align-items:stretch;color:var(--ink);background:var(--op-paper);border:1px solid var(--line-2);border-radius:var(--op-radius);overflow:hidden;text-decoration:none;view-transition-name:xr-article}.op-cover{width:100%;height:100%;min-height:150px;object-fit:cover}.op-preview-copy{padding:1rem;min-width:0}.op-preview-copy>span{font-size:.61rem;line-height:1.7;color:var(--ink-3);display:block}.op-preview h2{font:600 .94rem/1.45 var(--op-display);margin:.45rem 0 .85rem;text-wrap:balance}.op-preview-copy p{display:flex;align-items:center;gap:.5rem;font-size:.68rem;font-weight:600;color:var(--blue);margin:0}.op-preview:hover{border-color:var(--blue)}
+.op-demo[data-phase=query] .op-response,.op-demo:is([data-phase=query],[data-phase=answer]) .op-source{opacity:0;transform:translateY(8px)}.op-response,.op-source{transition:opacity var(--op-reveal-duration) var(--op-ease),transform var(--op-reveal-duration) var(--op-ease)}.op-demo[data-phase=query] .op-query-caret{display:block}.op-demo [data-op-phase=query],.op-demo:not([data-phase=query]) [data-op-phase=answer],.op-demo:is([data-phase=source],[data-phase=complete]) [data-op-phase=source]{border-color:var(--blue);color:var(--blue)}
+.op-evidence{padding:3rem 1rem 0}.op-evidence>header{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);column-gap:3rem;align-items:start;margin-bottom:1.5rem}.op-evidence .op-eyebrow{grid-column:1/-1;color:var(--blue);margin-bottom:.8rem}.op-evidence h2{font:500 clamp(1.4rem,2vw,1.85rem)/1.4 var(--op-display);margin:0;max-width:23ch;text-wrap:balance}.op-evidence>header>p:last-child{font-size:.9rem;line-height:1.8;color:var(--ink-3);margin:0}.op-evidence-content{display:grid;grid-template-columns:1fr 1fr;gap:3rem;border-top:1px solid var(--line-2);padding-top:1.5rem}.op-market{font-size:.7rem;color:var(--ink-3)}.op-observation h3{font-size:.85rem;font-weight:600;margin:.7rem 0}.op-observation ol{padding:0;list-style:none;margin:0}.op-observation li{display:grid;grid-template-columns:1.3rem 1fr auto;gap:.5rem;align-items:center;padding:.7rem 0;border-bottom:1px solid var(--line);font-size:.75rem;min-width:0}.op-observation li>span{color:var(--ink-3);font-size:.68rem}.op-observation li strong{font-weight:500;overflow-wrap:anywhere}.op-rank{font-variant-numeric:tabular-nums}.op-observation details{font-size:.73rem;line-height:1.7;color:var(--ink-3);margin-top:.5rem}.op-observation summary{display:flex;align-items:center;justify-content:space-between;gap:.75rem;list-style:none;cursor:pointer;padding:.7rem 0;color:var(--ink);font-weight:500}.op-observation details p{margin:0 0 .6rem}.op-reading{padding-left:2.5rem;border-left:1px solid var(--line-2)}.op-reading h3{font:500 1.15rem/1.5 var(--op-display);margin:.4rem 0 1rem}.op-reading>p:not(.op-label){font-size:.83rem;line-height:1.8;color:var(--ink-3);margin:0 0 .9rem}.op-reading>div{display:flex;align-items:flex-start;gap:.8rem;margin-top:1.1rem;color:var(--blue)}.op-reading>div svg{flex-shrink:0;margin-top:.2rem}.op-reading>div p{font-size:.83rem;line-height:1.8;color:var(--ink);margin:0}.opportunity :is(a,button,summary):focus-visible{outline:2px solid var(--blue-up);outline-offset:4px}
+@media(max-width:1050px){.op-stage{grid-template-columns:1fr;gap:2rem}.op-intro h1{max-width:26ch;font-size:clamp(2rem,4.7vw,2.7rem)}.op-lead{max-width:65ch;margin-bottom:1.5rem}.op-thesis{max-width:none;display:none}.op-intro .op-cta{display:none}.op-scope{display:none}.op-demo{max-width:720px;width:100%;justify-self:center}.op-evidence>header,.op-evidence-content{column-gap:1.5rem}.op-reading{padding-left:1.5rem}}
+@media(max-width:620px){.opportunity{padding-top:1rem}.op-stage{padding:1.25rem;gap:1.5rem}.op-intro h1{font-size:1.85rem;line-height:1.2;letter-spacing:-.02em}.op-eyebrow{margin-bottom:.9rem}.op-lead{font-size:.88rem;line-height:1.7;margin:1rem 0}.op-scope{font-size:.66rem}.op-demo{padding:1rem}.op-demo-head>span{font-size:.75rem}.op-replay span{display:none}.op-demo-note{font-size:.63rem}.op-query{padding:.75rem;min-height:64px}.op-query p{font-size:.82rem}.op-sequence{gap:.4rem}.op-sequence li{font-size:.6rem;gap:.3rem}.op-preview{grid-template-columns:72px 1fr}.op-preview-copy{padding:.75rem}.op-preview h2{font-size:.83rem}.op-preview-copy>span{font-size:.59rem}.op-answer-text{font-size:.82rem}.op-cover{min-height:160px}.op-evidence{padding:2rem 0 0}.op-evidence>header,.op-evidence-content{grid-template-columns:1fr;gap:1.25rem}.op-evidence h2{max-width:none}.op-reading{padding:1.5rem 0 0;border-left:0;border-top:1px solid var(--line-2)}.op-table table{font-size:.72rem}.op-caption{font-size:.7rem}.op-table :is(td,th){padding:.5rem .2rem}.op-answer-sources{font-size:.6rem}}
+@media(prefers-reduced-motion:reduce){.op-response,.op-source,.op-sequence li{transition:none!important;transform:none!important;opacity:1!important}.op-query-caret{display:none!important}}
+</style>

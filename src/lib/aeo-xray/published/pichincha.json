@@ -1369,7 +1369,7 @@
           "flow": [
             {
               "step": "",
-              "label": "El hueco",
+              "label": "La oportunidad",
               "next": "Veamos la pieza que responde a esta oportunidad."
             },
             {
@@ -1897,10 +1897,6 @@
               {
                 "text": "Fondo de Seguro de Depósitos · cobertura",
                 "href": "https://fsd.org.pe/cobertura/"
-              },
-              {
-                "text": "DataForSEO · metodología del proveedor, no snapshot de resultados",
-                "href": "https://docs.dataforseo.com/v3/dataforseo_labs-google-keyword_overview-live/"
               }
             ]
           }
@@ -2922,7 +2918,7 @@
           "flow": [
             {
               "step": "",
-              "label": "El hueco",
+              "label": "La oportunidad",
               "next": "Veamos la pieza que responde a esta oportunidad."
             },
             {

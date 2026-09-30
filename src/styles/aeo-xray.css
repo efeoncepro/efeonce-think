@@ -19,6 +19,21 @@
 @view-transition {
   navigation: auto;
 }
+/* With scripting disabled, keep native document navigation immediate. Some
+   engines stall cross-document snapshots in that mode; the readable fallback
+   does not depend on a transition. ClientRouter's same-document API is intact. */
+@media (scripting: none) {
+  @view-transition { navigation: none; }
+}
+:root {
+  --xr-motion-morph: 620ms;
+  --xr-motion-open: 820ms;
+  --xr-motion-return: 700ms;
+  --xr-motion-ease: cubic-bezier(0.2, 0, 0, 1);
+  --xr-morph-duration: var(--xr-motion-morph);
+}
+html[data-xray-route='opportunity-piece'] { --xr-morph-duration: var(--xr-motion-open); }
+html[data-xray-route='piece-opportunity'] { --xr-morph-duration: var(--xr-motion-return); }
 
 /* El chrome y el riel NO se animan: son el marco estable del recorrido.
    Si parpadean, el evaluador pierde el punto de referencia. */
@@ -52,8 +67,8 @@
 ::view-transition-new(xr-article),
 ::view-transition-old(xr-hero),
 ::view-transition-new(xr-hero) {
-  animation-duration: 620ms;
-  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  animation-duration: var(--xr-morph-duration);
+  animation-timing-function: var(--xr-motion-ease);
   mix-blend-mode: normal;
 }
 
@@ -66,6 +81,36 @@
   animation: xr-fade-in 260ms 60ms ease-out both;
 }
 @keyframes xr-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* ① ↔ ②: the actual preview becomes the piece. Give the expansion room to
+   settle before the surrounding reading context arrives; keep the same photo
+   visible while its frame changes, rather than dissolving identical imagery. */
+html:is([data-xray-route='opportunity-piece'], [data-xray-route='piece-opportunity'])::view-transition-group(xr-article) {
+  overflow: clip;
+}
+html:is([data-xray-route='opportunity-piece'], [data-xray-route='piece-opportunity'])::view-transition-old(xr-hero) {
+  animation: none;
+  opacity: 0;
+}
+html:is([data-xray-route='opportunity-piece'], [data-xray-route='piece-opportunity'])::view-transition-new(xr-hero) {
+  animation: none;
+  opacity: 1;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+html[data-xray-route='opportunity-piece']::view-transition-old(xr-article) {
+  animation: xr-fade-out 180ms ease-in both;
+}
+html[data-xray-route='opportunity-piece']::view-transition-new(xr-article) {
+  animation: xr-fade-in 320ms 120ms ease-out both;
+}
+
+/* Another artifact is another entity. Keep the navigation shell steady, but
+   let its content crossfade in the root instead of falsely morphing the pieces. */
+html[data-xray-direction='artifact'] .xr :is(.op-preview, .sp, .landing, .xr-hero-img, .inst) {
+  view-transition-name: none !important;
+}
 
 /* El instrumento ENTRA desde la derecha: no aparece, LLEGA. */
 ::view-transition-new(xr-inst) {
@@ -89,7 +134,7 @@
 
 /* El contenido de cada pantalla entra con un desplazamiento corto: dirección, no espectáculo. */
 ::view-transition-old(root) {
-  animation: xr-fade-out 180ms ease-in;
+  animation: xr-fade-out 180ms ease-in both;
 }
 ::view-transition-new(root) {
   animation: xr-rise 320ms cubic-bezier(0.2, 0, 0, 1);
@@ -119,8 +164,8 @@
   pointer-events: none;
 }
 ::view-transition-group(xr-progress) {
-  animation-duration: 620ms;
-  animation-timing-function: cubic-bezier(.2,0,0,1);
+  animation-duration: var(--xr-morph-duration);
+  animation-timing-function: var(--xr-motion-ease);
 }
 ::view-transition-old(xr-chrome), ::view-transition-new(xr-chrome),
 ::view-transition-old(xr-artifacts), ::view-transition-new(xr-artifacts),
@@ -130,6 +175,12 @@
 }
 html[data-xray-direction='back']::view-transition-new(root) {
   animation: xr-return 360ms cubic-bezier(.2,0,0,1);
+}
+html[data-xray-route='opportunity-piece']::view-transition-new(root) {
+  animation: xr-rise 360ms 120ms var(--xr-motion-ease) both;
+}
+html[data-xray-route='piece-opportunity']::view-transition-new(root) {
+  animation: xr-fade-in 320ms 180ms ease-out both;
 }
 @keyframes xr-return {
   from { opacity: 0; transform: translateY(-12px); }
@@ -147,6 +198,12 @@ html[data-xray-motion][data-astro-transition-fallback='new'] .xr > main {
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+  html[data-xray-motion][data-astro-transition-fallback='new'] .xr > main {
+    animation: none;
+  }
+  .xr .xr-next {
+    transition: none !important;
   }
 }
 

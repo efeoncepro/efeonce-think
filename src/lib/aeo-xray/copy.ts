@@ -18,6 +18,16 @@ export const xrayCopy = {
   sourceLink: 'Consultar fuente', next: 'Continúa con',
   categories: { technical: 'SEO técnico', 'on-page': 'SEO on-page', aeo: 'AEO', conversion: 'Conversión' },
   statuses: { proposed: 'Propuesto', implemented: 'Implementado en la muestra', verified: 'Verificado', measured: 'Medido' },
+  opportunity: {
+    nav: 'La oportunidad', eyebrow: 'La oportunidad', proposal: 'La respuesta que proponemos',
+    open: 'Explorar la pieza', scope: 'Una observación de búsqueda y una propuesta editorial. Los resultados se comprobarán después de publicar.',
+    demoTitle: 'De la búsqueda a la respuesta', demoNote: 'Recorrido ilustrativo con contenido de esta muestra. No es un resultado de un buscador.',
+    replay: 'Repetir', sequence: 'De la pregunta al contenido que la respalda',
+    query: 'La pregunta', answer: 'La respuesta', source: 'La fuente', answerLabel: 'Una respuesta con contexto',
+    conditions: 'Condiciones contrastadas con:', contentSource: 'La pieza que respalda esta respuesta', explorePiece: 'Abrir la pieza completa',
+    observed: 'Observación real · SEO', evidenceTitle: 'El punto de partida de esta propuesta.',
+    method: 'Metodología y alcance', reading: 'Nuestra lectura',
+  },
   value: {
     summary: 'El valor detrás de la pieza', questions: 'preguntas', open: 'Explorar decisiones',
     eyebrow: 'De la intención a la decisión', title: 'Una pregunta. Una respuesta que se puede comprobar.',

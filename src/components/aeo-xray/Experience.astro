@@ -14,6 +14,8 @@ import Landing from './Landing.astro'
 import SocialShowcase from './SocialShowcase.astro'
 import {assetHref} from '@/lib/aeo-xray/view'
 import ValueExplorer from './ValueExplorer.astro'
+import Opportunity from './Opportunity.astro'
+import {xrayCopy as C} from '@/lib/aeo-xray/copy'
 
 /**
  * Radiografía AEO — el FLOW. TASK-1410 (greenhouse-eo).
@@ -42,8 +44,9 @@ export interface Props {
  artifactChoices?: Array<{id:string;label:string;href:string;active:boolean}>
 }
 const { d, step, hrefForStep, kind = 'article', landing, artifactChoices = [] } = Astro.props as Props
-const { ui, machine, evidence, meta, client, flow, gap, atoms, thesis } = d
+const { ui, machine, evidence, meta, client, gap, atoms, thesis } = d
 const composition=landing as {artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest}|undefined
+const flow=d.flow.map(s=>({...s,label:s.step===''?C.opportunity.nav:s.label}))
 const headlineFacts = evidence.facts.filter(f => f.headline)
 const clientLogo = composition?.model.assets.find(asset=>asset.id===composition.model.brand?.logoAssetId)
 
@@ -117,7 +120,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 
   {/* `data-hero` es el puente: el héroe se DERIVA del payload y viaja al script por el DOM, no por
       una constante. Así el JS del acoplamiento deja de conocer un `coupleId` del cliente. */}
-  <div class="xr" data-kind={kind} data-composed={artifactChoices.length ? true : undefined} data-testid="xray-root" data-step={step || 'hueco'} data-next-state={step === 'articulo' ? 'pending' : undefined} data-hero={HERO} style={`--landing-action:${composition?.model.brand?.action??client.accent};--landing-action-ink:${composition?.model.brand?.actionText??'white'};--client:${client.accent};--client-font:${client.font.family};--client-body-font:${client.bodyFont??client.font.family};--w-client-title:${client.font.titleWeight};--w-client-body:${client.font.bodyWeight}`}>
+  <div class="xr" data-kind={kind} data-composed={artifactChoices.length ? true : undefined} data-testid="xray-root" data-step={step || 'oportunidad'} data-next-state={step === 'articulo' ? 'pending' : undefined} data-hero={HERO} style={`--landing-action:${composition?.model.brand?.action??client.accent};--landing-action-ink:${composition?.model.brand?.actionText??'white'};--client:${client.accent};--client-font:${client.font.family};--client-body-font:${client.bodyFont??client.font.family};--w-client-title:${client.font.titleWeight};--w-client-body:${client.font.bodyWeight}`}>
     <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
     <header class="xr-chrome">
       <div class="xr-wrap xr-chrome-in">
@@ -166,8 +169,9 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 
     {composition && (step === 'articulo' || step === 'radiografia') && <ValueExplorer {...composition} />}
     <main class="xr-wrap">
-      {/* ══════════ ① EL HUECO ══════════ */}
-      {!step && (
+      {/* ══════════ ① LA OPORTUNIDAD ══════════ */}
+      {!step && composition && <Opportunity d={d} {...composition} href={href('articulo')}/>}
+      {!step && !composition && (
         <section class="gap" data-capture="aeo-xray-gap">
           <header class="g-head">
             <p class="g-kick">{gap.kicker}</p>
@@ -374,7 +378,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 
     <footer class="xr-foot" aria-label="Acerca de esta muestra">
       <div class="xr-wrap">
-        {next && step && (
+        {next && (step || composition) && (
           <div class="read-finish" data-capture="aeo-xray-article-finish">
             <a data-astro-prefetch="false" class="read-finish-a" href={href(next.step)} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
               <span>

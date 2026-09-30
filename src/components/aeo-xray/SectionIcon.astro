@@ -1,0 +1,13 @@
+---
+import {Link2, CircleQuestionMark, ClipboardList, Files, ListChecks, ListOrdered, ListTree, ReceiptText, Scale, Shield} from '@lucide/astro'
+import type {SectionRole} from './section-icons'
+
+interface Props {role?:SectionRole;size?:number}
+const {role,size=20}=Astro.props
+const icons={contents:ListTree,comparison:Scale,steps:ListOrdered,benefits:ListChecks,requirements:ClipboardList,questions:CircleQuestionMark,sources:Files,related:Link2,costs:ReceiptText,protection:Shield}
+const Icon=role?icons[role]:undefined
+---
+{Icon&&<span class="section-icon" data-section-role={role} aria-hidden="true"><Icon size={size} stroke-width={1.65} aria-hidden="true" focusable="false"/></span>}
+<style>
+.section-icon{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;color:inherit;vertical-align:text-bottom}.section-icon :global(svg){display:block}
+</style>
