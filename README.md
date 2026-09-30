@@ -24,6 +24,9 @@ renderiza el modelo que el backend entrega.
 | `/brand-visibility/r/[token]` | Informe per-lead (SSR, token-gated) | **live, enterprise** | **noindex** |
 | `/insights/r/[token]` | Informe compartido de Efeonce Insights (SSR por request, token-gated). Ver sección abajo | en producción (2026-09-28) | **noindex** |
 | `/insights/muestra` | Muestra pública del informe de Insights para clientes: mismo render (`InsightReport`), datos de ejemplo y marca ficticia | en producción (2026-09-28) | **noindex**, fuera del sitemap |
+| `/muestras/<slug>-<token>` | Radiografía legacy (SKY), mismo renderer X-Ray | en producción | **noindex**, fuera del sitemap |
+| `/aeo-xray/r/sample_<clave>` | Composición X-Ray landing/artículo autónoma, sin Greenhouse; enlace público no listado | en producción (2026-09-30) | **noindex**, fuera del sitemap |
+| `/aeo-xray/r/xrg_<grant>` | Consumer de ediciones/acceso gobernados Greenhouse | implementación local; provider/flags/migración/canary productivos pendientes | **noindex** |
 
 ## Contrato que consume
 
@@ -135,8 +138,7 @@ node scripts/audit-insights-a11y.mjs               # contraste AA + recorrido co
 node scripts/capture-insights-report.mjs <dir>     # dossier visual desktop/mobile, presentación y motion reducido
 ```
 
-Estado: construido y verificado en local (verify «Todo verde», a11y AA en 1440/390, 14 pruebas). **Sin desplegar**:
-`main` publica producción automáticamente, así que el push queda pendiente del operador.
+Estado histórico de esas pruebas: local. El renderer Insights y la muestra están en producción desde el 28/09/2026; apertura del sharing Greenhouse requiere su flag/rollout y evidencia independientes. No inferir grant operativo por existir el renderer.
 
 ## Radiografía AEO — muestras de trabajo (`/muestras/<slug>`)
 
@@ -145,13 +147,13 @@ Un artículo real con **su capa de máquina visible y acoplada** al lado (JSON-L
 ese artículo existe. Se usa como muestra en propuestas comerciales. Owner: `TASK-1410`
 (greenhouse-eo).
 
-**El cliente es un payload, no código.** Para hacer la muestra del siguiente cliente:
+**El cliente es un payload, no código.** El procedimiento siguiente es **legacy**; para un cliente nuevo usar el kit AXIS compuesto documentado en Greenhouse (sección siguiente), no copiar el caso SKY ni su token:
 
 1. Escribe `src/content/aeo-xray/<cliente>-<slug>.json`. Copia
    `sky-carretera-austral.json` como referencia.
    **Genera su token con `openssl rand -hex 6`** y decláralo en el campo `token`.
-2. Deja las imágenes en `public/muestras/<cliente>-<slug>/`.
-3. `pnpm build && pnpm verify:aeo-xray` (usa `XRAY_SLUG=<cliente>-<slug>`).
+2. Para legacy, deja las fotografías en `src/assets/muestras/<cliente>-<slug>/` para pasar por el pipeline Astro. No confundir con entregas estáticas autorizadas del carril compuesto autónomo.
+3. `pnpm build && pnpm verify:aeo-xray` (usa `XRAY_SAMPLE=<cliente>-<slug>`).
 
 No se toca ni un componente. Si terminas escribiendo un `if (cliente === '...')` en algún
 componente, la frontera se rompió.
@@ -267,3 +269,94 @@ La burbuja `public/branding/url-bubble-baked-dark.svg` es una copia estática **
 Acompaña al lockup oficial AEO sobre fondo oscuro; nunca lo sustituye.
 Verificación: `node scripts/verify-aeo-xray-curtain.mjs` (mismo `XRAY_VERIFY_BASE` y
 `XRAY_VERIFY_TOKEN` que los gates de composición).
+
+
+### Manuales canónicos y repetición por cliente
+
+La documentación de dominio vive en `../greenhouse-eo/docs/think/`:
+
+- `radiografia-aeo-architecture.md`: modelo y renderer, acceso, evidencia e invariantes.
+- `radiografia-aeo-manual.md`: operación detallada de todos los carriles, etapas, QA y release.
+- `aeo-xray-nuevo-cliente.md`: kit neutral, expediente privado, investigación, marca, medios y entrega.
+- `aeo-xray-release-handoff.md`: publicación independiente y pendientes de integración.
+- `../docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`: producto y límites de venta.
+
+Desde Greenhouse, `node scripts/aeo-xray/client-kit.mjs init --client "Cliente" --locale es-CL
+--out /ruta/privada/caso` crea BRIEF/intent/assets; `validate` y `build` usan el contrato AXIS.
+`--draft` permite preview incompleta, nunca aprobación de entrega. Con `XRAY_CASE_DIR=/ruta/privada/caso`
+y `pnpm dev --host 127.0.0.1 --port 4346`, `/aeo-xray/r/fixture-client?artifact=landing&step=articulo`
+carga el expediente genérico únicamente en DEV. El loader verifica mapa lógico, hash de bytes,
+MIME soportado y containment real; rechaza escapes y symlinks fuera de la carpeta de medios.
+
+Reutilizar componentes y contrato, no copiar nombres/claims/personas ni aprobaciones de otro
+cliente. El selector conserva `step`; los valores técnicos siguen `''`, `articulo`, `radiografia`,
+`atomizacion` y los nombres visibles son La oportunidad/La pieza/La radiografía/Dónde más vive.
+`step=articulo` sirve también la landing. Un cliente nuevo requiere QA propio: los gates bancarios
+usan IDs del caso Pichincha y no acreditan automáticamente cualquier contenido.
+
+### Telón, motion y contrato de degradación
+
+La entrada primera etapa muestra logo cliente, invitación, botón, lockup AEO y burbuja oficial.
+La apertura normal asciende durante 1400ms con arco deliberado; el contenido entra desde 56px.
+`xray:curtain-opening` prepara la pregunta bajo el telón y `xray:curtain-opened` inicia la secuencia.
+El caso se recuerda por pathname en sessionStorage de la pestaña; nueva pestaña repite entrada.
+Deep links, Back y navegación interna conservan destino sin bienvenida repetida. `dialog`/form
+nativos mantienen Escape, foco, scroll y continuación sin JS; reduced-motion revela inmediatamente.
+
+**Bug de producción resuelto:** el optimizador CSS puede convertir `1400ms` en `1.4s`; WAAPI espera
+milisegundos. Leer parseFloat sin sufijo reduce apertura a 1.4ms. `WelcomeCurtain.astro` convierte
+según `ms`/`s`, y el gate ejercita CSS serializada en segundos y desplazamiento gradual. Validar
+build y live, no sólo DEV. No eliminar reduced-motion para forzar una animación.
+
+El selector tiene iconos, indicador compartido y texto en snapshot superior para evitar que se
+oculte durante la transición. La pieza→radiografía conserva geometría; cambiar de artefacto evita
+morph entre entidades distintas. Las duraciones vienen de `src/styles/aeo-xray.css`:
+control 300ms, morph 620ms, oportunidad→pieza 820ms, vuelta 700ms y telón 1400ms.
+
+### Honestidad, privacidad y operación
+
+El recorrido pregunta→respuesta→fuente es ilustrativo; no es resultado real de Google AI Mode/LLM.
+`ValueExplorer` muestra preguntas y fuentes contra bloques existentes. La radiografía distingue
+alcance y proposed/implemented/verified/measured, sin confundir implementación demo con sitio cliente.
+El schema del banco sólo se muestra como texto escapado, nunca JSON-LD activo en Think.
+DataForSEO sigue como provenance de research; no aparece entre fuentes editoriales del producto.
+Los beneficios/condiciones provienen de fuentes oficiales fechadas y se reverifican antes del envío.
+
+La distribución autónoma usa public/aeo-xray-media y lectura SSR con no-store/noindex/no-referrer,
+sin analytics. Esas cabeceras **no protegen medios estáticos ni autentican al lector**. No usarla
+para datos confidenciales. Su expiresAt de envelope es compatibilidad y no un TTL gobernado.
+Retiro: borrar entrada **y medios**, redeploy y readback. Modelo/API/medios privados/TTL/revocación
+Greenhouse pertenecen al carril xrg_* pendiente. No desplegar Greenhouse para compartir un sample.
+
+Los masters, briefs, research, prompts y costos quedan fuera de Git; el registro runtime incluye
+sólo modelo y entregas finales autorizadas. Nunca copiar secretos de proveedores o bearer de grants
+al manifest, evidencias públicas, analytics o docs. Un permiso de gasto/creación no se hereda entre clientes.
+
+### Verificación y evidencia al cierre del 30/09/2026
+
+Think `be8d4841e1124818bd7f4c88d0d7ad7b970e5122`, deployment
+`dpl_7AEWYHEiiWWUyCiwrcTj1US1e3vB`, READY y alias `think.efeoncepro.com` verificados.
+Es un registro de release, no garantía de salud futura. URL concreta y QA del caso se conservan
+privadamente. Greenhouse no se publicó con esta entrega; migración y canary productivos pendientes.
+
+Con servidor local corriendo, elegir `XRAY_VERIFY_BASE`/`XRAY_VERIFY_TOKEN` por entorno y ejecutar:
+
+```bash
+pnpm type-check
+pnpm build
+pnpm test:aeo-xray-v2
+node scripts/qa/verify-aeo-xray-distribution.mjs
+pnpm verify:aeo-xray-v2
+node scripts/verify-aeo-xray-motion.mjs
+node scripts/verify-aeo-xray-value.mjs
+node scripts/verify-aeo-xray-media.mjs
+node scripts/verify-aeo-xray-curtain.mjs
+XRAY_SAMPLE=sky-carretera-austral pnpm verify:aeo-xray
+```
+
+Defaults de verificadores compuestos: base 127.0.0.1:4345, token fixture-pichincha (sólo DEV).
+Capturas ignoradas `.captures/aeo-xray-{v2,motion,value,media,curtain}` deben abrirse y revisarse.
+Comprobar 1440/390/320, deep links, teclado, noJS, reduced-motion, overflow y video con tiempo avanzando.
+No provocar HMR mientras un test registra transición. Gate verde no sustituye lectura editorial ni
+revisión visual. Publish autorizado: commit alcance propio, push main **Think**, READY + SHA exacto
++alias y lectura pública de documento/medios, conservando rollback del deployment anterior.
