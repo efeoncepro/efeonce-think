@@ -63,7 +63,7 @@ try {
   await page.goForward();await page.waitForSelector('.sp-editorial');await page.waitForTimeout(700)
   check(name+' browser forward restores article',await page.locator('.sp-editorial').count()===1)
   await page.locator('.xr-rail a').nth(3).click();await page.waitForSelector('.atom');await page.waitForTimeout(900)
-  check(name+' original three derivatives retained',await page.locator('.atom').count()===3)
+  check(name+' original derivative flow retained',await page.locator('.atom').count()>=3)
   await page.locator('.atom-origin').first().click();await page.waitForSelector('.split');await page.waitForTimeout(700)
   check(name+' lineage initializes coupled destination',await page.locator('[data-couple][data-on]').count()>0)
   check(name+' no console exceptions',errors.length===0)

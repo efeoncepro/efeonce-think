@@ -1,0 +1,134 @@
+---
+import { ArrowDownToLine, ArrowLeft, ArrowRight, Expand, Images, MessagesSquare, Play, X } from '@lucide/astro'
+import Image from './SampleImage.astro'
+import type { RenderSample } from '@/lib/aeo-xray/render-model'
+
+interface Props { d: RenderSample; hrefForOrigin: (id: string) => string }
+const {d, hrefForOrigin} = Astro.props
+const images = d.article.blocks.filter((b): b is Extract<typeof b,{type:'image'|'hero-image'}> => b.type==='image'||b.type==='hero-image')
+const typeOf = (atom:typeof d.atoms[number]) => atom.video||atom.reel ? 'video' : atom.post ? 'social' : atom.showsImages ? 'images' : 'video'
+const first = Math.max(0, d.atoms.findIndex(a=>a.post))
+const mediaText = (a:typeof d.atoms[number], pattern:RegExp) => a.deliverable.find(v=>pattern.test(v.k))?.v ?? ''
+const video = (a:typeof d.atoms[number]) => a.reel ?? a.video
+const codeText = (value:unknown) => JSON.stringify({'@context':'https://schema.org',...(value as object)},null,2)
+---
+<section class="social-showcase" data-social-showcase data-initial={first} aria-label="Piezas y formatos de contenido">
+  <nav class="ss-formats" aria-label="Explorar los formatos">
+    {d.atoms.map((a,n)=><a class="ss-format" id={`format-${n}`} href={`#delivery-${n}`} data-format={n}>
+      <span class="ss-format-icon" aria-hidden="true">{typeOf(a)==='social'?<MessagesSquare size={19}/>:typeOf(a)==='images'?<Images size={19}/>:<Play size={19}/>}</span>
+      <span><strong>{a.kind}</strong><small>{a.video||a.reel?'Pieza gráfica + video':a.post?'Pieza social':a.showsImages?'Recursos visuales':'Narrativa audiovisual'}</small></span>
+      <ArrowRight class="ss-format-arrow" size={19} aria-hidden="true"/>
+    </a>)}
+  </nav>
+  <div class="ss-panels">
+    {d.atoms.map((a,n)=><article class="atom ss-panel" id={`delivery-${n}`} data-format-panel={n} data-artifact={typeOf(a)} data-couple-target={a.coupleId} aria-labelledby={`delivery-title-${n}`}>
+      <div class:list={['ss-stage',`ss-stage-${typeOf(a)}`]}>
+        <div class="ss-stage-meta"><span>{d.client.name}</span><span>{String(n+1).padStart(2,'0')} / {String(d.atoms.length).padStart(2,'0')}</span></div>
+        {a.post?.image&&video(a)&&<div class="ss-media-controls" data-media-controls hidden><button type="button" data-media-choice="image" aria-pressed="true">Pieza gráfica</button><button type="button" data-media-choice="video" aria-pressed="false"><Play size={15} aria-hidden="true"/>Video</button></div>}
+        {a.post && <div class="ss-media-panel" data-media-panel="image">{a.post.image ? <figure class="ss-artwork">
+          <Image src={a.post.image} alt={a.post.alt??a.post.hook} widths={[540,720,1080]} sizes="(min-width:1080px) 540px,90vw" format="avif" quality={88} loading="lazy"/>
+          <figcaption class="ss-artwork-tools"><button type="button" data-enlarge hidden aria-label="Ampliar la pieza social"><Expand size={18} aria-hidden="true"/>Ampliar</button><a href={a.post.image.src} download data-astro-reload><ArrowDownToLine size={18} aria-hidden="true"/>Descargar pieza</a></figcaption>
+        </figure> : <div class="ss-copy-preview"><p>{a.post.hook}</p><h3>{a.post.body}</h3><span>{a.post.cta}</span><strong>{d.client.name}</strong></div>}</div>}
+        {(video(a)||(!a.post&&typeOf(a)==='video')) && <div class="ss-media-panel" data-media-panel="video">{video(a) ? <figure class:list={['ss-video',{'ss-video-vertical':!!a.reel}]}>
+          <video controls playsinline preload="metadata" poster={video(a)!.poster} src={video(a)!.src} aria-label={video(a)!.alt}></video>
+          <figcaption><span>{video(a)!.label??'Video de la pieza'}</span><a href={video(a)!.src} download data-astro-reload aria-label="Descargar video"><ArrowDownToLine size={18} aria-hidden="true"/>Descargar</a></figcaption>
+        </figure> : <div class="ss-script-preview"><span class="ss-preview-label">Guion audiovisual</span><h3>{mediaText(a,/duraci/i)||a.kind}</h3><p>{mediaText(a,/guion|transcrip/i)}</p></div>}</div>}
+        {a.showsImages && !a.post?.image && <div class="ss-gallery" data-gallery>
+          <div class="ss-gallery-track">{images.map((img,index)=><figure class="ss-gallery-slide" data-gallery-slide={index}>
+            <Image src={img.src} alt={img.alt} widths={[540,900,1200]} sizes="(min-width:1080px) 720px,90vw" format="avif" quality={85} loading="lazy"/>
+            <figcaption><p>{img.alt}</p><span>{img.credit.author}</span><div class="ss-artwork-tools"><button type="button" data-enlarge hidden aria-label={`Ampliar imagen ${index+1}`}><Expand size={18} aria-hidden="true"/>Ampliar</button><a href={img.src.src} download data-astro-reload><ArrowDownToLine size={18} aria-hidden="true"/>Descargar imagen</a></div></figcaption>
+          </figure>)}</div>
+          {images.length>1&&<div class="ss-gallery-controls" hidden><button type="button" data-gallery-prev aria-label="Imagen anterior"><ArrowLeft size={19}/></button><span data-gallery-count aria-live="polite">1 / {images.length}</span><button type="button" data-gallery-next aria-label="Imagen siguiente"><ArrowRight size={19}/></button></div>}
+        </div>}
+      </div>
+      <div class="ss-story">
+        <p class="ss-eyebrow">Una idea, otro formato</p>
+        <h2 id={`delivery-title-${n}`}>{a.post?.hook??a.reel?.title??a.kind}</h2>
+        <p class="ss-rationale">{a.why}</p>
+        {a.post&&<div class="ss-caption"><p>{a.post.body}</p><strong>{a.post.cta}</strong></div>}
+        <div class="ss-origin"><span>Parte del contenido original</span><p>{a.bornFrom}</p>{a.coupleId&&<a class="atom-origin" href={hrefForOrigin(a.coupleId)}>Ver el bloque de origen <ArrowRight size={16} aria-hidden="true"/></a>}</div>
+        <details class="ss-detail"><summary>Detalle de producción</summary><dl>{a.deliverable.map(row=><div><dt>{row.k}</dt><dd>{row.v}</dd></div>)}</dl></details>
+        {a.code&&<details class="ss-detail"><summary>Datos estructurados</summary><pre role="region" tabindex="0" aria-label={`Datos estructurados: ${a.kind}`}><code>{codeText(a.code)}</code></pre></details>}
+        {a.stat&&<div class="ss-evidence"><strong>{a.stat}</strong><p>{a.statNote}</p><cite class="atom-cite">{a.source} · {a.asOf}</cite></div>}
+        <p class="ss-note">{a.video?.disclosure??a.reel?.disclosure??a.honesty}</p>
+      </div>
+    </article>)}
+  </div>
+  <dialog class="ss-lightbox" aria-label="Pieza ampliada"><div class="ss-lightbox-bar"><span>Vista de la pieza</span><button type="button" data-close-enlarge aria-label="Cerrar ampliación"><X size={22}/></button></div><div data-enlarged-image></div></dialog>
+</section>
+<script>
+  function initializeSocialShowcase() {
+    document.querySelectorAll<HTMLElement>('[data-social-showcase]').forEach(root=>{
+      if(root.dataset.initialized) return
+      root.dataset.initialized='true'
+      const tabs=[...root.querySelectorAll<HTMLAnchorElement>('[data-format]')]
+      const panels=[...root.querySelectorAll<HTMLElement>('[data-format-panel]')]
+      const reduce=window.matchMedia('(prefers-reduced-motion:reduce)')
+      root.querySelector('.ss-formats')?.setAttribute('role','tablist')
+      const choose=(index:number, focus=false)=>{
+        tabs.forEach((tab,n)=>{tab.setAttribute('role','tab');tab.setAttribute('aria-selected',String(n===index));tab.setAttribute('aria-controls',panels[n].id);tab.tabIndex=n===index?0:-1})
+        panels.forEach((panel,n)=>{panel.hidden=n!==index;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby',tabs[n].id);if(n!==index)panel.querySelectorAll('video').forEach(video=>video.pause())})
+        if(focus){
+          tabs[index].focus({preventScroll:true})
+          const formats=tabs[index].parentElement!
+          if(formats.scrollWidth>formats.clientWidth)formats.scrollTo({left:tabs[index].offsetLeft-8,behavior:reduce.matches?'auto':'smooth'})
+        }
+        if(focus&&!reduce.matches)panels[index].animate([{opacity:.3,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],{duration:320,easing:'cubic-bezier(.2,0,0,1)'})
+      }
+      tabs.forEach((tab,n)=>{
+        tab.addEventListener('click',event=>{event.preventDefault();choose(n,true)})
+        tab.addEventListener('keydown',event=>{
+          let next=n
+          if(event.key==='ArrowRight')next=(n+1)%tabs.length
+          else if(event.key==='ArrowLeft')next=(n-1+tabs.length)%tabs.length
+          else if(event.key==='Home')next=0
+          else if(event.key==='End')next=tabs.length-1
+          else return
+          event.preventDefault();choose(next,true)
+        })
+      })
+      choose(Number(root.dataset.initial)||0)
+      panels.forEach(panel=>{
+        const controls=panel.querySelector<HTMLElement>('[data-media-controls]')
+        if(!controls)return
+        controls.hidden=false
+        const selectMedia=(format:string)=>{
+          panel.querySelectorAll<HTMLElement>('[data-media-panel]').forEach(media=>{media.hidden=media.dataset.mediaPanel!==format;if(media.hidden)media.querySelectorAll('video').forEach(video=>video.pause())})
+          controls.querySelectorAll<HTMLButtonElement>('[data-media-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mediaChoice===format)))
+        }
+        controls.querySelectorAll<HTMLButtonElement>('[data-media-choice]').forEach(button=>button.addEventListener('click',()=>selectMedia(button.dataset.mediaChoice!)))
+        selectMedia('image')
+      })
+      const dialog=root.querySelector<HTMLDialogElement>('.ss-lightbox')!
+      const content=dialog.querySelector<HTMLElement>('[data-enlarged-image]')!
+      root.querySelectorAll<HTMLButtonElement>('[data-enlarge]').forEach(button=>{
+        button.hidden=false
+        button.addEventListener('click',()=>{
+          const image=button.closest('figure')?.querySelector('img')
+          if(!image)return
+          const enlarged=image.cloneNode(false) as HTMLImageElement
+          enlarged.removeAttribute('loading');enlarged.removeAttribute('sizes');enlarged.removeAttribute('srcset')
+          content.replaceChildren(enlarged);dialog.showModal()
+        })
+      })
+      dialog.querySelector('[data-close-enlarge]')?.addEventListener('click',()=>dialog.close())
+      dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close()})
+      root.querySelectorAll<HTMLElement>('[data-gallery]').forEach(gallery=>{
+        const slides=[...gallery.querySelectorAll<HTMLElement>('[data-gallery-slide]')]
+        const controls=gallery.querySelector<HTMLElement>('.ss-gallery-controls')
+        if(!controls||slides.length<2)return
+        controls.hidden=false;let current=0
+        const show=(index:number)=>{current=(index+slides.length)%slides.length;slides.forEach((slide,n)=>slide.hidden=n!==current);gallery.querySelector('[data-gallery-count]')!.textContent=`${current+1} / ${slides.length}`}
+        gallery.querySelector('[data-gallery-prev]')?.addEventListener('click',()=>show(current-1))
+        gallery.querySelector('[data-gallery-next]')?.addEventListener('click',()=>show(current+1))
+        show(0)
+      })
+    })
+  }
+  initializeSocialShowcase()
+  document.addEventListener('astro:page-load',initializeSocialShowcase)
+  document.addEventListener('astro:before-swap',()=>document.querySelectorAll<HTMLVideoElement>('[data-social-showcase] video').forEach(video=>video.pause()))
+</script>
+<style>
+.ss-media-panel{width:100%}.ss-media-controls{display:flex;gap:.3rem;background:white;padding:.3rem;border:1px solid var(--line);border-radius:.4rem}.ss-media-controls button{display:flex;align-items:center;gap:.45rem;min-height:38px;padding:.4rem 1rem;font:inherit;font-size:.78rem;border:0;border-radius:.25rem;background:transparent;color:var(--ink-2);cursor:pointer}.ss-media-controls button[aria-pressed=true]{background:var(--navy);color:white}.social-showcase{margin-top:2.5rem}.social-showcase [hidden]{display:none!important}.ss-formats{position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:.65rem;margin-bottom:1.3rem}.ss-format{display:flex;align-items:center;gap:.8rem;padding:1.15rem 1.2rem;border:1px solid var(--line);border-radius:.6rem;background:white;color:var(--ink);text-decoration:none;min-height:84px;transition:background-color .18s,border-color .18s}.ss-format strong{display:block;font-size:.94rem;font-weight:600;line-height:1.3}.ss-format small{display:block;color:var(--muted);font-size:.75rem;margin-top:.3rem}.ss-format-icon{color:var(--blue);display:flex;align-items:center}.ss-format-arrow{margin-left:auto;flex-shrink:0}.ss-format[aria-selected=true]{background:var(--navy);color:white;border-color:var(--navy)}.ss-format[aria-selected=true] small{color:var(--dim-d)}.ss-format[aria-selected=true] .ss-format-icon{color:var(--blue-up)}.ss-format:hover{border-color:var(--blue)}.ss-format:focus-visible,.social-showcase button:focus-visible,.social-showcase a:focus-visible,.social-showcase summary:focus-visible{outline:3px solid var(--blue);outline-offset:4px}.ss-panels{display:grid;gap:2rem}.ss-panel{display:grid;grid-template-columns:minmax(0,1.38fr) minmax(320px,.8fr);border:1px solid var(--line);border-radius:.85rem;overflow:hidden;background:white;min-width:0;scroll-margin-top:80px}.ss-stage{background:var(--surf);padding:1.5rem clamp(1.2rem,3vw,3rem) 2.5rem;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}.ss-stage-meta{display:flex;justify-content:space-between;gap:1rem;width:100%;font-size:.72rem;letter-spacing:.05em;color:var(--muted)}.ss-artwork{width:min(100%,450px);margin:auto}.ss-artwork :global(img){display:block;width:auto;max-width:100%;height:auto;max-height:650px;object-fit:contain;margin-inline:auto;box-shadow:0 16px 45px color-mix(in srgb,var(--navy) 12%,transparent)}.ss-artwork-tools{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-top:1rem}.ss-artwork-tools a,.ss-artwork-tools button,.ss-video figcaption a{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:.3rem .65rem;background:transparent;border:0;border-radius:.3rem;color:var(--ink-2);font-family:inherit;font-size:.78rem;text-decoration:none;cursor:pointer}.ss-artwork-tools a:hover,.ss-artwork-tools button:hover{background:var(--line)}.ss-story{padding:clamp(1.5rem,3vw,3rem);min-width:0;align-self:center}.ss-eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:600}.ss-story h2{font-family:Poppins,system-ui,sans-serif;font-size:clamp(1.65rem,2.3vw,2.25rem);line-height:1.2;font-weight:500;letter-spacing:-.025em;margin:.9rem 0 1.2rem;color:var(--ink);text-wrap:balance}.ss-rationale{font-size:.94rem;color:var(--ink-2);line-height:1.7}.ss-caption{margin:1.4rem 0;padding-left:1rem;border-left:2px solid var(--blue);font-size:.93rem;line-height:1.6}.ss-caption strong{display:block;margin-top:.7rem;font-weight:600}.ss-origin{margin:1.5rem 0;padding:1.1rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.ss-origin>span{font-size:.69rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}.ss-origin p{font-size:.82rem;line-height:1.5;margin:.55rem 0}.ss-origin a{display:inline-flex;gap:.5rem;align-items:center;min-height:36px;color:var(--blue);font-size:.81rem;font-weight:600;text-decoration:none}.ss-detail{border-bottom:1px solid var(--line);padding:.8rem 0}.ss-detail summary{cursor:pointer;font-size:.82rem;font-weight:600;color:var(--ink-2);min-height:28px}.ss-detail dl{margin:1rem 0;font-size:.8rem;line-height:1.6}.ss-detail dl>div+div{margin-top:.75rem}.ss-detail dt{font-weight:600;color:var(--ink)}.ss-detail dd{margin:.15rem 0 0;color:var(--muted)}.ss-detail pre{max-width:100%;overflow:auto;margin-top:1rem;font-size:.72rem;padding:1rem;background:var(--navy);color:var(--ink-d);border-radius:.35rem}.ss-note{font-size:.7rem;color:var(--muted);line-height:1.55;margin-top:1.2rem}.ss-evidence{margin-top:1.2rem;font-size:.8rem}.ss-evidence strong{font-size:1.5rem}.ss-evidence cite{display:block;color:var(--muted);font-size:.68rem;margin-top:.5rem}.ss-video{width:100%;margin:auto}.ss-video video{width:100%;height:auto;max-height:650px;display:block;background:var(--navy-sunk);border-radius:.4rem}.ss-video-vertical{max-width:330px}.ss-video-vertical video{aspect-ratio:9/16;object-fit:contain}.ss-video figcaption{display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-size:.72rem;color:var(--muted);margin-top:1rem}.ss-gallery{width:100%}.ss-gallery-slide{margin:0}.ss-gallery-slide+.ss-gallery-slide{margin-top:2rem}.ss-gallery-slide :global(img){display:block;width:100%;height:auto;max-height:590px;object-fit:contain}.ss-gallery-slide figcaption>p{font-size:.82rem;line-height:1.6;margin-top:1rem;color:var(--ink-2)}.ss-gallery-slide figcaption>span{display:block;margin-top:.45rem;font-size:.7rem;color:var(--muted)}.ss-gallery-controls{display:flex;justify-content:center;gap:1.5rem;align-items:center;margin-top:1rem}.ss-gallery-controls button{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--line);background:white;border-radius:50%;cursor:pointer;color:var(--ink)}.ss-gallery-controls span{font-variant-numeric:tabular-nums;font-size:.8rem}.ss-copy-preview,.ss-script-preview{margin:auto;padding:clamp(1.5rem,4vw,3.5rem);color:var(--ink);background:white;border:1px solid var(--line);width:100%;max-width:470px;min-height:440px;display:flex;flex-direction:column;justify-content:center;gap:1.5rem}.ss-copy-preview h3,.ss-script-preview h3{font-family:var(--client-font);font-size:2rem;line-height:1.2;font-weight:600;color:var(--client)}.ss-copy-preview p,.ss-script-preview p{font-size:1rem;line-height:1.6}.ss-copy-preview>strong{font-size:.8rem;color:var(--client);margin-top:1rem}.ss-preview-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.ss-lightbox{position:fixed;inset:0;margin:auto;width:min(1080px,96vw);max-width:96vw;max-height:96dvh;padding:0;border:0;border-radius:.65rem;background:var(--surf);color:var(--ink)}.ss-lightbox::backdrop{background:color-mix(in srgb,var(--navy-sunk) 88%,transparent)}.ss-lightbox-bar{display:flex;justify-content:space-between;align-items:center;padding:.65rem 1rem;font-size:.8rem;position:sticky;top:0;background:var(--surf);z-index:1}.ss-lightbox-bar button{background:none;border:0;color:var(--ink);width:44px;height:44px;display:grid;place-items:center;cursor:pointer}.ss-lightbox [data-enlarged-image]{padding:0 1rem 1rem}.ss-lightbox :global(img){display:block;width:auto;max-width:100%;max-height:calc(96dvh - 90px);height:auto;margin:auto;object-fit:contain}@media(max-width:1050px){.ss-formats{grid-template-columns:repeat(2,minmax(0,1fr))}.ss-panel{grid-template-columns:minmax(0,1.15fr) minmax(290px,.85fr)}.ss-story{padding:1.5rem}.ss-format{padding:.85rem;gap:.5rem}.ss-format-arrow{display:none}.ss-format strong{font-size:.82rem}}@media(max-width:720px){.ss-formats{display:flex;overflow-x:auto;gap:.5rem;padding:3px 2px 9px;scroll-snap-type:x proximity}.ss-format{min-width:170px;flex:1;scroll-snap-align:start}.ss-format small{font-size:.7rem}.ss-panel{grid-template-columns:1fr}.ss-stage{padding:1rem 1rem 1.5rem}.ss-story{padding:1.5rem}.ss-story h2{font-size:1.8rem}.social-showcase{margin-top:1.5rem}.ss-video-vertical{max-width:280px}.ss-stage-meta{font-size:.66rem}.ss-artwork{max-width:420px}.ss-artwork-tools{gap:.25rem}.ss-artwork-tools a,.ss-artwork-tools button{font-size:.73rem}.ss-lightbox{width:100vw;max-width:100vw;max-height:100dvh;border-radius:0}}@media(prefers-reduced-motion:reduce){.ss-format{transition:none}}
+</style>

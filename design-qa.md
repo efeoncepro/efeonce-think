@@ -84,3 +84,33 @@ del operador, auditoría integral de accesibilidad ni medición de rendimiento d
 
 Alcance de publicación: sólo **efeonce-think**. Greenhouse no recibe deploy ni cambios de runtime.
 La verificación de Vercel y del enlace público se registra después del push.
+
+## Personalización y producción visual — 30/09/2026
+
+- Header con SVG oficial de Banco Pichincha Perú; atribución «Demostración de Efeonce»
+  trasladada al footer. Marca resuelta desde el manifest, sin cliente fijo en componentes.
+- Dos banners editoriales1440×640, tras TREA y apertura. La inspección de píxeles detectó
+  un recorte heredado16:9 que eliminaba texto: ahora las imágenes interiores conservan
+  su proporción intrínseca. El gate verifica esa relación, además de cargar el archivo.
+- Tres láminas de feed1080×1350 y una Story1080×1920 compuestas con logo oficial, fuentes
+  licenciadas y fotografía de procedencia conocida. Referencia: Instagram Banco Pichincha Perú.
+- Video ilustrativo generado con Gemini Omni1.1 y acabado con placas tipográficas y SVG;
+  entrega720×1280,10s,24fps, sin audio. No es un testimonio y se declara su procedencia.
+- Galería por formato, controles de video, ampliación, descarga, teclado y bloque de origen.
+  No-JS expone todo el contenido; cambiar de formato o ruta pausa el video. La galería es
+  reutilizable para cualquier número de derivados del manifest.
+
+Revisión visual: desktop1440, móvil390 y compacto320; abiertas las capturas de showcase,
+video y banners. Se revisaron también los contact sheets de las piezas y del video.
+Evidencia en `.captures/aeo-xray-media` y masters externos documentados en README.
+
+Validación final local: Astro check0 errores, build PASS,19 tests de contrato,46 del motor
+original,198 del recorrido compuesto,104 de medios y25 de movimiento/navegación; distribución
+AXIS7 hashes. El gate legacy se adaptó a la clase compuesta del nuevo panel y conserva la
+exigencia de fuente/fecha para cada cifra. La comprobación de privacidad falló de manera
+intermitente durante trabajo con el servidor dev; una sonda posterior no reprodujo el caso
+en HTML ni DOM y la corrida completa final pasó. Se conserva diagnóstico de contexto en
+el gate y se exige comprobar de nuevo el enlace de producción.
+
+Alcance: sólo Think. No se publica en Instagram, no se envía correo y no se despliega Greenhouse.
+Aceptación visual final del operador y auditoría integral de accesibilidad no se presuponen.

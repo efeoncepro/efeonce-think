@@ -24,7 +24,7 @@ export function adaptExperience(model: AxisAeoXrayManifest, artifact: AxisAeoXra
   }
   const imageBlock = (id:string, assetId:string, hero=false, caption?:string): Block => {
     const a=asset(assetId), source=model.sources.find(s=>s.id===a.sourceId)!
-    return {type:hero?'hero-image':'image', coupleId:id,src:image(assetId),alt:a.alt,caption,credit:{author:a.credit.replace(/^(Fotografía|Imagen):\s*/,''),license:'Fuente',url:source.url}}
+    return {type:hero?'hero-image':'image', coupleId:id,src:image(assetId),alt:a.alt,caption,creditLabel:a.credit.startsWith('Composición:')?'Diseño':'Foto',credit:{author:a.credit.replace(/^(Fotografía|Imagen|Composición):\s*/,''),license:'Fuente',url:source.url}}
   }
   const blocks: Block[] = artifact.blocks.flatMap((b):Block[] => {
     const coupleId=b.id

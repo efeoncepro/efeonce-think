@@ -14,14 +14,15 @@ try{
    const response=await page.goto(`${base}/aeo-xray/r/${token}?artifact=${artifact}&step=${step}`,{waitUntil:'networkidle'})
    check(prefix+' status',response.status()===200)
    const html=await page.content(),headers=response.headers()
+   if(html.includes(token)){const at=html.indexOf(token);console.error('Unexpected share-key context:',html.slice(Math.max(0,at-90),at+token.length+90).replaceAll(token,'[share-key]'))}
    const privacy={noStore:headers['cache-control']?.includes('no-store'),noReferrer:headers['referrer-policy']==='no-referrer',noKeyInMarkup:!html.includes(token),noAnalytics:!html.includes('googletagmanager.com'),noActiveSchema:!html.includes('application/ld+json')}
    check(prefix+' privacy '+JSON.stringify(privacy),Object.values(privacy).every(Boolean))
    check(prefix+' flow4',await page.locator('.xr-rail a').count()===4)
    check(prefix+' selector retains step',(await page.locator('.xr-artifacts a').evaluateAll(els=>els.map(e=>e.getAttribute('href')))).every(h=>step?h.includes('step='+step):!h.includes('step=')))
    check(prefix+' no overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1))
-   for(const img of await page.locator('.xr img').all()){await img.scrollIntoViewIfNeeded();await img.evaluate(i=>i.decode()).catch(()=>{})}
+   for(const img of await page.locator('.xr img:visible').all()){await img.scrollIntoViewIfNeeded();await img.evaluate(i=>i.decode()).catch(()=>{})}
    await page.evaluate(()=>scrollTo(0,0))
-   check(prefix+' images loaded',await page.locator('.xr img').evaluateAll(els=>els.every(i=>i.complete&&i.naturalWidth>0)))
+   check(prefix+' images loaded',await page.locator('.xr img:visible').evaluateAll(els=>els.every(i=>i.complete&&i.naturalWidth>0)))
    if(step==='articulo'){
     if(artifact==='ahorro-preferente'){
      const layout=await page.locator('.landing-hero').evaluate(el=>{
@@ -44,7 +45,7 @@ try{
     if(name!=='desktop'){check(prefix+' sheet open',await page.locator('.inst').isVisible());await page.locator('[data-close-sheet]').click()}
     else{check(prefix+' filter concrete',await page.locator('.inst [data-hide]').count()>0);await page.keyboard.press('Escape');check(prefix+' map restored',await page.locator('.inst [data-hide]').count()===0)}
    }
-   if(step==='atomizacion'){check(prefix+' all derivatives',await page.locator('.atom').count()>=3);check(prefix+' origin links',await page.locator('.atom-origin').count()===3)}
+   if(step==='atomizacion'){check(prefix+' all derivatives',await page.locator('.atom').count()>=3);check(prefix+' origin links',await page.locator('.atom-origin').count()===await page.locator('.atom').count())}
    await page.screenshot({path:`${out}/${name}-${artifact}-${step||'gap'}.png`})
   }
   check(name+' no JS errors',errors.length===0);await context.close()

@@ -1,5 +1,4 @@
 ---
-import Image from './SampleImage.astro'
 import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
 import type { RenderSample } from '@/lib/aeo-xray/render-model'
 import { FileText, Images, MessagesSquare, Play } from '@lucide/astro'
@@ -12,6 +11,8 @@ import '@fontsource/poppins/500.css'
 import '@fontsource/poppins/600.css'
 import '@styles/aeo-xray.css'
 import Landing from './Landing.astro'
+import SocialShowcase from './SocialShowcase.astro'
+import {assetHref} from '@/lib/aeo-xray/view'
 import ValueExplorer from './ValueExplorer.astro'
 
 /**
@@ -44,6 +45,7 @@ const { d, step, hrefForStep, kind = 'article', landing, artifactChoices = [] } 
 const { ui, machine, evidence, meta, client, flow, gap, atoms, thesis } = d
 const composition=landing as {artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest}|undefined
 const headlineFacts = evidence.facts.filter(f => f.headline)
+const clientLogo = composition?.model.assets.find(asset=>asset.id===composition.model.brand?.logoAssetId)
 
 const i = flow.findIndex(s => s.step === step)
 const cur = flow[i]
@@ -88,13 +90,6 @@ bump(machine.headings.coupleId)
 evidence.facts.forEach(x => bump(x.coupleId))
 evidence.fanOut.items.forEach(x => bump(x.coveredBy))
 
-/* Las fotos del artículo — las mismas, con su alt. El átomo de imágenes las EXHIBE en vez de
-   limitarse a argumentar sobre ellas. */
-const imageBlocks = d.article.blocks.filter(
-  (b): b is Extract<typeof b, { type: 'image' | 'hero-image' }> =>
-    b.type === 'image' || b.type === 'hero-image',
-)
-
 const codeRecord = (code: unknown): Record<string, unknown> =>
   code && typeof code === 'object' ? (code as Record<string, unknown>) : {}
 
@@ -103,27 +98,15 @@ const codeField = (code: unknown, key: string): string => {
   return typeof value === 'string' ? value : ''
 }
 
-const deliverableValue = (atom: (typeof atoms)[number], pattern: RegExp): string =>
-  atom.deliverable.find(x => pattern.test(x.k))?.v ?? ''
-
 const artifactKind = (atom: (typeof atoms)[number]) => {
   const type = codeField(atom.code, '@type')
 
+  if (atom.video || atom.reel) return 'video'
   if (atom.post) return 'social'
   if (atom.showsImages) return 'images'
   if (type === 'VideoObject' || /guion|vídeo|video|reel/i.test(atom.kind)) return 'video'
 
   return 'asset'
-}
-
-const asText = (code: unknown) =>
-  JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
-
-const titles: Record<string, string> = {
-  '': `${meta.instrument} — la brecha`,
-  articulo: `${meta.instrument} — el artículo`,
-  radiografia: `${meta.instrument} — la radiografía`,
-  atomizacion: `${meta.instrument} — dónde más vive`,
 }
 
 const EFEONCE_SEO_URL = 'https://efeoncepro.com/servicios/posicionamiento-seo/'
@@ -136,7 +119,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       una constante. Así el JS del acoplamiento deja de conocer un `coupleId` del cliente. */}
   <div class="xr" data-kind={kind} data-composed={artifactChoices.length ? true : undefined} data-testid="xray-root" data-step={step || 'hueco'} data-next-state={step === 'articulo' ? 'pending' : undefined} data-hero={HERO} style={`--landing-action:${composition?.model.brand?.action??client.accent};--landing-action-ink:${composition?.model.brand?.actionText??'white'};--client:${client.accent};--client-font:${client.font.family};--client-body-font:${client.bodyFont??client.font.family};--w-client-title:${client.font.titleWeight};--w-client-body:${client.font.bodyWeight}`}>
     <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
-    <header class="xr-chrome" data-testid="disclaimer">
+    <header class="xr-chrome">
       <div class="xr-wrap xr-chrome-in">
         {/* LOCKUP, no isotipo. El isotipo solo comunica a quien YA conoce la marca —
             y el comité que abre esto no la conoce. El logotipo dice QUIÉN; el nombre de
@@ -152,10 +135,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
           <span class="xr-brand-sep" aria-hidden="true"></span>
           <span class="xr-brand-t">{meta.instrument}</span>
         </a>
-        <p class="xr-rotulo">
-          <strong>{ui.disclaimerLabel}</strong>
-          <span>{ui.disclaimerBody}</span>
-        </p>
+        {clientLogo && <div class="xr-client-brand"><img src={assetHref(clientLogo)} alt={client.name} width={clientLogo.width} height={clientLogo.height}/></div>}
       </div>
     </header>
 
@@ -320,6 +300,8 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
           <h1 class="at-h1">{kind === 'landing' ? 'Esta landing' : 'Este artículo'} no vive solo en una URL</h1>
           <p class="at-intro">{d.atomsIntro}</p>
 
+          <SocialShowcase d={d} hrefForOrigin={(id:string)=>`${href('radiografia')}#block-${encodeURIComponent(id)}`} />
+
           <div class="at-lineage" aria-label="Línea de sangre de la distribución">
             <div class="at-lineage-source">
               <span class="at-lineage-source-k"><FileText size={16} aria-hidden="true" />{kind === 'landing' ? 'Landing original' : 'Artículo original'}</span>
@@ -344,144 +326,6 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div class="at-grid">
-            {atoms.map(a => (
-              <article class="atom" data-artifact={artifactKind(a)} data-featured={a.post ? 'true' : undefined} data-couple-target={a.coupleId} tabindex="0">
-                <div class="atom-h">
-                  <span class="atom-icon" aria-hidden="true">
-                    {artifactKind(a) === 'video' && <Play size={18} />}
-                    {artifactKind(a) === 'social' && <MessagesSquare size={18} />}
-                    {artifactKind(a) === 'images' && <Images size={18} />}
-                  </span>
-                  <span class="atom-title">
-                    <span class="atom-k">{a.kind}</span>
-                    <span class="atom-from">{a.bornFrom}</span>
-                    {a.coupleId && <a class="atom-origin" href={`${href('radiografia')}#block-${encodeURIComponent(a.coupleId)}`}>Ver el bloque de origen ↗</a>}
-                  </span>
-                </div>
-
-                <div class="atom-artifact">
-                  {artifactKind(a) === 'video' && imageBlocks[0] && (
-                    <figure class="video-artifact">
-                      <div class="video-frame">
-                        {a.video ? (
-                          <>
-                            <video class="video-preview" src={a.video.src} poster={a.video.poster} muted playsinline loop autoplay preload="metadata" aria-label={a.video.alt}></video>
-                            {a.video.disclosure && <span class="video-disclosure">{a.video.disclosure}</span>}
-                          </>
-                        ) : (
-                          <Image src={imageBlocks[0].src} alt={imageBlocks[0].alt} widths={[360, 720]} sizes="420px" format="avif" quality={70} loading="lazy" />
-                        )}
-                        <div class="video-caption">
-                          <span>{composition && !a.video ? 'Guion audiovisual' : a.video?.label || deliverableValue(a, /duraci/i) || 'Video recuperable'}</span>
-                          <strong>{codeField(a.code, 'name') || a.kind}</strong>
-                        </div>
-                      </div>
-                      {a.reel && (
-                        <div class="reel-artifact" data-capture="atom-video-reel">
-                          <div class="reel-phone">
-                            <video class="reel-preview" src={a.reel.src} poster={a.reel.poster} muted playsinline loop autoplay preload="metadata" aria-label={a.reel.alt}></video>
-                            {a.reel.disclosure && <span class="video-disclosure">{a.reel.disclosure}</span>}
-                          </div>
-                          <div class="reel-copy">
-                            <span>{a.reel.label || 'Reel vertical 9:16'}</span>
-                            <strong>{a.reel.title || 'Reel vertical'}</strong>
-                            {a.reel.description && <p>{a.reel.description}</p>}
-                          </div>
-                        </div>
-                      )}
-                      <div class="video-script">
-                        <span>Guion + transcripción</span>
-                        <p>{deliverableValue(a, /guion/i) || codeField(a.code, 'description')}</p>
-                      </div>
-                    </figure>
-                  )}
-
-                  {/* La pieza social se RENDERIZA. Si el payload trae arte final, se muestra el arte. */}
-                  {a.post && (
-                    a.post.image ? (
-                      <figure class="post-artifact">
-                        <Image
-                          src={a.post.image}
-                          alt={a.post.alt || `${a.kind} de ${client.name}`}
-                          widths={[360, 540, 720, 1080]}
-                          sizes="(min-width: 980px) 34rem, 100vw"
-                          format="avif"
-                          quality={76}
-                          loading="lazy"
-                        />
-                      </figure>
-                    ) : (
-                      <div class="post-card">
-                        <p class="pc-hook">{a.post.hook}</p>
-                        <p class="pc-body">{a.post.body}</p>
-                        <p class="pc-cta">{a.post.cta}</p>
-                        <span class="pc-brand">{client.name}</span>
-                      </div>
-                    )
-                  )}
-
-                  {/* 🔴 ASIMETRÍA DE PRUEBA: el átomo de video ESPECIFICA el entregable y el social lo
-                      RENDERIZA — pero el de imágenes, cuyo argumento textual es «un alt que dice
-                      "paisaje" no sirve para nada; uno que dice "las agujas de roca del Cerro Castillo
-                      nevadas sobre un lago" hace que esa foto se recupere», NO MOSTRABA NI UNA FOTO NI
-                      UN ALT. Dos átomos demostraban y uno solo afirmaba — en la pieza cuya regla entera
-                      es demostrar. Y de paso dejaba un hueco blanco de ~600px en la lámina de cierre.
-                      Ahora enseña las cuatro fotos reales con su alt: el argumento se ve. */}
-                  {a.showsImages && (
-                    <ul class="atom-imgs">
-                      {imageBlocks.map(img => (
-                        <li>
-                          <Image src={img.src} alt={img.alt} widths={[180, 360]} sizes="180px" format="avif" quality={65} loading="lazy" />
-                          <p class="atom-alt"><span>alt</span> “{img.alt}”</p>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                {a.stat && <div class="atom-proof">
-                  {/* La cifra va CON su fuente. La ④ afirmaba tres números sin una sola cita
-                      mientras la ① y la ③ citaban todo — en la pieza cuya tesis es el rigor.
-                      Sin fuente y sin fecha, una cifra es una opinión con números. */}
-                  <span class="atom-section-label">Evidencia</span>
-                  <p class="atom-stat"><strong>{a.stat}</strong> <span>{a.statNote}</span></p>
-                  <cite class="atom-cite">{a.source} · {a.asOf}</cite>
-                </div>}
-
-                <div class="atom-rationale">
-                  <span class="atom-section-label">Criterio</span>
-                  <p>{a.why}</p>
-                </div>
-
-                <div class="atom-spec">
-                  <span class="atom-section-label">Entregable</span>
-                  <dl class="atom-d">
-                    {a.deliverable.map(x => (
-                      <div class="atom-spec-row">
-                        <dt>{x.k}</dt>
-                        <dd>{x.v}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-
-                {a.code && (
-                  <details class="atom-code">
-                    <summary>Ver los datos estructurados</summary>
-                    <pre role="region" tabindex="0" aria-label={`Datos estructurados: ${a.kind}`}><code>{asText(a.code)}</code></pre>
-                  </details>
-                )}
-
-                {/* Lo que la muestra NO puede fingir. Decirlo suma; simularlo la destruye. */}
-                <div class="atom-hon" role="note">
-                  <span>Nota de honestidad</span>
-                  <p>{a.honesty}</p>
-                </div>
-              </article>
-            ))}
           </div>
 
           {/* 🔴 EL RECORRIDO MORÍA ACÁ. Cuatro pantallas construyendo tensión y la soltaba en el
@@ -546,6 +390,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
             />
           </a>
           <div class="xr-foot-copy">
+            <p class="xr-disclaimer" data-testid="disclaimer"><strong>{ui.disclaimerLabel}</strong><span>{ui.disclaimerBody}</span></p>
             <p>© {COPYRIGHT_YEAR} Efeonce Group SpA. Radiografía AEO es una herramienta propietaria de Efeonce.</p>
             <p>Todos los derechos reservados. Efeonce se reserva los derechos de uso, reproducción, distribución, adaptación y explotación sin autorización expresa.</p>
           </div>
@@ -946,6 +791,8 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 )}
 
 <style>
+.xr-client-brand{margin-left:auto;padding:.5rem .9rem;background:white;border-radius:.35rem;flex:0 0 auto}.xr-client-brand img{display:block;width:auto;height:30px;max-width:190px;object-fit:contain}.xr-disclaimer{display:flex;flex-wrap:wrap;gap:.25rem .65rem;margin-bottom:.65rem;font-size:.78rem}.xr-disclaimer strong{font-weight:600;color:var(--ink)}.xr-disclaimer span{color:var(--muted)}
+@media(max-width:680px){.xr-client-brand{padding:.4rem}.xr-client-brand img{width:clamp(100px,calc(100vw - 250px),130px);height:24px}.xr-brand .xr-logo{width:82px;height:auto}.xr-brand{gap:.5rem}}
 @media(max-width:680px){.xr[data-composed] .xr-rail::after{content:"›";position:absolute;right:0;top:.4rem;padding:.15rem .4rem;background:var(--navy-2);color:var(--blue-up);font-size:1.3rem;line-height:1;pointer-events:none}}
 .xr[data-composed][data-step="articulo"] .read-stage{width:100%;padding-top:0}.xr[data-composed][data-step="articulo"] main.xr-wrap{padding-inline:0;max-width:none}
 @media(max-width:680px){.xr[data-composed] .xr-chrome-in{display:flex;align-items:center;gap:.5rem;padding-block:.65rem}.xr[data-composed] .xr-rotulo{border:0;padding:0;font-size:.65rem;flex:1}.xr[data-composed] .xr-rotulo span{display:none}.xr[data-composed] .xr-artifacts{padding-block:.45rem}.xr[data-composed] .xr-brand-t{font-size:.65rem}}
@@ -1490,7 +1337,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
     letter-spacing: 0;
   }
   .at-lineage-list {
-    list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; min-width: 0;
+    list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 0.4rem; min-width: 0;
   }
   .at-lineage-list li {
     min-width: 0; padding: 0.55rem 0.6rem; border-radius: 10px;
@@ -1531,13 +1378,18 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       text-align: left;
       padding-inline: 0.4rem;
     }
-    .at-lineage-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .at-lineage-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); }
     .at-lineage-list li { padding: 0.7rem 0.8rem; }
     .at-lineage-list span { font-size: var(--t-meta); line-height: 1.35; }
     .at-lineage-list small { display: block; }
     .at-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr); }
     .atom[data-featured='true'] { grid-column:2;grid-row:1;transform: translateY(-0.35rem); }
     .atom:not([data-featured]){grid-row:1}
+  }
+
+  @media (min-width: 980px) and (max-width: 1200px) {
+    .at-lineage { grid-template-columns: minmax(0, 1fr) auto; }
+    .at-lineage-list { grid-column: 1 / -1; }
   }
 
   .atom {

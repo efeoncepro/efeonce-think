@@ -198,7 +198,7 @@ const probeFor = (id: string) => {
             <div class="fig-m">
               {b.caption && <figcaption>{b.caption}</figcaption>}
               <p class="credit">
-                Foto: {b.credit.author} · <a href={b.credit.url} rel="nofollow noopener">{b.credit.license}</a>
+                {b.creditLabel??'Foto'}: {b.credit.author} · <a href={b.credit.url} rel="nofollow noopener">{b.credit.license}</a>
               </p>
             </div>
           </figure>
@@ -483,12 +483,9 @@ const probeFor = (id: string) => {
   .fig { margin: 1.75rem 0; }
   .fig.hero { margin: 0 0 1.5rem; }
   .fig :global(img) { width: 100%; height: auto; display: block; border-radius: 8px; }
-  /* TODAS a 16:9, hero incluido. El hero era una franja 21:9 y ése fue el error:
-     sacar una franja 21:9 de una foto 3:2 tira el 60% del alto — la composición del
-     fotógrafo (el camino, el primer plano) se pierde y queda solo cielo. 16:9 desde
-     3:2 recorta ~15% de alto: la foto sobrevive. El formato se elige por la foto,
-     no al revés. */
-  .fig :global(img) { aspect-ratio: 16 / 9; object-fit: cover; }
+  /* Inline compositions retain their intrinsic ratio: cropping can remove copy or logos. */
+  .fig :global(img) { aspect-ratio: auto; object-fit: contain; }
+  .fig.hero :global(img) { aspect-ratio: 16 / 9; object-fit: cover; }
   .fig.hero :global(img) { border-radius: 0; }
   .fig-m { padding: 0.55rem 1.75rem 0; }
   .sp-read .post {

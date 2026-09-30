@@ -74,6 +74,18 @@
         "label": "Google Search Central · consolidar URL duplicadas",
         "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
         "accessedAt": "2026-09-30"
+      },
+      {
+        "id": "creative-demo",
+        "label": "Efeonce · composición editorial de muestra",
+        "url": "https://efeoncepro.com/",
+        "accessedAt": "2026-09-30"
+      },
+      {
+        "id": "omni-production",
+        "label": "Google Cloud · Gemini Omni 1.1 Flash, modelo utilizado",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-1-flash",
+        "accessedAt": "2026-09-30"
       }
     ],
     "assets": [
@@ -110,13 +122,125 @@
         "ref": {
           "kind": "protected",
           "assetId": "bank-logo",
-          "sha256": "845b14481fce8da85d6efc4f994a85c0f999492959a51794128b26dceb4c0e86"
+          "sha256": "6aafa29d25a5b30db96a60e490fdbe514ef6f351482ad21e783f570c37821a63"
         },
         "alt": "Banco Pichincha",
-        "width": 480,
-        "height": 101,
-        "credit": "Marca oficial Banco Pichincha; referencia en muestra compartida por enlace",
+        "width": 114,
+        "height": 24,
+        "credit": "Marca oficial Banco Pichincha · SVG original del sitio del banco",
         "sourceId": "bank-visual-reference",
+        "approval": "approved"
+      },
+      {
+        "id": "banner-compare",
+        "ref": {
+          "kind": "protected",
+          "assetId": "banner-compare",
+          "sha256": "01f292f1101047204d8ca529113cdbe3eff447e8db8900c0cc1381e7c309d889"
+        },
+        "alt": "Ahorra con las condiciones a la vista. Compara moneda, saldo y costos.",
+        "width": 1440,
+        "height": 640,
+        "credit": "Composición: Efeonce · propuesta editorial",
+        "sourceId": "creative-demo",
+        "approval": "approved"
+      },
+      {
+        "id": "banner-prepare",
+        "ref": {
+          "kind": "protected",
+          "assetId": "banner-prepare",
+          "sha256": "e188aec22b0a9f283d46811c08d47514b909c92e3e8ac148075dfd498f731d9e"
+        },
+        "alt": "Antes de abrirla, haz buenas preguntas. Documentos, condiciones y canal oficial. Fotografía de unas manos usando un teléfono.",
+        "width": 1440,
+        "height": 640,
+        "credit": "Composición: Efeonce · fotografía de Anete Lusina / Pexels",
+        "sourceId": "creative-demo",
+        "approval": "approved"
+      },
+      {
+        "id": "social-compare",
+        "ref": {
+          "kind": "protected",
+          "assetId": "social-compare",
+          "sha256": "d02a2caabdfba3e28598c8aeefd5775298d78f9f6f5c48559938f3cd8de80e62"
+        },
+        "alt": "Banco Pichincha. Tu ahorro merece más que una tasa. Moneda, saldo y costos. Tres cosas que también importan. Fotografía de unas manos usando un teléfono junto a un computador. Mira el panorama completo. Cuenta de ahorros: guía para decidir. Lámina 1 de 3.",
+        "width": 1080,
+        "height": 1350,
+        "credit": "Composición: Efeonce · propuesta editorial; marca Banco Pichincha",
+        "sourceId": "creative-demo",
+        "approval": "approved"
+      },
+      {
+        "id": "social-average",
+        "ref": {
+          "kind": "protected",
+          "assetId": "social-average",
+          "sha256": "6c090878e51a5737afe02720adb4905a0cb5d59c9b7b42bd772af9bc9ab8199e"
+        },
+        "alt": "Banco Pichincha. Tu saldo de hoy no siempre es tu saldo promedio. Ejemplo de un mes de 30 días: 15 días con S/ 3,000 y 15 días con S/ 1,000 dan un saldo promedio de S/ 2,000. Dos barras proporcionales comparan ambos saldos. Ejemplo aritmético, no simulación de intereses. Lámina 2 de 3.",
+        "width": 1080,
+        "height": 1350,
+        "credit": "Composición: Efeonce · propuesta editorial; marca Banco Pichincha",
+        "sourceId": "creative-demo",
+        "approval": "approved"
+      },
+      {
+        "id": "social-costs",
+        "ref": {
+          "kind": "protected",
+          "assetId": "social-costs",
+          "sha256": "6f20818b27c3a8d10c60f62730eaaff3cd071794b4d2082f8bdf19df78a33b79"
+        },
+        "alt": "Banco Pichincha. Sin mantenimiento no significa todo gratis. Mantenimiento: S/ 0. Esto es distinto de las operaciones, cuyas comisiones deben consultarse. Mira cómo usas tu cuenta. Revisa el tarifario y la cartilla antes de elegir. Lámina 3 de 3.",
+        "width": 1080,
+        "height": 1350,
+        "credit": "Composición: Efeonce · propuesta editorial; marca Banco Pichincha",
+        "sourceId": "creative-demo",
+        "approval": "approved"
+      },
+      {
+        "id": "social-story",
+        "ref": {
+          "kind": "protected",
+          "assetId": "social-story",
+          "sha256": "2f771d46efc180a9a3c31e79069633876c619443074d06d8c5b7fec55dfb6c26"
+        },
+        "alt": "Banco Pichincha. Antes de elegir: una cuenta, tres cosas por revisar. Moneda, saldo y costos. Fotografía real de unas manos usando un teléfono junto a un computador. Decide con la información completa. Lee la guía antes de abrir tu cuenta. Story de ejemplo; sin enlace de plataforma publicado.",
+        "width": 1080,
+        "height": 1920,
+        "credit": "Composición: Efeonce · propuesta editorial; marca Banco Pichincha",
+        "sourceId": "creative-demo",
+        "approval": "approved"
+      },
+      {
+        "id": "social-video",
+        "ref": {
+          "kind": "protected",
+          "assetId": "social-video",
+          "sha256": "e89c90420efa0bff1402ff057ffd22ee0fa50f211b145efa2083a4b3f5c18171"
+        },
+        "alt": "Tres pasos antes de abrir tu cuenta: define tu objetivo, compara condiciones y revisa documentos.",
+        "width": 720,
+        "height": 1280,
+        "credit": "Video: Efeonce · toma ilustrativa generada con Gemini Omni 1.1; textos y marca compuestos",
+        "sourceId": "omni-production",
+        "approval": "approved"
+      },
+      {
+        "id": "social-video-poster",
+        "ref": {
+          "kind": "protected",
+          "assetId": "social-video-poster",
+          "sha256": "b17ae35057be31d96d1a7f1f4d7c7934d50d7db8392a2ce5d70ac7e7336989f2"
+        },
+        "alt": "Antes de abrir tu cuenta. Tres pasos para decidir mejor.",
+        "width": 720,
+        "height": 1280,
+        "credit": "Composición: Efeonce · fotograma del video de muestra",
+        "sourceId": "omni-production",
         "approval": "approved"
       }
     ],
@@ -1239,104 +1363,146 @@
               "next": ""
             }
           ],
-          "atomsIntro": "Una pieza, varias formas de responder. Cada derivado mantiene el vínculo con su bloque de origen; publicación y resultados permanecen pendientes.",
+          "atomsIntro": "De una guía a piezas listas para revisar: tres láminas de feed, una Story y un video. Explora cada formato y vuelve al bloque que le dio origen.",
           "atoms": [
             {
-              "id": "social",
-              "coupleId": "lp-tabla",
               "sourceScope": "block",
-              "sourceStatus": "proposed",
-              "kind": "Pieza social",
-              "bornFrom": "De la tabla de condiciones de Ahorro Preferente",
-              "why": "Traslada una idea comprobable a un formato breve y devuelve a la pieza que explica sus condiciones.",
-              "honesty": "Copy y mockup demostrativo, no publicación ni campaña aprobada por el banco. Sin datos de alcance.",
+              "sourceStatus": "implemented",
+              "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Pendiente de revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+              "id": "social",
+              "kind": "Feed · Comparación",
+              "coupleId": "lp-tabla",
+              "bornFrom": "Del bloque de la pieza que explica esta decisión",
+              "why": "Una respuesta extensa se convierte en una entrada visual a la guía, conservando el mensaje y su vínculo con el contenido completo.",
               "post": {
-                "hook": "Una tasa se entiende mejor con sus condiciones.",
-                "body": "Antes de elegir una cuenta, mira la moneda, el saldo promedio al que aplica la tasa y el costo de las operaciones que usarás. En Ahorro Preferente, las condiciones deben leerse junto al tarifario y la cartilla vigentes. Sin mantenimiento no significa que todas las operaciones sean gratuitas.",
-                "cta": "Consulta las condiciones en el canal oficial.",
-                "alt": "Un hombre con camiseta azul sostiene billetes y un teléfono móvil en un entorno luminoso."
+                "hook": "Tu ahorro merece más que una tasa.",
+                "body": "Moneda, saldo y costos. Tres condiciones que conviene mirar juntas antes de elegir una cuenta.",
+                "cta": "Lee la guía completa antes de elegir tu cuenta.",
+                "imageAssetId": "social-compare",
+                "alt": "Banco Pichincha. Tu ahorro merece más que una tasa. Moneda, saldo y costos. Tres cosas que también importan. Fotografía de unas manos usando un teléfono junto a un computador. Mira el panorama completo. Cuenta de ahorros: guía para decidir. Lámina 1 de 3."
               },
               "deliverable": [
                 {
-                  "k": "Formato propuesto",
-                  "v": "Feed 1080×1350 e historia 1080×1920; componer sin recortar la fotografía ni tapar las manos."
+                  "k": "Formato producido",
+                  "v": "1080×1350 px · WebP"
                 },
                 {
-                  "k": "Copy completo",
-                  "v": "Una tasa se entiende mejor con sus condiciones. Antes de elegir una cuenta, mira la moneda, el saldo promedio al que aplica la tasa y el costo de las operaciones que usarás. En Ahorro Preferente, las condiciones deben leerse junto al tarifario y la cartilla vigentes. Sin mantenimiento no significa que todas las operaciones sean gratuitas."
-                },
-                {
-                  "k": "Fuente y fecha",
-                  "v": "https://www.pichincha.pe/sites/default/files/2026-07/Tarifario%20Ahorro%20Preferente%2016.07.26.pdf · consultada 30/09/2026"
+                  "k": "Composición",
+                  "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Banco Pichincha Perú."
                 },
                 {
                   "k": "Publicación",
-                  "v": "Pendiente de revisión editorial/financiera y autorización del banco."
+                  "v": "Muestra para revisión; no publicada en Instagram."
                 }
               ]
             },
             {
+              "sourceScope": "block",
+              "sourceStatus": "implemented",
+              "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Pendiente de revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
               "id": "video",
+              "kind": "Story + video",
               "coupleId": "lp-pasos",
-              "sourceScope": "block",
-              "sourceStatus": "proposed",
-              "kind": "Guion de video + adaptación Reel",
-              "bornFrom": "De los pasos de preparación para la apertura",
-              "why": "Explica una secuencia en voz y texto conservando el vínculo con la información completa.",
-              "honesty": "Guion y transcripción de ejemplo completos. No hay video ni Reel producido; no se simula reproductor, duración medida o publicación.",
+              "bornFrom": "Del bloque de la pieza que explica esta decisión",
+              "why": "La misma idea se adapta al consumo vertical. El video se entiende sin audio y devuelve a los requisitos explicados en la pieza.",
+              "post": {
+                "hook": "Antes de abrir tu cuenta.",
+                "body": "Define tu objetivo. Compara moneda, saldo y costos. Revisa la documentación en el canal oficial.",
+                "cta": "Lee la guía completa antes de elegir tu cuenta.",
+                "imageAssetId": "social-story",
+                "alt": "Banco Pichincha. Antes de elegir: una cuenta, tres cosas por revisar. Moneda, saldo y costos. Fotografía real de unas manos usando un teléfono junto a un computador. Decide con la información completa. Lee la guía antes de abrir tu cuenta. Story de ejemplo; sin enlace de plataforma publicado."
+              },
               "deliverable": [
                 {
-                  "k": "Título",
-                  "v": "Tres cosas que revisar antes de abrir tu cuenta"
+                  "k": "Formato producido",
+                  "v": "1080×1920 px · WebP"
                 },
                 {
-                  "k": "Formatos propuestos",
-                  "v": "Master 16:9 y adaptación vertical 9:16. Duración final sujeta a locución y montaje."
+                  "k": "Composición",
+                  "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Banco Pichincha Perú."
                 },
                 {
-                  "k": "Guion visual",
-                  "v": "Plano 1: título con la pregunta. Plano 2: moneda y condición de saldo en texto legible. Plano 3: lista de operaciones y documentación. Plano 4: cierre con enlace al canal oficial. Rodaje/material autorizado pendiente."
+                  "k": "Publicación",
+                  "v": "Muestra para revisión; no publicada en Instagram."
                 },
                 {
-                  "k": "Transcripción completa propuesta",
-                  "v": "¿Estás revisando una cuenta de ahorros? No te quedes sólo con la tasa. Primero, confirma la moneda. Segundo, mira el saldo promedio al que aplica. Tercero, revisa las comisiones de tus operaciones habituales. En Ahorro Preferente, consulta siempre el tarifario y la cartilla vigentes antes de contratar. Esta es una propuesta editorial de Efeonce; la apertura pertenece al canal oficial del banco."
+                  "k": "Video producido",
+                  "v": "MP4 H.264 · 720×1280 · 24 fps · 10 segundos · sin audio; controles y descarga disponibles."
                 },
                 {
-                  "k": "Accesibilidad",
-                  "v": "Subtítulos revisados a partir de esta transcripción; no se requiere audio para comprender las condiciones."
+                  "k": "Transcripción visual",
+                  "v": "Antes de abrir tu cuenta. Tres pasos para decidir mejor. Define tu objetivo: ¿para qué vas a usarla? Compara las condiciones: moneda, saldo y costos. Revisa los documentos: consulta el canal oficial. Decide con todo claro. Lee la guía completa."
+                }
+              ],
+              "reel": {
+                "assetId": "social-video",
+                "posterAssetId": "social-video-poster",
+                "alt": "Tres pasos antes de abrir tu cuenta: define tu objetivo, compara condiciones y revisa documentos.",
+                "label": "Video vertical · 10 segundos",
+                "title": "Tres pasos para decidir mejor",
+                "description": "Pieza vertical con toma ilustrativa generada y composición gráfica de Efeonce.",
+                "disclosure": "Ejemplo editorial de Efeonce. Toma generada con Gemini Omni 1.1; marca y textos compuestos por separado. No representa a una clienta real ni un testimonio del banco."
+              }
+            },
+            {
+              "sourceScope": "block",
+              "sourceStatus": "implemented",
+              "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Pendiente de revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+              "id": "imagenes",
+              "kind": "Feed · Saldo promedio",
+              "coupleId": "lp-condiciones-copy",
+              "bornFrom": "Del bloque de la pieza que explica esta decisión",
+              "why": "La gráfica mantiene proporción, unidades y período. Explica una condición de la cuenta sin convertir el ejemplo en una promesa de rentabilidad.",
+              "post": {
+                "hook": "Tu saldo de hoy no siempre es tu saldo promedio.",
+                "body": "En un mes de 30 días, 15 días con S/ 3,000 y 15 días con S/ 1,000 dan un promedio de S/ 2,000. Es un ejemplo aritmético, no una simulación de intereses.",
+                "cta": "Lee la guía completa antes de elegir tu cuenta.",
+                "imageAssetId": "social-average",
+                "alt": "Banco Pichincha. Tu saldo de hoy no siempre es tu saldo promedio. Ejemplo de un mes de 30 días: 15 días con S/ 3,000 y 15 días con S/ 1,000 dan un saldo promedio de S/ 2,000. Dos barras proporcionales comparan ambos saldos. Ejemplo aritmético, no simulación de intereses. Lámina 2 de 3."
+              },
+              "deliverable": [
+                {
+                  "k": "Formato producido",
+                  "v": "1080×1350 px · WebP"
+                },
+                {
+                  "k": "Composición",
+                  "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Banco Pichincha Perú."
+                },
+                {
+                  "k": "Publicación",
+                  "v": "Muestra para revisión; no publicada en Instagram."
                 }
               ]
             },
             {
-              "id": "imagenes",
-              "coupleId": "landing-banner-block",
               "sourceScope": "block",
-              "sourceStatus": "proposed",
-              "kind": "Fotografía y adaptaciones",
-              "bornFrom": "Del banner de esta pieza",
-              "why": "La referencia visual oficial se conserva con autoría y un ALT que describe la imagen.",
-              "honesty": "Recurso oficial utilizado como referencia en esta muestra compartida por enlace; no es una fotografía producida por Efeonce ni una aprobación bancaria.",
-              "showsImages": true,
+              "sourceStatus": "implemented",
+              "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Pendiente de revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+              "id": "social-costos",
+              "kind": "Feed · Comisiones",
+              "coupleId": "lp-faq",
+              "bornFrom": "Del bloque de la pieza que explica esta decisión",
+              "why": "La pieza corrige una interpretación frecuente y conduce al bloque que explica el alcance de la condición comercial.",
+              "post": {
+                "hook": "Sin mantenimiento no significa todo gratis.",
+                "body": "El mantenimiento y el costo de las operaciones son conceptos distintos. Revisa los que correspondan a la forma en que usarás tu cuenta.",
+                "cta": "Lee la guía completa antes de elegir tu cuenta.",
+                "imageAssetId": "social-costs",
+                "alt": "Banco Pichincha. Sin mantenimiento no significa todo gratis. Mantenimiento: S/ 0. Esto es distinto de las operaciones, cuyas comisiones deben consultarse. Mira cómo usas tu cuenta. Revisa el tarifario y la cartilla antes de elegir. Lámina 3 de 3."
+              },
               "deliverable": [
                 {
-                  "k": "Original",
-                  "v": "Banco Pichincha · ahorros.webp · 1280×536 px · https://www.pichincha.pe/sites/default/files/2025-08/ahorros.webp"
+                  "k": "Formato producido",
+                  "v": "1080×1350 px · WebP"
                 },
                 {
-                  "k": "Texto alternativo",
-                  "v": "Un hombre con camiseta azul sostiene billetes y un teléfono móvil en un entorno luminoso."
+                  "k": "Composición",
+                  "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Banco Pichincha Perú."
                 },
                 {
-                  "k": "Uso y procedencia",
-                  "v": "Recurso del sitio oficial utilizado como referencia visual en muestra compartida por enlace, consultado el 30/09/2026. No acredita autorización de publicación externa ni aprobación del banco."
-                },
-                {
-                  "k": "Integridad",
-                  "v": "SHA-256 e943b7fd7edfc3bed941ff0a1e14f763667e32f697ed110a386844de291b442d"
-                },
-                {
-                  "k": "Adaptación",
-                  "v": "WebP de entrega con dimensiones originales 1280×536; hash corresponde a landing-ahorro-v1.webp. Cada composición debe verificar encuadre, rostro, manos y legibilidad; las adaptaciones sociales no están producidas."
+                  "k": "Publicación",
+                  "v": "Muestra para revisión; no publicada en Instagram."
                 }
               ]
             }
@@ -1412,8 +1578,8 @@
             "schemaNote": "JSON-LD propuesto, mostrado como texto. No se emite en esta muestra ni acredita una publicación del banco.",
             "sourceLabel": "Fuente",
             "thesisLabel": "Por qué existe esta pieza",
-            "licenseTitle": "Fotografía real y licencia",
-            "licenseNote": "Banner y marca procedentes del sitio oficial de Banco Pichincha, utilizados como referencia en esta muestra compartida por enlace. No son producción fotográfica de Efeonce ni implican aprobación bancaria o autorización de publicación externa.",
+            "licenseTitle": "Imágenes, diseño y procedencia",
+            "licenseNote": "Fotografía de Anete Lusina/Pexels y recursos oficiales de Banco Pichincha, con fuentes verificadas. Banners y derivados compuestos por Efeonce para esta muestra. No representan testimonios ni aprobación del banco.",
             "backToArticle": "Volver a la pieza",
             "bylineBy": "Por",
             "readTime": "min de lectura",
@@ -1516,6 +1682,16 @@
             "kind": "paragraph"
           },
           {
+            "id": "art-banner-compare",
+            "kind": "image",
+            "role": "body",
+            "assetId": "banner-compare",
+            "caption": "Moneda, saldo promedio y costos: compara las condiciones juntas.",
+            "sourceIds": [
+              "creative-demo"
+            ]
+          },
+          {
             "id": "art-saldo",
             "level": 2,
             "text": "¿Por qué importa el saldo promedio mensual?",
@@ -1605,6 +1781,16 @@
             "id": "art-apertura-body",
             "text": "Antes de empezar, abre el sitio oficial desde una dirección que hayas comprobado. Evita hacer el proceso con prisa o desde un enlace que no puedas identificar. Durante la lectura, detente donde aparezca algo que no entiendes y utiliza los canales de consulta del banco. Al terminar, guarda la confirmación y la documentación recibida en un lugar al que puedas volver. Completar un formulario no sustituye esa revisión.",
             "kind": "paragraph"
+          },
+          {
+            "id": "art-banner-prepare",
+            "kind": "image",
+            "role": "body",
+            "assetId": "banner-prepare",
+            "caption": "Confirma los documentos y requisitos en el canal oficial antes de iniciar.",
+            "sourceIds": [
+              "creative-demo"
+            ]
           },
           {
             "id": "art-respaldo",
@@ -2007,6 +2193,36 @@
             "sourceIds": [
               "product"
             ]
+          },
+          {
+            "id": "ann-art-banner-compare",
+            "scope": "block",
+            "blockId": "art-banner-compare",
+            "category": "on-page",
+            "title": "Un apoyo visual en el momento de decisión",
+            "explanation": "El banner refuerza la idea del pasaje sin sustituir el texto. La imagen conserva dimensiones explícitas, texto alternativo y carga diferida; la explicación y las condiciones siguen disponibles en HTML.",
+            "status": "implemented",
+            "sourceIds": [],
+            "evidence": {
+              "description": "Banner editorial renderizado en la muestra, con dimensiones y ALT. No acredita publicación en el sitio del banco ni impacto de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
+          },
+          {
+            "id": "ann-art-banner-prepare",
+            "scope": "block",
+            "blockId": "art-banner-prepare",
+            "category": "on-page",
+            "title": "Un apoyo visual en el momento de decisión",
+            "explanation": "El banner refuerza la idea del pasaje sin sustituir el texto. La imagen conserva dimensiones explícitas, texto alternativo y carga diferida; la explicación y las condiciones siguen disponibles en HTML.",
+            "status": "implemented",
+            "sourceIds": [],
+            "evidence": {
+              "description": "Banner editorial renderizado en la muestra, con dimensiones y ALT. No acredita publicación en el sitio del banco ni impacto de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
           }
         ],
         "seo": {
@@ -2228,6 +2444,20 @@
                 "sourceStatus": "proposed",
                 "alt": "Manos de una persona que consulta un teléfono móvil junto a un computador portátil.",
                 "why": "Descripción observable de la fotografía; no inventa nacionalidad, actividad bancaria o relación comercial."
+              },
+              {
+                "coupleId": "art-banner-compare",
+                "alt": "Ahorra con las condiciones a la vista. Compara moneda, saldo y costos.",
+                "why": "El ALT comunica el mensaje esencial del banner; la explicación permanece en texto visible.",
+                "sourceScope": "block",
+                "sourceStatus": "implemented"
+              },
+              {
+                "coupleId": "art-banner-prepare",
+                "alt": "Antes de abrirla, haz buenas preguntas. Documentos, condiciones y canal oficial. Fotografía de unas manos usando un teléfono.",
+                "why": "El ALT comunica el mensaje esencial del banner; la explicación permanece en texto visible.",
+                "sourceScope": "block",
+                "sourceStatus": "implemented"
               }
             ],
             "jsonld": [
@@ -2622,6 +2852,26 @@
                 "tier": 2,
                 "source": "Cuenta de Ahorros Preferente · Banco Pichincha",
                 "asOf": "2026-09-30"
+              },
+              {
+                "id": "ann-art-banner-compare",
+                "coupleId": "art-banner-compare",
+                "sourceScope": "block",
+                "sourceStatus": "implemented",
+                "label": "Un apoyo visual en el momento de decisión",
+                "detail": "SEO on-page",
+                "why": "El banner refuerza la idea del pasaje sin sustituir el texto. La imagen conserva dimensiones explícitas, texto alternativo y carga diferida; la explicación y las condiciones siguen disponibles en HTML.",
+                "tier": 2
+              },
+              {
+                "id": "ann-art-banner-prepare",
+                "coupleId": "art-banner-prepare",
+                "sourceScope": "block",
+                "sourceStatus": "implemented",
+                "label": "Un apoyo visual en el momento de decisión",
+                "detail": "SEO on-page",
+                "why": "El banner refuerza la idea del pasaje sin sustituir el texto. La imagen conserva dimensiones explícitas, texto alternativo y carga diferida; la explicación y las condiciones siguen disponibles en HTML.",
+                "tier": 2
               }
             ]
           },
@@ -2647,100 +2897,146 @@
               "next": ""
             }
           ],
-          "atomsIntro": "Una pieza, varias formas de responder. Cada derivado mantiene el vínculo con su bloque de origen; publicación y resultados permanecen pendientes.",
+          "atomsIntro": "De una guía a piezas listas para revisar: tres láminas de feed, una Story y un video. Explora cada formato y vuelve al bloque que le dio origen.",
           "atoms": [
             {
-              "id": "social",
-              "coupleId": "art-saldo-answer",
               "sourceScope": "block",
-              "sourceStatus": "proposed",
-              "kind": "Pieza social",
-              "bornFrom": "De la explicación del saldo promedio mensual",
-              "why": "Traslada una idea comprobable a un formato breve y devuelve a la pieza que explica sus condiciones.",
-              "honesty": "Copy y mockup demostrativo, no publicación ni campaña aprobada por el banco. Sin datos de alcance.",
+              "sourceStatus": "implemented",
+              "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Pendiente de revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+              "id": "social",
+              "kind": "Feed · Comparación",
+              "coupleId": "article-answer",
+              "bornFrom": "Del bloque de la pieza que explica esta decisión",
+              "why": "Una respuesta extensa se convierte en una entrada visual a la guía, conservando el mensaje y su vínculo con el contenido completo.",
               "post": {
-                "hook": "Tu saldo de hoy no siempre es tu saldo promedio.",
-                "body": "Si mantienes S/ 3,000 durante 15 días y S/ 1,000 durante los otros 15, el promedio de ese mes de 30 días es S/ 2,000. Es un ejemplo aritmético, no una simulación de intereses. Antes de comparar tasas, revisa qué saldo exige cada una y qué dinero esperas mantener.",
-                "cta": "Lee la guía antes de elegir tu cuenta.",
-                "alt": "Manos de una persona que consulta un teléfono móvil junto a un computador portátil."
+                "hook": "Tu ahorro merece más que una tasa.",
+                "body": "Moneda, saldo y costos. Tres condiciones que conviene mirar juntas antes de elegir una cuenta.",
+                "cta": "Lee la guía completa antes de elegir tu cuenta.",
+                "imageAssetId": "social-compare",
+                "alt": "Banco Pichincha. Tu ahorro merece más que una tasa. Moneda, saldo y costos. Tres cosas que también importan. Fotografía de unas manos usando un teléfono junto a un computador. Mira el panorama completo. Cuenta de ahorros: guía para decidir. Lámina 1 de 3."
               },
               "deliverable": [
                 {
-                  "k": "Formato propuesto",
-                  "v": "Feed 1080×1350 e historia 1080×1920; componer sin recortar la fotografía ni tapar las manos."
+                  "k": "Formato producido",
+                  "v": "1080×1350 px · WebP"
                 },
                 {
-                  "k": "Copy completo",
-                  "v": "Tu saldo de hoy no siempre es tu saldo promedio. Si mantienes S/ 3,000 durante 15 días y S/ 1,000 durante los otros 15, el promedio de ese mes de 30 días es S/ 2,000. Es un ejemplo aritmético, no una simulación de intereses. Antes de comparar tasas, revisa qué saldo exige cada una y qué dinero esperas mantener."
-                },
-                {
-                  "k": "Fuente y fecha",
-                  "v": "https://www.pichincha.pe/sites/default/files/2026-07/Tarifario%20Ahorro%20Preferente%2016.07.26.pdf · consultada 30/09/2026"
+                  "k": "Composición",
+                  "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Banco Pichincha Perú."
                 },
                 {
                   "k": "Publicación",
-                  "v": "Pendiente de revisión editorial/financiera y autorización del banco."
+                  "v": "Muestra para revisión; no publicada en Instagram."
                 }
               ]
             },
             {
+              "sourceScope": "block",
+              "sourceStatus": "implemented",
+              "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Pendiente de revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
               "id": "video",
+              "kind": "Story + video",
               "coupleId": "art-apertura-answer",
-              "sourceScope": "block",
-              "sourceStatus": "proposed",
-              "kind": "Guion de video + adaptación Reel",
-              "bornFrom": "De los pasos de preparación para la apertura",
-              "why": "Explica una secuencia en voz y texto conservando el vínculo con la información completa.",
-              "honesty": "Guion y transcripción de ejemplo completos. No hay video ni Reel producido; no se simula reproductor, duración medida o publicación.",
+              "bornFrom": "Del bloque de la pieza que explica esta decisión",
+              "why": "La misma idea se adapta al consumo vertical. El video se entiende sin audio y devuelve a los requisitos explicados en la pieza.",
+              "post": {
+                "hook": "Antes de abrir tu cuenta.",
+                "body": "Define tu objetivo. Compara moneda, saldo y costos. Revisa la documentación en el canal oficial.",
+                "cta": "Lee la guía completa antes de elegir tu cuenta.",
+                "imageAssetId": "social-story",
+                "alt": "Banco Pichincha. Antes de elegir: una cuenta, tres cosas por revisar. Moneda, saldo y costos. Fotografía real de unas manos usando un teléfono junto a un computador. Decide con la información completa. Lee la guía antes de abrir tu cuenta. Story de ejemplo; sin enlace de plataforma publicado."
+              },
               "deliverable": [
                 {
-                  "k": "Título",
-                  "v": "Tres cosas que revisar antes de abrir tu cuenta"
+                  "k": "Formato producido",
+                  "v": "1080×1920 px · WebP"
                 },
                 {
-                  "k": "Formatos propuestos",
-                  "v": "Master 16:9 y adaptación vertical 9:16. Duración final sujeta a locución y montaje."
+                  "k": "Composición",
+                  "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Banco Pichincha Perú."
                 },
                 {
-                  "k": "Guion visual",
-                  "v": "Plano 1: título con la pregunta. Plano 2: moneda y condición de saldo en texto legible. Plano 3: lista de operaciones y documentación. Plano 4: cierre con enlace al canal oficial. Rodaje/material autorizado pendiente."
+                  "k": "Publicación",
+                  "v": "Muestra para revisión; no publicada en Instagram."
                 },
                 {
-                  "k": "Transcripción completa propuesta",
-                  "v": "Antes de abrir una cuenta online, haz tres comprobaciones. Define para qué vas a usarla. Compara la tasa con la moneda, el saldo promedio y los costos que te corresponden. Después revisa los documentos y la validación que pide el canal oficial. Elegir una cuenta empieza por entender sus condiciones. Esta guía es una propuesta editorial de Efeonce, no asesoría personalizada ni un canal de apertura."
+                  "k": "Video producido",
+                  "v": "MP4 H.264 · 720×1280 · 24 fps · 10 segundos · sin audio; controles y descarga disponibles."
                 },
                 {
-                  "k": "Accesibilidad",
-                  "v": "Subtítulos revisados a partir de esta transcripción; no se requiere audio para comprender las condiciones."
+                  "k": "Transcripción visual",
+                  "v": "Antes de abrir tu cuenta. Tres pasos para decidir mejor. Define tu objetivo: ¿para qué vas a usarla? Compara las condiciones: moneda, saldo y costos. Revisa los documentos: consulta el canal oficial. Decide con todo claro. Lee la guía completa."
+                }
+              ],
+              "reel": {
+                "assetId": "social-video",
+                "posterAssetId": "social-video-poster",
+                "alt": "Tres pasos antes de abrir tu cuenta: define tu objetivo, compara condiciones y revisa documentos.",
+                "label": "Video vertical · 10 segundos",
+                "title": "Tres pasos para decidir mejor",
+                "description": "Pieza vertical con toma ilustrativa generada y composición gráfica de Efeonce.",
+                "disclosure": "Ejemplo editorial de Efeonce. Toma generada con Gemini Omni 1.1; marca y textos compuestos por separado. No representa a una clienta real ni un testimonio del banco."
+              }
+            },
+            {
+              "sourceScope": "block",
+              "sourceStatus": "implemented",
+              "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Pendiente de revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+              "id": "imagenes",
+              "kind": "Feed · Saldo promedio",
+              "coupleId": "art-saldo-answer",
+              "bornFrom": "Del bloque de la pieza que explica esta decisión",
+              "why": "La gráfica mantiene proporción, unidades y período. Explica una condición de la cuenta sin convertir el ejemplo en una promesa de rentabilidad.",
+              "post": {
+                "hook": "Tu saldo de hoy no siempre es tu saldo promedio.",
+                "body": "En un mes de 30 días, 15 días con S/ 3,000 y 15 días con S/ 1,000 dan un promedio de S/ 2,000. Es un ejemplo aritmético, no una simulación de intereses.",
+                "cta": "Lee la guía completa antes de elegir tu cuenta.",
+                "imageAssetId": "social-average",
+                "alt": "Banco Pichincha. Tu saldo de hoy no siempre es tu saldo promedio. Ejemplo de un mes de 30 días: 15 días con S/ 3,000 y 15 días con S/ 1,000 dan un saldo promedio de S/ 2,000. Dos barras proporcionales comparan ambos saldos. Ejemplo aritmético, no simulación de intereses. Lámina 2 de 3."
+              },
+              "deliverable": [
+                {
+                  "k": "Formato producido",
+                  "v": "1080×1350 px · WebP"
+                },
+                {
+                  "k": "Composición",
+                  "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Banco Pichincha Perú."
+                },
+                {
+                  "k": "Publicación",
+                  "v": "Muestra para revisión; no publicada en Instagram."
                 }
               ]
             },
             {
-              "id": "imagenes",
-              "coupleId": "article-banner-block",
               "sourceScope": "block",
-              "sourceStatus": "proposed",
-              "kind": "Fotografía y adaptaciones",
-              "bornFrom": "Del banner de esta pieza",
-              "why": "Mantiene la misma fotografía con autoría y ALT a través de página, vista previa y derivados.",
-              "honesty": "Una fotografía real seleccionada por pieza. Adaptaciones adicionales pendientes; no se presentan como un pack ya producido.",
-              "showsImages": true,
+              "sourceStatus": "implemented",
+              "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Pendiente de revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+              "id": "social-costos",
+              "kind": "Feed · Comisiones",
+              "coupleId": "art-costos-answer",
+              "bornFrom": "Del bloque de la pieza que explica esta decisión",
+              "why": "La pieza corrige una interpretación frecuente y conduce al bloque que explica el alcance de la condición comercial.",
+              "post": {
+                "hook": "Sin mantenimiento no significa todo gratis.",
+                "body": "El mantenimiento y el costo de las operaciones son conceptos distintos. Revisa los que correspondan a la forma en que usarás tu cuenta.",
+                "cta": "Lee la guía completa antes de elegir tu cuenta.",
+                "imageAssetId": "social-costs",
+                "alt": "Banco Pichincha. Sin mantenimiento no significa todo gratis. Mantenimiento: S/ 0. Esto es distinto de las operaciones, cuyas comisiones deben consultarse. Mira cómo usas tu cuenta. Revisa el tarifario y la cartilla antes de elegir. Lámina 3 de 3."
+              },
               "deliverable": [
                 {
-                  "k": "Original",
-                  "v": "Anete Lusina/Pexels 5239740, 5249×3504"
+                  "k": "Formato producido",
+                  "v": "1080×1350 px · WebP"
                 },
                 {
-                  "k": "Texto alternativo",
-                  "v": "Manos de una persona que consulta un teléfono móvil junto a un computador portátil."
+                  "k": "Composición",
+                  "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Banco Pichincha Perú."
                 },
                 {
-                  "k": "Licencia",
-                  "v": "https://www.pexels.com/license/ · verificada 30/09/2026; no implica respaldo del modelo."
-                },
-                {
-                  "k": "Adaptación",
-                  "v": "WebP sin recorte para web. Preservar mano y móvil en cualquier derivado; revisión de composición por formato."
+                  "k": "Publicación",
+                  "v": "Muestra para revisión; no publicada en Instagram."
                 }
               ]
             }
@@ -2821,8 +3117,8 @@
             "schemaNote": "JSON-LD propuesto, mostrado como texto. No se emite en esta muestra ni acredita una publicación del banco.",
             "sourceLabel": "Fuente",
             "thesisLabel": "Por qué existe esta pieza",
-            "licenseTitle": "Fotografía real y licencia",
-            "licenseNote": "Fotografías de Anete Lusina en Pexels, con fuente y licencia verificadas el 30/09/2026. Son imágenes de stock; no testimonios, clientes identificados ni respaldo del banco.",
+            "licenseTitle": "Imágenes, diseño y procedencia",
+            "licenseNote": "Fotografía de Anete Lusina/Pexels y recursos oficiales de Banco Pichincha, con fuentes verificadas. Banners y derivados compuestos por Efeonce para esta muestra. No representan testimonios ni aprobación del banco.",
             "backToArticle": "Volver a la pieza",
             "bylineBy": "Por",
             "readTime": "min de lectura",
@@ -3001,8 +3297,16 @@
     ]
   },
   "assets": {
-    "bank-logo": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/pichincha-logo.webp",
+    "bank-logo": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/pichincha-logo.svg",
     "landing-banner": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/landing-ahorro-v1.webp",
-    "article-banner": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/blog-elegir-cuenta-v1.webp"
+    "article-banner": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/blog-elegir-cuenta-v1.webp",
+    "banner-compare": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/banner-comparar.webp",
+    "banner-prepare": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/banner-apertura.webp",
+    "social-compare": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/pichincha-social-01-compara.webp",
+    "social-average": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/pichincha-social-02-promedio.webp",
+    "social-costs": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/pichincha-social-03-costos.webp",
+    "social-story": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/pichincha-story-01-guia.webp",
+    "social-video": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/pichincha-tres-pasos.mp4",
+    "social-video-poster": "/aeo-xray-media/sample_c07PVgg3mCHfzA79E6259bJrWpToLfVW/pichincha-video-poster.webp"
   }
 }

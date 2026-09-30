@@ -122,7 +122,7 @@ check(
    es que una cifra sin fuente es una opinión con números. El schema ya lo obliga (`source` +
    `asOf` en cada átomo); esto verifica que además se RENDERICE — un dato obligatorio que no
    se pinta no le sirve de nada al evaluador que lo quiere comprobar. */
-const atomCards = (pages.atomizacion.match(/<article class="atom"/g) ?? []).length
+const atomCards = (pages.atomizacion.match(/<article class="atom(?:\s[^"]*)?"/g) ?? []).length
 const atomCites = (pages.atomizacion.match(/<cite class="atom-cite"/g) ?? []).length
 check(
   '42b. Cada cifra de la atomización (④) se muestra con su fuente y su fecha',

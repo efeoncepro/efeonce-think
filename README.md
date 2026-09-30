@@ -169,7 +169,9 @@ build** en vez de publicar una muestra que promete rigor y no lo tiene.
    cuya tesis es el rigor técnico. El assert 1 del verify **falla el gate** si aparece uno solo.
 2. **`noindex` + fuera del sitemap** (el `filter` vive en `astro.config.mjs`).
 3. **Rótulo persistente** "Ejemplo ilustrativo de Efeonce": niega autoría **y** alojamiento.
-4. **Cero imágenes generadas con IA.** Licencia verificable + crédito visible.
+4. **Procedencia verificable + crédito visible.** El caso original usa fotografía licenciada.
+   Una composición nueva sólo incorpora material generativo con autorización del operador
+   y disclosure; nunca lo presenta como fotografía documental o testimonio real.
 5. **Nunca prometer el rich snippet de FAQ de Google** (restringido desde 2023 a gov/salud).
 6. **Cero cifras sin fuente y sin `as-of`.**
 7. **La URL lleva token: `/muestras/<slug>-<token>`.** Sin él es adivinable — quien recibe
@@ -188,7 +190,7 @@ analytics. No es autenticación: quien recibe el enlace puede abrirlo y sus imá
 
 Para otro cliente: generar y validar el manifest con el kit de composición, agregar un JSON en
 `src/lib/aeo-xray/published/` con `key` aleatoria estable, `editionId`, `model` y mapa `assets`,
-y registrarlo en `published.ts`. Copiar únicamente las imágenes aprobadas a
+y registrarlo en `published.ts`. Copiar únicamente los archivos finales autorizados a
 `public/aeo-xray-media/<key>/`. No se modifica la UI. Para retirar una muestra, quitar su
 entrada y sus imágenes y volver a desplegar; esta modalidad no ofrece revocación central.
 El carril futuro `xrg_*` conserva su contrato separado con Greenhouse.
@@ -220,3 +222,26 @@ Antes de publicar cambios al recorrido, ejecutar también con `XRAY_VERIFY_TOKEN
 `node scripts/verify-aeo-xray-motion.mjs` (movimiento real, no sólo presencia de CSS) y
 `node scripts/verify-aeo-xray-value.mjs` (pregunta, respuesta, fuente, bloque y módulos).
 Las capturas y trazas quedan en `.captures/aeo-xray-motion` y `.captures/aeo-xray-value`.
+
+### Marca y producción de derivados
+
+El header toma el logo de `brand.logoAssetId`; la atribución de la demostración vive en el
+footer. Los banners del artículo son bloques de imagen con proporción intrínseca, crédito,
+fuente y anotación. Los assets cuyo crédito comienza con `Composición:` se muestran como
+«Diseño» en lugar de «Foto».
+
+`SocialShowcase.astro` presenta todos los elementos de `experience.atoms`, sin un límite fijo
+de tres. `post.imageAssetId` proporciona una gráfica; `reel` incorpora el video y su poster.
+El componente incluye pestañas accesibles, ampliación, descarga y reproducción controlada,
+conservando el enlace al bloque de origen y el detalle de producción. Sin JavaScript muestra
+todos los formatos. Cambiar de formato o de página pausa el video.
+
+La muestra Pichincha contiene tres piezas de feed, una Story, un video de diez segundos y
+dos banners contextuales. Los masters, editables, referencias, prompt, consumo y procedencia
+quedan fuera del repositorio en `Banco Pichincha Peru — Prospect Case/06-Social-production`,
+`07-Video-production` y `08-Article-banners`; Think distribuye únicamente las entregas.
+
+Gate de medios: `XRAY_VERIFY_TOKEN=<key> node scripts/verify-aeo-xray-media.mjs`.
+Verifica carga y proporción de banners, formatos, ampliación, teclado, video real, pausa,
+origen, no-JS y ausencia de overflow a1440/390/320. Las capturas quedan en
+`.captures/aeo-xray-media`. La revisión visual de esas capturas sigue siendo necesaria.
