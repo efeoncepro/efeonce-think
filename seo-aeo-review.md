@@ -43,6 +43,7 @@ La aprobación y datos del cliente son insumos para esa fase; no impiden mostrar
 - 19 pruebas del contrato, aislamiento, transporte, referencias y activos aprobados.
 - 198 comprobaciones de los cuatro pasos y dos piezas en 1440, 390 y 320 px, incluidos privacidad, HTML sin JS, imágenes y navegación.
 - 113 comprobaciones de medios y reproducción desde gesto del usuario.
+- 46 comprobaciones del X-Ray original: se actualizó el selector de la prueba de separación tipográfica para el rótulo actual de cabecera, sin relajar la aserción. La captura desktop legacy también fue revisada.
 - Astro check: 0 errores, 0 warnings; 15 hints preexistentes. Build completo.
 - Revisión directa en navegador: prueba de keyword con fecha/método, decisiones específicas, plan por URL, condición de tasas, retorno de foco y estado expandido, enlace social `#delivery-2`, ausencia de overflow a 390 px.
 - 25 comprobaciones de motion y navegación pasaron en la corrida final, registrada en `.captures/aeo-xray-motion/verification.json`; el primer intento coincidió con cambios del servidor de desarrollo y agotó la espera de la transición. No se usa como evidencia de aprobación.

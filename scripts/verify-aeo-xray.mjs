@@ -520,7 +520,7 @@ try {
 
     return {
       articulo: ['.p-h1', '.p-h2', '.para', '.cap p'].map(fam),
-      efeonce: ['.stat', '.nd-v', '.xr-brand-t', '.sp-head h2'].map(fam),
+      efeonce: ['.stat', '.nd-v', '.xr-edition-description', '.sp-head h2'].map(fam),
     }
   })
   check(
