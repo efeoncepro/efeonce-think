@@ -19,6 +19,8 @@ try{
   check(name+' both official brands and URL loaded',await page.locator('[data-xray-curtain] img').evaluateAll(imgs=>imgs.length===3&&imgs.every(i=>i.complete&&i.naturalWidth>0)))
   check(name+' search sequence waits for entrance',await page.locator('[data-op-demo]').getAttribute('data-phase')==='complete')
   await page.screenshot({path:`${out}/${name}-closed.png`})
+  // Exercise the seconds serialization emitted by the production CSS optimizer.
+  if(name==='compact')await page.addStyleTag({content:':root{--xr-motion-curtain:1.4s!important}'})
   await page.locator('[data-xray-curtain] button').click()
   await page.waitForTimeout(180)
   check(name+' curtain actually moves upward',await page.locator('[data-xray-curtain]').evaluate(d=>{const r=d.getBoundingClientRect();return r.top<0&&r.bottom>0}))
