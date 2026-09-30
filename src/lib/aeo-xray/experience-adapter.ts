@@ -45,14 +45,19 @@ export function adaptExperience(model: AxisAeoXrayManifest, artifact: AxisAeoXra
   })
   const m=x.machine
   // Empty coupling means page/site scope, never a fabricated relationship to the hero.
-  const node = (n:typeof m.seo[number]) => ({...n,coupleId:n.coupleId??'',id:n.id??'',label:n.label??'',value:n.value??'',why:n.why??'',tier:n.tier??3 as 1|2|3})
+  const node = (n:typeof m.seo[number]) => {
+    const annotation=artifact.annotations.find(a=>a.id===n.id)
+    const proof=annotation?.evidence
+    return {...n,coupleId:n.coupleId??'',id:n.id??'',label:n.label??'',value:n.value??'',why:n.why??'',tier:n.tier??3 as 1|2|3,
+      sourceEvidence:proof?{description:proof.description,asOf:proof.asOf,sources:model.sources.filter(s=>proof.sourceIds.includes(s.id)).map(s=>({label:s.label,url:s.url}))}:undefined}
+  }
   const media = (v: NonNullable<typeof x.atoms[number]['video']>) => ({...v,src:assetHref(asset(v.assetId)),poster:assetHref(asset(v.posterAssetId))})
   return {
     token:'',
     client:{bodyFont:model.tokens.fonts[model.brand?.fontFamily??'system-sans'],name:model.brand?.name??model.preparedFor,legalName:model.preparedFor,site:new URL(artifact.seo.canonical).origin,accent:model.brand?.ink??model.tokens.canvas.ink,font:{family:model.tokens.fonts[model.brand?.displayFontFamily??'system-serif'],titleWeight:700,bodyWeight:400}},
     meta:{instrument:'AEO X-Ray',sampleFor:model.preparedFor,sampleTitle:artifact.title,kicker:'Una muestra de nuestro trabajo',preparedAt:model.preparedAt,preparedBy:'Efeonce',...x.meta},
     thesis:x.thesis,gap:x.gap,flow:x.flow,atomsIntro:x.atomsIntro,
-    article:{proposedUrl:artifact.seo.canonical,category:artifact.blocks.find(b=>b.kind==='hero')?.eyebrow??(artifact.kind==='article'?'Artículo':'Página'),author:artifact.byline?.author??'Efeonce',publishedAt:(artifact.byline?.publishedAt??model.preparedAt).slice(0,10),blocks},
+    article:{proposedUrl:artifact.seo.canonical,category:artifact.blocks.find(b=>b.kind==='hero')?.eyebrow??(artifact.kind==='article'?'Artículo':'Página'),author:artifact.byline?.author??'Efeonce',reviewer:artifact.byline?.reviewer,publishedAt:(artifact.byline?.publishedAt??model.preparedAt).slice(0,10),blocks},
     machine:{seo:m.seo.map(node),og:m.og.map(node),headings:{...m.headings,coupleId:m.headings.coupleId??'',tree:m.headings.tree.map(h=>({...h,coupleId:h.coupleId??''}))},alts:m.alts.map(a=>({...a,coupleId:a.coupleId??''})),jsonld:m.jsonld.map(n=>({...node(n),type:n.type??'',metric:n.metric??'',code:n.code??{}})),craft:m.craft.map(n=>({...node(n),detail:n.detail??''}))},
     evidence:{...x.evidence,facts:x.evidence.facts.map(f=>({...f,coupleId:f.coupleId??''}))},
     atoms:x.atoms.map(a=>({...a,coupleId:a.coupleId??'',stat:a.stat??'',statNote:a.statNote??'',source:a.source??'',asOf:a.asOf??'',video:a.video?media(a.video):undefined,reel:a.reel?media(a.reel):undefined,post:a.post?{...a.post,image:a.post.imageAssetId?image(a.post.imageAssetId):undefined}:undefined})),

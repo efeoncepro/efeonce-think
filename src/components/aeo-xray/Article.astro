@@ -1,6 +1,7 @@
 ---
 import Image from './SampleImage.astro'
 import SpecimenHeader from './SpecimenHeader.astro'
+import {xrayCopy as C} from '@/lib/aeo-xray/copy'
 import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
 import {experienceHref} from '@/lib/aeo-xray/experience-adapter'
 import type { RenderSample } from '@/lib/aeo-xray/render-model'
@@ -221,6 +222,7 @@ const probeFor = (id: string) => {
               <span class="dot" aria-hidden="true">·</span>
               {readMin} {ui.readTime}
             </p>
+            {composition && <p class="editorial-review">{article.reviewer ? <>{C.reviewedBy} <b>{article.reviewer}</b></> : C.review}</p>}
           </div>
         )
       if (b.type === 'paragraph') return <div class="blk" {...a}><p class="para">{b.text}</p>{probe && <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probe}</button>}</div>
@@ -598,6 +600,7 @@ const probeFor = (id: string) => {
     margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line);
     font-size: 0.9375rem; color: var(--muted);
   }
+  .editorial-review {font:500 .75rem/1.6 var(--font-sans);color:var(--ink-3);margin:.45rem 0 0;max-width:65ch;}
   .byline b { color: var(--ink); font-weight: var(--w-client-title); }
   .byline .dot { color: var(--line-2); }
 

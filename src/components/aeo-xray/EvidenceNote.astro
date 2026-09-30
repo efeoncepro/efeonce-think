@@ -1,0 +1,23 @@
+---
+import {ChevronDown,ArrowUpRight} from '@lucide/astro'
+import type {RenderEvidence} from '@/lib/aeo-xray/render-model'
+import {xrayCopy as C} from '@/lib/aeo-xray/copy'
+interface Props {evidence:RenderEvidence}
+const {evidence}=Astro.props
+---
+<details class="proof-note">
+  <summary>{C.proof.title}<ChevronDown size={15}/></summary>
+  <div class="proof-body">
+    <p class="proof-date">{C.proof.date}: <time datetime={evidence.asOf}>{evidence.asOf}</time></p>
+    <p>{evidence.description}</p>
+    {evidence.sources.map(s=><a href={s.url} data-astro-prefetch="false" target="_blank" rel="noopener noreferrer">{s.label}<ArrowUpRight size={14}/></a>)}
+  </div>
+</details>
+<style>
+.proof-note{margin-top:.9rem;border-top:1px solid var(--line-d);font:400 .78rem/1.65 var(--font-sans);color:var(--dim-d);overflow-wrap:anywhere}
+.proof-note>summary{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.65rem 0;cursor:pointer;list-style:none;color:var(--ink-d);font-weight:500}
+.proof-note>summary::-webkit-details-marker{display:none}.proof-note svg{flex-shrink:0}.proof-note[open]>summary svg{transform:rotate(180deg)}
+.proof-body p{margin:.2rem 0 .65rem}.proof-body .proof-date{font-size:.68rem;color:var(--blue-up)}
+.proof-body a{display:flex;align-items:center;gap:.4rem;color:var(--ink-d);text-underline-offset:3px;margin:.5rem 0}
+.proof-note :is(summary,a):focus-visible{outline:2px solid var(--blue-up);outline-offset:4px}
+</style>

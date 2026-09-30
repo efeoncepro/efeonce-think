@@ -528,10 +528,28 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       /** MÓVIL: el instrumento espera fuera de la lectura. Sube como hoja al acoplar. */
       const sheet = () => window.matchMedia('(max-width: 1079px)').matches
       let opener: HTMLElement | null = null
+      let restoringSheetFocus = false
+      const rememberSheetOpener = (block: HTMLElement, event?: Event) => {
+        const target = event?.target instanceof HTMLElement ? event.target : null
+        opener = target?.closest<HTMLElement>('[data-probe]') ??
+          block.querySelector<HTMLElement>('[data-probe]') ?? block
+      }
       const closeSheet = () => {
-        root.dataset.sheet = ''
-        opener?.focus()
+        const target = opener
         opener = null
+        root.dataset.sheet = ''
+        root.querySelectorAll('[data-probe][aria-expanded="true"]').forEach(probe => probe.setAttribute('aria-expanded', 'false'))
+        if (!target?.isConnected) return
+        // Return to the actual control. A block clicked outside its probe is a
+        // programmatic focus fallback, never an extra stop in the tab order.
+        const temporaryTabindex = !target.hasAttribute('tabindex') && target.tabIndex < 0
+        if (temporaryTabindex) target.setAttribute('tabindex', '-1')
+        restoringSheetFocus = true
+        try { target.focus({ preventScroll: true }) }
+        finally {
+          restoringSheetFocus = false
+          if (temporaryTabindex) target.removeAttribute('tabindex')
+        }
       }
       root.querySelector('[data-close-sheet]')?.addEventListener('click', closeSheet)
 
@@ -756,10 +774,11 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
        */
       const enter = (e: Event) => {
         const el = hit(e)
-        if (!el || pinned) return
+        if (!el || pinned || restoringSheetFocus) return
         if (e.type === 'mouseover' && keyboard) return
         // Solo el lado del artículo dispara el acoplamiento. El panel se lee, no se repinta.
         if (!el.dataset.couple) return
+        if (sheet()) rememberSheetOpener(el, e)
         paint(el.dataset.couple)
       }
 
@@ -767,7 +786,10 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       if (sourceHash.startsWith('block-')) {
         const source = document.getElementById(sourceHash)
         const sourceId = source?.dataset.couple
-        if (sourceId) { pinned = sourceId; paint(sourceId); source?.scrollIntoView({block:'center'}) }
+        if (source && sourceId) {
+          if (sheet()) rememberSheetOpener(source)
+          pinned = sourceId; paint(sourceId); source.scrollIntoView({block:'center'})
+        }
       }
       root.addEventListener('mouseover', enter)
       root.addEventListener('focusin', enter)
@@ -775,7 +797,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
         const el = hit(e)
         if (!el) return
         const id = el.dataset.couple ?? el.dataset.coupleTarget ?? null
-        if (sheet() && el.dataset.couple) opener = el
+        if (sheet() && el.dataset.couple) rememberSheetOpener(el, e)
         pinned = pinned === id ? null : id
         paint(pinned ?? id)
       })

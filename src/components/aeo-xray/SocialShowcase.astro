@@ -66,9 +66,17 @@ const codeText = (value:unknown) => JSON.stringify({'@context':'https://schema.o
       const panels=[...root.querySelectorAll<HTMLElement>('[data-format-panel]')]
       const reduce=window.matchMedia('(prefers-reduced-motion:reduce)')
       root.querySelector('.ss-formats')?.setAttribute('role','tablist')
-      const choose=(index:number, focus=false)=>{
+      const choose=(index:number, focus=false, reflectHash=false)=>{
+        if(!tabs[index]||!panels[index])return
         tabs.forEach((tab,n)=>{tab.setAttribute('role','tab');tab.setAttribute('aria-selected',String(n===index));tab.setAttribute('aria-controls',panels[n].id);tab.tabIndex=n===index?0:-1})
         panels.forEach((panel,n)=>{panel.hidden=n!==index;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby',tabs[n].id);if(n!==index)panel.querySelectorAll('video').forEach(video=>video.pause())})
+        if(reflectHash){
+          const url=new URL(window.location.href)
+          url.hash=panels[index].id
+          // Keep the current step, artifact and Astro history state. A tab choice
+          // updates the shareable fragment without adding another route to Back.
+          window.history.replaceState(window.history.state,'',url)
+        }
         if(focus){
           tabs[index].focus({preventScroll:true})
           const formats=tabs[index].parentElement!
@@ -77,7 +85,7 @@ const codeText = (value:unknown) => JSON.stringify({'@context':'https://schema.o
         if(focus&&!reduce.matches)panels[index].animate([{opacity:.3,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],{duration:320,easing:'cubic-bezier(.2,0,0,1)'})
       }
       tabs.forEach((tab,n)=>{
-        tab.addEventListener('click',event=>{event.preventDefault();choose(n,true)})
+        tab.addEventListener('click',event=>{event.preventDefault();choose(n,true,true)})
         tab.addEventListener('keydown',event=>{
           let next=n
           if(event.key==='ArrowRight')next=(n+1)%tabs.length
@@ -85,10 +93,22 @@ const codeText = (value:unknown) => JSON.stringify({'@context':'https://schema.o
           else if(event.key==='Home')next=0
           else if(event.key==='End')next=tabs.length-1
           else return
-          event.preventDefault();choose(next,true)
+          event.preventDefault();choose(next,true,true)
         })
       })
-      choose(Number(root.dataset.initial)||0)
+      const indexFromHash=()=>{
+        let fragment=window.location.hash.slice(1)
+        try{fragment=decodeURIComponent(fragment)}catch{return -1}
+        return panels.findIndex(panel=>panel.id===fragment)
+      }
+      const initial=indexFromHash()
+      choose(initial<0?Number(root.dataset.initial)||0:initial)
+      const hashController=new AbortController()
+      window.addEventListener('hashchange',()=>{
+        const index=indexFromHash()
+        if(index>=0)choose(index)
+      },{signal:hashController.signal})
+      document.addEventListener('astro:before-swap',()=>hashController.abort(),{once:true})
       panels.forEach(panel=>{
         const player=panel.querySelector<HTMLVideoElement>('video')
         const playButton=panel.querySelector<HTMLButtonElement>('[data-video-play]')

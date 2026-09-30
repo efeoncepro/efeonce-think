@@ -1,4 +1,5 @@
 ---
+import EvidenceNote from './EvidenceNote.astro'
 import type { RenderSample } from '@/lib/aeo-xray/render-model'
 
 /**
@@ -79,6 +80,7 @@ const asText = (code: unknown) =>
         {c.source && <cite class="stat-src">{c.source} · {c.asOf}</cite>}
         <p class="nd-l">{c.label} <em>· {c.detail}</em></p>
         <p class="why"><b>{ui.whyLabel}:</b> {c.why}</p>
+        {c.sourceEvidence && <EvidenceNote evidence={c.sourceEvidence}/>}
       </div>
     ))}
 
@@ -93,6 +95,7 @@ const asText = (code: unknown) =>
         </div>
         {n.stat && <p class="stat"><span class="stat-fix">arregla</span>{n.stat} <span>{n.statNote}</span></p>}
         {n.tier < 3 && <p class="why"><b>{ui.whyLabel}:</b> {n.why}</p>}
+        {n.sourceEvidence && <EvidenceNote evidence={n.sourceEvidence}/>}
         <details>
           <summary>Ver el código</summary>
           <pre role="region" tabindex="0" aria-label={`Datos estructurados: ${n.type}`}><code>{asText(n.code)}</code></pre>

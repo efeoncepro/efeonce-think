@@ -86,6 +86,12 @@
         "label": "Google Cloud · Gemini Omni 1.1 Flash, modelo utilizado",
         "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-1-flash",
         "accessedAt": "2026-09-30"
+      },
+      {
+        "id": "google-search-updates",
+        "label": "Google Search Central · retirada de resultados enriquecidos FAQ, mayo de 2026",
+        "url": "https://developers.google.com/search/updates",
+        "accessedAt": "2026-09-30"
       }
     ],
     "assets": [
@@ -334,7 +340,7 @@
               "product",
               "tariff"
             ],
-            "caption": "Referencia consultada el 30/09/2026. Verifica la vigencia y las condiciones aplicables a tu cuenta antes de contratar.",
+            "caption": "Tramos en soles aplicables a cuentas abiertas desde el 01/06/2026, según la página del producto. Referencia consultada el 30/09/2026. Verifica la vigencia y las condiciones de tu cuenta antes de contratar.",
             "kind": "table",
             "columns": [
               "Moneda",
@@ -765,6 +771,25 @@
               "product",
               "tariff"
             ]
+          },
+          {
+            "id": "faq-schema",
+            "blockId": "lp-faq",
+            "scope": "block",
+            "category": "technical",
+            "title": "FAQ: contenido útil, marcado opcional",
+            "explanation": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
+            "status": "proposed",
+            "sourceIds": [
+              "google-search-updates"
+            ],
+            "evidence": {
+              "description": "Google Search Central registra el retiro de los resultados enriquecidos FAQ desde el 07/05/2026 y la retirada de su documentación el 15/06/2026. El ejemplo de código se conserva sólo como representación semántica opcional de preguntas visibles.",
+              "asOf": "2026-09-30",
+              "sourceIds": [
+                "google-search-updates"
+              ]
+            }
           }
         ],
         "seo": {
@@ -999,7 +1024,7 @@
                 "sourceStatus": "proposed",
                 "type": "FAQPage",
                 "metric": "3 preguntas visibles",
-                "why": "Pregunta y respuesta coinciden con la pieza; no garantiza rich results ni citas de IA.",
+                "why": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
                 "tier": 2,
                 "code": {
                   "@context": "https://schema.org",
@@ -1944,7 +1969,7 @@
             "blockId": "art-trea-answer",
             "category": "aeo",
             "title": "Respuesta y contexto",
-            "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+            "explanation": "Resuelve qué comparar además de la tasa: moneda, saldo requerido y costos. La respuesta conserva esas condiciones junto al dato financiero y enlaza al criterio de la SBS; así permite comparar productos sin reducir la decisión a un porcentaje.",
             "status": "implemented",
             "sourceIds": [
               "sbs"
@@ -1971,7 +1996,7 @@
             "blockId": "art-saldo-answer",
             "category": "aeo",
             "title": "Respuesta y contexto",
-            "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+            "explanation": "Explica el saldo promedio con una operación comprensible y lo conecta con el tarifario. Atiende la duda que puede impedir cumplir el tramo de una tasa; una respuesta extraída debe conservar el período y la regla de cálculo, no sólo el porcentaje.",
             "status": "implemented",
             "sourceIds": [
               "tariff"
@@ -2030,7 +2055,7 @@
             "blockId": "art-apertura-answer",
             "category": "aeo",
             "title": "Respuesta y contexto",
-            "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+            "explanation": "Separa la preparación para abrir la cuenta de la contratación. Responde la intención de apertura con requisitos y canal oficial, y obliga a comprobar su vigencia; reduce incertidumbre sin prometer aprobación ni inventar pasos del banco.",
             "status": "implemented",
             "sourceIds": [
               "product"
@@ -2057,7 +2082,7 @@
             "blockId": "art-respaldo-answer",
             "category": "aeo",
             "title": "Respuesta y contexto",
-            "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+            "explanation": "Mantiene juntos entidad, depósito cubierto, límite y período de cobertura. La fuente es el Fondo de Seguro de Depósitos: conservar estas condiciones evita que una respuesta aislada transforme una protección acotada en una garantía universal.",
             "status": "implemented",
             "sourceIds": [
               "fsd"
@@ -2222,6 +2247,25 @@
               "description": "Banner editorial renderizado en la muestra, con dimensiones y ALT. No acredita publicación en el sitio del banco ni impacto de búsqueda.",
               "asOf": "2026-09-30",
               "sourceIds": []
+            }
+          },
+          {
+            "id": "faq-schema",
+            "blockId": "art-faq",
+            "scope": "block",
+            "category": "technical",
+            "title": "FAQ: contenido útil, marcado opcional",
+            "explanation": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
+            "status": "proposed",
+            "sourceIds": [
+              "google-search-updates"
+            ],
+            "evidence": {
+              "description": "Google Search Central registra el retiro de los resultados enriquecidos FAQ desde el 07/05/2026 y la retirada de su documentación el 15/06/2026. El ejemplo de código se conserva sólo como representación semántica opcional de preguntas visibles.",
+              "asOf": "2026-09-30",
+              "sourceIds": [
+                "google-search-updates"
+              ]
             }
           }
         ],
@@ -2485,7 +2529,7 @@
                 "sourceStatus": "proposed",
                 "type": "FAQPage",
                 "metric": "3 preguntas visibles",
-                "why": "Pregunta y respuesta coinciden con la pieza; no garantiza rich results ni citas de IA.",
+                "why": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
                 "tier": 2,
                 "code": {
                   "@context": "https://schema.org",
@@ -2628,7 +2672,7 @@
                 "sourceStatus": "implemented",
                 "label": "Respuesta y contexto",
                 "detail": "AEO",
-                "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+                "why": "Resuelve qué comparar además de la tasa: moneda, saldo requerido y costos. La respuesta conserva esas condiciones junto al dato financiero y enlaza al criterio de la SBS; así permite comparar productos sin reducir la decisión a un porcentaje.",
                 "tier": 2,
                 "source": "SBS · Compara y elige",
                 "asOf": "2026-09-30"
@@ -2650,7 +2694,7 @@
                 "sourceStatus": "implemented",
                 "label": "Respuesta y contexto",
                 "detail": "AEO",
-                "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+                "why": "Explica el saldo promedio con una operación comprensible y lo conecta con el tarifario. Atiende la duda que puede impedir cumplir el tramo de una tasa; una respuesta extraída debe conservar el período y la regla de cálculo, no sólo el porcentaje.",
                 "tier": 2,
                 "source": "Tarifario Ahorro Preferente · actualizado 16/07/2026",
                 "asOf": "2026-09-30"
@@ -2704,7 +2748,7 @@
                 "sourceStatus": "implemented",
                 "label": "Respuesta y contexto",
                 "detail": "AEO",
-                "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+                "why": "Separa la preparación para abrir la cuenta de la contratación. Responde la intención de apertura con requisitos y canal oficial, y obliga a comprobar su vigencia; reduce incertidumbre sin prometer aprobación ni inventar pasos del banco.",
                 "tier": 2,
                 "source": "Cuenta de Ahorros Preferente · Banco Pichincha",
                 "asOf": "2026-09-30"
@@ -2726,7 +2770,7 @@
                 "sourceStatus": "implemented",
                 "label": "Respuesta y contexto",
                 "detail": "AEO",
-                "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+                "why": "Mantiene juntos entidad, depósito cubierto, límite y período de cobertura. La fuente es el Fondo de Seguro de Depósitos: conservar estas condiciones evita que una respuesta aislada transforme una protección acotada en una garantía universal.",
                 "tier": 2,
                 "source": "Fondo de Seguro de Depósitos · cobertura",
                 "asOf": "2026-09-30"
