@@ -198,7 +198,7 @@ const probeFor = (id: string) => {
             <div class="fig-m">
               {b.caption && <figcaption>{b.caption}</figcaption>}
               <p class="credit">
-                {b.creditLabel??'Foto'}: {b.credit.author} · <a href={b.credit.url} rel="nofollow noopener">{b.credit.license}</a>
+                {b.creditLabel??'Foto'}: {b.credit.author} · <a data-astro-prefetch="false" href={b.credit.url} rel="nofollow noopener">{b.credit.license}</a>
               </p>
             </div>
           </figure>
@@ -250,7 +250,7 @@ const probeFor = (id: string) => {
             <ol>
               {tocItems.map(h => (
                 <li>
-                  <a href={`#${h.anchor}`}>{h.short}</a>
+                  <a data-astro-prefetch="false" href={`#${h.anchor}`}>{h.short}</a>
                 </li>
               ))}
             </ol>
@@ -342,7 +342,7 @@ const probeFor = (id: string) => {
             <ul class="lnks">
               {b.items.map(i => (
                 <li>
-                  <a href={i.href} rel="nofollow noopener">{i.text}</a>
+                  <a data-astro-prefetch="false" href={i.href} rel="nofollow noopener">{i.text}</a>
                   {i.note && <em> — {i.note}</em>}
                 </li>
               ))}
@@ -358,7 +358,7 @@ const probeFor = (id: string) => {
         return (
           <div class="blk srcs" {...a}>
             <p class="blk-t">{b.title}</p>
-            <ul>{b.items.map(i => <li><a href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
+            <ul>{b.items.map(i => <li><a data-astro-prefetch="false" href={i.href} rel="nofollow noopener">{i.text}</a></li>)}</ul>
             {probe && (
               <button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">
                 {probe}
@@ -370,7 +370,7 @@ const probeFor = (id: string) => {
       return null
     })}
   </article>
-  {richRead&&<aside class="editorial-aside" id="article-index"><details class="mobile-index"><summary>En esta guía</summary><ul>{tocItems.map(t=><li><a href={`#${t.anchor}`}>{t.short}</a></li>)}</ul></details><nav aria-label="Contenido del artículo"><p>En esta guía</p><ol>{tocItems.map(t=><li><a href={`#${t.anchor}`}>{t.short}</a></li>)}</ol></nav>{related&&<a class="editorial-related" href={experienceHref(related.toArtifactId,'articulo')}>{related.label}<span aria-hidden="true"> ↗</span></a>}</aside>}
+  {richRead&&<aside class="editorial-aside" id="article-index"><details class="mobile-index"><summary>En esta guía</summary><ul>{tocItems.map(t=><li><a data-astro-prefetch="false" href={`#${t.anchor}`}>{t.short}</a></li>)}</ul></details><nav aria-label="Contenido del artículo"><p>En esta guía</p><ol>{tocItems.map(t=><li><a data-astro-prefetch="false" href={`#${t.anchor}`}>{t.short}</a></li>)}</ol></nav>{related&&<a data-astro-prefetch="false" class="editorial-related" href={experienceHref(related.toArtifactId,'articulo')}>{related.label}<span aria-hidden="true"> ↗</span></a>}</aside>}
   </div>
 
   {/* El pie de licencias ES la demostración del requisito 5 de las bases — pero es NUESTRA
@@ -385,7 +385,7 @@ const probeFor = (id: string) => {
         {article.blocks.filter(isImage).map(i => (
           <li>
             <span class="lic-a">{i.alt}</span>
-            <span class="lic-c">{i.credit.author} · <a href={i.credit.url} rel="nofollow noopener">{i.credit.license}</a></span>
+            <span class="lic-c">{i.credit.author} · <a data-astro-prefetch="false" href={i.credit.url} rel="nofollow noopener">{i.credit.license}</a></span>
           </li>
         ))}
       </ul>

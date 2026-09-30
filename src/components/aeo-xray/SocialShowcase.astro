@@ -14,7 +14,7 @@ const codeText = (value:unknown) => JSON.stringify({'@context':'https://schema.o
 ---
 <section class="social-showcase" data-social-showcase data-initial={first} aria-label="Piezas y formatos de contenido">
   <nav class="ss-formats" aria-label="Explorar los formatos">
-    {d.atoms.map((a,n)=><a class="ss-format" id={`format-${n}`} href={`#delivery-${n}`} data-format={n}>
+    {d.atoms.map((a,n)=><a data-astro-prefetch="false" class="ss-format" id={`format-${n}`} href={`#delivery-${n}`} data-format={n}>
       <span class="ss-format-icon" aria-hidden="true">{typeOf(a)==='social'?<MessagesSquare size={19}/>:typeOf(a)==='images'?<Images size={19}/>:<Play size={19}/>}</span>
       <span><strong>{a.kind}</strong><small>{a.video||a.reel?'Pieza gráfica + video':a.post?'Pieza social':a.showsImages?'Recursos visuales':'Narrativa audiovisual'}</small></span>
       <ArrowRight class="ss-format-arrow" size={19} aria-hidden="true"/>
@@ -27,17 +27,17 @@ const codeText = (value:unknown) => JSON.stringify({'@context':'https://schema.o
         {a.post?.image&&video(a)&&<div class="ss-media-controls" data-media-controls hidden><button type="button" data-media-choice="image" aria-pressed="true">Pieza gráfica</button><button type="button" data-media-choice="video" aria-pressed="false"><Play size={15} aria-hidden="true"/>Video</button></div>}
         {a.post && <div class="ss-media-panel" data-media-panel="image">{a.post.image ? <figure class="ss-artwork">
           <Image src={a.post.image} alt={a.post.alt??a.post.hook} widths={[540,720,1080]} sizes="(min-width:1080px) 540px,90vw" format="avif" quality={88} loading="lazy"/>
-          <figcaption class="ss-artwork-tools"><button type="button" data-enlarge hidden aria-label="Ampliar la pieza social"><Expand size={18} aria-hidden="true"/>Ampliar</button><a href={a.post.image.src} download data-astro-reload><ArrowDownToLine size={18} aria-hidden="true"/>Descargar pieza</a></figcaption>
+          <figcaption class="ss-artwork-tools"><button type="button" data-enlarge hidden aria-label="Ampliar la pieza social"><Expand size={18} aria-hidden="true"/>Ampliar</button><a data-astro-prefetch="false" href={a.post.image.src} download data-astro-reload><ArrowDownToLine size={18} aria-hidden="true"/>Descargar pieza</a></figcaption>
         </figure> : <div class="ss-copy-preview"><p>{a.post.hook}</p><h3>{a.post.body}</h3><span>{a.post.cta}</span><strong>{d.client.name}</strong></div>}</div>}
         {(video(a)||(!a.post&&typeOf(a)==='video')) && <div class="ss-media-panel" data-media-panel="video">{video(a) ? <figure class:list={['ss-video',{'ss-video-vertical':!!a.reel}]}>
           <div class="ss-video-player"><video controls playsinline preload="metadata" poster={video(a)!.poster} src={video(a)!.src} aria-label={video(a)!.alt}></video><button class="ss-video-play" type="button" data-video-play hidden><Play size={23} aria-hidden="true"/><span>Reproducir video</span></button></div>
           <p class="ss-video-status" data-video-status role="status" hidden></p>
-          <figcaption><span>{video(a)!.label??'Video de la pieza'}</span><a href={video(a)!.src} download data-astro-reload aria-label="Descargar video"><ArrowDownToLine size={18} aria-hidden="true"/>Descargar</a></figcaption>
+          <figcaption><span>{video(a)!.label??'Video de la pieza'}</span><a data-astro-prefetch="false" href={video(a)!.src} download data-astro-reload aria-label="Descargar video"><ArrowDownToLine size={18} aria-hidden="true"/>Descargar</a></figcaption>
         </figure> : <div class="ss-script-preview"><span class="ss-preview-label">Guion audiovisual</span><h3>{mediaText(a,/duraci/i)||a.kind}</h3><p>{mediaText(a,/guion|transcrip/i)}</p></div>}</div>}
         {a.showsImages && !a.post?.image && <div class="ss-gallery" data-gallery>
           <div class="ss-gallery-track">{images.map((img,index)=><figure class="ss-gallery-slide" data-gallery-slide={index}>
             <Image src={img.src} alt={img.alt} widths={[540,900,1200]} sizes="(min-width:1080px) 720px,90vw" format="avif" quality={85} loading="lazy"/>
-            <figcaption><p>{img.alt}</p><span>{img.credit.author}</span><div class="ss-artwork-tools"><button type="button" data-enlarge hidden aria-label={`Ampliar imagen ${index+1}`}><Expand size={18} aria-hidden="true"/>Ampliar</button><a href={img.src.src} download data-astro-reload><ArrowDownToLine size={18} aria-hidden="true"/>Descargar imagen</a></div></figcaption>
+            <figcaption><p>{img.alt}</p><span>{img.credit.author}</span><div class="ss-artwork-tools"><button type="button" data-enlarge hidden aria-label={`Ampliar imagen ${index+1}`}><Expand size={18} aria-hidden="true"/>Ampliar</button><a data-astro-prefetch="false" href={img.src.src} download data-astro-reload><ArrowDownToLine size={18} aria-hidden="true"/>Descargar imagen</a></div></figcaption>
           </figure>)}</div>
           {images.length>1&&<div class="ss-gallery-controls" hidden><button type="button" data-gallery-prev aria-label="Imagen anterior"><ArrowLeft size={19}/></button><span data-gallery-count aria-live="polite">1 / {images.length}</span><button type="button" data-gallery-next aria-label="Imagen siguiente"><ArrowRight size={19}/></button></div>}
         </div>}
@@ -47,7 +47,7 @@ const codeText = (value:unknown) => JSON.stringify({'@context':'https://schema.o
         <h2 id={`delivery-title-${n}`}>{a.post?.hook??a.reel?.title??a.kind}</h2>
         <p class="ss-rationale">{a.why}</p>
         {a.post&&<div class="ss-caption"><p>{a.post.body}</p><strong>{a.post.cta}</strong></div>}
-        <div class="ss-origin"><span>Parte del contenido original</span><p>{a.bornFrom}</p>{a.coupleId&&<a class="atom-origin" href={hrefForOrigin(a.coupleId)}>Ver el bloque de origen <ArrowRight size={16} aria-hidden="true"/></a>}</div>
+        <div class="ss-origin"><span>Parte del contenido original</span><p>{a.bornFrom}</p>{a.coupleId&&<a data-astro-prefetch="false" class="atom-origin" href={hrefForOrigin(a.coupleId)}>Ver el bloque de origen <ArrowRight size={16} aria-hidden="true"/></a>}</div>
         <details class="ss-detail"><summary>Detalle de producción</summary><dl>{a.deliverable.map(row=><div><dt>{row.k}</dt><dd>{row.v}</dd></div>)}</dl></details>
         {a.code&&<details class="ss-detail"><summary>Datos estructurados</summary><pre role="region" tabindex="0" aria-label={`Datos estructurados: ${a.kind}`}><code>{codeText(a.code)}</code></pre></details>}
         {a.stat&&<div class="ss-evidence"><strong>{a.stat}</strong><p>{a.statNote}</p><cite class="atom-cite">{a.source} · {a.asOf}</cite></div>}

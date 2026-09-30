@@ -124,7 +124,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
         {/* LOCKUP, no isotipo. El isotipo solo comunica a quien YA conoce la marca —
             y el comité que abre esto no la conoce. El logotipo dice QUIÉN; el nombre de
             la herramienta, QUÉ. El separador impide que se lean como una sola cosa. */}
-        <a class="xr-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
+        <a data-astro-prefetch="false" class="xr-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
           <img
             class="xr-logo"
             src="/branding/efeonce-logo-negative.svg"
@@ -139,12 +139,12 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       </div>
     </header>
 
-    {artifactChoices.length > 1 && <nav class="xr-artifacts" aria-label="Piezas de la demostración">{artifactChoices.map(choice => <a href={choice.href} aria-current={choice.active ? 'page' : undefined}>{choice.label}</a>)}</nav>}
+    {artifactChoices.length > 1 && <nav class="xr-artifacts" aria-label="Piezas de la demostración">{artifactChoices.map(choice => <a data-astro-prefetch="false" href={choice.href} aria-current={choice.active ? 'page' : undefined}>{choice.label}</a>)}</nav>}
     <!-- El RIEL. Su trabajo no es navegar: es AVISAR que el recorrido tiene más pantallas. -->
     <nav class="xr-rail" aria-label="Recorrido de la muestra" style={`--xr-step-progress:${((i + 1) / flow.length) * 100}%`}>
       <div class="xr-wrap xr-rail-in">
         {flow.map((s, n) => (
-          <a
+          <a data-astro-prefetch="false"
             class="xr-step"
             href={href(s.step)}
             aria-current={n === i ? 'step' : undefined}
@@ -233,7 +233,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
                 <span>{gap.aside}</span>
               </aside>
               {next && (
-                <a class="g-next" href={href(next.step)}>
+                <a data-astro-prefetch="false" class="g-next" href={href(next.step)}>
                   <span>
                     <span class="xr-next-l">{ui.flowNext}: paso {i + 2} {ui.flowOf} {flow.length}</span>
                     <span class="xr-next-t">{cur.next}</span>
@@ -252,7 +252,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
           {kind === 'landing' ? <Landing d={d} landing={landing} /> : <Article d={d} composition={landing} semantic={artifactChoices.length>0} />}
           {next && (
             <div class="read-finish" data-capture="aeo-xray-article-finish">
-              <a class="read-finish-a" href={href(next.step)} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
+              <a data-astro-prefetch="false" class="read-finish-a" href={href(next.step)} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
                 <span>
                   <span class="read-finish-k">{ui.flowNext}: paso {i + 2} {ui.flowOf} {flow.length}</span>
                   <span class="read-finish-t">{cur.next}</span>
@@ -366,7 +366,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 
       {next && step && (
         <div class="xr-next">
-          <a href={href(next.step)} data-step-count={`${i + 2}/${flow.length}`} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
+          <a data-astro-prefetch="false" href={href(next.step)} data-step-count={`${i + 2}/${flow.length}`} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
             <span>
               <span class="xr-next-l"><span class="xr-next-l-prefix">{ui.flowNext}: </span>paso {i + 2} {ui.flowOf} {flow.length}</span>
               <span class="xr-next-t xr-next-t-full">{cur.next}</span>
@@ -379,7 +379,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 
       <footer class="xr-foot" aria-label="Información legal de Efeonce">
         <div class="xr-foot-card">
-          <a class="xr-foot-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
+          <a data-astro-prefetch="false" class="xr-foot-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
             <img
               src="/branding/efeonce-logo.svg"
               alt="Efeonce"
@@ -395,8 +395,8 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
             <p>Todos los derechos reservados. Efeonce se reserva los derechos de uso, reproducción, distribución, adaptación y explotación sin autorización expresa.</p>
           </div>
           <nav class="xr-foot-nav" aria-label="Enlaces legales de Efeonce">
-            <a href={EFEONCE_PRIVACY_URL}>Política de privacidad</a>
-            <a href={EFEONCE_SEO_URL}>Servicios SEO/AEO</a>
+            <a data-astro-prefetch="false" href={EFEONCE_PRIVACY_URL}>Política de privacidad</a>
+            <a data-astro-prefetch="false" href={EFEONCE_SEO_URL}>Servicios SEO/AEO</a>
           </nav>
         </div>
       </footer>

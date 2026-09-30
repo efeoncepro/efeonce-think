@@ -13,6 +13,7 @@ try{
    const prefix=`${name}/${artifact}/${step||'gap'}`;console.log(prefix)
    const response=await page.goto(`${base}/aeo-xray/r/${token}?artifact=${artifact}&step=${step}`,{waitUntil:'networkidle'})
    check(prefix+' status',response.status()===200)
+   await page.locator('.xr-artifacts a').first().hover();await page.waitForTimeout(140)
    const html=await page.content(),headers=response.headers()
    if(html.includes(token)){const at=html.indexOf(token);console.error('Unexpected share-key context:',html.slice(Math.max(0,at-90),at+token.length+90).replaceAll(token,'[share-key]'))}
    const privacy={noStore:headers['cache-control']?.includes('no-store'),noReferrer:headers['referrer-policy']==='no-referrer',noKeyInMarkup:!html.includes(token),noAnalytics:!html.includes('googletagmanager.com'),noActiveSchema:!html.includes('application/ld+json')}

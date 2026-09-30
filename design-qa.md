@@ -127,3 +127,11 @@ El gate ya no inicia el video con `play()` para probar ese flujo: exige que avan
 clic en «Video» y prueba el control grande.113 checks locales de medios y25 de motion PASS.
 El caso no-JS de motion espera la carga del instrumento completo: esperar sólo su contenedor
 podía comprobarlo antes de que llegaran sus hijos en producción. No cambió el runtime no-JS.
+
+### Precarga del router — causa confirmada
+
+La corrida pública permitió identificar el fallo intermitente: ClientRouter habilitaba por
+defecto prefetch en hover/foco e insertaba la URL absoluta del enlace compartido en un
+`link rel=prefetch` del DOM. Se deshabilita la precarga con el atributo soportado por Astro
+en los enlaces del X-Ray; las transiciones y la navegación por clic permanecen. El gate de
+privacidad ahora provoca hover antes de comprobar el documento para reproducir esa ruta.
