@@ -198,3 +198,25 @@ Verificar antes de publicar: `pnpm type-check`, `pnpm build`, `pnpm test:aeo-xra
 `XRAY_VERIFY_TOKEN=<key> pnpm verify:aeo-xray-v2` sobre el servidor local.
 Publicación: commit del alcance propio y push a `main` de **efeonce-think**;
 Vercel despliega Think de forma independiente. Verificar el SHA nuevo y el enlace público.
+
+### Módulos de landing y exploración del valor
+
+`LandingModules.astro` compone los bloques del manifest en beneficios, condiciones,
+proceso, documentos, FAQ, contenido relacionado y CTA. `landingSections` conserva el orden
+y los IDs de origen; los módulos no contienen nombres ni IDs de clientes. Las tablas no
+compatibles con el selector conservan su representación semántica completa.
+
+`ValueExplorer.astro` conecta `experience.evidence.fanOut.items[].coveredBy` con el bloque real,
+sus anotaciones y sus fuentes. Las explicaciones y estados duplicados en `machine.craft`
+deben coincidir con la anotación correspondiente; el paquete publicado lo verifica con tests.
+No se simula una respuesta de un motor ni se presentan resultados que no se han medido.
+
+El `ClientRouter` del enlace compuesto conserva el documento durante el recorrido. El espécimen
+se transforma entre lectura y radiografía; los listeners se reinician tras `astro:page-load`,
+y la atomización revela los derivados conservando sus vínculos de origen. La navegación
+sin JS y con movimiento reducido mantiene el contenido y los enlaces.
+
+Antes de publicar cambios al recorrido, ejecutar también con `XRAY_VERIFY_TOKEN=<key>`:
+`node scripts/verify-aeo-xray-motion.mjs` (movimiento real, no sólo presencia de CSS) y
+`node scripts/verify-aeo-xray-value.mjs` (pregunta, respuesta, fuente, bloque y módulos).
+Las capturas y trazas quedan en `.captures/aeo-xray-motion` y `.captures/aeo-xray-value`.

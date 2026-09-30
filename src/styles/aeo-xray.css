@@ -11,7 +11,7 @@
  */
 
 /* ══════════════════════════════════════════════════════════════════════════
-   VIEW TRANSITIONS — cross-document, CSS puro, cero JavaScript.
+   VIEW TRANSITIONS — elementos compartidos; ClientRouter en las ediciones por URL.
    Sin transición, cuatro pantallas se sienten como cuatro páginas sueltas.
    La que cuenta la historia es ② → ③: el artículo que acabas de leer se ENCOGE
    y se convierte en el espécimen bajo el instrumento. El morph es el argumento.
@@ -40,6 +40,11 @@
 .xr-hero-img {
   view-transition-name: xr-hero;
 }
+/* In a landing the photo is behind the copy. Extracting it as a second
+   shared element would lift its snapshot over the headline while morphing. */
+.landing .xr-hero-img {
+  view-transition-name: none;
+}
 
 ::view-transition-group(xr-article),
 ::view-transition-group(xr-hero),
@@ -47,17 +52,27 @@
 ::view-transition-new(xr-article),
 ::view-transition-old(xr-hero),
 ::view-transition-new(xr-hero) {
-  animation-duration: 420ms;
+  animation-duration: 620ms;
   animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
   mix-blend-mode: normal;
 }
 
+/* Resolve the text quickly while its frame continues to morph. Holding both
+   full-page snapshots for the whole morph produced a double-exposure of copy. */
+::view-transition-old(xr-article), ::view-transition-old(xr-hero) {
+  animation: xr-fade-out 160ms ease-in both;
+}
+::view-transition-new(xr-article), ::view-transition-new(xr-hero) {
+  animation: xr-fade-in 260ms 60ms ease-out both;
+}
+@keyframes xr-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
 /* El instrumento ENTRA desde la derecha: no aparece, LLEGA. */
 ::view-transition-new(xr-inst) {
-  animation: xr-slide-in 420ms cubic-bezier(0.2, 0, 0, 1);
+  animation: xr-slide-in 520ms 100ms both cubic-bezier(0.2, 0, 0, 1);
 }
 ::view-transition-old(xr-inst) {
-  animation: xr-slide-out 260ms cubic-bezier(0.4, 0, 1, 1);
+  animation: xr-slide-out 360ms cubic-bezier(0.4, 0, 1, 1);
 }
 @keyframes xr-slide-in {
   from {
@@ -89,6 +104,40 @@
     opacity: 0;
     transform: translateY(10px);
   }
+}
+
+/* The shell is a fixed reference; only its progress line changes length. */
+.xr-artifacts { view-transition-name: xr-artifacts; }
+.xr-route-progress {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: var(--xr-step-progress);
+  height: 3px;
+  background: var(--blue-up);
+  view-transition-name: xr-progress;
+  pointer-events: none;
+}
+::view-transition-group(xr-progress) {
+  animation-duration: 620ms;
+  animation-timing-function: cubic-bezier(.2,0,0,1);
+}
+::view-transition-old(xr-chrome), ::view-transition-new(xr-chrome),
+::view-transition-old(xr-artifacts), ::view-transition-new(xr-artifacts),
+::view-transition-old(xr-rail), ::view-transition-new(xr-rail) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-xray-direction='back']::view-transition-new(root) {
+  animation: xr-return 360ms cubic-bezier(.2,0,0,1);
+}
+@keyframes xr-return {
+  from { opacity: 0; transform: translateY(-12px); }
+}
+/* Browsers without View Transition API keep Astro's functional swap and a
+   short entrance. The original content and links remain complete without JS. */
+html[data-xray-motion][data-astro-transition-fallback='new'] .xr > main {
+  animation: xr-rise 320ms cubic-bezier(.2,0,0,1);
 }
 
 /* El significado nunca estuvo en el movimiento: con `reduce` se cae la animación,

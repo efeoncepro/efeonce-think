@@ -1,6 +1,7 @@
 ---
 export const prerender = false
 import BaseLayout from '@layouts/BaseLayout.astro'
+import { ClientRouter } from 'astro:transitions'
 import StatusScreen from '@/components/primitives/StatusScreen.astro'
 import Experience from '@/components/aeo-xray/Experience.astro'
 import { adaptExperience, experienceHref, experienceSteps } from '@lib/aeo-xray/experience-adapter'
@@ -40,5 +41,6 @@ const artifactChoices = edition?.model.artifacts.map(a => ({id:a.id,label:a.kind
 const state = status === 'ok' ? null : C.states[status]
 ---
 <BaseLayout title={status === 'ok' && edition ? `${edition.header.title} · ${C.name}` : C.name} description="Una muestra del trabajo de Efeonce: contenido, diseño y decisiones SEO/AEO." noindex canonical="/aeo-xray" analytics={false} lang={edition?.model.locale ?? 'es-PE'} ogTitle="AEO X-Ray · Efeonce" ogDescription="Contenido y decisiones SEO/AEO en una misma demostración.">
+  <ClientRouter slot="head" fallback="animate" />
   {status === 'ok' && edition && artifact ? <Experience d={sample!} step={step!} hrefForStep={(s:string)=>experienceHref(artifact.id,s)} kind={artifact.kind} landing={{artifact,model:edition.model}} artifactChoices={artifactChoices} /> : state && <StatusScreen kind={status as 'not_found' | 'gone' | 'rate_limited' | 'error'} title={state.title} body={state.body} />}
 </BaseLayout>

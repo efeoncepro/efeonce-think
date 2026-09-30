@@ -1,0 +1,98 @@
+---
+import { ArrowUpRight, FileText, Check, ChevronDown } from '@lucide/astro'
+import Image from './SampleImage.astro'
+import type {RenderSample, RenderBlock} from '@/lib/aeo-xray/render-model'
+import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
+import {assetHref} from '@/lib/aeo-xray/view'
+import {landingComparison, landingSections} from '@/lib/aeo-xray/landing-model'
+interface Props {d:RenderSample;coupled:boolean;produces:Map<string,number>;hero?:string;context?:{artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest}}
+const {d,coupled,produces,hero,context}=Astro.props
+const sections=landingSections(d.article.blocks)
+const attrs=(b:RenderBlock)=>{const n=produces.get(b.coupleId??'')??0;return {id:`block-${b.coupleId}`,...(coupled?{'data-couple':b.coupleId,'data-n':n?`${n} ${n===1?d.ui.producesLabelOne:d.ui.producesLabel}`:undefined,'data-on':b.coupleId===hero?true:undefined}:{})}}
+const probe=(b:RenderBlock)=>coupled&&(produces.get(b.coupleId??'')??0)>0
+const probeText=(b:RenderBlock)=>d.ui.srProduces.replace('{n}',String(produces.get(b.coupleId??'')??0))
+---
+<article class="post landing-body">
+ {sections.map((section)=>{
+  const comparison=landingComparison(section.blocks)
+  const process=section.blocks.some(b=>b.type==='ordered-list'&&b.ordered)
+  const benefits=section.blocks.some(b=>b.type==='ordered-list'&&!b.ordered)
+  const faq=section.blocks.some(b=>b.type==='faq')
+  const links=section.blocks.find(b=>b.type==='internal-links')
+  const related=links?.type==='internal-links'&&links.items.some(l=>l.href.startsWith('?artifact='))
+  const targetId=related&&links?.type==='internal-links'?new URLSearchParams(links.items[0].href.split('#')[0]).get('artifact'):null
+  const target=context?.model.artifacts.find(a=>a.id===targetId)
+  const targetImage=target?.blocks.find(b=>b.kind==='image'&&b.role==='hero')
+  const media=targetImage?.kind==='image'?context?.model.assets.find(a=>a.id===targetImage.assetId):undefined
+  const docs=section.blocks.some(b=>b.type==='sources')
+  const intro=section.blocks.some(b=>b.type==='answer-capsule')
+  return <section class:list={['landing-module',{'module-benefits':benefits,'module-process':process,'module-rates':!!comparison,'module-faq':faq,'module-action':!!links&&!related,'module-related':related,'module-documents':docs,'module-intro':intro}]} data-landing-module={process?'process':benefits?'benefits':comparison?'comparison':faq?'faq':related?'related':docs?'documents':links?'action':intro?'intro':'information'}>
+   <div class="module-inner">
+    {media&&<figure class="related-photo"><Image src={{src:assetHref(media),width:media.width,height:media.height,format:'webp'}} alt={media.alt} loading="lazy"/><figcaption>{media.credit}</figcaption></figure>}
+    <div class="module-content">
+    {section.blocks.map(b=>{
+      if(b.type==='h2')return <div class="module-heading blk" {...attrs(b)}><h2 id={b.anchor}>{b.text}</h2>{probe(b)&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probeText(b)}</button>}</div>
+      if(b.type==='paragraph'||b.type==='answer-capsule'||b.type==='pull-quote')return <div class:list={['blk',{'module-intro-copy':b.type==='answer-capsule'}]} {...attrs(b)}><p>{b.text}</p>{probe(b)&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probeText(b)}</button>}</div>
+      if(b.type==='ordered-list')return <div class="blk module-list" {...attrs(b)}>{b.ordered?<ol class="process-list">{b.items.map((item,i)=><li><span class="step-index" aria-hidden="true">{String(i+1).padStart(2,'0')}</span><p>{item}</p></li>)}</ol>:<ul class="benefit-list">{b.items.map(item=><li><Check size={26} stroke-width={1.5}/><p>{item}</p></li>)}</ul>}{probe(b)&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probeText(b)}</button>}</div>
+      if(b.type==='table'&&comparison?.table===b)return <div class="blk landing-rates" {...attrs(b)}>
+        <div class="currency-picker" role="group" aria-label={b.headers[0]} hidden>{comparison.groups.map((g,i)=><button type="button" data-currency={i} aria-pressed={i===0} aria-controls={`currency-${b.coupleId}-${i}`}>{g.label}</button>)}</div>
+        <div class="currency-grid">{comparison.groups.map((g,i)=><div class="currency-card" data-currency-panel={i} id={`currency-${b.coupleId}-${i}`}><p class="currency-title">{g.label}</p>{[...g.rows].reverse().map((r,j)=><div class:list={['rate-row',{'rate-primary':j===0}]}><div><strong>{r[2]}</strong><span>{b.headers[2]}</span></div><p>{r[1]}<small>{b.headers[1]}</small></p></div>)}</div>)}</div>
+        <details class="rates-detail"><summary>Comparar todas las condiciones <ChevronDown size={18}/></summary><div class="table-scroll"><table><caption>{b.caption}</caption><thead><tr>{b.headers.map(h=><th scope="col">{h}</th>)}</tr></thead><tbody>{b.rows.map(r=><tr>{r.map(c=><td>{c}</td>)}</tr>)}</tbody></table></div></details>
+        <p class="rate-caption">{b.caption}</p>{probe(b)&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probeText(b)}</button>}
+      </div>
+      if(b.type==='table')return <div class="blk table-scroll" {...attrs(b)}><table><caption>{b.caption}</caption><thead><tr>{b.headers.map(h=><th scope="col">{h}</th>)}</tr></thead><tbody>{b.rows.map(r=><tr>{r.map(c=><td>{c}</td>)}</tr>)}</tbody></table>{probe(b)&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probeText(b)}</button>}</div>
+      if(b.type==='faq')return <div class="blk faq-layout" {...attrs(b)}><h2 id={b.anchor}>{b.title}</h2><div class="faq-items">{b.items.map(q=><details class="faq-item"><summary>{q.q}<ChevronDown size={20}/></summary><p>{q.a}</p></details>)}</div>{probe(b)&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probeText(b)}</button>}</div>
+      if(b.type==='internal-links')return <div class="blk action-content" {...attrs(b)}><p class="module-title">{b.title}</p>{b.items.map(link=><div>{link.note&&<p>{link.note}</p>}<a class="module-button" href={link.href}>{link.text}<ArrowUpRight size={22}/></a></div>)}{probe(b)&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probeText(b)}</button>}</div>
+      if(b.type==='sources')return <div class="blk" {...attrs(b)}><p class="module-title">{b.title}</p><ul class="document-list">{b.items.map(link=><li><a href={link.href} target="_blank" rel="noopener noreferrer"><FileText size={23}/><span>{link.text}</span><ArrowUpRight size={18}/></a></li>)}</ul>{probe(b)&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probeText(b)}</button>}</div>
+      if(b.type==='image'||b.type==='hero-image')return <figure class="blk module-image" {...attrs(b)}><Image src={b.src} alt={b.alt} loading="lazy"/><figcaption>{b.caption??b.credit.author}</figcaption>{probe(b)&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{probeText(b)}</button>}</figure>
+      if(b.type==='toc')return <nav class="blk" {...attrs(b)} aria-label={b.title}>{d.article.blocks.filter(s=>s.type==='h2').map(s=>s.type==='h2'&&<a href={`#${s.anchor}`}>{s.short}</a>)}</nav>
+      return null
+    })}
+    </div>
+   </div>
+  </section>
+ })}
+</article>
+<script>
+ const initLanding=()=>document.querySelectorAll<HTMLElement>('.landing-rates:not([data-enhanced])').forEach(root=>{
+   const controls=root.querySelectorAll<HTMLButtonElement>('[data-currency]'),panels=root.querySelectorAll<HTMLElement>('[data-currency-panel]')
+   if(!controls.length)return
+   root.dataset.enhanced='true'
+   root.querySelector<HTMLElement>('.currency-picker')!.hidden=false
+   const select=(id:string)=>{controls.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.currency===id)));panels.forEach(p=>p.hidden=p.dataset.currencyPanel!==id)}
+   controls.forEach(b=>b.addEventListener('click',()=>{select(b.dataset.currency!);const panel=root.querySelector<HTMLElement>('[data-currency-panel]:not([hidden])');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)panel?.animate([{opacity:.3,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:260,easing:'ease-out'})}))
+   select('0')
+ })
+ initLanding()
+ document.addEventListener('astro:page-load',initLanding)
+ const revealLanding=()=>{
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return
+  const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+    if(!entry.isIntersecting)return
+    entry.target.animate([{opacity:.4,transform:'translateY(22px)'},{opacity:1,transform:'none'}],{duration:540,easing:'cubic-bezier(.2,0,0,1)'})
+    observer.unobserve(entry.target)
+  }),{threshold:.12})
+  document.querySelectorAll<HTMLElement>('.landing-module .module-inner:not([data-reveal-bound])').forEach(el=>{
+    el.dataset.revealBound='true'
+    if(el.getBoundingClientRect().top>innerHeight)observer.observe(el)
+  })
+  document.addEventListener('astro:before-swap',()=>observer.disconnect(),{once:true})
+ }
+ revealLanding()
+ document.addEventListener('astro:page-load',revealLanding)
+</script>
+<style>
+.landing-body{margin:0;font-family:var(--client-body-font,var(--font-sans));color:var(--ink);line-height:1.65}
+.landing-module{padding:clamp(3rem,6vw,6rem) 1.5rem;background:white}.module-inner{width:100%;max-width:1160px;margin:0 auto}.module-content{min-width:0}.blk{position:relative;scroll-margin-top:160px}.landing-module h2,.module-title{font-family:var(--client-font);font-weight:600;font-size:clamp(1.8rem,3vw,2.65rem);letter-spacing:-.025em;line-height:1.15;color:var(--client);margin:0 0 1.5rem;text-wrap:balance}.landing-module p{font-size:1.05rem;line-height:1.75;margin:0 0 1.25rem;max-width:70ch}.landing-module h2[id]{scroll-margin-top:180px}.module-heading{max-width:780px}.module-intro{padding-block:2rem;border-bottom:1px solid var(--line)}.module-intro p{max-width:88ch;font-size:1rem;margin:auto;color:var(--ink-2)}
+.module-benefits{text-align:center}.module-benefits .module-heading{margin-inline:auto}.benefit-list{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;list-style:none;padding:1.5rem 0 0;margin:0}.benefit-list li{padding:0 1.75rem}.benefit-list li+li{border-left:1px solid var(--line)}.benefit-list svg{color:var(--client);margin:0 auto 1rem}.benefit-list p{margin:0;font-size:1.1rem;color:var(--client);line-height:1.5}
+.module-rates{background:var(--tint-c)}.module-rates .module-content{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:0 4rem}.module-rates .module-heading{grid-column:1}.module-rates .landing-rates{grid-column:2;grid-row:1/span 5}.module-rates .module-content>div:not(.landing-rates){grid-column:1}.module-rates p{font-size:.95rem}.currency-picker{display:flex;gap:.3rem;padding:.3rem;background:white;border-radius:100px;width:fit-content;margin:0 0 1.5rem;border:1px solid var(--line)}.currency-picker[hidden]{display:none}.currency-picker button{border:0;background:transparent;color:var(--client);border-radius:100px;padding:.7rem 1.5rem;font:inherit;font-size:.95rem;cursor:pointer;transition:background 180ms ease,color 180ms ease}.currency-picker button[aria-pressed=true]{background:var(--client);color:white}.currency-grid{min-height:260px}.currency-card{border-top:1px solid var(--line-2);padding-top:1.3rem}.currency-card[hidden]{display:none}.currency-card .currency-title{font-size:.95rem;margin:0 0 .75rem;color:var(--client);font-weight:500}.rate-row{display:flex;align-items:center;gap:2rem;justify-content:space-between;padding:1rem 0;border-bottom:1px solid var(--line-2)}.rate-row>div{flex-shrink:0}.rate-row strong{display:block;font-family:var(--client-font);font-weight:500;font-size:1.8rem;line-height:1.1;color:var(--client)}.rate-primary strong{font-size:clamp(3rem,5vw,4.5rem)}.rate-row span,.rate-row small{display:block;font-size:.72rem;color:var(--ink-3)}.rate-row p{margin:0;line-height:1.5}.rate-caption{font-size:.72rem!important;line-height:1.6!important;margin-top:1rem!important;color:var(--ink-3)}.rates-detail summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:.85rem;font-weight:600;padding:1.3rem 0;color:var(--client)}.table-scroll{overflow:auto}.table-scroll table{border-collapse:collapse;width:100%;font-size:.8rem}.table-scroll td,.table-scroll th{padding:.8rem;border-bottom:1px solid var(--line-2);text-align:left}.table-scroll caption{font-size:.75rem;text-align:left}
+.module-process{background:var(--client);color:white}.module-process .module-content{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:0 4rem}.module-process .module-heading{grid-column:1}.module-process h2{color:white}.module-process .module-list{grid-column:2;grid-row:1/span 4}.module-process .module-content>div:not(.module-list){grid-column:1}.module-process .module-content>div>p{color:color-mix(in srgb,white 85%,var(--client));font-size:1rem}.process-list{padding:0;margin:0;list-style:none}.process-list li{display:flex;align-items:flex-start;gap:1.75rem;padding:1.5rem 0;border-top:1px solid color-mix(in srgb,white 25%,var(--client))}.process-list li:first-child{padding-top:0;border-top:0}.step-index{font-size:2.5rem;line-height:1.2;font-family:var(--client-font);color:var(--landing-action);font-weight:500}.process-list p{margin:0;line-height:1.6}
+.module-faq{background:var(--surf)}.faq-layout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:4rem}.faq-item{border-bottom:1px solid var(--line-2)}.faq-item summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;cursor:pointer;padding:1.5rem 0;color:var(--client);font-size:1.05rem;font-weight:600}.faq-item summary::-webkit-details-marker{display:none}.faq-item summary svg{flex-shrink:0;transition:transform 200ms ease}.faq-item[open] summary svg{transform:rotate(180deg)}.faq-item p{font-size:.95rem;color:var(--ink-2);max-width:62ch}
+.module-action{background:var(--landing-action);text-align:center}.module-action .module-title,.module-action p{color:var(--landing-action-ink)}.module-action p{margin-inline:auto}.module-button{display:inline-flex;align-items:center;justify-content:space-between;gap:2rem;padding:1rem 1.5rem;min-height:50px;text-decoration:none;border-radius:.3rem;background:var(--client);color:white;font-weight:600;font-size:.95rem;margin-top:.75rem;transition:transform 200ms ease,background 200ms ease}.module-button:hover{transform:translateY(-3px)}.module-related .module-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}.related-photo{margin:0;min-width:0}.related-photo :global(img){width:100%;height:360px;object-fit:cover}.related-photo figcaption{font-size:.68rem;color:var(--muted);margin-top:.5rem;line-height:1.5}.module-related .module-button{background:var(--landing-action);color:var(--landing-action-ink)}
+.module-documents{padding-block:3rem;border-top:1px solid var(--line)}.module-documents .module-title{font-size:1.5rem}.document-list{display:grid;grid-template-columns:1fr 1fr;gap:0 3rem;list-style:none;margin:0;padding:0}.document-list a{display:flex;align-items:center;gap:1rem;text-decoration:none;border-bottom:1px solid var(--line);padding:1.2rem 0;color:var(--client);font-size:.85rem}.document-list a>svg{flex-shrink:0}.document-list a>svg:last-child{margin-left:auto}.document-list small{display:block;color:var(--muted)}.module-image{margin:2rem 0}.module-image :global(img){width:100%;height:auto}
+.probe{position:absolute;right:.5rem;top:.5rem;z-index:3;width:44px;height:44px;background:transparent;border:0;padding:0;font-size:0}.probe::before{content:'';display:block;width:12px;height:12px;border-radius:50%;background:var(--blue);border:2px solid white;margin:auto;box-shadow:0 0 0 1px var(--blue)}.probe:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.blk[data-on]{outline:2px solid var(--blue);outline-offset:6px}.landing-module :is(a,button,summary):focus-visible{outline:3px solid var(--blue);outline-offset:4px}
+@media(min-width:901px){:global(.landing-split) .module-process .module-content,:global(.landing-split) .module-rates .module-content,:global(.landing-split) .faq-layout,:global(.landing-split) .module-related .module-inner{display:block}:global(.landing-split) .landing-module{padding:2.5rem 1.5rem}:global(.landing-split) .module-heading{max-width:none}:global(.landing-split) .module-list,:global(.landing-split) .landing-rates{margin-top:2rem}:global(.landing-split) .benefit-list{gap:1rem}:global(.landing-split) .benefit-list li{padding:0 .5rem}:global(.landing-split) .benefit-list p{font-size:.9rem}:global(.landing-split) .related-photo{margin-bottom:1.5rem}}
+@media(max-width:900px){.module-rates .module-content,.module-process .module-content,.faq-layout{display:block}.module-list,.landing-rates{margin-top:2rem}.module-related .module-inner{gap:2rem}.related-photo :global(img){height:300px}.module-inner{max-width:680px}}
+@media(max-width:600px){.landing-module{padding:3rem 1.5rem}.module-intro{padding-block:1.5rem}.landing-module h2,.module-title{font-size:2rem}.benefit-list{display:block;padding-top:.25rem}.benefit-list li{display:flex;gap:1rem;text-align:left;padding:1.25rem 0}.benefit-list li+li{border-left:0;border-top:1px solid var(--line)}.benefit-list svg{flex-shrink:0;margin:0}.benefit-list p{font-size:1rem}.rate-row{gap:1rem}.rate-primary strong{font-size:3.4rem}.process-list li{gap:1.25rem}.step-index{font-size:2rem}.module-related .module-inner,.document-list{display:block}.related-photo{margin-bottom:2rem}.module-button{width:100%;gap:1rem}.faq-item summary{font-size:1rem}.related-photo :global(img){height:230px}}
+@media(prefers-reduced-motion:reduce){.module-button,.currency-picker button,.faq-item summary svg{transition:none}.module-button:hover{transform:none}}
+</style>

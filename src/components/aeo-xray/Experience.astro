@@ -12,6 +12,7 @@ import '@fontsource/poppins/500.css'
 import '@fontsource/poppins/600.css'
 import '@styles/aeo-xray.css'
 import Landing from './Landing.astro'
+import ValueExplorer from './ValueExplorer.astro'
 
 /**
  * Radiografía AEO — el FLOW. TASK-1410 (greenhouse-eo).
@@ -160,7 +161,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 
     {artifactChoices.length > 1 && <nav class="xr-artifacts" aria-label="Piezas de la demostración">{artifactChoices.map(choice => <a href={choice.href} aria-current={choice.active ? 'page' : undefined}>{choice.label}</a>)}</nav>}
     <!-- El RIEL. Su trabajo no es navegar: es AVISAR que el recorrido tiene más pantallas. -->
-    <nav class="xr-rail" aria-label="Recorrido de la muestra">
+    <nav class="xr-rail" aria-label="Recorrido de la muestra" style={`--xr-step-progress:${((i + 1) / flow.length) * 100}%`}>
       <div class="xr-wrap xr-rail-in">
         {flow.map((s, n) => (
           <a
@@ -177,8 +178,10 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
           </a>
         ))}
       </div>
+      <span class="xr-route-progress" aria-hidden="true"></span>
     </nav>
 
+    {composition && (step === 'articulo' || step === 'radiografia') && <ValueExplorer {...composition} />}
     <main class="xr-wrap">
       {/* ══════════ ① EL HUECO ══════════ */}
       {!step && (
@@ -557,6 +560,8 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 
 
 <script>
+  import '@/scripts/aeo-xray-motion'
+  function initializeXrayRail() {
   /**
    * En móvil el riel es horizontal. Si alguien entra por deep-link a la ④, el paso activo
    * no puede quedar fuera de la primera mirada: el riel debe decir "estás acá".
@@ -568,10 +573,22 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       activeXrayStep.scrollIntoView({ block: 'nearest', inline: 'center' })
     })
   }
+  }
+  initializeXrayRail()
+  document.addEventListener('astro:page-load', initializeXrayRail)
 </script>
 
 {step === 'articulo' && (
   <script>
+    let readingController: AbortController | undefined
+    let initializedReading: HTMLElement | null = null
+    function initializeXrayReading() {
+    const currentReading = document.querySelector<HTMLElement>('[data-testid="xray-root"][data-step="articulo"]')
+    if (currentReading && currentReading === initializedReading) return
+    readingController?.abort()
+    initializedReading = currentReading
+    readingController = new AbortController()
+    const { signal } = readingController
     /**
      * El CTA acompaña la lectura, no el footer. Mientras queda artículo por leer flota
      * como rail lateral; cuando el final real del artículo entra en la mirada, se retira.
@@ -607,20 +624,34 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       }
 
       updateNextState()
-      window.addEventListener('scroll', queueNextState, { passive: true })
-      window.addEventListener('resize', queueNextState)
+      window.addEventListener('scroll', queueNextState, { passive: true, signal })
+      window.addEventListener('resize', queueNextState, { signal })
+      signal.addEventListener('abort', () => cancelAnimationFrame(nextRaf), { once: true })
     }
+    }
+    initializeXrayReading()
+    document.addEventListener('astro:page-load', initializeXrayReading)
   </script>
 )}
 
 {step === 'radiografia' && (
   <script>
+    let couplingController: AbortController | undefined
+    let initializedCoupling: HTMLElement | null = null
+    function initializeXrayCoupling() {
+    const currentCoupling = document.querySelector<HTMLElement>('[data-testid="xray-root"][data-step="radiografia"]')
+    if (currentCoupling && currentCoupling === initializedCoupling) return
+    couplingController?.abort()
+    initializedCoupling = currentCoupling
+    if (!currentCoupling) return
+    couplingController = new AbortController()
+    const { signal } = couplingController
     /**
      * Acoplamiento asimétrico artículo ↔ instrumento. CERO React: el contenido es estático;
      * hidratarlo para conmutar un resaltado sería over-hydration. Esto solo mueve `data-on`;
      * el CSS hace el resto. Sin JS, el par héroe ya viene pintado desde el HTML.
      */
-    const root = document.querySelector<HTMLElement>('[data-testid="xray-root"]')
+    const root = currentCoupling
     /* El héroe llega por el DOM, DERIVADO del payload. El script no conoce al cliente. */
     const HERO = root?.dataset.hero ?? ''
 
@@ -854,7 +885,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       root.addEventListener('mousemove', () => { keyboard = false }, { passive: true })
       document.addEventListener('keydown', e => {
         if (e.key === 'Tab' || e.key.startsWith('Arrow')) keyboard = true
-      })
+      }, { signal })
 
       /**
        * 🔴 EL INSTRUMENTO NO PUEDE REPINTARSE DESDE SÍ MISMO.
@@ -906,8 +937,11 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
            instrumento, y sin ella —al no haber `mouseout`, el acoplamiento es pegajoso a
            propósito— no habría forma de volver a ver la máquina completa sin recargar. */
         exitFocus()
-      })
+      }, { signal })
     }
+    }
+    initializeXrayCoupling()
+    document.addEventListener('astro:page-load', initializeXrayCoupling)
   </script>
 )}
 

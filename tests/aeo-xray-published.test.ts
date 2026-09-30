@@ -21,3 +21,17 @@ test('unknown publication and undeclared assets fail closed',()=>{
  for(const id of ['../pichincha.json','constructor','__proto__','unknown'])assert.equal(publishedSampleAsset(sample.key,id),null)
  assert.equal(publishedSampleAsset('sample_unknown','bank-logo'),null)
 })
+
+test('published question decisions agree with their instrument nodes',()=>{
+ for(const artifact of sample.model.artifacts){
+  for(const question of artifact.experience.evidence.fanOut.items){
+   assert.ok(artifact.blocks.some(block=>block.id===question.coveredBy))
+   for(const annotation of artifact.annotations.filter(a=>a.blockId===question.coveredBy)){
+    const node=artifact.experience.machine.craft.find(n=>n.id===annotation.id)
+    assert.ok(node,annotation.id)
+    assert.equal(node.sourceStatus,annotation.status)
+    assert.equal(node.why,annotation.explanation)
+   }
+  }
+ }
+})

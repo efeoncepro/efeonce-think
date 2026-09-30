@@ -163,23 +163,27 @@
           {
             "id": "lp-beneficios-title",
             "level": 2,
-            "text": "Elige la moneda de tu ahorro",
+            "text": "Más espacio para tus planes.",
             "kind": "heading",
             "short": "Beneficios"
           },
           {
             "id": "lp-beneficios",
             "items": [
-              "Elige la moneda de tu ahorro según el uso que le darás.",
-              "Ten presentes las condiciones de rendimiento antes de trasladar tu dinero.",
-              "Revisa los canales y costos de las operaciones que usas con más frecuencia."
+              "Sin costo de mantenimiento mensual.",
+              "Sin monto mínimo para abrir tu cuenta.",
+              "Ahorra en soles o dólares, según tus planes."
             ],
-            "kind": "list"
+            "kind": "list",
+            "sourceIds": [
+              "product",
+              "tariff"
+            ]
           },
           {
             "id": "lp-condiciones",
             "level": 2,
-            "text": "La tasa, con sus condiciones a la vista",
+            "text": "Tu ahorro, en la moneda que eliges.",
             "kind": "heading",
             "short": "Condiciones"
           },
@@ -233,12 +237,13 @@
           {
             "id": "lp-requisitos",
             "level": 2,
-            "text": "Prepara tu apertura digital",
-            "kind": "heading"
+            "text": "Tu siguiente paso empieza aquí.",
+            "kind": "heading",
+            "short": "Cómo abrirla"
           },
           {
             "id": "lp-requisitos-copy",
-            "text": "La apertura digital descrita por el banco incluye DNI, ingreso de datos y validación de identidad mediante reconocimiento facial. Después se revisan los términos. La evaluación y confirmación pertenecen al canal oficial.",
+            "text": "Ten tu DNI a mano. El canal digital del banco te guía para completar tus datos y validar tu identidad.",
             "sourceIds": [
               "product"
             ],
@@ -248,26 +253,56 @@
             "id": "lp-pasos",
             "ordered": true,
             "items": [
-              "Consulta el tarifario y la cartilla. Resuelve tus dudas antes de aceptar.",
-              "Ingresa al canal oficial y completa la información que solicite.",
-              "Conserva la confirmación y los documentos de tu cuenta."
+              "Completa tus datos y valida tu identidad con reconocimiento facial.",
+              "Revisa tu información, las condiciones y los documentos de tu cuenta.",
+              "Conserva la confirmación de apertura y accede a los canales del banco."
             ],
-            "kind": "list"
+            "kind": "list",
+            "sourceIds": [
+              "product"
+            ]
           },
           {
             "id": "lp-confianza",
             "level": 2,
-            "text": "Información que conviene guardar",
+            "text": "Decide con toda la información.",
             "kind": "heading"
           },
           {
             "id": "lp-confianza-copy",
-            "text": "Ten a mano el tarifario, la cartilla y el contrato. Consulta la cobertura vigente del Fondo de Seguro de Depósitos y sus condiciones: no es una garantía ilimitada.",
+            "text": "Consulta el tarifario, la cartilla y el contrato antes de abrir tu cuenta. También puedes revisar la cobertura y condiciones del Fondo de Seguro de Depósitos.",
             "sourceIds": [
               "fsd",
               "sbs"
             ],
             "kind": "paragraph"
+          },
+          {
+            "id": "landing-sources",
+            "kind": "sources",
+            "title": "Fuentes y condiciones consultadas",
+            "items": [
+              {
+                "text": "Cuenta de Ahorros Preferente · Banco Pichincha",
+                "href": "https://www.pichincha.pe/personas/cuenta/ahorro-preferente"
+              },
+              {
+                "text": "Tarifario Ahorro Preferente · actualizado 16/07/2026",
+                "href": "https://www.pichincha.pe/sites/default/files/2026-07/Tarifario%20Ahorro%20Preferente%2016.07.26.pdf"
+              },
+              {
+                "text": "Cartilla unificada enlazada desde la página del producto",
+                "href": "https://www.pichincha.pe/sites/default/files/2026-07/CARTILLA%20DE%20INFORMACI%C3%93N%20UNIFICADA%20MAYO%202026%20%281%29.pdf"
+              },
+              {
+                "text": "SBS · Compara y elige",
+                "href": "https://www.sbs.gob.pe/usuarios/aprende-con-la-sbs/compara-y-elige"
+              },
+              {
+                "text": "Fondo de Seguro de Depósitos · cobertura",
+                "href": "https://fsd.org.pe/cobertura/"
+              }
+            ]
           },
           {
             "id": "lp-faq",
@@ -295,16 +330,6 @@
             "short": "Preguntas"
           },
           {
-            "id": "lp-final",
-            "title": "Empieza por conocer tu cuenta.",
-            "text": "Consulta la información oficial y decide con las condiciones completas.",
-            "kind": "cta",
-            "action": {
-              "label": "Ver Cuenta de Ahorros Preferente",
-              "href": "https://www.pichincha.pe/personas/cuenta/ahorro-preferente"
-            }
-          },
-          {
             "id": "lp-related",
             "title": "Antes de abrirla, revisa estas preguntas.",
             "text": "Una guía para comparar una cuenta de ahorros online con tu forma de usar el dinero.",
@@ -315,35 +340,14 @@
             }
           },
           {
-            "id": "landing-sources",
-            "kind": "sources",
-            "title": "Fuentes y condiciones consultadas",
-            "items": [
-              {
-                "text": "Cuenta de Ahorros Preferente · Banco Pichincha",
-                "href": "https://www.pichincha.pe/personas/cuenta/ahorro-preferente"
-              },
-              {
-                "text": "Tarifario Ahorro Preferente · actualizado 16/07/2026",
-                "href": "https://www.pichincha.pe/sites/default/files/2026-07/Tarifario%20Ahorro%20Preferente%2016.07.26.pdf"
-              },
-              {
-                "text": "Cartilla unificada enlazada desde la página del producto",
-                "href": "https://www.pichincha.pe/sites/default/files/2026-07/CARTILLA%20DE%20INFORMACI%C3%93N%20UNIFICADA%20MAYO%202026%20%281%29.pdf"
-              },
-              {
-                "text": "SBS · Compara y elige",
-                "href": "https://www.sbs.gob.pe/usuarios/aprende-con-la-sbs/compara-y-elige"
-              },
-              {
-                "text": "Fondo de Seguro de Depósitos · cobertura",
-                "href": "https://fsd.org.pe/cobertura/"
-              },
-              {
-                "text": "DataForSEO · metodología del proveedor, no snapshot de resultados",
-                "href": "https://docs.dataforseo.com/v3/dataforseo_labs-google-keyword_overview-live/"
-              }
-            ]
+            "id": "lp-final",
+            "title": "Empieza por conocer tu cuenta.",
+            "text": "Consulta la información oficial y decide con las condiciones completas.",
+            "kind": "cta",
+            "action": {
+              "label": "Ver Cuenta de Ahorros Preferente",
+              "href": "https://www.pichincha.pe/personas/cuenta/ahorro-preferente"
+            }
           }
         ],
         "annotations": [
@@ -400,12 +404,17 @@
             "blockId": "lp-tabla",
             "category": "on-page",
             "title": "Comparación con condiciones",
-            "explanation": "La comparación conserva las condiciones junto al dato; los encabezados deben ser semánticos y legibles en móvil.",
-            "status": "proposed",
+            "explanation": "La tasa permanece junto a la moneda y el saldo promedio mensual que la hace aplicable. La comparación completa está en HTML, con encabezados de tabla; el selector ayuda a leer sin separar la cifra de sus condiciones.",
+            "status": "implemented",
             "sourceIds": [
               "product",
               "tariff"
-            ]
+            ],
+            "evidence": {
+              "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
           },
           {
             "id": "ann-lp-condiciones-copy",
@@ -447,11 +456,16 @@
             "blockId": "lp-requisitos-copy",
             "category": "aeo",
             "title": "Respuesta y contexto",
-            "explanation": "La afirmación puede contrastarse contra una fuente oficial fechada. Se debe reverificar antes de enviar y al cambiar las condiciones.",
-            "status": "proposed",
+            "explanation": "El pasaje responde qué preparar antes de iniciar la apertura y remite al canal del banco. Tiene contexto suficiente para entenderse por sí mismo y una fuente oficial; su presencia no demuestra que un motor ya lo haya citado.",
+            "status": "implemented",
             "sourceIds": [
               "product"
-            ]
+            ],
+            "evidence": {
+              "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
           },
           {
             "id": "ann-lp-confianza",
@@ -483,8 +497,13 @@
             "category": "on-page",
             "title": "Jerarquía y navegación",
             "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
-            "status": "proposed",
-            "sourceIds": []
+            "status": "implemented",
+            "sourceIds": [],
+            "evidence": {
+              "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
           },
           {
             "id": "ann-lp-faq",
@@ -492,12 +511,17 @@
             "blockId": "lp-faq",
             "category": "aeo",
             "title": "Preguntas que resuelven dudas",
-            "explanation": "Preguntas y respuestas visibles; su representación técnica debe derivarse de este mismo contenido, sin prometer un resultado enriquecido.",
-            "status": "proposed",
+            "explanation": "La respuesta distingue mantenimiento de comisiones por operaciones. Ese matiz evita que una respuesta breve se vuelva una afirmación financiera incorrecta. Las respuestas están en el HTML y se pueden contrastar con el tarifario.",
+            "status": "implemented",
             "sourceIds": [
               "tariff",
               "product"
-            ]
+            ],
+            "evidence": {
+              "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
           },
           {
             "id": "ann-lp-final",
@@ -792,22 +816,22 @@
                 },
                 {
                   "level": 2,
-                  "text": "Elige la moneda de tu ahorro",
+                  "text": "Más espacio para tus planes.",
                   "coupleId": "lp-beneficios-title"
                 },
                 {
                   "level": 2,
-                  "text": "La tasa, con sus condiciones a la vista",
+                  "text": "Tu ahorro, en la moneda que eliges.",
                   "coupleId": "lp-condiciones"
                 },
                 {
                   "level": 2,
-                  "text": "Prepara tu apertura digital",
+                  "text": "Tu siguiente paso empieza aquí.",
                   "coupleId": "lp-requisitos"
                 },
                 {
                   "level": 2,
-                  "text": "Información que conviene guardar",
+                  "text": "Decide con toda la información.",
                   "coupleId": "lp-confianza"
                 },
                 {
@@ -943,7 +967,7 @@
                 "sourceStatus": "measured",
                 "label": "La búsqueda que informa esta propuesta",
                 "detail": "SEO on-page",
-                "why": "La observación distingue una consulta amplia de búsquedas de apertura y comparación. Sirve para decidir el papel de cada contenido; no mide resultados de esta muestra. Observación de Efeonce con DataForSEO el 30/09/2026, mercado Perú (2604), idioma español. Volumen mensual estimado, sin segmentación por dispositivo: «cuenta de ahorros», 2,900 (dato actualizado 17/09/2026); «abrir cuenta de ahorros», 210 (14/09/2026); «como abrir una cuenta de ahorros», 90 (15/09/2026); «cuenta de ahorros online», 30 (12/09/2026). Los volúmenes no se suman ni equivalen a tráfico potencial. El enlace documenta la metodología del proveedor; los resultados consultados se conservan en el expediente de esta edición.",
+                "why": "La observación distingue una consulta amplia de búsquedas de apertura y comparación. Sirve para decidir el papel de cada contenido; no mide resultados de esta muestra.",
                 "tier": 2,
                 "source": "DataForSEO · metodología del proveedor, no snapshot de resultados",
                 "asOf": "2026-09-30"
@@ -981,10 +1005,10 @@
                 "id": "ann-lp-tabla",
                 "coupleId": "lp-tabla",
                 "sourceScope": "block",
-                "sourceStatus": "proposed",
+                "sourceStatus": "implemented",
                 "label": "Comparación con condiciones",
                 "detail": "SEO on-page",
-                "why": "La comparación conserva las condiciones junto al dato; los encabezados deben ser semánticos y legibles en móvil.",
+                "why": "La tasa permanece junto a la moneda y el saldo promedio mensual que la hace aplicable. La comparación completa está en HTML, con encabezados de tabla; el selector ayuda a leer sin separar la cifra de sus condiciones.",
                 "tier": 2,
                 "source": "Cuenta de Ahorros Preferente · Banco Pichincha · Tarifario Ahorro Preferente · actualizado 16/07/2026",
                 "asOf": "2026-09-30"
@@ -1027,10 +1051,10 @@
                 "id": "ann-lp-requisitos-copy",
                 "coupleId": "lp-requisitos-copy",
                 "sourceScope": "block",
-                "sourceStatus": "proposed",
+                "sourceStatus": "implemented",
                 "label": "Respuesta y contexto",
                 "detail": "AEO",
-                "why": "La afirmación puede contrastarse contra una fuente oficial fechada. Se debe reverificar antes de enviar y al cambiar las condiciones.",
+                "why": "El pasaje responde qué preparar antes de iniciar la apertura y remite al canal del banco. Tiene contexto suficiente para entenderse por sí mismo y una fuente oficial; su presencia no demuestra que un motor ya lo haya citado.",
                 "tier": 2,
                 "source": "Cuenta de Ahorros Preferente · Banco Pichincha",
                 "asOf": "2026-09-30"
@@ -1061,7 +1085,7 @@
                 "id": "ann-lp-faq-title",
                 "coupleId": "lp-faq",
                 "sourceScope": "block",
-                "sourceStatus": "proposed",
+                "sourceStatus": "implemented",
                 "label": "Jerarquía y navegación",
                 "detail": "SEO on-page",
                 "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
@@ -1071,10 +1095,10 @@
                 "id": "ann-lp-faq",
                 "coupleId": "lp-faq",
                 "sourceScope": "block",
-                "sourceStatus": "proposed",
+                "sourceStatus": "implemented",
                 "label": "Preguntas que resuelven dudas",
                 "detail": "AEO",
-                "why": "Preguntas y respuestas visibles; su representación técnica debe derivarse de este mismo contenido, sin prometer un resultado enriquecido.",
+                "why": "La respuesta distingue mantenimiento de comisiones por operaciones. Ese matiz evita que una respuesta breve se vuelva una afirmación financiera incorrecta. Las respuestas están en el HTML y se pueden contrastar con el tarifario.",
                 "tier": 2,
                 "source": "Tarifario Ahorro Preferente · actualizado 16/07/2026 · Cuenta de Ahorros Preferente · Banco Pichincha",
                 "asOf": "2026-09-30"
@@ -1133,7 +1157,7 @@
                 "sourceStatus": "implemented",
                 "label": "Titular, contexto y fotografía original",
                 "detail": "SEO on-page",
-                "why": "La pieza abre con un H1 único y un contexto que explica qué encontrará la persona. La imagen declara dimensiones y texto alternativo; su crédito distingue la creación ilustrativa de un testimonio bancario. Implementado en el renderer de esta muestra y comprobado en HTML y navegador local a 1440 y 390 píxeles. No representa una implementación en pichincha.pe.",
+                "why": "La pieza abre con un H1 único y un contexto que explica qué encontrará la persona. La imagen declara dimensiones y texto alternativo; su crédito distingue la creación ilustrativa de un testimonio bancario.",
                 "tier": 2
               },
               {
@@ -1735,10 +1759,15 @@
             "category": "aeo",
             "title": "Respuesta y contexto",
             "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
-            "status": "proposed",
+            "status": "implemented",
             "sourceIds": [
               "sbs"
-            ]
+            ],
+            "evidence": {
+              "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
           },
           {
             "id": "ann-art-saldo",
@@ -1757,10 +1786,15 @@
             "category": "aeo",
             "title": "Respuesta y contexto",
             "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
-            "status": "proposed",
+            "status": "implemented",
             "sourceIds": [
               "tariff"
-            ]
+            ],
+            "evidence": {
+              "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
           },
           {
             "id": "ann-art-tabla",
@@ -1811,10 +1845,15 @@
             "category": "aeo",
             "title": "Respuesta y contexto",
             "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
-            "status": "proposed",
+            "status": "implemented",
             "sourceIds": [
               "product"
-            ]
+            ],
+            "evidence": {
+              "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
           },
           {
             "id": "ann-art-respaldo",
@@ -1833,10 +1872,15 @@
             "category": "aeo",
             "title": "Respuesta y contexto",
             "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
-            "status": "proposed",
+            "status": "implemented",
             "sourceIds": [
               "fsd"
-            ]
+            ],
+            "evidence": {
+              "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+              "asOf": "2026-09-30",
+              "sourceIds": []
+            }
           },
           {
             "id": "ann-art-faq-title",
@@ -2303,7 +2347,7 @@
                 "sourceStatus": "measured",
                 "label": "La búsqueda que informa esta propuesta",
                 "detail": "SEO on-page",
-                "why": "La observación distingue una consulta amplia de búsquedas de apertura y comparación. Sirve para decidir el papel de cada contenido; no mide resultados de esta muestra. Observación de Efeonce con DataForSEO el 30/09/2026, mercado Perú (2604), idioma español. Volumen mensual estimado, sin segmentación por dispositivo: «cuenta de ahorros», 2,900 (dato actualizado 17/09/2026); «abrir cuenta de ahorros», 210 (14/09/2026); «como abrir una cuenta de ahorros», 90 (15/09/2026); «cuenta de ahorros online», 30 (12/09/2026). Los volúmenes no se suman ni equivalen a tráfico potencial. El enlace documenta la metodología del proveedor; los resultados consultados se conservan en el expediente de esta edición.",
+                "why": "La observación distingue una consulta amplia de búsquedas de apertura y comparación. Sirve para decidir el papel de cada contenido; no mide resultados de esta muestra.",
                 "tier": 2,
                 "source": "DataForSEO · metodología del proveedor, no snapshot de resultados",
                 "asOf": "2026-09-30"
@@ -2351,7 +2395,7 @@
                 "id": "ann-art-trea-answer",
                 "coupleId": "art-trea-answer",
                 "sourceScope": "block",
-                "sourceStatus": "proposed",
+                "sourceStatus": "implemented",
                 "label": "Respuesta y contexto",
                 "detail": "AEO",
                 "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
@@ -2373,7 +2417,7 @@
                 "id": "ann-art-saldo-answer",
                 "coupleId": "art-saldo-answer",
                 "sourceScope": "block",
-                "sourceStatus": "proposed",
+                "sourceStatus": "implemented",
                 "label": "Respuesta y contexto",
                 "detail": "AEO",
                 "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
@@ -2427,7 +2471,7 @@
                 "id": "ann-art-apertura-answer",
                 "coupleId": "art-apertura-answer",
                 "sourceScope": "block",
-                "sourceStatus": "proposed",
+                "sourceStatus": "implemented",
                 "label": "Respuesta y contexto",
                 "detail": "AEO",
                 "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
@@ -2449,7 +2493,7 @@
                 "id": "ann-art-respaldo-answer",
                 "coupleId": "art-respaldo-answer",
                 "sourceScope": "block",
-                "sourceStatus": "proposed",
+                "sourceStatus": "implemented",
                 "label": "Respuesta y contexto",
                 "detail": "AEO",
                 "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
@@ -2521,7 +2565,7 @@
                 "sourceStatus": "implemented",
                 "label": "Titular, contexto y fotografía original",
                 "detail": "SEO on-page",
-                "why": "La pieza abre con un H1 único y un contexto que explica qué encontrará la persona. La imagen declara dimensiones y texto alternativo; su crédito distingue la creación ilustrativa de un testimonio bancario. Implementado en el renderer de esta muestra y comprobado en HTML y navegador local a 1440 y 390 píxeles. No representa una implementación en pichincha.pe.",
+                "why": "La pieza abre con un H1 único y un contexto que explica qué encontrará la persona. La imagen declara dimensiones y texto alternativo; su crédito distingue la creación ilustrativa de un testimonio bancario.",
                 "tier": 2
               },
               {

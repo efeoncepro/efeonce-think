@@ -54,3 +54,33 @@ La recaptura detectó regresión del hero desktop: regla genérica `.landing .bl
 El operador solicita enviar la muestra ahora y pospone la conexión a Greenhouse. Se publica el mismo recorrido completo mediante paquete `sample_*` incluido en Think: manifest validado y tres imágenes aprobadas con hashes comprobados. No requiere Greenhouse, migraciones, flags, grants ni release general. Enlace no listado, noindex, sin analytics; no es acceso autenticado. Retirada mediante redeploy.
 
 Preflight autónomo: build PASS, Astro check sin errores,17 pruebas unitarias PASS,198 verificaciones de experiencia con el paquete publicado PASS, distribución AXIS7 hashes PASS. El estado de despliegue se verifica contra Vercel y HTTP después del push.
+
+
+## Corrección tras revisión del operador — motion y landing completa
+
+El operador identificó que la publicación conservaba CSS de view transitions pero no una
+transición perceptible durante el recorrido, y que la landing terminaba en texto genérico tras
+el hero. El gate anterior con `reducedMotion: reduce` no certificaba movimiento real. Se corrige
+esa afirmación de cierre: el motion ahora tiene una prueba independiente sin reducción.
+
+- `ClientRouter` en la ruta compuesta; navegación por query y cambio de artefacto dentro del
+  mismo documento, transformación del espécimen de620ms, entrada del instrumento y secuencia
+  de derivados. Navegación atrás/adelante y acoplamiento reinicializados después del swap.
+- Landing con9 módulos reutilizables: respuesta inicial, beneficios, condiciones por moneda,
+  apertura, información de confianza, documentos, FAQ, artículo relacionado y CTA final.
+  Se preservan hero, fotografía, tipografía y paleta de la referencia bancaria.
+- Explorador compacto del valor: preguntas del manifest, respuesta real, decisión SEO/AEO,
+  fuentes y salto al bloque exacto. Medición propuesta separa descubrimiento, presencia/citas
+  y avance hacia producto; no atribuye resultados ni despliegue al dominio del banco.
+- Paquete publicado revalidado con el contrato AXIS y condiciones oficiales consultadas al
+ 30/09/2026. Estados implementados sólo se refieren al HTML de esta muestra.
+
+Evidencia local: Astro check0 errores, build PASS,19 tests, distribución AXIS7 hashes,
+198 comprobaciones del recorrido,25 de motion efectivo,87 de valor/módulos y46 del motor original. Capturas y
+trazas en `.captures/aeo-xray-extension`, `.captures/aeo-xray-motion` y
+`.captures/aeo-xray-value`. Revisadas landing desktop y móvil y panel de valor; la revisión
+independiente no identificó P1/P2 en las capturas de módulos. Esto no constituye aprobación
+del operador, auditoría integral de accesibilidad ni medición de rendimiento del cliente.
+
+Alcance de publicación: sólo **efeonce-think**. Greenhouse no recibe deploy ni cambios de runtime.
+La verificación de Vercel y del enlace público se registra después del push.

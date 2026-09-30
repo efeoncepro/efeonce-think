@@ -14,7 +14,8 @@ try{
    const response=await page.goto(`${base}/aeo-xray/r/${token}?artifact=${artifact}&step=${step}`,{waitUntil:'networkidle'})
    check(prefix+' status',response.status()===200)
    const html=await page.content(),headers=response.headers()
-   check(prefix+' privacy',headers['cache-control'].includes('no-store')&&headers['referrer-policy']==='no-referrer'&&!html.includes(token)&&!html.includes('googletagmanager.com')&&!html.includes('application/ld+json'))
+   const privacy={noStore:headers['cache-control']?.includes('no-store'),noReferrer:headers['referrer-policy']==='no-referrer',noKeyInMarkup:!html.includes(token),noAnalytics:!html.includes('googletagmanager.com'),noActiveSchema:!html.includes('application/ld+json')}
+   check(prefix+' privacy '+JSON.stringify(privacy),Object.values(privacy).every(Boolean))
    check(prefix+' flow4',await page.locator('.xr-rail a').count()===4)
    check(prefix+' selector retains step',(await page.locator('.xr-artifacts a').evaluateAll(els=>els.map(e=>e.getAttribute('href')))).every(h=>step?h.includes('step='+step):!h.includes('step=')))
    check(prefix+' no overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1))

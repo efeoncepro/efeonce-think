@@ -1,6 +1,5 @@
 ---
-import {landingComparison} from '@/lib/aeo-xray/landing-model'
-import Article from './Article.astro'
+import LandingModules from './LandingModules.astro'
 import SpecimenHeader from './SpecimenHeader.astro'
 import Image from './SampleImage.astro'
 import type {RenderSample} from '@/lib/aeo-xray/render-model'
@@ -12,12 +11,8 @@ const context=Astro.props.landing as {artifact:AxisAeoXrayArtifact;model:AxisAeo
 const headline=d.article.blocks.find(b=>b.type==='h1')
 const photo=d.article.blocks.find(b=>b.type==='hero-image')
 const marketing=context?.artifact.blocks.find(b=>b.kind==='hero')
-const comparison=landingComparison(d.article.blocks)
-const rateTable=comparison?.table
-const comparisonGroups=comparison?.groups??[]
 const sections=d.article.blocks.filter(b=>b.type==='h2'||b.type==='faq')
-const benefitsHeading=comparison?.heading
-const body={...d,article:{...d.article,blocks:d.article.blocks.filter(b=>b!==headline&&b!==photo&&b!==rateTable&&b!==benefitsHeading&&!(b.type==='paragraph'&&marketing?.kind==='hero'&&b.text===marketing.text))}}
+const body={...d,article:{...d.article,blocks:d.article.blocks.filter(b=>b!==headline&&b!==photo&&!(b.type==='paragraph'&&marketing?.kind==='hero'&&b.text===marketing.text))}}
 const id=headline?.coupleId??''
 const count=produces.get(id)??0
 const attrs=(id:string)=>coupled?{id:`block-${id}`,'data-couple':id,'data-n':`${produces.get(id)??0} ${d.ui.producesLabel}`,'data-on':id===hero?true:undefined}:{}
@@ -42,18 +37,10 @@ const href=action?.artifactId?experienceHref(action.artifactId,'articulo',action
       <figcaption>{photo.credit.author}</figcaption>
     </figure>}
   </section>
-  {rateTable?.type==='table'&&<section class="landing-rates blk" {...attrs(rateTable.coupleId??'')} aria-label={rateTable.caption}>
-    <p class="rates-eyebrow">{rateTable.headers[2]}</p><div class="blk" {...attrs(benefitsHeading?.coupleId??'')}><h2 id={benefitsHeading?.anchor}>{benefitsHeading&&'text'in benefitsHeading?benefitsHeading.text:rateTable.caption}</h2>{coupled&&(produces.get(benefitsHeading?.coupleId??'')??0)>0&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{d.ui.srProduces.replace('{n}',String(produces.get(benefitsHeading?.coupleId??'')))}</button>}</div>
-    <div class="currency-grid">{comparisonGroups.map(g=><article class="currency-card"><h3>{g.label}</h3>{g.rows.map((r,i)=><div class:list={['rate-row',{'rate-primary':i===g.rows.length-1}]}><strong>{r[2]}</strong><p><span>{rateTable.headers[1]}</span><br/>{r[1]}</p></div>)}</article>)}</div>
-    <details class="rates-detail"><summary>Ver tabla completa</summary><div class="rates-table-scroll"><table><caption>{rateTable.caption}</caption><thead><tr>{rateTable.headers.map(h=><th scope="col">{h}</th>)}</tr></thead><tbody>{rateTable.rows.map(r=><tr>{r.map(c=><td>{c}</td>)}</tr>)}</tbody></table></div></details><p class="rate-caption">{rateTable.caption}</p>
-    {coupled&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{d.ui.srProduces.replace('{n}',String(produces.get(rateTable.coupleId??'')??0))}</button>}
-  </section>}
-  <Article d={body} semantic={!coupled} coupled={coupled} produces={produces} hero={hero}/>
+  <LandingModules d={body} coupled={coupled} produces={produces} hero={hero} context={context}/>
 </div>
 <style>
 .landing .blk{position:relative}
-.rates-detail{max-width:900px;margin:1.5rem auto;text-align:left;font-size:.85rem}.rates-detail summary{cursor:pointer;padding:1rem;font-weight:650}.rates-table-scroll{overflow:auto}.rates-detail table{width:100%;border-collapse:collapse}.rates-detail td,.rates-detail th{padding:.8rem;border-bottom:1px solid var(--line)}.rates-detail caption{text-align:left;padding:1rem;line-height:1.5}
-.landing-rates{position:relative;background:var(--surf);padding:3rem clamp(1.5rem,5vw,5rem);text-align:center}.landing .landing-rates h2{font-size:2.6rem;margin:0 0 2rem}.rates-eyebrow{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}.currency-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:900px;margin:auto}.currency-card{display:flex;flex-direction:column;background:white;border:1px solid var(--line);border-radius:.65rem;padding:2rem}.currency-card h3{order:-2;font-size:1.1rem;color:var(--client);margin:0 0 1rem}.rate-row{padding:.6rem}.rate-row strong{font-size:1.2rem;color:var(--client)}.rate-primary{order:-1}.rate-primary strong{font-family:var(--client-font);font-size:3.5rem}.rate-row p{font-size:.85rem;margin-top:.5rem}.rate-caption{font-size:.75rem;line-height:1.6;max-width:80ch;margin:1.5rem auto 0}.landing-split .currency-card{padding:1rem}.landing-split .rate-primary{order:-1}.rate-primary strong{font-size:2.5rem}@media(max-width:680px){.currency-grid{grid-template-columns:1fr}.landing-photo :global(img){max-height:360px}.landing-hero{min-height:0}}
 
 .landing{view-transition-name:xr-article;min-width:0;background:white;color:var(--ink)}
 .landing-hero{position:relative;display:block;min-height:536px;overflow:hidden;border-radius:var(--r);background:white}

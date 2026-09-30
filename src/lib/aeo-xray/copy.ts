@@ -17,6 +17,20 @@ export const xrayCopy = {
   sourceLink: 'Consultar fuente', next: 'Continúa con',
   categories: { technical: 'SEO técnico', 'on-page': 'SEO on-page', aeo: 'AEO', conversion: 'Conversión' },
   statuses: { proposed: 'Propuesto', implemented: 'Implementado en la muestra', verified: 'Verificado', measured: 'Medido' },
+  value: {
+    summary: 'El valor detrás de la pieza', questions: 'preguntas', open: 'Explorar decisiones',
+    eyebrow: 'De la intención a la decisión', title: 'Una pregunta. Una respuesta que se puede comprobar.',
+    intro: 'Explora cómo conectamos una necesidad de búsqueda con contenido útil, decisiones técnicas y un siguiente paso.',
+    choose: 'Preguntas resueltas por la pieza', answer: 'Contenido real de esta muestra', why: 'La decisión SEO / AEO',
+    sources: 'Fuentes de esta respuesta', inspect: 'Ver el bloque en la radiografía', read: 'Ir a la respuesta',
+    measureTitle: 'Cómo comprobaríamos el valor después de publicar',
+    measureIntro: 'Estas son las señales que contrastaríamos con una línea base. Esta muestra demuestra la implementación; todavía no mide rendimiento del banco.',
+    measure: [
+      {label:'SEO · descubrimiento',question:'¿Nos encuentran por las consultas que queremos resolver?',method:'Comparar impresiones, clics y CTR por consulta y página en Search Console, con país, dispositivo y períodos equivalentes. Comprobar indexación y rendimiento de campo por separado.'},
+      {label:'AEO · presencia y exactitud',question:'¿Qué motores usan la fuente y con qué precisión?',method:'Repetir un panel definido de preguntas por motor, modo y fecha. Registrar mención de marca, URL citada y exactitud de tasas, moneda y condiciones. Tener la respuesta en la página no demuestra una cita.'},
+      {label:'Conversión · siguiente paso',question:'¿La respuesta ayuda a avanzar hacia el producto?',method:'Medir lectura, clic en el CTA y llegada al canal oficial. Conectar aperturas o fondeo únicamente con datos y acceso autorizados del banco; una visita o una cita no equivale a una cuenta abierta.'},
+    ],
+  },
   states: {
     not_found: { title: 'Este enlace no está disponible', body: 'Solicita un enlace vigente a tu contacto de Efeonce.' },
     gone: { title: 'Este enlace dejó de estar disponible', body: 'La muestra fue retirada o el acceso fue revocado. Tu contacto de Efeonce puede ayudarte.' },
