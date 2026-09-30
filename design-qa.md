@@ -114,3 +114,16 @@ el gate y se exige comprobar de nuevo el enlace de producción.
 
 Alcance: sólo Think. No se publica en Instagram, no se envía correo y no se despliega Greenhouse.
 Aceptación visual final del operador y auditoría integral de accesibilidad no se presuponen.
+
+### Ajuste de reproducción tras prueba del operador
+
+El operador reportó que el video no reproducía. En su navegador IAB se verificó carga720×1280,
+duración10s, avance tras el Play nativo y llegada al último fotograma. La interacción requería
+dos clics: «Video» sólo cambiaba de vista y el Play quedaba debajo del primer viewport. Ahora
+esa selección inicia reproducción por gesto del usuario; un botón grande permite reproducir,
+reanudar y repetir, y un fallo real expone recuperación/descarga. No hay autoplay al abrir la página.
+
+El gate ya no inicia el video con `play()` para probar ese flujo: exige que avance después del
+clic en «Video» y prueba el control grande.113 checks locales de medios y25 de motion PASS.
+El caso no-JS de motion espera la carga del instrumento completo: esperar sólo su contenedor
+podía comprobarlo antes de que llegaran sus hijos en producción. No cambió el runtime no-JS.

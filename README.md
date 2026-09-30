@@ -233,6 +233,7 @@ fuente y anotación. Los assets cuyo crédito comienza con `Composición:` se mu
 `SocialShowcase.astro` presenta todos los elementos de `experience.atoms`, sin un límite fijo
 de tres. `post.imageAssetId` proporciona una gráfica; `reel` incorpora el video y su poster.
 El componente incluye pestañas accesibles, ampliación, descarga y reproducción controlada,
+que arranca al pulsar «Video» y ofrece un Play grande para reanudar o repetir,
 conservando el enlace al bloque de origen y el detalle de producción. Sin JavaScript muestra
 todos los formatos. Cambiar de formato o de página pausa el video.
 

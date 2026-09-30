@@ -78,7 +78,7 @@ try {
  await reduced.close()
  const nojs=await browser.newContext({javaScriptEnabled:false})
  const nojsPage=await nojs.newPage();await nojsPage.goto(url())
- await nojsPage.locator('.xr-rail a').nth(2).click();await nojsPage.waitForSelector('.split')
+ await nojsPage.locator('.xr-rail a').nth(2).click();await nojsPage.waitForSelector('.inst');await nojsPage.waitForLoadState('networkidle')
  check('no-JS links and instrument still work',await nojsPage.locator('.inst').isVisible()&&await nojsPage.locator('[data-couple][data-on]').count()>0)
  await nojs.close()
  writeFileSync(`${out}/verification.json`,JSON.stringify({checks},null,2))
