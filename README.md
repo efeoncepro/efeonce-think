@@ -225,6 +225,12 @@ Las capturas y trazas quedan en `.captures/aeo-xray-motion` y `.captures/aeo-xra
 
 ### Marca y producción de derivados
 
+La cabecera usa el lockup oficial `aeo-lockup-negative.svg` de
+`@efeoncepro/axis-brand-assets` 0.4.8, idéntico al archivo de Greenhouse y al sello AXIS
+`5e51544c05601735213789b0d9fc8e3be12eee950251bb3a2abf78f49403fecb`.
+Se distribuye como copia estática sin editar en `public/branding/`; X-Ray identifica
+la experiencia en la barra de piezas, separado del lockup de marca.
+
 El header toma el logo de `brand.logoAssetId`; la atribución de la demostración vive en el
 footer. Los banners del artículo son bloques de imagen con proporción intrínseca, crédito,
 fuente y anotación. Los assets cuyo crédito comienza con `Composición:` se muestran como

@@ -1,7 +1,7 @@
 ---
 import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
 import type { RenderSample } from '@/lib/aeo-xray/render-model'
-import { FileText, Images, MessagesSquare, Play } from '@lucide/astro'
+import { FileText, Images, MessagesSquare, Play, ScanLine } from '@lucide/astro'
 import Article from '@/components/aeo-xray/Article.astro'
 import Instrument from '@/components/aeo-xray/Instrument.astro'
 // Los pesos de display de la pieza. SIN estos imports la ruta solo hereda los del slogan
@@ -121,25 +121,28 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
     <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
     <header class="xr-chrome">
       <div class="xr-wrap xr-chrome-in">
-        {/* LOCKUP, no isotipo. El isotipo solo comunica a quien YA conoce la marca —
-            y el comité que abre esto no la conoce. El logotipo dice QUIÉN; el nombre de
-            la herramienta, QUÉ. El separador impide que se lean como una sola cosa. */}
-        <a data-astro-prefetch="false" class="xr-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
+        {/* Lockup oficial completo de AXIS; X-Ray identifica la experiencia en la barra inferior. */}
+        <a data-astro-prefetch="false" class="xr-brand xr-product-brand" href={EFEONCE_SEO_URL} aria-label="Efeonce AEO — servicios SEO y AEO">
           <img
             class="xr-logo"
-            src="/branding/efeonce-logo-negative.svg"
-            alt="Efeonce"
-            width="102"
-            height="24"
+            src="/branding/aeo-lockup-negative.svg"
+            alt="Efeonce AEO"
+            width="228"
+            height="30"
           />
-          <span class="xr-brand-sep" aria-hidden="true"></span>
-          <span class="xr-brand-t">{meta.instrument}</span>
         </a>
         {clientLogo && <div class="xr-client-brand"><img src={assetHref(clientLogo)} alt={client.name} width={clientLogo.width} height={clientLogo.height}/></div>}
       </div>
     </header>
 
-    {artifactChoices.length > 1 && <nav class="xr-artifacts" aria-label="Piezas de la demostración">{artifactChoices.map(choice => <a data-astro-prefetch="false" href={choice.href} aria-current={choice.active ? 'page' : undefined}>{choice.label}</a>)}</nav>}
+    <div class="xr-artifacts">
+      <div class="xr-edition" aria-label="X-Ray: el contenido, por dentro">
+        <ScanLine size={27} stroke-width={1.4} aria-hidden="true"/>
+        <span class="xr-edition-name">X-Ray</span>
+        <span class="xr-edition-description">El contenido, por dentro</span>
+      </div>
+      {artifactChoices.length > 1 && <nav class="xr-artifact-links" aria-label="Piezas de la demostración">{artifactChoices.map(choice => <a data-astro-prefetch="false" href={choice.href} aria-current={choice.active ? 'page' : undefined}>{choice.label}</a>)}</nav>}
+    </div>
     <!-- El RIEL. Su trabajo no es navegar: es AVISAR que el recorrido tiene más pantallas. -->
     <nav class="xr-rail" aria-label="Recorrido de la muestra" style={`--xr-step-progress:${((i + 1) / flow.length) * 100}%`}>
       <div class="xr-wrap xr-rail-in">
@@ -792,15 +795,22 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 
 <style>
 .xr-client-brand{margin-left:auto;padding:.5rem .9rem;background:white;border-radius:.35rem;flex:0 0 auto}.xr-client-brand img{display:block;width:auto;height:30px;max-width:190px;object-fit:contain}.xr-disclaimer{display:flex;flex-wrap:wrap;gap:.25rem .65rem;margin-bottom:.65rem;font-size:.78rem}.xr-disclaimer strong{font-weight:600;color:var(--ink)}.xr-disclaimer span{color:var(--muted)}
-@media(max-width:680px){.xr-client-brand{padding:.4rem}.xr-client-brand img{width:clamp(100px,calc(100vw - 250px),130px);height:24px}.xr-brand .xr-logo{width:82px;height:auto}.xr-brand{gap:.5rem}}
+@media(max-width:680px){.xr-client-brand{padding:.4rem}.xr-client-brand img{width:clamp(100px,calc(100vw - 250px),130px);height:24px}.xr-brand.xr-product-brand .xr-logo{width:clamp(138px,calc(100vw - 205px),228px);height:auto}.xr-brand{gap:.5rem}}
 @media(max-width:680px){.xr[data-composed] .xr-rail::after{content:"›";position:absolute;right:0;top:.4rem;padding:.15rem .4rem;background:var(--navy-2);color:var(--blue-up);font-size:1.3rem;line-height:1;pointer-events:none}}
 .xr[data-composed][data-step="articulo"] .read-stage{width:100%;padding-top:0}.xr[data-composed][data-step="articulo"] main.xr-wrap{padding-inline:0;max-width:none}
 @media(max-width:680px){.xr[data-composed] .xr-chrome-in{display:flex;align-items:center;gap:.5rem;padding-block:.65rem}.xr[data-composed] .xr-rotulo{border:0;padding:0;font-size:.65rem;flex:1}.xr[data-composed] .xr-rotulo span{display:none}.xr[data-composed] .xr-artifacts{padding-block:.45rem}.xr[data-composed] .xr-brand-t{font-size:.65rem}}
 
 @media(max-width:680px){.xr[data-composed] .at-lineage-list{grid-template-columns:1fr}.xr[data-composed] .at-lineage-list span{overflow-wrap:anywhere}}
 .atom-origin{display:inline-block;color:var(--blue-up);font-size:.75rem;text-decoration:underline;margin-top:.5rem;min-height:24px}
-  .xr-artifacts{display:flex;gap:1rem;padding:.75rem max(1rem,calc((100vw - 1440px)/2));background:var(--navy);color:var(--ink-d)}
-  .xr-artifacts a{padding:.35rem .8rem;border:1px solid var(--navy-3);border-radius:var(--r-sm);text-decoration:none;font-size:var(--t-meta)}
+  .xr-product-brand .xr-logo{width:228px;height:auto}
+  .xr-artifacts{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;padding:.75rem max(1.25rem,calc((100vw - 1400px)/2));background:var(--navy);color:var(--ink-d);border-top:1px solid var(--line-d)}
+  .xr-edition{display:flex;align-items:center;gap:.75rem;min-width:0}
+  .xr-edition>svg{color:var(--blue-up);flex-shrink:0}
+  .xr-edition-name{font-family:var(--font-display);font-size:1.3rem;font-weight:500;letter-spacing:-.04em;white-space:nowrap}
+  .xr-edition-description{margin-left:.3rem;padding-left:1rem;border-left:1px solid var(--line-d);font-size:.78rem;color:var(--dim-d)}
+  .xr-artifact-links{display:flex;gap:.25rem;padding:.2rem;border:1px solid var(--line-d);border-radius:.4rem}
+  @media(max-width:680px){.xr-artifacts{gap:.75rem;padding-inline:1.25rem}.xr-edition{gap:.45rem}.xr-edition>svg{width:21px;height:21px}.xr-edition-name{font-size:1.1rem}.xr-edition-description{display:none}.xr-artifact-links{gap:.15rem}}
+  .xr-artifacts a{padding:.35rem .8rem;border:1px solid transparent;border-radius:var(--r-sm);text-decoration:none;font-size:var(--t-meta)}
   .xr-artifacts a[aria-current]{background:var(--blue);color:white}
 
   /* ══════════ ① EL HUECO ══════════ */

@@ -135,3 +135,17 @@ defecto prefetch en hover/foco e insertaba la URL absoluta del enlace compartido
 `link rel=prefetch` del DOM. Se deshabilita la precarga con el atributo soportado por Astro
 en los enlaces del X-Ray; las transiciones y la navegación por clic permanecen. El gate de
 privacidad ahora provoca hover antes de comprobar el documento para reproducir esa ruta.
+
+## Cabecera Efeonce AEO — 30/09/2026
+
+Petición del operador: reemplazar la firma genérica del header por el logo existente de
+Efeonce AEO y dar a X-Ray otra ubicación. Intervención `ui-lite`, sobre el shell existente.
+Se usa el lockup negativo completo de AXIS sin rearmarlo ni editarlo; sus bytes coinciden
+con Greenhouse y con el sello del paquete 0.4.8. Banco Pichincha conserva su posición a la derecha.
+
+X-Ray pasa a la barra de piezas con un icono de inspección y «El contenido, por dentro»;
+Landing/Artículo se agrupan a la derecha. En móvil se conserva el nombre y se omite el
+descriptor secundario para dejar espacio útil. Capturas y geometría revisadas en 1440, 768,
+390 y 320 px: logos separados, sin recorte ni overflow. Compilación y 25 comprobaciones de
+motion y navegación aprobadas. Evidencia `.captures/aeo-brand/`.
+Greenhouse y AXIS se consultan como fuentes; no se modifican ni se despliegan.
