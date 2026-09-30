@@ -1,7 +1,7 @@
 ---
 import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
 import type { RenderSample } from '@/lib/aeo-xray/render-model'
-import { FileText, Images, MessagesSquare, Play, ScanLine } from '@lucide/astro'
+import { ArrowRight, ArrowUpRight, FileText, Images, MessagesSquare, Play, ScanLine } from '@lucide/astro'
 import Article from '@/components/aeo-xray/Article.astro'
 import Instrument from '@/components/aeo-xray/Instrument.astro'
 // Los pesos de display de la pieza. SIN estos imports la ruta solo hereda los del slogan
@@ -253,17 +253,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       {step === 'articulo' && (
         <div class="read-stage" data-capture="aeo-xray-article-read">
           {kind === 'landing' ? <Landing d={d} landing={landing} /> : <Article d={d} composition={landing} semantic={artifactChoices.length>0} />}
-          {next && (
-            <div class="read-finish" data-capture="aeo-xray-article-finish">
-              <a data-astro-prefetch="false" class="read-finish-a" href={href(next.step)} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
-                <span>
-                  <span class="read-finish-k">{ui.flowNext}: paso {i + 2} {ui.flowOf} {flow.length}</span>
-                  <span class="read-finish-t">{cur.next}</span>
-                </span>
-                <span class="xr-next-arrow" aria-hidden="true">→</span>
-              </a>
-            </div>
-          )}
+
         </div>
       )}
 
@@ -367,7 +357,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
         </section>
       )}
 
-      {next && step && (
+      {next && step === 'articulo' && (
         <div class="xr-next">
           <a data-astro-prefetch="false" href={href(next.step)} data-step-count={`${i + 2}/${flow.length}`} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
             <span>
@@ -380,30 +370,42 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
         </div>
       )}
 
-      <footer class="xr-foot" aria-label="Información legal de Efeonce">
-        <div class="xr-foot-card">
-          <a data-astro-prefetch="false" class="xr-foot-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
-            <img
-              src="/branding/efeonce-logo.svg"
-              alt="Efeonce"
-              width="112"
-              height="26"
-              loading="lazy"
-              decoding="async"
-            />
+    </main>
+
+    <footer class="xr-foot" aria-label="Acerca de esta muestra">
+      <div class="xr-wrap">
+        {next && step && (
+          <div class="read-finish" data-capture="aeo-xray-article-finish">
+            <a data-astro-prefetch="false" class="read-finish-a" href={href(next.step)} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
+              <span>
+                <span class="read-finish-k">{ui.flowNext} · {String(i + 2).padStart(2, '0')} / {String(flow.length).padStart(2, '0')}</span>
+                <span class="read-finish-t">{cur.next}</span>
+              </span>
+              <span class="read-finish-arrow" aria-hidden="true"><ArrowRight size={26} stroke-width={1.5}/></span>
+            </a>
+          </div>
+        )}
+        <div class="xr-foot-main">
+          <a data-astro-prefetch="false" class="xr-foot-brand" href={EFEONCE_SEO_URL} aria-label="Servicios SEO y AEO de Efeonce">
+            <img src="/branding/efeonce-logo-negative.svg" alt="Efeonce" width="128" height="30" loading="lazy" decoding="async"/>
           </a>
+          <p class="xr-disclaimer" data-testid="disclaimer"><strong>{ui.disclaimerLabel}</strong><span>{ui.disclaimerBody}</span></p>
+          <a data-astro-prefetch="false" class="xr-foot-service" href={EFEONCE_SEO_URL}>Servicios SEO/AEO <ArrowUpRight size={18} aria-hidden="true"/></a>
+        </div>
+        <div class="xr-foot-bottom">
           <div class="xr-foot-copy">
-            <p class="xr-disclaimer" data-testid="disclaimer"><strong>{ui.disclaimerLabel}</strong><span>{ui.disclaimerBody}</span></p>
-            <p>© {COPYRIGHT_YEAR} Efeonce Group SpA. Radiografía AEO es una herramienta propietaria de Efeonce.</p>
-            <p>Todos los derechos reservados. Efeonce se reserva los derechos de uso, reproducción, distribución, adaptación y explotación sin autorización expresa.</p>
+            <p>© {COPYRIGHT_YEAR} Efeonce Group SpA. Todos los derechos reservados.</p>
+            <details class="xr-foot-rights">
+              <summary>Derechos de uso</summary>
+              <p>Radiografía AEO es una herramienta propietaria de Efeonce. Efeonce se reserva los derechos de uso, reproducción, distribución, adaptación y explotación sin autorización expresa.</p>
+            </details>
           </div>
           <nav class="xr-foot-nav" aria-label="Enlaces legales de Efeonce">
             <a data-astro-prefetch="false" href={EFEONCE_PRIVACY_URL}>Política de privacidad</a>
-            <a data-astro-prefetch="false" href={EFEONCE_SEO_URL}>Servicios SEO/AEO</a>
           </nav>
         </div>
-      </footer>
-    </main>
+      </div>
+    </footer>
   </div>
 
 
@@ -454,7 +456,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
         const compact = window.matchMedia('(max-width: 720px)').matches
         const stage = articleStage.getBoundingClientRect()
         const action = nextAction.getBoundingClientRect()
-        const readFinish = articleStage.querySelector<HTMLElement>('.read-finish')
+        const readFinish = articleRoot.querySelector<HTMLElement>('.read-finish')
         const readTarget = articleStage.querySelector<HTMLElement>('.cap-read, .post > .para, .toc')
         const readTop = readTarget?.getBoundingClientRect().top ?? stage.top
         const finishTop = readFinish?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
@@ -794,7 +796,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 )}
 
 <style>
-.xr-client-brand{margin-left:auto;padding:.5rem .9rem;background:white;border-radius:.35rem;flex:0 0 auto}.xr-client-brand img{display:block;width:auto;height:30px;max-width:190px;object-fit:contain}.xr-disclaimer{display:flex;flex-wrap:wrap;gap:.25rem .65rem;margin-bottom:.65rem;font-size:.78rem}.xr-disclaimer strong{font-weight:600;color:var(--ink)}.xr-disclaimer span{color:var(--muted)}
+.xr-client-brand{margin-left:auto;padding:.5rem .9rem;background:white;border-radius:.35rem;flex:0 0 auto}.xr-client-brand img{display:block;width:auto;height:30px;max-width:190px;object-fit:contain}
 @media(max-width:680px){.xr-client-brand{padding:.4rem}.xr-client-brand img{width:clamp(100px,calc(100vw - 250px),130px);height:24px}.xr-brand.xr-product-brand .xr-logo{width:clamp(138px,calc(100vw - 205px),228px);height:auto}.xr-brand{gap:.5rem}}
 @media(max-width:680px){.xr[data-composed] .xr-rail::after{content:"›";position:absolute;right:0;top:.4rem;padding:.15rem .4rem;background:var(--navy-2);color:var(--blue-up);font-size:1.3rem;line-height:1;pointer-events:none}}
 .xr[data-composed][data-step="articulo"] .read-stage{width:100%;padding-top:0}.xr[data-composed][data-step="articulo"] main.xr-wrap{padding-inline:0;max-width:none}
@@ -1009,7 +1011,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
     isolation: isolate;
     width: min(100%, 64rem);
     margin-inline: auto;
-    padding-block: clamp(0.75rem, 1.8vw, 1.35rem) 1rem;
+    padding-block: clamp(0.75rem, 1.8vw, 1.35rem) 0;
   }
   @media (max-width: 720px) {
     .read-stage {
@@ -1019,7 +1021,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
   }
 
   .xr[data-step='articulo'] main.xr-wrap {
-    padding-bottom: clamp(2rem, 5vw, 3.5rem);
+    padding-bottom: 0;
   }
   .xr[data-step='articulo'] .xr-next {
     position: fixed;
@@ -1075,33 +1077,20 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
     transform: translateY(0);
   }
   .read-finish {
-    margin: clamp(1.8rem, 4vw, 2.6rem) auto 0;
-    padding: 1.25rem 0 0;
-    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line-d);
   }
   .read-finish-a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    width: min(100%, 28rem);
-    margin-left: auto;
-    padding: 0.9rem 1rem 0.9rem 1.1rem;
-    border-radius: 10px;
-    background: var(--navy);
+    gap: 2rem;
+    padding-block: clamp(1.5rem, 3vw, 2.5rem);
     color: var(--ink-d);
-    border: 1px solid var(--navy-3);
     text-decoration: none;
-    box-shadow: 0 18px 48px color-mix(in srgb, var(--navy) 14%, transparent);
-    transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
-  }
-  .read-finish-a:hover {
-    background: var(--navy-3);
-    transform: translateY(-2px);
   }
   .read-finish-a:focus-visible {
-    outline: 2px solid var(--blue);
-    outline-offset: 3px;
+    outline: 2px solid var(--blue-up);
+    outline-offset: 4px;
   }
   .read-finish-k {
     display: block;
@@ -1113,14 +1102,33 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
   }
   .read-finish-t {
     display: block;
-    margin-top: 0.25rem;
-    color: #fff;
-    font-family: Poppins, system-ui, sans-serif;
-    font-size: clamp(1rem, 1.6vw, 1.18rem);
-    font-weight: var(--w-display);
-    line-height: 1.2;
+    max-width: 38ch;
+    margin-top: 0.5rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 2.2vw, 1.8rem);
+    font-weight: var(--w-display-lg);
+    line-height: 1.3;
     text-wrap: balance;
   }
+  .read-finish-arrow {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: clamp(2.75rem, 5vw, 4rem);
+    aspect-ratio: 1;
+    border: 1px solid var(--blue-up);
+    border-radius: 50%;
+    color: var(--blue-up);
+    transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .read-finish-arrow svg {
+    transition: transform var(--dur) var(--ease);
+  }
+  .read-finish-a:hover .read-finish-arrow {
+    color: var(--navy);
+    background: var(--blue-up);
+  }
+  .read-finish-a:hover .read-finish-arrow svg { transform: translateX(3px); }
   @media (min-width: 1280px) {
     .xr[data-step='articulo'] .xr-next {
       left: calc(50% + 32rem + 1rem);
@@ -1169,9 +1177,6 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
     }
   }
   @media (max-width: 720px) {
-    .xr[data-step='articulo'] main.xr-wrap {
-      padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
-    }
     .xr[data-step='articulo'] .xr-next {
       left: auto;
       right: 0.75rem;
@@ -1215,13 +1220,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
       height: 1.75rem;
       font-size: 1.35rem;
     }
-    .read-finish {
-      padding-inline: 0.55rem;
-    }
-    .read-finish-a {
-      width: 100%;
-      margin-inline: 0;
-    }
+    .read-finish-a { gap: 1rem; }
   }
   .xr[data-step='articulo'][data-next-state='pending'] .xr-next,
   .xr[data-step='articulo'][data-next-state='done'] .xr-next {
@@ -1676,73 +1675,63 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
     font-size: 1.125rem; font-weight: var(--w-body); color: var(--ink);
   }
 
+  /* One closing surface: next chapter, attribution, then secondary legal details. */
   .xr-foot {
-    margin-top: clamp(2rem, 4vw, 3.5rem);
-    padding-block: clamp(1.25rem, 3vw, 2rem) clamp(2.5rem, 5vw, 4rem);
-    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+    background: var(--navy);
+    color: var(--ink-d);
+    padding-bottom: env(safe-area-inset-bottom);
   }
-  .xr-foot-card {
+  .xr[data-step='articulo'] .xr-foot { margin-top: 0; }
+  .xr-foot-main {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 1rem 1.35rem;
     align-items: center;
-    padding: 1rem 1.15rem;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background:
-      linear-gradient(135deg, color-mix(in srgb, var(--ax-primary-100) 28%, white), #fff 58%),
-      #fff;
-    box-shadow: 0 18px 48px color-mix(in srgb, var(--navy) 6%, transparent);
+    gap: 1rem 2.5rem;
+    padding-block: 1.75rem;
   }
-  .xr-foot-brand {
-    display: inline-flex;
-    align-items: center;
-    width: max-content;
-  }
-  .xr-foot-brand img {
-    display: block;
-    height: 26px;
-    width: auto;
-  }
+  .xr-foot-brand { display: inline-flex; width: max-content; }
+  .xr-foot-brand img { display: block; width: 128px; height: auto; }
+  .xr-disclaimer { display: grid; gap: 0.25rem; font-size: var(--t-meta); line-height: 1.5; }
+  .xr-disclaimer strong { color: var(--ink-d); font-weight: var(--w-label); }
+  .xr-disclaimer span { color: var(--dim-d); }
+  .xr-foot-service { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; color: var(--ink-d); font-size: var(--t-meta); text-decoration: none; }
+  .xr-foot-service:hover { color: var(--blue-up); }
   .xr-foot-brand:focus-visible,
-  .xr-foot-nav a:focus-visible {
-    outline: 2px solid var(--blue);
-    outline-offset: 3px;
-    border-radius: 6px;
+  .xr-foot-service:focus-visible,
+  .xr-foot-nav a:focus-visible,
+  .xr-foot-rights summary:focus-visible {
+    outline: 2px solid var(--blue-up);
+    outline-offset: 4px;
+    border-radius: var(--r-sm);
   }
-  .xr-foot-copy {
-    min-width: 0;
-    color: var(--muted);
+  .xr-foot-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem 2rem;
+    padding-block: 1rem;
+    border-top: 1px solid var(--line-d);
+    color: var(--dim-d);
     font-size: var(--t-meta);
     line-height: 1.55;
   }
-  .xr-foot-copy p + p {
-    margin-top: 0.18rem;
-  }
-  .xr-foot-nav {
-    display: flex;
-    gap: 0.45rem 0.9rem;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    font-size: var(--t-meta);
-    font-weight: var(--w-label);
-    line-height: 1.35;
-  }
-  .xr-foot-nav a {
-    color: var(--ax-primary-700);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
-  }
-  .xr-foot-nav a:hover {
-    color: var(--ax-primary-800);
-  }
+  .xr-foot-copy { min-width: 0; }
+  .xr-foot-rights { margin-top: 0.3rem; }
+  .xr-foot-rights summary { width: fit-content; cursor: pointer; padding-block: 0.5rem; }
+  .xr-foot-rights summary:hover { color: var(--ink-d); }
+  .xr-foot-rights p { max-width: 86ch; margin-top: 0.25rem; }
+  .xr-foot-nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--dim-d); text-decoration: none; white-space: nowrap; }
+  .xr-foot-nav a:hover { color: var(--ink-d); text-decoration: underline; text-underline-offset: 0.2em; }
   @media (max-width: 760px) {
-    .xr-foot-card {
-      grid-template-columns: 1fr;
-      align-items: start;
-    }
-    .xr-foot-nav {
-      justify-content: flex-start;
-    }
+    .xr-foot-main { grid-template-columns: 1fr auto; gap: 1.25rem 1rem; padding-block: 1.5rem; }
+    .xr-disclaimer { grid-row: 2; grid-column: 1 / -1; }
+    .xr-foot-service { grid-column: 2; grid-row: 1; }
+    .xr-foot-bottom { display: block; }
+    .xr-foot-nav { margin-top: 0.35rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .read-finish-arrow, .read-finish-arrow svg { transition: none; }
+    .read-finish-a:hover .read-finish-arrow svg { transform: none; }
   }
 </style>

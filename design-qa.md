@@ -149,3 +149,20 @@ descriptor secundario para dejar espacio útil. Capturas y geometría revisadas 
 390 y 320 px: logos separados, sin recorte ni overflow. Compilación y 25 comprobaciones de
 motion y navegación aprobadas. Evidencia `.captures/aeo-brand/`.
 Greenhouse y AXIS se consultan como fuentes; no se modifican ni se despliegan.
+
+## Cierre y footer integrados — 30/09/2026
+
+Referencia: captura del operador con el vacío entre la pieza, la continuación y el bloque
+legal. Ajuste del cierre existente: una superficie navy del mismo shell, continuación a
+ancho completo y firma corporativa en negativo. Se eliminan los márgenes acumulados y la
+antigua tarjeta legal. El footer queda fuera de `main` y conserva su semántica de cierre.
+La atribución sigue usando el payload del cliente; los derechos completos quedan en un
+`details` nativo operable con teclado, con copyright y privacidad siempre visibles.
+
+La continuación está integrada al footer de cada etapa. En la última no se ofrece otro
+paso; durante la lectura se conserva el acceso flotante, que se retira al llegar al cierre.
+Verificados: landing y artículo reales, navegación desde el footer a radiografía y
+atomización, apertura/cierre legal con teclado, escritorio 1440 px y móvil 390/320 px,
+sin overflow; separación entre pieza y footer: 0 px. Capturas en `.captures/aeo-footer/`.
+Typecheck sin errores ni warnings, build y 25 checks de motion/navegación aprobados.
+Sólo se publica Think.
