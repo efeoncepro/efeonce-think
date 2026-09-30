@@ -252,3 +252,18 @@ Gate de medios: `XRAY_VERIFY_TOKEN=<key> node scripts/verify-aeo-xray-media.mjs`
 Verifica carga y proporción de banners, formatos, ampliación, teclado, video real, pausa,
 origen, no-JS y ausencia de overflow a1440/390/320. Las capturas quedan en
 `.captures/aeo-xray-media`. La revisión visual de esas capturas sigue siendo necesaria.
+
+### Invitación de entrada del X-Ray
+
+Las ediciones compuestas tienen un telón de bienvenida al entrar por «La oportunidad».
+`WelcomeCurtain.astro` toma el logo del manifiesto y mantiene el contenido completo debajo.
+La apertura se recuerda por caso en la pestaña; enlaces profundos e historial conservan su destino.
+Se usa `dialog` y `form method=dialog`: navegación con teclado, reducción de movimiento y
+continuación sin JavaScript. La secuencia de preguntas espera hasta abrir el telón.
+
+La burbuja `public/branding/url-bubble-baked-dark.svg` es una copia estática **sin modificar** de
+`@efeoncepro/axis-brand-assets`, hash canónico
+`cdc09b6b0250cffc442aec76e3415136396400baf433194e594e99496ab73c29`.
+Acompaña al lockup oficial AEO sobre fondo oscuro; nunca lo sustituye.
+Verificación: `node scripts/verify-aeo-xray-curtain.mjs` (mismo `XRAY_VERIFY_BASE` y
+`XRAY_VERIFY_TOKEN` que los gates de composición).

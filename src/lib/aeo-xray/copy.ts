@@ -28,6 +28,7 @@ export const xrayCopy = {
     observed: 'Observación real · SEO', evidenceTitle: 'El punto de partida de esta propuesta.',
     method: 'Metodología y alcance', reading: 'Nuestra lectura',
   },
+  welcome: {title:'Esto preparamos para ti:',enter:'Haz click aquí'},
   value: {
     summary: 'El valor detrás de la pieza', questions: 'preguntas', open: 'Explorar decisiones',
     eyebrow: 'De la intención a la decisión', title: 'Una pregunta. Una respuesta que se puede comprobar.',

@@ -13,6 +13,10 @@ try{
    const prefix=`${name}/${artifact}/${step||'gap'}`;console.log(prefix)
    const response=await page.goto(`${base}/aeo-xray/r/${token}?artifact=${artifact}&step=${step}`,{waitUntil:'networkidle'})
    check(prefix+' status',response.status()===200)
+   if(await page.locator('[data-xray-curtain][open]').count()){
+    await page.locator('[data-xray-curtain] button').click()
+    await page.locator('[data-xray-curtain][open]').waitFor({state:'hidden'})
+   }
    await page.locator('.xr-artifacts a').first().hover();await page.waitForTimeout(140)
    const html=await page.content(),headers=response.headers()
    if(html.includes(token)){const at=html.indexOf(token);console.error('Unexpected share-key context:',html.slice(Math.max(0,at-90),at+token.length+90).replaceAll(token,'[share-key]'))}

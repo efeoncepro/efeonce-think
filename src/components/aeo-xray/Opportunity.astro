@@ -78,6 +78,9 @@ const answerSources=model.sources.filter(s=>sourceIds.includes(s.id))
       }
       button.hidden=reduced.matches
       button.addEventListener('click',play,{signal})
+      document.addEventListener('xray:curtain-opening',()=>{
+        if(!reduced.matches){finish();root.dataset.phase='query';button.disabled=true}
+      },{once:true,signal})
       root.addEventListener('focusin',finish,{signal})
       reduced.addEventListener('change',()=>{finish();button.hidden=reduced.matches},{signal})
       document.addEventListener('visibilitychange',()=>{if(document.hidden)finish()},{signal})
@@ -86,13 +89,19 @@ const answerSources=model.sources.filter(s=>sourceIds.includes(s.id))
       // Keep the returning shared card visible; replay remains available by choice.
       if(document.documentElement.dataset.xrayRoute==='piece-opportunity')return
       // No JS/reduced motion is complete HTML. Autoplay once, when the scene enters view.
-      const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)){observer.disconnect();play()}},{threshold:.25})
+      const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)){
+        observer.disconnect()
+        if(document.querySelector('[data-xray-curtain][open]'))document.addEventListener('xray:curtain-opened',play,{once:true,signal})
+        else play()
+      }},{threshold:.25})
       observer.observe(root);signal.addEventListener('abort',()=>observer.disconnect(),{once:true})
     })
   }
   initOpportunity();document.addEventListener('astro:page-load',initOpportunity)
 </script>
 <style>
+.op-intro h1[tabindex="-1"]:focus{outline:none}
+:global(.xr:has([data-xray-curtain][open])) .op-response,:global(.xr:has([data-xray-curtain][open])) .op-source{transition:none}
 .opportunity{--op-display:Poppins,system-ui,sans-serif;--op-body:'Geist Variable',system-ui,sans-serif;--op-paper:var(--color-white,white);--op-radius:12px;--op-reveal-duration:480ms;--op-ease:var(--ease);padding-block:1.5rem 3rem;color:var(--ink);font-family:var(--op-body)}
 .op-stage{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(2rem,4vw,4rem);padding:clamp(1.5rem,3vw,3rem);background:var(--navy);border-radius:var(--op-radius);color:var(--ink-d);align-items:center}
 .op-intro{min-width:0}.op-eyebrow{display:flex;gap:.65rem;align-items:center;font-size:var(--t-over);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-up);margin:0 0 1.3rem}.op-intro h1{font:500 clamp(2rem,3.1vw,3rem)/1.16 var(--op-display);letter-spacing:-.025em;text-wrap:balance;max-width:19ch;margin:0}.op-lead{font-size:1rem;line-height:1.8;color:var(--dim-d);margin:1.3rem 0 2rem;max-width:46ch}.op-thesis{border-top:1px solid var(--line-d);padding-top:1.3rem;max-width:44ch}.op-thesis>span{color:var(--blue-up);font-size:var(--t-over);text-transform:uppercase;letter-spacing:.07em;font-weight:600}.op-thesis p{font:500 1.2rem/1.6 var(--op-display);margin:.5rem 0 1.5rem}.op-cta{display:inline-flex;align-items:center;justify-content:space-between;gap:2rem;border-radius:var(--op-radius);padding:.9rem 1.15rem;background:var(--ink-d);color:var(--navy);font-size:.9rem;font-weight:600;text-decoration:none}.op-cta:hover{background:var(--blue-up)}.op-scope{font-size:.73rem;line-height:1.7;max-width:46ch;color:var(--dim-d);margin:1rem 0 0}

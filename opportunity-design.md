@@ -36,3 +36,15 @@ Capturas 1440/390/320; inspección del pliegue y de la evidencia; iconos en mód
 - Inspección visual 1440, 390 y 320; sin overflow. Replay reproduce y se detiene completo. Fuentes del artículo verificadas en DOM: cinco enlaces, sin DataForSEO.
 - Iconos decorativos fuera del árbol accesible; las rutas y el contenido técnico permanecen disponibles.
 - Captura final local: `.captures/aeo-opportunity/local-final.png`. El cierre de publicación se registra por separado en `.captures/aeo-opportunity/release.json` contra el SHA exacto del proveedor.
+
+## Portada de entrada — 2026-09-30
+
+Solicitud del operador: telón azul con logo cliente, «Esto preparamos para ti:», «Haz click aquí» y, bastante más abajo, Efeonce AEO + URL bubble. Dirección elegida: invitación centrada sobre azul profundo, con dos zonas de lectura separadas por aire. Se descartó una tarjeta flotante (no sería un telón) y una portada con imagen (compite con la jerarquía solicitada). El logo cliente sale de `brand.logoAssetId`; el fallback es `preparedFor`.
+
+El telón usa `--navy-sunk` del X-Ray; textos y acción usan sus tokens de contraste. Firma oficial sin alterar: lockup AEO y `url-bubble-baked-dark` de AXIS. El gris de firma tiene contraste >5:1 sobre este fondo. No hay órbita decorativa ni un nuevo logo.
+
+Se muestra al entrar por el primer paso, una vez por pestaña/caso; no interrumpe navegación interna ni enlaces profundos. La apertura dura `--xr-motion-open` (820 ms) y usa `--xr-motion-ease`; sólo transforma el telón y desplaza suavemente el contenido. Modal nativo con foco contenido y retorno al título. Reduced motion abre de inmediato. Sin JS, el formulario nativo `method=dialog` permite continuar. El demo de búsqueda espera al evento de apertura. El estado no persiste si sessionStorage está bloqueado, pero nunca impide abrir el contenido.
+
+QA del telón: `scripts/verify-aeo-xray-curtain.mjs`; evidencia en `.captures/aeo-xray-curtain/`. Los gates del recorrido y motion abren primero la invitación con su botón real.
+
+Validación final del telón: 41 comprobaciones (1440, 390 y 320 px), 198 del recorrido y 49 de motion; build correcto y type-check sin errores ni warnings. Revisadas capturas del telón cerrado y en ascenso. La respuesta se reinicia aún cubierta, sin fundido inverso visible, y comienza a revelarse después de la apertura.

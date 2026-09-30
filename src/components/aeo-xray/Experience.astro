@@ -15,6 +15,7 @@ import SocialShowcase from './SocialShowcase.astro'
 import {assetHref} from '@/lib/aeo-xray/view'
 import ValueExplorer from './ValueExplorer.astro'
 import Opportunity from './Opportunity.astro'
+import WelcomeCurtain from './WelcomeCurtain.astro'
 import {xrayCopy as C} from '@/lib/aeo-xray/copy'
 
 /**
@@ -121,6 +122,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
   {/* `data-hero` es el puente: el héroe se DERIVA del payload y viaja al script por el DOM, no por
       una constante. Así el JS del acoplamiento deja de conocer un `coupleId` del cliente. */}
   <div class="xr" data-kind={kind} data-composed={artifactChoices.length ? true : undefined} data-testid="xray-root" data-step={step || 'oportunidad'} data-next-state={step === 'articulo' ? 'pending' : undefined} data-hero={HERO} style={`--landing-action:${composition?.model.brand?.action??client.accent};--landing-action-ink:${composition?.model.brand?.actionText??'white'};--client:${client.accent};--client-font:${client.font.family};--client-body-font:${client.bodyFont??client.font.family};--w-client-title:${client.font.titleWeight};--w-client-body:${client.font.bodyWeight}`}>
+    {composition&&<WelcomeCurtain model={composition.model} enabled={!step}/>}
     <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
     <header class="xr-chrome">
       <div class="xr-wrap xr-chrome-in">

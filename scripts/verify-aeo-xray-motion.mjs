@@ -51,6 +51,8 @@ try {
    return await page.evaluate(index=>window.__xrayTransitions[index],index)
   }
   await page.goto(url(''),{waitUntil:'networkidle'})
+  await page.locator('[data-xray-curtain] button').click()
+  await page.locator('[data-xray-curtain][open]').waitFor({state:'hidden'})
   for(const [artifactIndex,kind] of [[0,'landing'],[1,'article']]){
    if(artifactIndex){
     const changed=await navigate(()=>page.locator('.xr-artifacts a').nth(artifactIndex).click(),'.op-preview')
@@ -102,6 +104,7 @@ try {
  const reduced=await browser.newContext({reducedMotion:'reduce'})
  const reducedPage=await reduced.newPage()
  await reducedPage.goto(url(''),{waitUntil:'networkidle'})
+ await reducedPage.locator('[data-xray-curtain] button').click()
  await reducedPage.locator('[data-op-open]').first().click();await reducedPage.waitForSelector('.read-stage')
  check('reduced opportunity still opens the complete piece',await reducedPage.locator('.landing').isVisible()&&await reducedPage.evaluate(()=>document.getAnimations().filter(a=>a.playState==='running').length===0))
  await reducedPage.locator('.xr-rail a').nth(2).click();await reducedPage.waitForSelector('.split');await reducedPage.waitForTimeout(100)
@@ -109,6 +112,7 @@ try {
  await reduced.close()
  const nojs=await browser.newContext({javaScriptEnabled:false})
  const nojsPage=await nojs.newPage();await nojsPage.goto(url(''))
+ await nojsPage.locator('[data-xray-curtain] button').click()
  await nojsPage.locator('[data-op-open]').first().click();await nojsPage.waitForSelector('.landing')
  check('no-JS opportunity link opens the complete piece',await nojsPage.locator('.landing').isVisible())
  await nojsPage.locator('.xr-rail a').nth(2).click();await nojsPage.waitForSelector('.inst');await nojsPage.waitForLoadState('networkidle')
