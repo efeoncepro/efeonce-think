@@ -21,6 +21,7 @@ import vercel from '@astrojs/vercel'
 export default defineConfig({
   site: 'https://think.efeoncepro.com',
   trailingSlash: 'never',
+  devToolbar: { enabled: false },
 
   env: {
     schema: {
@@ -71,7 +72,7 @@ export default defineConfig({
       filter: (page) => {
         const { pathname } = new URL(page)
 
-        return !pathname.startsWith('/preview/') && !pathname.startsWith('/muestras/') && !pathname.startsWith('/insights/')
+        return !pathname.startsWith('/preview/') && !pathname.startsWith('/muestras/') && !pathname.startsWith('/insights/') && !pathname.startsWith('/aeo-xray/')
       },
     }),
   ],

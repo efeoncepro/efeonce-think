@@ -1,5 +1,5 @@
 ---
-import type { CollectionEntry } from 'astro:content'
+import type { RenderSample } from '@/lib/aeo-xray/render-model'
 
 /**
  * EL INSTRUMENTO — navy Efeonce. Nuestro análisis habla con NUESTRA voz.
@@ -14,11 +14,14 @@ import type { CollectionEntry } from 'astro:content'
  * se aplana.
  */
 
-type Sample = CollectionEntry<'aeoXray'>['data']
+type Sample = RenderSample
 interface Props { d: Sample; hero: string }
 
 const { d, hero } = Astro.props
 const { ui, machine, evidence } = d
+const stateNames = {proposed:'Propuesto',implemented:'Implementado en la muestra',verified:'Verificado',measured:'Medido'}
+const contextLabel = (n:{sourceScope?:'block'|'page'|'site';sourceStatus?:keyof typeof stateNames}) => [n.sourceScope === 'site' ? 'Sitio' : n.sourceScope === 'page' ? 'Página' : n.sourceStatus ? 'Elemento' : '', n.sourceStatus ? stateNames[n.sourceStatus] : ''].filter(Boolean).join(' · ')
+
 
 const kpis = evidence.facts.filter(f => f.headline)
 const details = evidence.facts.filter(f => !f.headline)
@@ -56,6 +59,7 @@ const asText = (code: unknown) =>
     <div class="kpis" data-testid="kpis">
       {kpis.map(k => (
         <div class="kpi" data-couple-target={k.coupleId}>
+        {contextLabel(k) && <p class="scope-state">{contextLabel(k)}</p>}
           <p class="kpi-n">{k.big}</p>
           <p class="kpi-u">{k.bigUnit}</p>
           <cite class="kpi-s">{k.source} · {k.asOf}</cite>
@@ -66,12 +70,13 @@ const asText = (code: unknown) =>
     <p class="grp">Cómo está escrito</p>
     {machine.craft.map(c => (
       <div class={`nd t${c.tier}`} data-couple-target={c.coupleId} data-on={c.coupleId === hero ? true : undefined}>
+        {contextLabel(c) && <p class="scope-state">{contextLabel(c)}</p>}
         {/* La cifra va CON su fuente, igual que en la ① y en la ④. La ③ era la única pantalla
             donde los números flotaban — justo la que argumenta el rigor. El schema ya lo obliga
             (superRefine de la raíz); esto lo RENDERIZA: un dato obligatorio que no se pinta no le
             sirve de nada al evaluador que lo quiere comprobar. */}
         {c.stat && <p class="stat">{c.stat} <span>{c.statNote}</span></p>}
-        {c.stat && c.source && <cite class="stat-src">{c.source} · {c.asOf}</cite>}
+        {c.source && <cite class="stat-src">{c.source} · {c.asOf}</cite>}
         <p class="nd-l">{c.label} <em>· {c.detail}</em></p>
         <p class="why"><b>{ui.whyLabel}:</b> {c.why}</p>
       </div>
@@ -81,6 +86,7 @@ const asText = (code: unknown) =>
     <p class="warn">{ui.schemaNote}</p>
     {machine.jsonld.map(n => (
       <div class={`nd t${n.tier} sch`} data-couple-target={n.coupleId}>
+        {contextLabel(n) && <p class="scope-state">{contextLabel(n)}</p>}
         <div class="sch-h">
           <span class="sch-t">{n.type}</span>
           <span class="sch-m">{n.metric}</span>
@@ -97,6 +103,7 @@ const asText = (code: unknown) =>
     <p class="grp">Metadatos</p>
     {machine.seo.map(s => (
       <div class={`nd t${s.tier}`} data-couple-target={s.coupleId}>
+        {contextLabel(s) && <p class="scope-state">{contextLabel(s)}</p>}
         <p class="nd-l">{s.label} {s.detail && <em>· {s.detail}</em>}</p>
         <p class="nd-v">{s.value}</p>
         {s.tier < 3 && <p class="why"><b>{ui.whyLabel}:</b> {s.why}</p>}
@@ -105,6 +112,7 @@ const asText = (code: unknown) =>
     <div class="t3wrap">
       {machine.og.map(o => (
         <div class="nd t3" data-couple-target={o.coupleId}>
+        {contextLabel(o) && <p class="scope-state">{contextLabel(o)}</p>}
           <p class="nd-l">{o.label}</p>
           <p class="nd-v mono">{o.value}</p>
         </div>
@@ -122,6 +130,7 @@ const asText = (code: unknown) =>
     </div>
     {machine.alts.map(a => (
       <div class="nd t2" data-couple-target={a.coupleId}>
+        {contextLabel(a) && <p class="scope-state">{contextLabel(a)}</p>}
         <p class="nd-v">“{a.alt}”</p>
         <p class="why"><b>{ui.whyLabel}:</b> {a.why}</p>
       </div>
@@ -130,6 +139,7 @@ const asText = (code: unknown) =>
     <p class="grp">La evidencia <em>· por qué existe este artículo</em></p>
     {details.map(f => (
       <div class="nd t2 fct" data-couple-target={f.coupleId}>
+        {contextLabel(f) && <p class="scope-state">{contextLabel(f)}</p>}
         <p class="nd-l">{f.label}</p>
         <p class="fct-v">{f.value}</p>
         <p class="why">{f.note}</p>
@@ -152,6 +162,7 @@ const asText = (code: unknown) =>
 </aside>
 
 <style>
+.scope-state { font-size:.7rem; font-weight:600; color:var(--dim-d); margin:0 0 .55rem; letter-spacing:.025em; }
   .inst {
     background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
     font-weight: var(--w-body-dark);

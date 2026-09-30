@@ -1,4 +1,5 @@
-import { defineCollection, z } from 'astro:content'
+import { defineCollection } from 'astro:content'
+import { z } from 'zod'
 import { glob } from 'astro/loaders'
 
 /**
@@ -27,7 +28,8 @@ const credit = z.object({
  * pieza que argumenta rigor técnico no puede reprobar su propio PageSpeed.
  * El helper solo existe dentro de `schema: ({ image }) => …`.
  */
-type ImageFn = Parameters<Parameters<typeof defineCollection>[0]['schema'] & object>[0]['image']
+type CollectionSchema = NonNullable<Parameters<typeof defineCollection>[0]['schema']>
+type ImageFn = Parameters<Extract<CollectionSchema, (...args: any[]) => any>>[0]['image']
 
 const blockUnion = (image: ImageFn) =>
   z.discriminatedUnion('type', [
@@ -263,9 +265,9 @@ const aeoXray = defineCollection({
       accent: z
         .string()
         .regex(/^#[0-9a-fA-F]{6}$/)
-        .refine(hex => contrastOnWhite(hex) >= 4.5, hex => ({
-          message: `El acento ${hex} da ${contrastOnWhite(hex).toFixed(2)}:1 sobre blanco y WCAG 1.4.3 pide 4,5:1. Entra como color de TEXTO en el artículo (categoría, enlaces, números del índice): quedaría ilegible en la pantalla del cliente, en la pieza cuya tesis es el rigor. Usa un tono más oscuro de la marca para el texto.`,
-        })),
+        .refine(hex => contrastOnWhite(hex) >= 4.5, {
+          message: 'El acento requiere contraste de al menos 4,5:1 sobre blanco (WCAG 1.4.3). Usa un tono más oscuro de la marca para el texto.',
+        }),
       /* 🔴 LA TIPOGRAFÍA DEL CLIENTE ES DATO, NO CÓDIGO.
          Vivía en el CSS (`--client-font: 'Assistant Variable'`), y el propio comentario lo confesaba:
          «cuando la muestra sea de otro, cambia acá». Eso es un `if (cliente === 'sky')` escrito en

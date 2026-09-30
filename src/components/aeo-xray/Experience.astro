@@ -1,0 +1,1852 @@
+---
+import Image from './SampleImage.astro'
+import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
+import type { RenderSample } from '@/lib/aeo-xray/render-model'
+import { FileText, Images, MessagesSquare, Play } from '@lucide/astro'
+import Article from '@/components/aeo-xray/Article.astro'
+import Instrument from '@/components/aeo-xray/Instrument.astro'
+// Los pesos de display de la pieza. SIN estos imports la ruta solo hereda los del slogan
+// (800/900i, que son de la marca) y el algoritmo de matching CSS resuelve TODO 600/700 a 800:
+// los titulares salían ExtraBold sin que el CSS lo pidiera. Un @font-face que falta no falla: sustituye.
+import '@fontsource/poppins/500.css'
+import '@fontsource/poppins/600.css'
+import '@styles/aeo-xray.css'
+import Landing from './Landing.astro'
+
+/**
+ * Radiografía AEO — el FLOW. TASK-1410 (greenhouse-eo).
+ *
+ * CUATRO PANTALLAS, cada una con UN trabajo. Estaba todo en una sola, y el síntoma era que
+ * el artículo «se veía plano»: nunca tuvo espacio para ser LEÍDO, porque un panel le comía el
+ * 46% de la pantalla. Le pusimos tipografía editorial a un contenedor que no lo era.
+ *
+ *   ① La brecha      — el SERP real. Wikipedia, Instagram, TripAdvisor. Y SKY no está.
+ *   ② El artículo    — a ancho completo, sin nada al lado. Acá por fin respira.
+ *   ③ La radiografía — el split con el acoplamiento. Funciona 10× mejor porque el evaluador
+ *                      YA leyó el artículo: la revelación aterriza en vez de competir.
+ *   ④ Dónde más vive — la atomización. Cada átomo es una SUPERFICIE MÁS donde el motor de
+ *                      respuesta puede encontrar al cliente.
+ *
+ * ⚠️ INVARIANTE #1: el JSON-LD se muestra como TEXTO ESCAPADO, nunca como marcado activo.
+ * Esta página NO le pasa `jsonLd` a BaseLayout. Ver Instrument.astro.
+ */
+
+export interface Props {
+ d: RenderSample
+ step: string
+ hrefForStep: (step: string) => string
+ kind?: 'article' | 'landing'
+ landing?: unknown
+ artifactChoices?: Array<{id:string;label:string;href:string;active:boolean}>
+}
+const { d, step, hrefForStep, kind = 'article', landing, artifactChoices = [] } = Astro.props as Props
+const { ui, machine, evidence, meta, client, flow, gap, atoms, thesis } = d
+const composition=landing as {artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest}|undefined
+const headlineFacts = evidence.facts.filter(f => f.headline)
+
+const i = flow.findIndex(s => s.step === step)
+const cur = flow[i]
+const next = flow[i + 1]
+const href = hrefForStep
+
+/** El par pintado desde el HTML: sin JS, la pieza sigue argumentando. */
+/**
+ * 🔴 EL MOTOR NO PUEDE CONOCER UN `coupleId` DEL CLIENTE.
+ *
+ * Antes esto era `const HERO = 'capsule-main'` — una cadena de SKY escrita en el motor, y repetida
+ * DOS veces más dentro del `<script>` del cliente. Sostenía dos invariantes: el par héroe pintado
+ * desde el HTML (*sin JS, la pieza sigue argumentando*) y la salida del enfoque. Un payload que
+ * llamara a su cápsula `capsule-hero` llegaba **sin `data-on`** y no fallaba nada: simplemente el
+ * argumento zero-JS desaparecía en silencio. El acoplamiento más barato de romper y el más caro de
+ * detectar.
+ *
+ * Ahora el héroe se DERIVA del payload: la primera cápsula de respuesta acoplable del artículo. Y
+ * viaja al script por `data-hero`, no por una constante — así el JS deja de conocer al cliente.
+ */
+const coupleIdOf = (b: (typeof d.article.blocks)[number]): string =>
+  'coupleId' in b && typeof b.coupleId === 'string' ? b.coupleId : ''
+
+const HERO =
+  d.article.blocks.filter(b => b.type === 'answer-capsule').map(coupleIdOf).find(Boolean) ??
+  d.article.blocks.map(coupleIdOf).find(Boolean) ??
+  ''
+
+/**
+ * Cuántos datos de máquina produce cada bloque — alimenta el chip direccional («→ 3 datos»).
+ * Sin el número, el hover te dice QUE hay algo al otro lado, pero no CUÁNTO ni hacia dónde.
+ */
+const produces = new Map<string, number>()
+const bump = (id: string) => { if (id) produces.set(id, (produces.get(id) ?? 0) + 1) }
+machine.seo.forEach(x => bump(x.coupleId))
+machine.og.forEach(x => bump(x.coupleId))
+machine.craft.forEach(x => bump(x.coupleId))
+machine.jsonld.forEach(x => bump(x.coupleId))
+machine.alts.forEach(x => bump(x.coupleId))
+machine.headings.tree.forEach(x => bump(x.coupleId))
+bump(machine.headings.coupleId)
+evidence.facts.forEach(x => bump(x.coupleId))
+evidence.fanOut.items.forEach(x => bump(x.coveredBy))
+
+/* Las fotos del artículo — las mismas, con su alt. El átomo de imágenes las EXHIBE en vez de
+   limitarse a argumentar sobre ellas. */
+const imageBlocks = d.article.blocks.filter(
+  (b): b is Extract<typeof b, { type: 'image' | 'hero-image' }> =>
+    b.type === 'image' || b.type === 'hero-image',
+)
+
+const codeRecord = (code: unknown): Record<string, unknown> =>
+  code && typeof code === 'object' ? (code as Record<string, unknown>) : {}
+
+const codeField = (code: unknown, key: string): string => {
+  const value = codeRecord(code)[key]
+  return typeof value === 'string' ? value : ''
+}
+
+const deliverableValue = (atom: (typeof atoms)[number], pattern: RegExp): string =>
+  atom.deliverable.find(x => pattern.test(x.k))?.v ?? ''
+
+const artifactKind = (atom: (typeof atoms)[number]) => {
+  const type = codeField(atom.code, '@type')
+
+  if (atom.post) return 'social'
+  if (atom.showsImages) return 'images'
+  if (type === 'VideoObject' || /guion|vídeo|video|reel/i.test(atom.kind)) return 'video'
+
+  return 'asset'
+}
+
+const asText = (code: unknown) =>
+  JSON.stringify({ '@context': 'https://schema.org', ...(code as object) }, null, 2)
+
+const titles: Record<string, string> = {
+  '': `${meta.instrument} — la brecha`,
+  articulo: `${meta.instrument} — el artículo`,
+  radiografia: `${meta.instrument} — la radiografía`,
+  atomizacion: `${meta.instrument} — dónde más vive`,
+}
+
+const EFEONCE_SEO_URL = 'https://efeoncepro.com/servicios/posicionamiento-seo/'
+const EFEONCE_PRIVACY_URL = 'https://efeoncepro.com/politica-de-privacidad/'
+const COPYRIGHT_YEAR = new Date().getFullYear()
+---
+
+
+  {/* `data-hero` es el puente: el héroe se DERIVA del payload y viaja al script por el DOM, no por
+      una constante. Así el JS del acoplamiento deja de conocer un `coupleId` del cliente. */}
+  <div class="xr" data-kind={kind} data-composed={artifactChoices.length ? true : undefined} data-testid="xray-root" data-step={step || 'hueco'} data-next-state={step === 'articulo' ? 'pending' : undefined} data-hero={HERO} style={`--landing-action:${composition?.model.brand?.action??client.accent};--landing-action-ink:${composition?.model.brand?.actionText??'white'};--client:${client.accent};--client-font:${client.font.family};--client-body-font:${client.bodyFont??client.font.family};--w-client-title:${client.font.titleWeight};--w-client-body:${client.font.bodyWeight}`}>
+    <!-- ══ CHROME EFEONCE — la marca es dueña del marco, no un pie de página ══ -->
+    <header class="xr-chrome" data-testid="disclaimer">
+      <div class="xr-wrap xr-chrome-in">
+        {/* LOCKUP, no isotipo. El isotipo solo comunica a quien YA conoce la marca —
+            y el comité que abre esto no la conoce. El logotipo dice QUIÉN; el nombre de
+            la herramienta, QUÉ. El separador impide que se lean como una sola cosa. */}
+        <a class="xr-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
+          <img
+            class="xr-logo"
+            src="/branding/efeonce-logo-negative.svg"
+            alt="Efeonce"
+            width="102"
+            height="24"
+          />
+          <span class="xr-brand-sep" aria-hidden="true"></span>
+          <span class="xr-brand-t">{meta.instrument}</span>
+        </a>
+        <p class="xr-rotulo">
+          <strong>{ui.disclaimerLabel}</strong>
+          <span>{ui.disclaimerBody}</span>
+        </p>
+      </div>
+    </header>
+
+    {artifactChoices.length > 1 && <nav class="xr-artifacts" aria-label="Piezas de la demostración">{artifactChoices.map(choice => <a href={choice.href} aria-current={choice.active ? 'page' : undefined}>{choice.label}</a>)}</nav>}
+    <!-- El RIEL. Su trabajo no es navegar: es AVISAR que el recorrido tiene más pantallas. -->
+    <nav class="xr-rail" aria-label="Recorrido de la muestra">
+      <div class="xr-wrap xr-rail-in">
+        {flow.map((s, n) => (
+          <a
+            class="xr-step"
+            href={href(s.step)}
+            aria-current={n === i ? 'step' : undefined}
+          >
+            {/* Número, nunca ✓. El ✓ afirmaba «ya lo viste» a quien entró por deep-link desde el
+                deck y NO lo vio: historia inventada, y apagaba el scent que lo mandaría a leer el
+                artículo primero — que es la lectura de la que depende la ③. El estado activo lo
+                comunica `aria-current` + el realce, que es lo honesto. */}
+            <span class="xr-step-n">{n + 1}</span>
+            {s.label}
+          </a>
+        ))}
+      </div>
+    </nav>
+
+    <main class="xr-wrap">
+      {/* ══════════ ① EL HUECO ══════════ */}
+      {!step && (
+        <section class="gap" data-capture="aeo-xray-gap">
+          <header class="g-head">
+            <p class="g-kick">{gap.kicker}</p>
+            <h1 class="g-h1">{gap.headline}</h1>
+            {gap.lead && <p class="g-lead">{gap.lead}</p>}
+          </header>
+
+          <div class="g-kpis" aria-label="Resumen del diagnóstico">
+            {headlineFacts.map((k, n) => (
+              <div class:list={['g-kpi', { 'g-kpi-hit': n === headlineFacts.length - 1 }]}>
+                <p class="g-kpi-l">{k.label}</p>
+                <p class="g-kpi-n">{k.big}</p>
+                <p class="g-kpi-u">{k.bigUnit}</p>
+                <cite>{k.source} · {k.asOf}</cite>
+              </div>
+            ))}
+          </div>
+
+          <div class="g-grid">
+            <div class="g-serp" data-capture="aeo-xray-gap-serp">
+              <div class="g-serp-h">
+                <div>
+                  <p class="g-panel-k">Evidencia SERP</p>
+                  <h2 class="g-serp-t">{gap.serpTitle}</h2>
+                </div>
+                {gap.serpBadge && <span class="g-serp-badge">{gap.serpBadge}</span>}
+              </div>
+              {gap.serpSummary && <p class="g-serp-s">{gap.serpSummary}</p>}
+              <ol class="g-list">
+                {gap.serp.map(r => (
+                  <li>
+                    <span class="g-pos">{r.pos}</span>
+                    <span class="g-dom">{r.domain}</span>
+                    <span class="g-kind">{r.kind}</span>
+                  </li>
+                ))}
+              </ol>
+              <p class="g-note">{gap.serpNote}</p>
+            </div>
+
+            <div class="g-side">
+              <article class="g-punch" data-capture="aeo-xray-gap-diagnosis">
+                {gap.diagnosisLabel && <p class="g-panel-k g-panel-k--dark">{gap.diagnosisLabel}</p>}
+                <h2 class="g-punch-t">{gap.punch}</h2>
+                <div class="g-diagnosis">
+                  <p>
+                    <strong>Qué muestra el SERP</strong>
+                    <span>{gap.punchNote}</span>
+                  </p>
+                  {gap.punchWhy && (
+                    <p>
+                      <strong>Por qué importa</strong>
+                      <span>{gap.punchWhy}</span>
+                    </p>
+                  )}
+                  {gap.punchOpportunity && (
+                    <p>
+                      <strong>Dónde atacar</strong>
+                      <span>{gap.punchOpportunity}</span>
+                    </p>
+                  )}
+                </div>
+              </article>
+              <aside class="g-aside">
+                {gap.asideLabel && <strong>{gap.asideLabel}</strong>}
+                <span>{gap.aside}</span>
+              </aside>
+              {next && (
+                <a class="g-next" href={href(next.step)}>
+                  <span>
+                    <span class="xr-next-l">{ui.flowNext}: paso {i + 2} {ui.flowOf} {flow.length}</span>
+                    <span class="xr-next-t">{cur.next}</span>
+                  </span>
+                  <span class="xr-next-arrow" aria-hidden="true">→</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══════════ ② EL ARTÍCULO — a ancho completo. Acá por fin se LEE. ══════════ */}
+      {step === 'articulo' && (
+        <div class="read-stage" data-capture="aeo-xray-article-read">
+          {kind === 'landing' ? <Landing d={d} landing={landing} /> : <Article d={d} composition={landing} semantic={artifactChoices.length>0} />}
+          {next && (
+            <div class="read-finish" data-capture="aeo-xray-article-finish">
+              <a class="read-finish-a" href={href(next.step)} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
+                <span>
+                  <span class="read-finish-k">{ui.flowNext}: paso {i + 2} {ui.flowOf} {flow.length}</span>
+                  <span class="read-finish-t">{cur.next}</span>
+                </span>
+                <span class="xr-next-arrow" aria-hidden="true">→</span>
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════ ③ LA RADIOGRAFÍA — el split con el acoplamiento ══════════ */}
+      {step === 'radiografia' && (
+        <>
+          {/* 🔴 LA PANTALLA QUE CARGA TODO EL ARGUMENTO ERA LA ÚNICA SIN TITULAR.
+              La ① tiene kicker + H1 + punch. La ④ tiene kicker + H1 + intro. La ③ abría directo con
+              el hint —«pase el cursor y verá…»—, que dice CÓMO SE USA y nunca POR QUÉ IMPORTA. Doble
+              golpe: para quien recorre en orden, la revelación llegaba sin enunciar; y para quien
+              entra por DEEP-LINK desde el deck (caso de primera clase, la propia arquitectura lo
+              promueve) era una pantalla partida sin contexto. No se defendía sola.
+
+              Y la ironía: el payload YA TENÍA `thesis` (el schema lo obliga, `min(40)`) y
+              `ui.thesisLabel`… y el motor NO LOS RENDERIZABA EN NINGUNA PARTE. Prosa obligatoria que
+              nadie veía. */}
+          <header class="r-head">
+            <p class="g-kick">{ui.thesisLabel}</p>
+            <h1 class="r-h1">
+              El schema solo marca contenido <em>visible</em>. La máquina lee lo que {kind === 'landing' ? 'la landing' : 'el artículo'} dice.
+            </h1>
+            <p class="r-thesis">{thesis}</p>
+          </header>
+          <p class="r-hint hint-d" hidden data-hint>{ui.hintDesktop}</p>
+          <p class="r-hint hint-m" hidden data-hint data-testid="hint-m">{ui.hintMobile}</p>
+          <div class="split">
+            {kind === 'landing' ? <Landing d={d} landing={landing} coupled produces={produces} hero={HERO} /> : <Article d={d} coupled produces={produces} hero={HERO} />}
+            <Instrument d={d} hero={HERO} />
+          </div>
+        </>
+      )}
+
+      {/* ══════════ ④ DÓNDE MÁS VIVE — la atomización ══════════ */}
+      {step === 'atomizacion' && (
+        <section class="at">
+          <p class="g-kick">La distribución</p>
+          <h1 class="at-h1">{kind === 'landing' ? 'Esta landing' : 'Este artículo'} no vive solo en una URL</h1>
+          <p class="at-intro">{d.atomsIntro}</p>
+
+          <div class="at-lineage" aria-label="Línea de sangre de la distribución">
+            <div class="at-lineage-source">
+              <span class="at-lineage-source-k"><FileText size={16} aria-hidden="true" />{kind === 'landing' ? 'Landing original' : 'Artículo original'}</span>
+              <strong>{meta.sampleTitle}</strong>
+            </div>
+            <div class="at-lineage-bridge" aria-hidden="true">
+              <span>se convierte en</span>
+              <strong>{atoms.length} superficies reutilizables</strong>
+            </div>
+            <ul class="at-lineage-list">
+              {atoms.map(a => (
+                <li data-artifact={artifactKind(a)}>
+                  <span>
+                    <i class="at-channel-icon" aria-hidden="true">
+                      {artifactKind(a) === 'video' && <Play size={15} />}
+                      {artifactKind(a) === 'social' && <MessagesSquare size={15} />}
+                      {artifactKind(a) === 'images' && <Images size={15} />}
+                    </i>
+                    {a.kind}
+                  </span>
+                  <small>{a.bornFrom}</small>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="at-grid">
+            {atoms.map(a => (
+              <article class="atom" data-artifact={artifactKind(a)} data-featured={a.post ? 'true' : undefined} data-couple-target={a.coupleId} tabindex="0">
+                <div class="atom-h">
+                  <span class="atom-icon" aria-hidden="true">
+                    {artifactKind(a) === 'video' && <Play size={18} />}
+                    {artifactKind(a) === 'social' && <MessagesSquare size={18} />}
+                    {artifactKind(a) === 'images' && <Images size={18} />}
+                  </span>
+                  <span class="atom-title">
+                    <span class="atom-k">{a.kind}</span>
+                    <span class="atom-from">{a.bornFrom}</span>
+                    {a.coupleId && <a class="atom-origin" href={`${href('radiografia')}#block-${encodeURIComponent(a.coupleId)}`}>Ver el bloque de origen ↗</a>}
+                  </span>
+                </div>
+
+                <div class="atom-artifact">
+                  {artifactKind(a) === 'video' && imageBlocks[0] && (
+                    <figure class="video-artifact">
+                      <div class="video-frame">
+                        {a.video ? (
+                          <>
+                            <video class="video-preview" src={a.video.src} poster={a.video.poster} muted playsinline loop autoplay preload="metadata" aria-label={a.video.alt}></video>
+                            {a.video.disclosure && <span class="video-disclosure">{a.video.disclosure}</span>}
+                          </>
+                        ) : (
+                          <Image src={imageBlocks[0].src} alt={imageBlocks[0].alt} widths={[360, 720]} sizes="420px" format="avif" quality={70} loading="lazy" />
+                        )}
+                        <div class="video-caption">
+                          <span>{composition && !a.video ? 'Guion audiovisual' : a.video?.label || deliverableValue(a, /duraci/i) || 'Video recuperable'}</span>
+                          <strong>{codeField(a.code, 'name') || a.kind}</strong>
+                        </div>
+                      </div>
+                      {a.reel && (
+                        <div class="reel-artifact" data-capture="atom-video-reel">
+                          <div class="reel-phone">
+                            <video class="reel-preview" src={a.reel.src} poster={a.reel.poster} muted playsinline loop autoplay preload="metadata" aria-label={a.reel.alt}></video>
+                            {a.reel.disclosure && <span class="video-disclosure">{a.reel.disclosure}</span>}
+                          </div>
+                          <div class="reel-copy">
+                            <span>{a.reel.label || 'Reel vertical 9:16'}</span>
+                            <strong>{a.reel.title || 'Reel vertical'}</strong>
+                            {a.reel.description && <p>{a.reel.description}</p>}
+                          </div>
+                        </div>
+                      )}
+                      <div class="video-script">
+                        <span>Guion + transcripción</span>
+                        <p>{deliverableValue(a, /guion/i) || codeField(a.code, 'description')}</p>
+                      </div>
+                    </figure>
+                  )}
+
+                  {/* La pieza social se RENDERIZA. Si el payload trae arte final, se muestra el arte. */}
+                  {a.post && (
+                    a.post.image ? (
+                      <figure class="post-artifact">
+                        <Image
+                          src={a.post.image}
+                          alt={a.post.alt || `${a.kind} de ${client.name}`}
+                          widths={[360, 540, 720, 1080]}
+                          sizes="(min-width: 980px) 34rem, 100vw"
+                          format="avif"
+                          quality={76}
+                          loading="lazy"
+                        />
+                      </figure>
+                    ) : (
+                      <div class="post-card">
+                        <p class="pc-hook">{a.post.hook}</p>
+                        <p class="pc-body">{a.post.body}</p>
+                        <p class="pc-cta">{a.post.cta}</p>
+                        <span class="pc-brand">{client.name}</span>
+                      </div>
+                    )
+                  )}
+
+                  {/* 🔴 ASIMETRÍA DE PRUEBA: el átomo de video ESPECIFICA el entregable y el social lo
+                      RENDERIZA — pero el de imágenes, cuyo argumento textual es «un alt que dice
+                      "paisaje" no sirve para nada; uno que dice "las agujas de roca del Cerro Castillo
+                      nevadas sobre un lago" hace que esa foto se recupere», NO MOSTRABA NI UNA FOTO NI
+                      UN ALT. Dos átomos demostraban y uno solo afirmaba — en la pieza cuya regla entera
+                      es demostrar. Y de paso dejaba un hueco blanco de ~600px en la lámina de cierre.
+                      Ahora enseña las cuatro fotos reales con su alt: el argumento se ve. */}
+                  {a.showsImages && (
+                    <ul class="atom-imgs">
+                      {imageBlocks.map(img => (
+                        <li>
+                          <Image src={img.src} alt={img.alt} widths={[180, 360]} sizes="180px" format="avif" quality={65} loading="lazy" />
+                          <p class="atom-alt"><span>alt</span> “{img.alt}”</p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {a.stat && <div class="atom-proof">
+                  {/* La cifra va CON su fuente. La ④ afirmaba tres números sin una sola cita
+                      mientras la ① y la ③ citaban todo — en la pieza cuya tesis es el rigor.
+                      Sin fuente y sin fecha, una cifra es una opinión con números. */}
+                  <span class="atom-section-label">Evidencia</span>
+                  <p class="atom-stat"><strong>{a.stat}</strong> <span>{a.statNote}</span></p>
+                  <cite class="atom-cite">{a.source} · {a.asOf}</cite>
+                </div>}
+
+                <div class="atom-rationale">
+                  <span class="atom-section-label">Criterio</span>
+                  <p>{a.why}</p>
+                </div>
+
+                <div class="atom-spec">
+                  <span class="atom-section-label">Entregable</span>
+                  <dl class="atom-d">
+                    {a.deliverable.map(x => (
+                      <div class="atom-spec-row">
+                        <dt>{x.k}</dt>
+                        <dd>{x.v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+
+                {a.code && (
+                  <details class="atom-code">
+                    <summary>Ver los datos estructurados</summary>
+                    <pre role="region" tabindex="0" aria-label={`Datos estructurados: ${a.kind}`}><code>{asText(a.code)}</code></pre>
+                  </details>
+                )}
+
+                {/* Lo que la muestra NO puede fingir. Decirlo suma; simularlo la destruye. */}
+                <div class="atom-hon" role="note">
+                  <span>Nota de honestidad</span>
+                  <p>{a.honesty}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {/* 🔴 EL RECORRIDO MORÍA ACÁ. Cuatro pantallas construyendo tensión y la soltaba en el
+              vacío: la última línea era un párrafo con un borde encima, y después el footer. Un
+              comité que termina convencido y SIN NADA QUE HACER con esa convicción se queda
+              exactamente donde estaba — y el competidor de fondo es la indecisión.
+
+              El cierre hace dos cosas que la pieza prometía y no entregaba:
+              1. Cierra el arco contra la ① (la brecha → la disciplina que la cierra).
+              2. Le da al evaluador la HERRAMIENTA para verificarlo con sus propias manos. La
+                 arquitectura dice, textual, que esto es «una prueba que el comité puede verificar
+                 por su cuenta» — y en ninguna pantalla se le decía CÓMO. Convertir un claim en una
+                 comprobación que hace él mismo es lo que le da el argumento que va a repetir en la
+                 reunión interna. Hoy le pedíamos fe donde podíamos darle prueba. */}
+          <footer class="at-end">
+            <p class="at-close">{ui.closing}</p>
+
+            <div class="verify">
+              <p class="verify-t">{ui.verifyTitle}</p>
+              <ol class="verify-l">
+                {ui.verifySteps.map(v => (
+                  <li>
+                    <strong>{v.what}</strong>
+                    <span>{v.how}</span>
+                  </li>
+                ))}
+              </ol>
+              {/* ⚠️ EL VALIDADOR IMPORTA. Schema.org valida ESTRUCTURA. El Rich Results Test de
+                  Google reportaría el `FAQPage` como «detectado pero NO elegible para resultado
+                  enriquecido» — que es exactamente el autogol del invariante 6, con el evaluador
+                  de testigo. Es la herramienta correcta por la MISMA razón por la que la pieza no
+                  promete la cajita. */}
+              <p class="verify-n">{ui.verifyNote}</p>
+            </div>
+          </footer>
+        </section>
+      )}
+
+      {next && step && (
+        <div class="xr-next">
+          <a href={href(next.step)} data-step-count={`${i + 2}/${flow.length}`} aria-label={`${ui.flowNext}: paso ${i + 2} ${ui.flowOf} ${flow.length}. ${cur.next}`}>
+            <span>
+              <span class="xr-next-l"><span class="xr-next-l-prefix">{ui.flowNext}: </span>paso {i + 2} {ui.flowOf} {flow.length}</span>
+              <span class="xr-next-t xr-next-t-full">{cur.next}</span>
+              <span class="xr-next-t xr-next-t-short">{next.label}</span>
+            </span>
+            <span class="xr-next-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      )}
+
+      <footer class="xr-foot" aria-label="Información legal de Efeonce">
+        <div class="xr-foot-card">
+          <a class="xr-foot-brand" href={EFEONCE_SEO_URL} aria-label="Ir a la landing de SEO de Efeonce">
+            <img
+              src="/branding/efeonce-logo.svg"
+              alt="Efeonce"
+              width="112"
+              height="26"
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+          <div class="xr-foot-copy">
+            <p>© {COPYRIGHT_YEAR} Efeonce Group SpA. Radiografía AEO es una herramienta propietaria de Efeonce.</p>
+            <p>Todos los derechos reservados. Efeonce se reserva los derechos de uso, reproducción, distribución, adaptación y explotación sin autorización expresa.</p>
+          </div>
+          <nav class="xr-foot-nav" aria-label="Enlaces legales de Efeonce">
+            <a href={EFEONCE_PRIVACY_URL}>Política de privacidad</a>
+            <a href={EFEONCE_SEO_URL}>Servicios SEO/AEO</a>
+          </nav>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+
+<script>
+  /**
+   * En móvil el riel es horizontal. Si alguien entra por deep-link a la ④, el paso activo
+   * no puede quedar fuera de la primera mirada: el riel debe decir "estás acá".
+   */
+  const activeXrayStep = document.querySelector<HTMLElement>('.xr-step[aria-current="step"]')
+
+  if (activeXrayStep && window.matchMedia('(max-width: 719px)').matches) {
+    requestAnimationFrame(() => {
+      activeXrayStep.scrollIntoView({ block: 'nearest', inline: 'center' })
+    })
+  }
+</script>
+
+{step === 'articulo' && (
+  <script>
+    /**
+     * El CTA acompaña la lectura, no el footer. Mientras queda artículo por leer flota
+     * como rail lateral; cuando el final real del artículo entra en la mirada, se retira.
+     */
+    const articleRoot = document.querySelector<HTMLElement>('[data-testid="xray-root"][data-step="articulo"]')
+    const articleStage = articleRoot?.querySelector<HTMLElement>('.read-stage')
+    const nextAction = articleRoot?.querySelector<HTMLElement>('.xr-next')
+
+    if (articleRoot && articleStage && nextAction) {
+      let nextRaf = 0
+
+      const updateNextState = () => {
+        nextRaf = 0
+
+        const compact = window.matchMedia('(max-width: 720px)').matches
+        const stage = articleStage.getBoundingClientRect()
+        const action = nextAction.getBoundingClientRect()
+        const readFinish = articleStage.querySelector<HTMLElement>('.read-finish')
+        const readTarget = articleStage.querySelector<HTMLElement>('.cap-read, .post > .para, .toc')
+        const readTop = readTarget?.getBoundingClientRect().top ?? stage.top
+        const finishTop = readFinish?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+        const endLine = window.innerHeight - Math.max(112, action.height + 56)
+        const hasEnteredReading = readTop < window.innerHeight * (compact ? 0.76 : 0.78)
+        const hasReachedFinish = finishTop < window.innerHeight * (compact ? 0.86 : 0.9)
+
+        articleRoot.dataset.nextState =
+          hasReachedFinish || stage.bottom <= endLine ? 'done' : hasEnteredReading ? 'floating' : 'pending'
+      }
+
+      const queueNextState = () => {
+        if (nextRaf) return
+        nextRaf = window.requestAnimationFrame(updateNextState)
+      }
+
+      updateNextState()
+      window.addEventListener('scroll', queueNextState, { passive: true })
+      window.addEventListener('resize', queueNextState)
+    }
+  </script>
+)}
+
+{step === 'radiografia' && (
+  <script>
+    /**
+     * Acoplamiento asimétrico artículo ↔ instrumento. CERO React: el contenido es estático;
+     * hidratarlo para conmutar un resaltado sería over-hydration. Esto solo mueve `data-on`;
+     * el CSS hace el resto. Sin JS, el par héroe ya viene pintado desde el HTML.
+     */
+    const root = document.querySelector<HTMLElement>('[data-testid="xray-root"]')
+    /* El héroe llega por el DOM, DERIVADO del payload. El script no conoce al cliente. */
+    const HERO = root?.dataset.hero ?? ''
+
+    /* 🔴 PRIMERA LÍNEA: recién ahora la página puede prometer un acoplamiento.
+       Todas las afordancias (cursor, punto, botón de sonda, chip) cuelgan de `[data-js]`. Sin JS
+       el artículo se lee entero y la capa de máquina se lee apilada abajo — pero NADA promete una
+       interacción que no existe. La lección ya estaba aprendida para el hint; faltaba el resto. */
+    if (root) root.dataset.js = 'on'
+    const live = document.querySelector<HTMLElement>('[data-testid="live"]')
+
+    // El hint promete que el hover produce algo. Sin JS no produce nada: solo aparece con JS.
+    document.querySelectorAll<HTMLElement>('[data-hint]').forEach(el => el.removeAttribute('hidden'))
+
+    if (root) {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const inst = root.querySelector<HTMLElement>('.inst')
+      const focusNote = root.querySelector<HTMLElement>('[data-testid="focus-note"]')
+      /* El destino seguro del foco cuando el panel colapsa bajo él, y el ancla del focus-return
+         al salir del enfoque. Es `tabindex="-1"`: alcanzable por script, nunca por Tab. */
+      const instTitle = root.querySelector<HTMLElement>('#in-t')
+      const showAll = root.querySelector<HTMLButtonElement>('[data-show-all]')
+      let pinned: string | null = null
+
+      /** MÓVIL: el instrumento espera fuera de la lectura. Sube como hoja al acoplar. */
+      const sheet = () => window.matchMedia('(max-width: 1079px)').matches
+      let opener: HTMLElement | null = null
+      const closeSheet = () => {
+        root.dataset.sheet = ''
+        opener?.focus()
+        opener = null
+      }
+      root.querySelector('[data-close-sheet]')?.addEventListener('click', closeSheet)
+
+      /**
+       * SALIR DEL ENFOQUE → volver al MAPA. Una sola puerta, usada por el botón y por Escape.
+       *
+       * El foco se mueve EXPLÍCITAMENTE al título del instrumento. Antes el botón se ocultaba al
+       * activarse (solo existía en modo enfoque), así que el foco caía al inicio del documento y el
+       * usuario de teclado quedaba perdido en una página de 9.000px — el mismo bug que el botón vino
+       * a arreglar, ahora en la salida. Hoy el botón NO desaparece: queda `disabled` en su sitio.
+       */
+      const exitFocus = () => {
+        pinned = null
+        paint(HERO, false)
+        if (showAll) showAll.disabled = true
+        instTitle?.focus({ preventScroll: true })
+        if (live) live.textContent = 'Capa completa: el instrumento vuelve a mostrarse entero.'
+      }
+
+      showAll?.addEventListener('click', exitFocus)
+
+      /**
+       * `collapse` separa los DOS MODOS del instrumento:
+       *
+       *  · MAPA (collapse=false) — el estado de llegada. El panel entero, agrupado por familia, con
+       *    el acoplamiento héroe ya resaltado. Es el argumento de masa: «miren TODO lo que hay que
+       *    poner para que una máquina cite esto». Si el panel se colapsara también al cargar, ese
+       *    argumento no existiría nunca: el evaluador aterrizaría viendo tres tarjetas sueltas.
+       *
+       *  · ENFOQUE (collapse=true) — cuando el evaluador INTERROGA un bloque. El panel se reduce a
+       *    lo que ese bloque produce y nada más.
+       *
+       * Primero ves la máquina entera. Después la apuntas.
+       */
+      const paint = (id: string | null, collapse = true) => {
+        if (inst) inst.dataset.focus = id && collapse ? 'true' : ''
+        if (sheet() && id) root.dataset.sheet = 'open'
+
+        root.querySelectorAll<HTMLElement>('[data-couple],[data-couple-target]').forEach(el => {
+          const mine = el.dataset.couple ?? el.dataset.coupleTarget
+          const on = Boolean(id) && mine === id
+
+          if (on) {
+            el.dataset.on = 'true'
+            el.setAttribute('aria-current', 'true')
+          } else {
+            delete el.dataset.on
+            el.removeAttribute('aria-current')
+          }
+
+          /* El botón de sonda DICE si la capa de su bloque está desplegada en el panel. Sin esto,
+             el lector de pantalla no sabe que el bloque controla algo remoto — ni si está activo. */
+          if (el.dataset.couple) el.querySelector('[data-probe]')?.setAttribute('aria-expanded', String(on))
+        })
+        /**
+         * EL INSTRUMENTO ENFOCA (no solo atenúa).
+         *
+         * El panel está ordenado POR FAMILIA (Metadatos · Datos estructurados · Estructura ·
+         * Evidencia), pero al tocar un bloque la pregunta es «¿qué produce ESTO?» — una consulta
+         * POR PRODUCTOR contra un layout POR FAMILIA. Los datos de un bloque nunca son contiguos.
+         *
+         * Antes solo atenuábamos y scrolleábamos al PRIMER match. Medido: de 51 datos prometidos
+         * por los chips, 44 NO se veían nunca. El `h1` prometía 11 y mostraba 0. El primero en el
+         * DOM suele ser el más aburrido («tu H2 está en la lista de H2») y el argumento de verdad
+         * —«nadie en ese resultado resuelve la llegada»— quedaba 1.000px abajo, invisible.
+         * Un chip que promete «4 datos» y muestra uno MIENTE, y en la pieza cuya tesis es el rigor
+         * eso es lo más caro que puede pasar.
+         *
+         * Ahora el panel COLAPSA a lo que ese bloque produce y nada más: los N datos quedan
+         * apilados arriba, sin cacería. En reposo vuelve a ser el mapa completo.
+         */
+        const body = inst?.querySelector<HTMLElement>('.in-body')
+        body?.querySelectorAll<HTMLElement>('[data-hide]').forEach(el => delete el.dataset.hide)
+
+        if (!id) {
+          if (focusNote) focusNote.textContent = ''
+          if (live) live.textContent = ''
+          if (inst) inst.dataset.more = ''
+
+          return
+        }
+
+        const target = root.querySelector<HTMLElement>(`[data-couple-target="${id}"]`)
+        if (!target) return
+        if (!sheet()) target.querySelector('details')?.setAttribute('open', '')
+
+        /* En modo MAPA se resalta y se acabó: no se colapsa, no se scrollea, no se anuncia cuenta. */
+        if (!collapse) {
+          if (focusNote) focusNote.textContent = ''
+          if (inst) inst.dataset.more = ''
+
+          return
+        }
+
+        if (body) {
+          /* Se conserva: cada nodo activo, su cadena de ancestros (para no romper el contenedor
+             que lo envuelve) y todo lo que cuelga de él (el dato es el nodo ENTERO). */
+          const keep = new Set<Element>()
+
+          body.querySelectorAll<HTMLElement>('[data-on]').forEach(on => {
+            for (let el: Element | null = on; el && el !== body; el = el.parentElement) keep.add(el)
+            on.querySelectorAll('*').forEach(d => keep.add(d))
+          })
+
+          /* 🔴 NUNCA OCULTAR BAJO EL FOCO. `display:none` saca el nodo del árbol de accesibilidad Y
+             del orden de tabulación: si el elemento activo queda dentro de lo que vamos a colapsar,
+             el foco cae al `<body>` y el usuario aparece al inicio de una página de 9.000px sin
+             entender qué pasó. Se lo movemos ANTES, al header del instrumento, que es el sitio
+             correcto: es donde acaba de aparecer la cuenta («Lo que produce este bloque · 4 datos»). */
+          const active = document.activeElement
+
+          if (active instanceof HTMLElement && body.contains(active) && !keep.has(active)) {
+            instTitle?.focus({ preventScroll: true })
+          }
+
+          /* Se colapsa: los rótulos de familia, los nodos de otros bloques, las filas del árbol
+             que no son ésta y las preguntas del fan-out que este bloque no cubre. */
+          body
+            .querySelectorAll<HTMLElement>(':scope > *, .kpi, .t3wrap > *, .hn, .fan li')
+            .forEach(el => {
+              if (!keep.has(el)) el.dataset.hide = 'true'
+            })
+
+          /* 🔴 EL ORDEN IMPORTA TANTO COMO LA VISIBILIDAD.
+             Se arregló QUÉ se ve; faltaba QUÉ SE LEE PRIMERO. Los nodos supervivientes quedaban en
+             orden del DOM = orden de FAMILIA (craft → jsonld → seo → estructura → evidencia AL
+             FINAL). Al interrogar un H2, lo primero que leía el comité era «cada H2 es una
+             sub-pregunta del FAN-OUT… el motor recupera PASAJES, no páginas» — jerga pura. Y los dos
+             nodos que de verdad ARGUMENTAN («cero aerolíneas en ese resultado», «Balmaceda es el
+             ángulo que solo SKY tiene», ambos con fuente) iban 2.º y 3.º.
+
+             El `tier` existe en el payload (1 = mueve un número del diagnóstico) y en modo enfoque no
+             se usaba. Para quien no sabe SEO, la PRIMERA frase decide si sigue o se desconecta.
+
+             Se ordenan los HIJOS DIRECTOS del panel (un `.hn` anidado no se puede reordenar solo):
+             cada uno toma el mejor rango que sobrevive dentro suyo.
+
+             ⚠️ Y el `tier` SOLO no alcanza: la evidencia y el árbol de encabezados son AMBOS tier 2,
+             así que ordenar por tier los dejaba igual. El tier mide la importancia en la CAPA DE
+             MÁQUINA; lo que decide si el comité sigue leyendo es otra cosa. Para quien no sabe SEO,
+             la EVIDENCIA es el argumento («cero aerolíneas en ese resultado», «Balmaceda es el
+             ángulo que solo SKY tiene»): va primero, siempre. Después el tier. */
+          const rank = (el: Element) => {
+            if (el.matches('.fct, .kpi') || el.querySelector('.fct, .kpi')) return 0
+            const t = /\bt([123])\b/.exec(el.className)?.[1]
+
+            return t ? Number(t) : 2
+          }
+
+          body.querySelectorAll<HTMLElement>(':scope > *').forEach(child => {
+            if (child.dataset.hide) return
+            const own = child.matches('[data-on]') ? rank(child) : 9
+            const inner = [...child.querySelectorAll('[data-on]')].map(n => rank(n.parentElement ?? n))
+            const best = Math.min(own, ...(inner.length ? inner : [9]))
+
+            child.style.order = String(best === 9 ? 2 : best)
+          })
+        }
+
+        /* Con el panel ya colapsado, los N datos empiezan arriba: se vuelve al tope en vez de
+           perseguir un nodo. Y el header pegajoso deja de poder taparlo (WCAG 2.2 AA 2.4.11). */
+        const pane = target.closest<HTMLElement>('.inst')
+        pane?.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
+
+        const all = root.querySelectorAll(`[data-couple-target="${id}"]`).length
+        const cuenta = `${all} ${all === 1 ? 'dato' : 'datos'}`
+
+        /* El H1 produce ONCE datos y en pantalla caben cuatro. Si la pila enfocada desborda, hay que
+           DECIRLO: si no, el header promete once y el ojo ve cuatro — que es la misma mentira que
+           vinimos a arreglar, sólo que más chica. */
+        requestAnimationFrame(() => {
+          if (!inst || !pane) return
+          inst.dataset.more = pane.scrollHeight > pane.clientHeight + 4 ? 'true' : ''
+        })
+
+        /* El comprador no tiene por qué saber SEO: se le dice en palabras, no solo con un realce. */
+        if (focusNote) focusNote.textContent = `Lo que produce este bloque · ${cuenta}`
+        if (showAll) showAll.disabled = false
+
+        /* El anuncio tiene que ser HONESTO: si el resto de la capa se colapsó, hay que decirlo — y
+           decir cómo volver. Antes anunciaba «4 datos. Primero: X» y dejaba al usuario de lector de
+           pantalla creyendo que el panel seguía entero. */
+        if (live) {
+          const name = target.querySelector('.nd-l,.sch-t,.kpi-u')?.textContent?.trim()
+
+          live.textContent =
+            `Enfocado: ${cuenta}${name ? `. Primero: ${name}` : ''}. ` +
+            'El resto de la capa está colapsada. Botón «Ver toda la capa» para volver.'
+        }
+      }
+
+      const hit = (e: Event) =>
+        (e.target as HTMLElement).closest<HTMLElement>('[data-couple],[data-couple-target]')
+
+      /**
+       * Modalidad de entrada. Sin esto, el mouse QUIETO le roba el acoplamiento al teclado: al
+       * enfocar con Tab la página scrollea, los elementos pasan bajo el cursor inmóvil y
+       * disparan `mouseover` fantasma que repinta encima de lo que el teclado seleccionó.
+       */
+      let keyboard = false
+      root.addEventListener('mousemove', () => { keyboard = false }, { passive: true })
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Tab' || e.key.startsWith('Arrow')) keyboard = true
+      })
+
+      /**
+       * 🔴 EL INSTRUMENTO NO PUEDE REPINTARSE DESDE SÍ MISMO.
+       *
+       * Antes, `enter()` escuchaba sobre `[data-couple]` Y `[data-couple-target]` — o sea, los DOS
+       * lados del split. Con el modo enfoque (que colapsa con `display:none` todo lo que el bloque
+       * no produce), eso volvía el panel inusable con teclado:
+       *
+       *   1. El usuario tabula al primer nodo del instrumento.
+       *   2. `focusin` → `paint(ese nodo)` → el 90% del panel se pone `display:none`.
+       *   3. Tab: ya no queda nada enfocable dentro → SALE del instrumento.
+       *
+       * El evaluador con teclado NUNCA podía recorrer la capa de máquina: se le deshacía cada vez
+       * que la tocaba. Y con mouse pasaba la variante fea: abrías un «Ver el código», movías el
+       * cursor a otro bloque, y el elemento enfocado desaparecía → el foco caía al `<body>`.
+       *
+       * El acoplamiento nace en el ARTÍCULO y viaja al instrumento. Nunca al revés.
+       */
+      const enter = (e: Event) => {
+        const el = hit(e)
+        if (!el || pinned) return
+        if (e.type === 'mouseover' && keyboard) return
+        // Solo el lado del artículo dispara el acoplamiento. El panel se lee, no se repinta.
+        if (!el.dataset.couple) return
+        paint(el.dataset.couple)
+      }
+
+      const sourceHash = decodeURIComponent(location.hash.slice(1))
+      if (sourceHash.startsWith('block-')) {
+        const source = document.getElementById(sourceHash)
+        const sourceId = source?.dataset.couple
+        if (sourceId) { pinned = sourceId; paint(sourceId); source?.scrollIntoView({block:'center'}) }
+      }
+      root.addEventListener('mouseover', enter)
+      root.addEventListener('focusin', enter)
+      root.addEventListener('click', e => {
+        const el = hit(e)
+        if (!el) return
+        const id = el.dataset.couple ?? el.dataset.coupleTarget ?? null
+        if (sheet() && el.dataset.couple) opener = el
+        pinned = pinned === id ? null : id
+        paint(pinned ?? id)
+      })
+      document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return
+        if (root.dataset.sheet === 'open') { closeSheet(); return }
+        pinned = null
+        /* Escape devuelve al MAPA (el panel entero), no a otro enfoque: es la salida del
+           instrumento, y sin ella —al no haber `mouseout`, el acoplamiento es pegajoso a
+           propósito— no habría forma de volver a ver la máquina completa sin recargar. */
+        exitFocus()
+      })
+    }
+  </script>
+)}
+
+<style>
+@media(max-width:680px){.xr[data-composed] .xr-rail::after{content:"›";position:absolute;right:0;top:.4rem;padding:.15rem .4rem;background:var(--navy-2);color:var(--blue-up);font-size:1.3rem;line-height:1;pointer-events:none}}
+.xr[data-composed][data-step="articulo"] .read-stage{width:100%;padding-top:0}.xr[data-composed][data-step="articulo"] main.xr-wrap{padding-inline:0;max-width:none}
+@media(max-width:680px){.xr[data-composed] .xr-chrome-in{display:flex;align-items:center;gap:.5rem;padding-block:.65rem}.xr[data-composed] .xr-rotulo{border:0;padding:0;font-size:.65rem;flex:1}.xr[data-composed] .xr-rotulo span{display:none}.xr[data-composed] .xr-artifacts{padding-block:.45rem}.xr[data-composed] .xr-brand-t{font-size:.65rem}}
+
+@media(max-width:680px){.xr[data-composed] .at-lineage-list{grid-template-columns:1fr}.xr[data-composed] .at-lineage-list span{overflow-wrap:anywhere}}
+.atom-origin{display:inline-block;color:var(--blue-up);font-size:.75rem;text-decoration:underline;margin-top:.5rem;min-height:24px}
+  .xr-artifacts{display:flex;gap:1rem;padding:.75rem max(1rem,calc((100vw - 1440px)/2));background:var(--navy);color:var(--ink-d)}
+  .xr-artifacts a{padding:.35rem .8rem;border:1px solid var(--navy-3);border-radius:var(--r-sm);text-decoration:none;font-size:var(--t-meta)}
+  .xr-artifacts a[aria-current]{background:var(--blue);color:white}
+
+  /* ══════════ ① EL HUECO ══════════ */
+  .gap, .at { padding-block: 2rem 1rem; }
+  .gap { --g-card-radius: 10px; }
+  .g-head { max-width: 76ch; }
+  .g-kick {
+    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .g-h1, .at-h1 {
+    margin-top: 0.6rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: 2.15rem; font-weight: var(--w-display-lg); line-height: 1.08;
+    letter-spacing: 0; max-width: 22ch; text-wrap: balance;
+  }
+  .g-lead {
+    max-width: 66ch; margin-top: 0.95rem; color: var(--ink-2);
+    font-size: clamp(1rem, 1.45vw, 1.125rem); line-height: 1.65;
+  }
+  @media (min-width: 900px) { .g-h1, .at-h1 { font-size: 3.15rem; } }
+
+  .g-kpis {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem; margin-top: clamp(1.35rem, 3vw, 2rem);
+  }
+  .g-kpi {
+    min-width: 0; padding: 0.95rem 1rem; background: #fff; color: var(--ink);
+    border: 1px solid var(--line); border-radius: var(--g-card-radius);
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--navy) 7%, transparent);
+  }
+  .g-kpi-l {
+    margin-bottom: 0.55rem; color: var(--muted); font-size: var(--t-over);
+    font-weight: var(--w-label); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .g-kpi-n {
+    font-family: Poppins, system-ui, sans-serif;
+    font-size: clamp(2rem, 3.5vw, 2.6rem); font-weight: var(--w-display);
+    line-height: 1; color: var(--navy);
+    font-variant-numeric: tabular-nums; letter-spacing: 0;
+  }
+  .g-kpi-u { margin-top: 0.35rem; font-size: var(--t-meta); line-height: 1.35; color: var(--ink-2); font-weight: var(--w-label); }
+  .g-kpi cite { display: block; margin-top: 0.65rem; font-size: 0.75rem; line-height: 1.35; color: var(--muted); font-style: normal; }
+  .g-kpi-hit {
+    border-color: color-mix(in srgb, var(--blue) 70%, var(--line));
+    background: color-mix(in srgb, var(--blue) 8%, white);
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--blue) 11%, transparent);
+  }
+  .g-kpi-hit .g-kpi-n { color: var(--blue); }
+  @media (max-width: 720px) {
+    .gap { padding-block: 1.35rem 0.75rem; }
+    .g-head { max-width: 100%; }
+    .g-h1 {
+      font-size: clamp(2.15rem, 9vw, 2.65rem);
+      line-height: 1.06;
+      max-width: 13ch;
+    }
+    .g-lead {
+      margin-top: 0.75rem;
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+    .g-kpis {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+      margin-top: 1rem;
+    }
+    .g-kpi:first-child { grid-column: 1 / -1; }
+    .g-kpi {
+      padding: 0.78rem 0.82rem;
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--navy) 5%, transparent);
+    }
+    .g-kpi:not(:first-child) .g-kpi-l {
+      margin-bottom: 0.42rem;
+      font-size: 0.62rem;
+      line-height: 1.28;
+    }
+    .g-kpi:not(:first-child) .g-kpi-n {
+      font-size: clamp(1.75rem, 8vw, 2.05rem);
+    }
+    .g-kpi:not(:first-child) .g-kpi-u,
+    .g-kpi:not(:first-child) cite {
+      font-size: 0.7rem;
+      line-height: 1.32;
+    }
+  }
+
+  .g-grid { display: grid; grid-template-columns: 1fr; gap: 1.1rem; margin-top: 1rem; }
+  @media (min-width: 980px) { .g-grid { grid-template-columns: minmax(0, 1.06fr) minmax(24rem, 0.94fr); align-items: start; } }
+
+  .g-serp {
+    border: 1px solid var(--line); border-radius: var(--g-card-radius);
+    padding: clamp(1rem, 2vw, 1.25rem); background: #fff;
+    box-shadow: 0 18px 45px color-mix(in srgb, var(--navy) 6%, transparent);
+  }
+  .g-serp-h {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 1rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--line);
+  }
+  .g-panel-k {
+    margin: 0 0 0.25rem; color: var(--muted); font-size: var(--t-over);
+    font-weight: var(--w-label); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .g-panel-k--dark { color: var(--blue-up); }
+  .g-serp-t {
+    margin: 0; font-family: Poppins, system-ui, sans-serif; font-size: 1.2rem;
+    font-weight: var(--w-display); line-height: 1.25; color: var(--ink);
+    text-wrap: balance;
+  }
+  .g-serp-badge {
+    flex: 0 0 auto; padding: 0.35rem 0.55rem; border-radius: 999px;
+    color: var(--blue); background: color-mix(in srgb, var(--blue) 9%, white);
+    border: 1px solid color-mix(in srgb, var(--blue) 32%, var(--line));
+    font-size: var(--t-meta); font-weight: var(--w-label); line-height: 1;
+    white-space: nowrap;
+  }
+  .g-serp-s {
+    margin: 0.8rem 0 0; max-width: 64ch; color: var(--ink-2);
+    font-size: var(--t-body); line-height: 1.6;
+  }
+  .g-list { list-style: none; margin-top: 0.75rem; }
+  .g-list li {
+    display: grid; grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+    gap: 0.7rem; align-items: center;
+    padding: 0.52rem 0; border-bottom: 1px solid var(--line); font-size: 0.9375rem;
+  }
+  .g-list li:last-child { border-bottom: 0; }
+  .g-pos { font-variant-numeric: tabular-nums; font-weight: var(--w-label); color: var(--muted); font-size: 0.8125rem; }
+  .g-dom { min-width: 0; font-weight: var(--w-label); color: var(--ink); overflow-wrap: anywhere; }
+  .g-kind {
+    padding: 0.28rem 0.45rem; border-radius: 999px;
+    background: var(--surf); border: 1px solid var(--line);
+    font-size: 0.75rem; color: var(--muted); line-height: 1; white-space: nowrap;
+  }
+  .g-note { margin-top: 0.8rem; font-size: var(--t-meta); color: var(--muted); }
+
+  .g-side { display: grid; gap: 0.9rem; }
+  .g-punch {
+    padding: clamp(1.1rem, 2vw, 1.35rem); background: var(--navy);
+    color: var(--ink-d); border-radius: var(--g-card-radius);
+    border: 1px solid var(--navy-3); border-left: 4px solid var(--blue-up);
+    box-shadow: 0 22px 48px color-mix(in srgb, var(--navy) 16%, transparent);
+  }
+  .g-punch-t {
+    margin: 0; font-family: Poppins, system-ui, sans-serif;
+    font-size: clamp(1.35rem, 2.2vw, 1.75rem); font-weight: var(--w-display);
+    line-height: 1.25; color: #fff; text-wrap: balance;
+  }
+  .g-diagnosis { margin-top: 1rem; border-top: 1px solid color-mix(in srgb, var(--line-d) 70%, transparent); }
+  .g-diagnosis p {
+    display: grid; grid-template-columns: minmax(8.5rem, 0.32fr) minmax(0, 1fr);
+    gap: 0.8rem; margin: 0; padding: 0.82rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--line-d) 56%, transparent);
+  }
+  .g-diagnosis p:last-child { border-bottom: 0; padding-bottom: 0; }
+  .g-diagnosis strong {
+    color: var(--blue-up); font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0.08em; line-height: 1.35; text-transform: uppercase;
+  }
+  .g-diagnosis span {
+    min-width: 0; color: var(--dim-d); font-size: var(--t-body); line-height: 1.6;
+    font-weight: var(--w-body-dark);
+  }
+  .g-aside {
+    display: grid; grid-template-columns: minmax(5rem, 0.22fr) minmax(0, 1fr);
+    gap: 0.75rem; padding: 0.9rem 1rem; font-size: var(--t-meta); line-height: 1.55;
+    color: var(--ink-2); background: var(--surf); border: 1px solid var(--line);
+    border-radius: var(--g-card-radius);
+  }
+  .g-aside strong {
+    color: var(--muted); font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .g-next {
+    display: flex; gap: 1rem; align-items: center; justify-content: space-between;
+    padding: 1rem 1.15rem; background: var(--navy);
+    color: var(--ink-d); border-radius: var(--g-card-radius); text-decoration: none;
+    border: 1px solid var(--navy-3);
+    transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .g-next:hover {
+    background: var(--navy-3); transform: translateX(3px);
+  }
+  .g-next:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+  @media (max-width: 640px) {
+    .g-serp-h { display: grid; }
+    .g-serp-badge { justify-self: start; }
+    .g-list li { grid-template-columns: 1.4rem minmax(0, 1fr); gap: 0.55rem; align-items: start; }
+    .g-kind { grid-column: 2; justify-self: start; white-space: normal; line-height: 1.25; }
+    .g-diagnosis p,
+    .g-aside { grid-template-columns: 1fr; gap: 0.35rem; }
+  }
+
+  /* ══════════ ② EL ARTÍCULO ══════════ */
+  .read-stage {
+    position: relative;
+    isolation: isolate;
+    width: min(100%, 64rem);
+    margin-inline: auto;
+    padding-block: clamp(0.75rem, 1.8vw, 1.35rem) 1rem;
+  }
+  @media (max-width: 720px) {
+    .read-stage {
+      width: 100%;
+      padding-block-start: 0.95rem;
+    }
+  }
+
+  .xr[data-step='articulo'] main.xr-wrap {
+    padding-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .xr[data-step='articulo'] .xr-next {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 30;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    transform: translateY(0.55rem);
+    pointer-events: none;
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .xr[data-step='articulo'] .xr-next a {
+    pointer-events: auto;
+    width: min(100%, 30rem);
+    max-width: none;
+    margin-inline: auto;
+    min-height: 4.35rem;
+    padding: 0.85rem 1rem 0.85rem 1.15rem;
+    border-radius: 10px;
+    border: 1px solid var(--navy-3);
+    box-shadow:
+      0 22px 60px color-mix(in srgb, var(--navy) 20%, transparent),
+      0 1px 0 rgb(255 255 255 / 0.12) inset;
+  }
+  .xr[data-step='articulo'] .xr-next a:hover {
+    transform: translateY(-2px);
+  }
+  .xr[data-step='articulo'] .xr-next-l {
+    letter-spacing: 0.12em;
+  }
+  .xr[data-step='articulo'] .xr-next-t {
+    font-size: clamp(1.02rem, 1.45vw, 1.22rem);
+    line-height: 1.18;
+    text-wrap: balance;
+  }
+  .xr-next-t-short {
+    display: none;
+  }
+  .xr[data-step='articulo'] .xr-next-arrow {
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--blue-up) 12%, transparent);
+  }
+  .xr[data-step='articulo'][data-next-state='floating'] .xr-next {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .read-finish {
+    margin: clamp(1.8rem, 4vw, 2.6rem) auto 0;
+    padding: 1.25rem 0 0;
+    border-top: 1px solid var(--line);
+  }
+  .read-finish-a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: min(100%, 28rem);
+    margin-left: auto;
+    padding: 0.9rem 1rem 0.9rem 1.1rem;
+    border-radius: 10px;
+    background: var(--navy);
+    color: var(--ink-d);
+    border: 1px solid var(--navy-3);
+    text-decoration: none;
+    box-shadow: 0 18px 48px color-mix(in srgb, var(--navy) 14%, transparent);
+    transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .read-finish-a:hover {
+    background: var(--navy-3);
+    transform: translateY(-2px);
+  }
+  .read-finish-a:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+  }
+  .read-finish-k {
+    display: block;
+    color: var(--blue-up);
+    font-size: var(--t-over);
+    font-weight: var(--w-label);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .read-finish-t {
+    display: block;
+    margin-top: 0.25rem;
+    color: #fff;
+    font-family: Poppins, system-ui, sans-serif;
+    font-size: clamp(1rem, 1.6vw, 1.18rem);
+    font-weight: var(--w-display);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  @media (min-width: 1280px) {
+    .xr[data-step='articulo'] .xr-next {
+      left: calc(50% + 32rem + 1rem);
+      right: auto;
+      bottom: clamp(1rem, 2vw, 1.5rem);
+      width: min(12rem, calc(50vw - 32rem - 2rem));
+    }
+    .xr[data-step='articulo'] .xr-next a {
+      width: 100%;
+      min-height: 4rem;
+      margin-inline: 0;
+      padding: 0.72rem 0.65rem 0.72rem 0.8rem;
+      gap: 0.55rem;
+    }
+    .xr[data-step='articulo'] .xr-next-l {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+    }
+    .xr[data-step='articulo'] .xr-next-l-prefix {
+      display: none;
+    }
+    .xr[data-step='articulo'] .xr-next-t-full {
+      display: none;
+    }
+    .xr[data-step='articulo'] .xr-next-t-short {
+      display: block;
+      font-size: 1rem;
+      line-height: 1.08;
+    }
+    .xr[data-step='articulo'] .xr-next-arrow {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+  @media (min-width: 1280px) and (max-width: 1439px) {
+    .xr[data-step='articulo'] .xr-next a {
+      justify-content: center;
+      gap: 0.45rem;
+    }
+    .xr[data-step='articulo'] .xr-next-l {
+      text-align: center;
+      line-height: 1.2;
+    }
+    .xr[data-step='articulo'] .xr-next-t-short {
+      display: none;
+    }
+  }
+  @media (max-width: 720px) {
+    .xr[data-step='articulo'] main.xr-wrap {
+      padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+    }
+    .xr[data-step='articulo'] .xr-next {
+      left: auto;
+      right: 0.75rem;
+      bottom: calc(0.85rem + env(safe-area-inset-bottom));
+      width: auto;
+    }
+    .xr[data-step='articulo'] .xr-next a {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 3.35rem;
+      max-width: none;
+      min-width: 0;
+      min-height: 3.35rem;
+      padding: 0.5rem;
+      border-radius: 999px;
+      box-shadow:
+        0 18px 44px color-mix(in srgb, var(--navy) 20%, transparent),
+        0 1px 0 rgb(255 255 255 / 0.12) inset;
+    }
+    .xr[data-step='articulo'] .xr-next a::before {
+      content: attr(data-step-count);
+      position: absolute;
+      top: 0.4rem;
+      left: 0;
+      right: 0;
+      color: var(--blue-up);
+      font-size: 0.58rem;
+      font-weight: var(--w-label);
+      letter-spacing: 0.03em;
+      line-height: 1;
+      text-align: center;
+    }
+    .xr[data-step='articulo'] .xr-next a > span:first-child {
+      display: none;
+    }
+    .xr[data-step='articulo'] .xr-next-arrow {
+      position: relative;
+      top: 0.27rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      font-size: 1.35rem;
+    }
+    .read-finish {
+      padding-inline: 0.55rem;
+    }
+    .read-finish-a {
+      width: 100%;
+      margin-inline: 0;
+    }
+  }
+  .xr[data-step='articulo'][data-next-state='pending'] .xr-next,
+  .xr[data-step='articulo'][data-next-state='done'] .xr-next {
+    opacity: 0;
+    transform: translateY(0.65rem);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .xr[data-step='articulo'] .xr-next a:hover {
+      transform: none;
+    }
+  }
+
+  /* ══════════ ③ LA RADIOGRAFÍA ══════════ */
+  /* EL MARCO DE LA ③. La pantalla que carga toda la revelación no puede abrir con una instrucción:
+     abre con el ARGUMENTO. Y si alguien entra por deep-link desde el deck, acá se defiende sola. */
+  .r-head {
+    max-width: 74ch;
+    margin: 0 0 clamp(0.9rem, 1.6vw, 1.25rem);
+    padding-top: clamp(1.35rem, 3vw, 2.4rem);
+  }
+  .r-h1 {
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--t-sect); font-weight: var(--w-display);
+    line-height: 1.16; letter-spacing: 0; color: var(--ink); margin-top: 0.3rem; max-width: 32ch; text-wrap: balance;
+  }
+  .r-h1 em { font-style: italic; color: var(--blue); }
+  .r-thesis { margin-top: 0.65rem; font-size: var(--t-body); line-height: 1.58; color: var(--ink-3); max-width: 64ch; }
+
+  .r-hint { padding-top: 0.45rem; font-size: var(--t-meta); color: var(--muted); }
+  .hint-d { display: none; }
+  @media (hover: hover) and (pointer: fine) { .hint-d { display: block; } .hint-m { display: none; } }
+  @media (max-width: 720px) { .hint-d { display: none; } .hint-m { display: block; } }
+      /* EN MÓVIL, LA ③ ES UNA LECTURA INTERROGABLE.
+     Poner el instrumento primero convertía la radiografía en una capa de máquina antes de que el
+     evaluador viera qué iba a tocar. El trabajo educativo de la pantalla no es enseñar teoría AEO:
+     es dejar que el comprador toque un bloque visible y vea qué produce.
+
+     Con JS, el instrumento espera cerrado y sube como hoja inferior al acoplar. Sin JS, queda después
+     del artículo como contenido estático: la pieza no promete interacción, pero sigue siendo legible. */
+  .split { display: grid; grid-template-columns: 1fr; gap: 1.25rem; min-width: 0; padding-top: 0.65rem; }
+  @media (max-width: 1079px) {
+    .xr[data-js='on'] .split > :global(.inst) { display: none; }
+    .xr[data-js='on'][data-sheet='open'] .split > :global(.inst) { display: block; }
+  }
+  @media (min-width: 1080px) {
+    .r-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(20rem, 0.78fr);
+      column-gap: clamp(2rem, 4vw, 4.5rem);
+      align-items: end;
+      max-width: min(100%, 88rem);
+    }
+    .r-head .g-kick,
+    .r-h1 {
+      grid-column: 1;
+    }
+    .r-thesis {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: end;
+      margin-top: 0;
+      padding-bottom: 0.1rem;
+      font-size: 1rem;
+      line-height: 1.62;
+    }
+    .split { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; }
+    .split :global(.inst) {
+      position: sticky; top: 6rem; max-height: calc(100vh - 7.2rem); overflow-y: auto;
+      view-transition-name: xr-inst; /* el instrumento LLEGA desde la derecha, no aparece */
+    }
+  }
+
+  @media (max-width: 720px) {
+    .r-head {
+      padding-top: clamp(1rem, 5vw, 1.5rem);
+      margin-bottom: 0.9rem;
+    }
+    .r-h1 {
+      font-size: clamp(1.58rem, 6.2vw, 1.9rem);
+      line-height: 1.12;
+    }
+    .r-thesis {
+      font-size: 1rem;
+      line-height: 1.54;
+    }
+  }
+
+  /* ══════════ ④ DÓNDE MÁS VIVE ══════════ */
+  .at-intro { margin-top: 1rem; font-size: 1.125rem; line-height: 1.65; color: var(--ink-2); max-width: 68ch; }
+  .at-lineage {
+    margin-top: 1.35rem; padding: 0.75rem; border: 1px solid var(--line);
+    border-radius: 14px; background: color-mix(in srgb, var(--blue-up) 5%, white);
+    display: grid; gap: 0.55rem; align-items: center;
+  }
+  .at-lineage-source {
+    padding: 0.65rem 0.75rem; border-radius: 10px; background: #fff;
+    border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  }
+  .at-lineage-source span,
+  .at-lineage-bridge {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0; text-transform: uppercase; color: var(--muted);
+  }
+  .at-lineage-source-k {
+    display: flex; align-items: center; gap: 0.35rem;
+  }
+  .at-lineage-source-k svg { flex: 0 0 auto; color: var(--blue-up); }
+  .at-lineage-source strong {
+    display: block; margin-top: 0.2rem; font-size: var(--t-meta);
+    line-height: 1.35; color: var(--ink); font-weight: var(--w-label);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .at-lineage-bridge { text-align: center; color: var(--blue-up); }
+  .at-lineage-bridge strong {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--ink);
+    font-family: Poppins, system-ui, sans-serif;
+    font-size: 0.95rem;
+    font-weight: var(--w-display);
+    line-height: 1.2;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .at-lineage-list {
+    list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; min-width: 0;
+  }
+  .at-lineage-list li {
+    min-width: 0; padding: 0.55rem 0.6rem; border-radius: 10px;
+    background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
+  }
+  .at-lineage-list li[data-artifact='social'] {
+    background: color-mix(in srgb, var(--client) 11%, var(--navy));
+    border-color: color-mix(in srgb, var(--client) 42%, var(--navy-3));
+  }
+  .at-lineage-list span {
+    display: flex; align-items: center; gap: 0.35rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: 0.78rem; line-height: 1.2; font-weight: var(--w-display); color: #fff;
+  }
+  .at-channel-icon {
+    width: 1.25rem; height: 1.25rem; border-radius: 999px;
+    display: inline-grid; place-items: center; flex: 0 0 auto;
+    background: color-mix(in srgb, var(--blue-up) 16%, var(--navy-2));
+    color: var(--blue-up); font-style: normal;
+  }
+  .at-lineage-list li[data-artifact='social'] .at-channel-icon {
+    background: color-mix(in srgb, var(--client) 18%, var(--navy-2));
+    color: #fff;
+  }
+  .at-lineage-list small {
+    display: none; margin-top: 0.2rem; font-size: 0.75rem;
+    line-height: 1.35; color: var(--dim-d);
+  }
+  .at-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-top: 1.35rem; align-items: start; }
+  @media (max-width: 979px) {
+    .atom[data-featured='true'] { order: -1; }
+  }
+  @media (min-width: 980px) {
+    .at-lineage { grid-template-columns: minmax(0, 1fr) auto minmax(0, 2.1fr); padding: 0.95rem; gap: 0.75rem; }
+    .at-lineage-source { padding: 0.8rem 0.9rem; }
+    .at-lineage-source strong { display: block; overflow: visible; }
+    .at-lineage-bridge {
+      min-width: 10rem;
+      text-align: left;
+      padding-inline: 0.4rem;
+    }
+    .at-lineage-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .at-lineage-list li { padding: 0.7rem 0.8rem; }
+    .at-lineage-list span { font-size: var(--t-meta); line-height: 1.35; }
+    .at-lineage-list small { display: block; }
+    .at-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr); }
+    .atom[data-featured='true'] { grid-column:2;grid-row:1;transform: translateY(-0.35rem); }
+    .atom:not([data-featured]){grid-row:1}
+  }
+
+  .atom {
+    background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
+    border-radius: 14px; padding: 1.2rem; min-width: 0; position: relative;
+    outline: 2px solid transparent; scroll-margin-top: 5rem;
+  }
+  .atom[data-featured='true'] {
+    border-color: color-mix(in srgb, var(--client) 42%, var(--navy-3));
+    background: color-mix(in srgb, var(--client) 10%, var(--navy));
+    box-shadow: 0 18px 40px color-mix(in srgb, var(--navy) 18%, transparent);
+  }
+  .atom:focus-visible { outline: 2px solid var(--blue-up); }
+  .atom-h { display: flex; align-items: flex-start; gap: 0.65rem; margin-bottom: 0.9rem; }
+  .atom-icon {
+    width: 2rem; height: 2rem; border-radius: 999px; display: inline-grid; place-items: center;
+    flex: 0 0 auto; color: var(--blue-up);
+    background: color-mix(in srgb, var(--blue-up) 12%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--blue-up) 26%, var(--navy-3));
+  }
+  .atom[data-artifact='social'] .atom-icon {
+    color: #fff; background: color-mix(in srgb, var(--client) 22%, var(--navy-2));
+    border-color: color-mix(in srgb, var(--client) 38%, var(--navy-3));
+  }
+  .atom-title { min-width: 0; display: grid; gap: 0.25rem; }
+  .atom-k {
+    display: block;
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--t-node);
+    font-weight: var(--w-display); color: #fff;
+  }
+  /* La LÍNEA DE SANGRE: de qué bloque del artículo nació. No son entregables sueltos. */
+  .atom-from { font-size: var(--t-meta); color: var(--blue-up); }
+  .atom-artifact { margin-top: 1rem; min-width: 0; }
+  .atom-proof {
+    margin-top: 1rem; padding: 0.85rem 0.9rem; border-radius: 12px;
+    background: color-mix(in srgb, var(--blue-up) 7%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--blue-up) 20%, var(--navy-3));
+    display: grid; gap: 0.55rem;
+  }
+  .atom-section-label {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue-up);
+  }
+  .atom-stat {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.7rem;
+    align-items: start; margin: 0; color: var(--ink-d);
+  }
+  .atom-stat strong {
+    font-family: Poppins, system-ui, sans-serif; font-size: 2.05rem; font-weight: var(--w-display);
+    line-height: 0.95; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: 0;
+  }
+  .atom-stat span {
+    display: block; font-size: var(--t-meta); font-weight: var(--w-body-dark);
+    line-height: 1.45; color: var(--ink-d); letter-spacing: 0;
+  }
+  /* La fuente de la cifra. Sobre navy el texto sube un paso (--w-body-dark): el mismo peso
+     sobre oscuro se rasteriza más fino. Misma voz, distinto sustrato. */
+  .atom-cite {
+    display: block; padding-top: 0.55rem; border-top: 1px solid color-mix(in srgb, var(--line-d) 58%, transparent);
+    font-size: 0.75rem; line-height: 1.45; color: var(--dim-d);
+    font-style: normal; font-weight: var(--w-body-dark);
+  }
+  /* Las cuatro fotos reales, con su alt. El argumento de las imágenes deja de estar solo AFIRMADO. */
+  .atom-imgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; list-style: none; }
+  .atom-imgs img {
+    width: 100%; aspect-ratio: 1 / 0.78; object-fit: cover; border-radius: 8px; display: block;
+  }
+  .atom-alt {
+    margin-top: 0.32rem; font-size: 0.66rem; line-height: 1.35; color: var(--dim-d);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .atom-alt span {
+    display: inline-block; margin-right: 0.3rem; padding: 0.05rem 0.3rem; border-radius: 3px;
+    background: var(--navy-3); color: var(--blue-up); font-family: ui-monospace, monospace;
+  }
+
+  .atom-rationale {
+    margin-top: 0.85rem; padding-left: 0.85rem;
+    border-left: 2px solid color-mix(in srgb, var(--blue-up) 42%, var(--navy-3));
+  }
+  .atom-rationale p {
+    margin-top: 0.35rem; font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d);
+  }
+
+  /* La pieza social, renderizada. Es un mockup del entregable.
+     `position: relative` NO es cosmético: `.pc-brand` es absolute, y sin este ancla se
+     colgaba del `.atom` (el único ancestro posicionado) — la marca de SKY terminaba abajo
+     del todo, encima de NUESTRA nota de honestidad, como si SKY la firmara. */
+  .post-card {
+    position: relative;
+    padding: 1.1rem; border-radius: 12px;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--client) 90%, black), color-mix(in srgb, var(--client) 55%, black));
+    color: #fff; aspect-ratio: 4 / 5; display: flex; flex-direction: column; justify-content: center; gap: 0.6rem;
+  }
+  .atom[data-featured='true'] .post-card { padding: 1.35rem; }
+  .atom[data-featured='true'] .pc-body { font-size: 1.25rem; }
+  @media (min-width: 980px) { .atom[data-featured='true'] .pc-body { font-size: 1.55rem; } }
+  .pc-hook { font-size: var(--t-meta); font-weight: var(--w-label); text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.85; }
+  .pc-body { font-family: Poppins, system-ui, sans-serif; font-size: 1.25rem; font-weight: var(--w-display); line-height: 1.3; text-wrap: balance; }
+  .pc-cta { font-size: var(--t-meta); opacity: 0.9; }
+  .pc-brand {
+    position: absolute; right: 1.9rem; bottom: 1.9rem; font-family: Poppins, system-ui, sans-serif;
+    font-weight: var(--w-display); font-size: 0.8125rem; letter-spacing: 0.06em; opacity: 0.75;
+  }
+  .post-artifact {
+    margin: 0 auto;
+    width: min(100%, 34rem);
+    overflow: hidden;
+    border-radius: 14px;
+    background: transparent;
+    box-shadow: 0 24px 70px color-mix(in srgb, var(--navy-sunk) 42%, transparent);
+  }
+  .post-artifact :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .video-artifact {
+    margin: 0; display: grid; gap: 0.7rem;
+  }
+  .video-frame {
+    position: relative; overflow: hidden; border-radius: 12px; background: var(--navy-sunk);
+    border: 1px solid color-mix(in srgb, var(--blue-up) 24%, var(--navy-3));
+  }
+  .video-frame img,
+  .video-frame video {
+    width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; filter: saturate(1.08) contrast(1.02);
+  }
+  .video-frame video { background: var(--navy-sunk); }
+  .video-disclosure {
+    position: absolute; top: 0.65rem; left: 0.65rem; z-index: 1;
+    display: inline-flex; align-items: center; padding: 0.25rem 0.45rem; border-radius: 999px;
+    background: color-mix(in srgb, var(--navy-sunk) 72%, transparent);
+    border: 1px solid color-mix(in srgb, #fff 22%, transparent);
+    color: #fff; font-size: 0.66rem; line-height: 1; font-weight: var(--w-label);
+  }
+  .video-caption {
+    position: absolute; inset: auto 0 0; padding: 2.4rem 0.85rem 0.8rem;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--navy-sunk) 92%, transparent));
+  }
+  .video-caption span {
+    display: block; font-size: 0.68rem; font-weight: var(--w-label);
+    letter-spacing: 0; text-transform: uppercase; color: var(--blue-up);
+  }
+  .video-caption strong {
+    display: block; margin-top: 0.2rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: 1rem; line-height: 1.25; color: #fff;
+  }
+  .reel-artifact {
+    display: grid; grid-template-columns: minmax(7.5rem, 0.48fr) minmax(0, 1fr); gap: 0.8rem; align-items: center;
+    padding: 0.7rem; border-radius: 12px;
+    background: color-mix(in srgb, var(--blue-up) 7%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--blue-up) 22%, var(--navy-3));
+  }
+  .reel-phone {
+    position: relative; overflow: hidden; width: 100%; max-width: 10.25rem; justify-self: center;
+    border-radius: 13px; background: var(--navy-sunk);
+    border: 1px solid color-mix(in srgb, #fff 15%, transparent);
+    box-shadow: 0 18px 40px color-mix(in srgb, #000 24%, transparent);
+  }
+  .reel-preview {
+    display: block; width: 100%; aspect-ratio: 9 / 16; object-fit: cover;
+    background: var(--navy-sunk); filter: saturate(1.05) contrast(1.02);
+  }
+  .reel-copy { min-width: 0; }
+  .reel-copy span {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0; text-transform: uppercase; color: var(--blue-up);
+  }
+  .reel-copy strong {
+    display: block; margin-top: 0.25rem; font-family: Poppins, system-ui, sans-serif;
+    font-size: clamp(1rem, 2.1vw, 1.25rem); line-height: 1.22; color: #fff;
+  }
+  .reel-copy p {
+    margin-top: 0.45rem; font-size: var(--t-meta); line-height: 1.5; color: var(--dim-d);
+  }
+  .video-script {
+    padding: 0.75rem 0.85rem; border-radius: 10px; background: color-mix(in srgb, var(--blue-up) 8%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--blue-up) 24%, var(--navy-3));
+  }
+  .video-script span {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0; text-transform: uppercase; color: var(--blue-up);
+  }
+  .video-script p {
+    margin-top: 0.35rem; font-size: var(--t-meta); line-height: 1.45; color: var(--ink-d);
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  @media (max-width: 560px) {
+    .reel-artifact { grid-template-columns: 1fr; }
+    .reel-phone { max-width: min(14rem, 82vw); }
+  }
+
+  .atom-spec { margin-top: 0.95rem; }
+  .atom-d {
+    margin-top: 0.45rem; display: grid; grid-template-columns: 1fr; gap: 0;
+    border: 1px solid color-mix(in srgb, var(--line-d) 72%, transparent);
+    border-radius: 10px; overflow: hidden;
+  }
+  .atom-spec-row {
+    display: grid; grid-template-columns: minmax(6.25rem, 0.34fr) minmax(0, 1fr);
+    gap: 0.75rem; padding: 0.62rem 0.75rem;
+    background: color-mix(in srgb, var(--navy-sunk) 34%, transparent);
+  }
+  .atom-spec-row + .atom-spec-row { border-top: 1px solid color-mix(in srgb, var(--line-d) 62%, transparent); }
+  .atom-d dt {
+    font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--blue-up); margin: 0.05rem 0 0;
+  }
+  .atom-d dd { font-size: var(--t-meta); line-height: 1.55; color: var(--ink-d); min-width: 0; }
+
+  .atom-code { margin-top: 1rem; }
+  .atom-code summary {
+    cursor: pointer; font-size: var(--t-over); font-weight: var(--w-label); letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--dim-d); list-style-position: inside;
+  }
+  .atom-code summary:hover { color: var(--blue-up); }
+  .atom-code pre {
+    margin-top: 0.6rem; padding: 0.65rem; background: var(--navy-sunk); color: var(--code-d);
+    border: 1px solid var(--line-d); border-radius: 7px; font-size: 0.6875rem; line-height: 1.55;
+    overflow-x: auto; max-height: 16rem;
+  }
+  .atom-hon {
+    margin-top: 0.9rem; padding: 0.7rem 0.8rem; border-radius: 9px;
+    background: color-mix(in srgb, var(--amber) 5%, var(--navy-2));
+    border: 1px solid color-mix(in srgb, var(--amber) 18%, var(--navy-3));
+  }
+  .atom-hon span {
+    display: block; font-size: var(--t-over); font-weight: var(--w-label);
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber);
+  }
+  .atom-hon p {
+    margin-top: 0.32rem; font-size: var(--t-meta); line-height: 1.55;
+    color: var(--ink-d); font-weight: var(--w-body-dark);
+  }
+  @media (max-width: 560px) {
+    .atom-stat { grid-template-columns: 1fr; gap: 0.3rem; }
+    .atom-spec-row { grid-template-columns: 1fr; gap: 0.2rem; }
+  }
+  /* EL CIERRE de la ④ — el recorrido moría acá sin darle al comité nada que HACER. */
+  .at-end { margin-top: 2.5rem; }
+  .verify {
+    margin-top: 1.5rem; padding: 1.5rem 1.6rem; border-radius: 14px;
+    background: var(--navy); color: var(--ink-d); border: 1px solid var(--navy-3);
+  }
+  .verify-t {
+    font-family: Poppins, system-ui, sans-serif; font-size: var(--t-node);
+    font-weight: var(--w-display); color: #fff; line-height: 1.25;
+  }
+  .verify-l { margin-top: 1rem; display: grid; gap: 0.8rem; counter-reset: v; list-style: none; }
+  .verify-l li {
+    display: grid; grid-template-columns: 1.6rem 1fr; gap: 0.2rem 0.7rem; align-items: baseline;
+    font-size: var(--t-meta); line-height: 1.6;
+  }
+  .verify-l li::before {
+    counter-increment: v; content: counter(v);
+    grid-row: span 2; justify-self: start;
+    width: 1.5rem; height: 1.5rem; display: grid; place-items: center;
+    border-radius: 999px; background: var(--blue-up); color: var(--navy);
+    font-size: var(--t-over); font-weight: var(--w-label);
+  }
+  .verify-l strong { color: #fff; font-weight: var(--w-label); }
+  .verify-l span { color: var(--dim-d); grid-column: 2; }
+  .verify-n {
+    margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--line-d);
+    font-size: var(--t-meta); line-height: 1.6; color: var(--dim-d);
+  }
+  @media (min-width: 1080px) {
+    .verify-l li, .verify-n { font-size: var(--t-body); }
+  }
+
+  .at-close {
+    margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
+    font-size: 1.125rem; font-weight: var(--w-body); color: var(--ink);
+  }
+
+  .xr-foot {
+    margin-top: clamp(2rem, 4vw, 3.5rem);
+    padding-block: clamp(1.25rem, 3vw, 2rem) clamp(2.5rem, 5vw, 4rem);
+    border-top: 1px solid var(--line);
+  }
+  .xr-foot-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 1rem 1.35rem;
+    align-items: center;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--ax-primary-100) 28%, white), #fff 58%),
+      #fff;
+    box-shadow: 0 18px 48px color-mix(in srgb, var(--navy) 6%, transparent);
+  }
+  .xr-foot-brand {
+    display: inline-flex;
+    align-items: center;
+    width: max-content;
+  }
+  .xr-foot-brand img {
+    display: block;
+    height: 26px;
+    width: auto;
+  }
+  .xr-foot-brand:focus-visible,
+  .xr-foot-nav a:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  .xr-foot-copy {
+    min-width: 0;
+    color: var(--muted);
+    font-size: var(--t-meta);
+    line-height: 1.55;
+  }
+  .xr-foot-copy p + p {
+    margin-top: 0.18rem;
+  }
+  .xr-foot-nav {
+    display: flex;
+    gap: 0.45rem 0.9rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    font-size: var(--t-meta);
+    font-weight: var(--w-label);
+    line-height: 1.35;
+  }
+  .xr-foot-nav a {
+    color: var(--ax-primary-700);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+  .xr-foot-nav a:hover {
+    color: var(--ax-primary-800);
+  }
+  @media (max-width: 760px) {
+    .xr-foot-card {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+    .xr-foot-nav {
+      justify-content: flex-start;
+    }
+  }
+</style>

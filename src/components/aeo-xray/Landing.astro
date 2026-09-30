@@ -1,0 +1,72 @@
+---
+import {landingComparison} from '@/lib/aeo-xray/landing-model'
+import Article from './Article.astro'
+import SpecimenHeader from './SpecimenHeader.astro'
+import Image from './SampleImage.astro'
+import type {RenderSample} from '@/lib/aeo-xray/render-model'
+import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
+import {experienceHref} from '@/lib/aeo-xray/experience-adapter'
+interface Props {d:RenderSample;landing?:unknown;coupled?:boolean;produces?:Map<string,number>;hero?:string}
+const {d,coupled=false,produces=new Map(),hero}=Astro.props
+const context=Astro.props.landing as {artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest}|undefined
+const headline=d.article.blocks.find(b=>b.type==='h1')
+const photo=d.article.blocks.find(b=>b.type==='hero-image')
+const marketing=context?.artifact.blocks.find(b=>b.kind==='hero')
+const comparison=landingComparison(d.article.blocks)
+const rateTable=comparison?.table
+const comparisonGroups=comparison?.groups??[]
+const sections=d.article.blocks.filter(b=>b.type==='h2'||b.type==='faq')
+const benefitsHeading=comparison?.heading
+const body={...d,article:{...d.article,blocks:d.article.blocks.filter(b=>b!==headline&&b!==photo&&b!==rateTable&&b!==benefitsHeading&&!(b.type==='paragraph'&&marketing?.kind==='hero'&&b.text===marketing.text))}}
+const id=headline?.coupleId??''
+const count=produces.get(id)??0
+const attrs=(id:string)=>coupled?{id:`block-${id}`,'data-couple':id,'data-n':`${produces.get(id)??0} ${d.ui.producesLabel}`,'data-on':id===hero?true:undefined}:{}
+const action=marketing?.kind==='hero'?marketing.cta:undefined
+const href=action?.artifactId?experienceHref(action.artifactId,'articulo',action.blockId):action?.href
+---
+<div class:list={['landing',{'landing-split':coupled}]} style={`--landing-action:${context?.model.brand?.action??context?.model.tokens.shell.accent??d.client.accent};--landing-action-ink:${context?.model.brand?.actionText??context?.model.tokens.shell.ink??'white'}`}>
+  <SpecimenHeader name={d.client.name} model={context?.model} links={[...sections.slice(0,2),...sections.filter(b=>b.type==='faq')].map(b=>({text:b.short,href:`#${'anchor'in b?b.anchor:''}`}))} action={action&&href?{text:action.label,href}:undefined}/>
+  <section id="specimen-top" class="landing-hero sp" aria-label="Propuesta de landing">
+    <div class="landing-copy blk" {...attrs(id)}>
+
+      {marketing?.kind==='hero'&&marketing.eyebrow&&marketing.eyebrow!==marketing.title&&<p class="landing-eyebrow">{marketing.eyebrow}</p>}
+      <h1>{headline&&'text'in headline?headline.text:d.meta.sampleTitle}</h1>
+      {marketing?.kind==='hero'&&<p class="landing-lead">{marketing.text}</p>}
+      {action&&<a class="landing-action" href={href}>{action.label}<span aria-hidden="true"> →</span></a>}
+
+      {coupled&&count>0&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{d.ui.srProduces.replace('{n}',String(count))}</button>}
+    </div>
+    {photo&&'src'in photo&&<figure class="landing-photo blk" {...attrs(photo.coupleId??'')}>
+      <Image class="xr-hero-img" src={photo.src} alt={photo.alt} loading="eager" fetchpriority="high" widths={[640,960]} sizes="(min-width:1080px) 40vw,100vw" format="avif"/>
+      {coupled&&(produces.get(photo.coupleId??'')??0)>0&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{d.ui.srProduces.replace('{n}',String(produces.get(photo.coupleId??'')))}</button>}
+      <figcaption>{photo.credit.author}</figcaption>
+    </figure>}
+  </section>
+  {rateTable?.type==='table'&&<section class="landing-rates blk" {...attrs(rateTable.coupleId??'')} aria-label={rateTable.caption}>
+    <p class="rates-eyebrow">{rateTable.headers[2]}</p><div class="blk" {...attrs(benefitsHeading?.coupleId??'')}><h2 id={benefitsHeading?.anchor}>{benefitsHeading&&'text'in benefitsHeading?benefitsHeading.text:rateTable.caption}</h2>{coupled&&(produces.get(benefitsHeading?.coupleId??'')??0)>0&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{d.ui.srProduces.replace('{n}',String(produces.get(benefitsHeading?.coupleId??'')))}</button>}</div>
+    <div class="currency-grid">{comparisonGroups.map(g=><article class="currency-card"><h3>{g.label}</h3>{g.rows.map((r,i)=><div class:list={['rate-row',{'rate-primary':i===g.rows.length-1}]}><strong>{r[2]}</strong><p><span>{rateTable.headers[1]}</span><br/>{r[1]}</p></div>)}</article>)}</div>
+    <details class="rates-detail"><summary>Ver tabla completa</summary><div class="rates-table-scroll"><table><caption>{rateTable.caption}</caption><thead><tr>{rateTable.headers.map(h=><th scope="col">{h}</th>)}</tr></thead><tbody>{rateTable.rows.map(r=><tr>{r.map(c=><td>{c}</td>)}</tr>)}</tbody></table></div></details><p class="rate-caption">{rateTable.caption}</p>
+    {coupled&&<button class="probe" type="button" data-probe aria-controls="in-body" aria-expanded="false">{d.ui.srProduces.replace('{n}',String(produces.get(rateTable.coupleId??'')??0))}</button>}
+  </section>}
+  <Article d={body} semantic={!coupled} coupled={coupled} produces={produces} hero={hero}/>
+</div>
+<style>
+.landing .blk{position:relative}
+.rates-detail{max-width:900px;margin:1.5rem auto;text-align:left;font-size:.85rem}.rates-detail summary{cursor:pointer;padding:1rem;font-weight:650}.rates-table-scroll{overflow:auto}.rates-detail table{width:100%;border-collapse:collapse}.rates-detail td,.rates-detail th{padding:.8rem;border-bottom:1px solid var(--line)}.rates-detail caption{text-align:left;padding:1rem;line-height:1.5}
+.landing-rates{position:relative;background:var(--surf);padding:3rem clamp(1.5rem,5vw,5rem);text-align:center}.landing .landing-rates h2{font-size:2.6rem;margin:0 0 2rem}.rates-eyebrow{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}.currency-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:900px;margin:auto}.currency-card{display:flex;flex-direction:column;background:white;border:1px solid var(--line);border-radius:.65rem;padding:2rem}.currency-card h3{order:-2;font-size:1.1rem;color:var(--client);margin:0 0 1rem}.rate-row{padding:.6rem}.rate-row strong{font-size:1.2rem;color:var(--client)}.rate-primary{order:-1}.rate-primary strong{font-family:var(--client-font);font-size:3.5rem}.rate-row p{font-size:.85rem;margin-top:.5rem}.rate-caption{font-size:.75rem;line-height:1.6;max-width:80ch;margin:1.5rem auto 0}.landing-split .currency-card{padding:1rem}.landing-split .rate-primary{order:-1}.rate-primary strong{font-size:2.5rem}@media(max-width:680px){.currency-grid{grid-template-columns:1fr}.landing-photo :global(img){max-height:360px}.landing-hero{min-height:0}}
+
+.landing{view-transition-name:xr-article;min-width:0;background:white;color:var(--ink)}
+.landing-hero{position:relative;display:block;min-height:536px;overflow:hidden;border-radius:var(--r);background:white}
+.landing-copy{position:relative;z-index:1;max-width:58%;padding:3rem 1.5rem 3rem max(1.5rem,calc((100vw - 1160px)/2));align-self:center}
+.landing-brand{font-weight:700;color:var(--client);margin-bottom:3rem;font-size:1.1rem}
+.landing-eyebrow{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1rem}
+.landing h1,.landing h2{font-family:var(--client-font);font-size:clamp(2.4rem,3.8vw,3.5rem);line-height:1.06;letter-spacing:-.04em;color:var(--client);text-wrap:balance;margin:0 0 1.5rem}
+.landing-copy h1{max-width:600px;text-wrap:initial}.landing-lead{font-size:1.15rem;line-height:1.6;max-width:42ch}.landing-action{display:inline-flex;align-items:center;justify-content:space-between;gap:2rem;padding:1rem 1.4rem;background:var(--landing-action);color:var(--landing-action-ink);border-radius:.4rem;font-weight:700;margin-top:1.8rem;text-decoration:none;min-height:48px}
+.landing-disclosure{font-size:.75rem;line-height:1.5;margin-top:1.25rem;color:var(--muted)}
+.landing .landing-photo{margin:0;position:absolute;inset:0;z-index:0;overflow:hidden}.landing-photo :global(img){width:100%;height:100%;object-fit:cover;display:block}.landing-photo figcaption{z-index:2;position:absolute;bottom:0;right:0;font-size:.75rem;padding:.4rem .6rem;line-height:1.5;background:white}
+.landing :global(.sp){view-transition-name:none}
+.landing :global(.sp-head){display:none}.landing :global(.post){font-family:var(--font-sans)}
+.landing-split .landing-hero{min-height:400px}.landing-split .landing-copy{padding:1.5rem}.landing-split h1{font-size:clamp(1.8rem,2.7vw,3rem)}.landing-split .landing-brand{margin-bottom:1.5rem}
+.landing :global(.blk[data-on]){outline:2px solid var(--client);outline-offset:-2px}.landing .probe{width:44px;height:44px;background:transparent;border:0;padding:0}.landing-photo .probe{right:0;left:auto}
+@media(max-width:900px){.landing-hero,.landing-split .landing-hero{display:flex;flex-direction:column;min-height:0}.landing-copy{max-width:100%}.landing .landing-photo{position:relative;inset:auto;order:2}.landing-photo :global(img){height:auto;width:100%}.landing-copy,.landing-split .landing-copy{padding:2rem 1.5rem}.landing-photo{max-width:100%;width:100%}.landing-photo :global(img){max-height:none}.landing h1,.landing h2{font-size:2.5rem}.landing .landing-rates h2{font-size:1.9rem}}
+</style>

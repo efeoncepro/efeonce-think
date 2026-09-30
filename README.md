@@ -177,3 +177,24 @@ build** en vez de publicar una muestra que promete rigor y no lo tiene.
    payload, jamás se genera en el build**: uno aleatorio por build cambiaría la URL en cada
    deploy, y esa URL va a una lámina y a una propuesta. Es oscuridad, no seguridad (no hay
    auth): quien tenga el enlace, entra. Para una muestra de trabajo, es justo lo que queremos.
+
+
+## X-Ray compuesto: publicación autónoma por cliente
+
+El mismo `Experience.astro` sirve el recorrido original y las composiciones de landing/artículo,
+radiografía y derivados. Una muestra `sample_*` se distribuye directamente desde Think, sin
+consultar Greenhouse, sin flags ni migraciones. El enlace es no listado, con `noindex`, sin
+analytics. No es autenticación: quien recibe el enlace puede abrirlo y sus imágenes son públicas.
+
+Para otro cliente: generar y validar el manifest con el kit de composición, agregar un JSON en
+`src/lib/aeo-xray/published/` con `key` aleatoria estable, `editionId`, `model` y mapa `assets`,
+y registrarlo en `published.ts`. Copiar únicamente las imágenes aprobadas a
+`public/aeo-xray-media/<key>/`. No se modifica la UI. Para retirar una muestra, quitar su
+entrada y sus imágenes y volver a desplegar; esta modalidad no ofrece revocación central.
+El carril futuro `xrg_*` conserva su contrato separado con Greenhouse.
+
+Verificar antes de publicar: `pnpm type-check`, `pnpm build`, `pnpm test:aeo-xray-v2`,
+`node scripts/qa/verify-aeo-xray-distribution.mjs` y el recorrido con
+`XRAY_VERIFY_TOKEN=<key> pnpm verify:aeo-xray-v2` sobre el servidor local.
+Publicación: commit del alcance propio y push a `main` de **efeonce-think**;
+Vercel despliega Think de forma independiente. Verificar el SHA nuevo y el enlace público.

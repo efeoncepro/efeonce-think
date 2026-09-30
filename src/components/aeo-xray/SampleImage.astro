@@ -1,0 +1,9 @@
+---
+import { Image } from 'astro:assets'
+import type { ImageMetadata } from 'astro'
+interface Props { src: ImageMetadata; alt: string; class?: string; widths?: number[]; sizes?: string; format?: 'avif' | 'webp'; quality?: number; loading?: 'eager' | 'lazy'; fetchpriority?: 'high' | 'low' | 'auto'; decoding?: 'async' | 'sync' | 'auto' }
+const {src, widths, format, quality, ...attributes} = Astro.props
+// Protected assets must retain the grant URL. Never hand it to a public optimizer/cache.
+const protectedAsset = src.src.startsWith('?asset=')
+---
+{protectedAsset ? <img src={src.src} width={src.width} height={src.height} {...attributes} /> : <Image src={src} widths={widths} format={format} quality={quality} {...attributes} />}

@@ -1,0 +1,44 @@
+---
+export const prerender = false
+import BaseLayout from '@layouts/BaseLayout.astro'
+import StatusScreen from '@/components/primitives/StatusScreen.astro'
+import Experience from '@/components/aeo-xray/Experience.astro'
+import { adaptExperience, experienceHref, experienceSteps } from '@lib/aeo-xray/experience-adapter'
+import '@fontsource-variable/roboto-slab'
+import { fetchSharedXray, fetchSharedXrayAsset } from '@lib/aeo-xray/client'
+import { isPublishedSampleKey, publishedSampleAsset } from '@lib/aeo-xray/published'
+import { selectArtifact } from '@lib/aeo-xray/view'
+import { xrayCopy as C } from '@lib/aeo-xray/copy'
+
+const token = Astro.params.token ?? ''
+const headers = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'no-referrer', 'X-Content-Type-Options': 'nosniff' }
+for (const [name, value] of Object.entries(headers)) Astro.response.headers.set(name, value)
+
+const requestedAsset = Astro.url.searchParams.get('asset')
+if (requestedAsset !== null) {
+  if (isPublishedSampleKey(token)) {
+    const path = publishedSampleAsset(token, requestedAsset)
+    return new Response(null, { status: path ? 302 : 404, headers: { ...headers, ...(path ? { Location: path } : {}) } })
+  }
+  const upstream = await fetchSharedXrayAsset(token, requestedAsset)
+  const mime = upstream?.headers.get('content-type')?.split(';')[0].trim()
+  if (upstream?.ok && upstream.body && mime && ['image/avif', 'image/webp', 'image/png', 'image/jpeg'].includes(mime)) {
+    return new Response(upstream.body, { status: 200, headers: { ...headers, 'Content-Type': mime } })
+  }
+  return new Response(null, { status: 404, headers })
+}
+
+const result = await fetchSharedXray(token)
+const edition = result.status === 'ok' ? result.edition : null
+const artifact = edition ? selectArtifact(edition.model, Astro.url.searchParams.get('artifact')) : null
+const sample = edition && artifact ? adaptExperience(edition.model, artifact) : null
+const requestedStep = Astro.url.searchParams.get('step') ?? ''
+const step = experienceSteps.find(s => s === requestedStep)
+const status = result.status === 'ok' ? artifact && sample && step !== undefined ? 'ok' : 'not_found' : result.status
+if (status !== 'ok') Astro.response.status = { not_found: 404, gone: 410, rate_limited: 429, error: 502 }[status]
+const artifactChoices = edition?.model.artifacts.map(a => ({id:a.id,label:a.kind === 'landing' ? 'Landing' : 'Artículo',href:experienceHref(a.id,step??''),active:a.id===artifact?.id})) ?? []
+const state = status === 'ok' ? null : C.states[status]
+---
+<BaseLayout title={status === 'ok' && edition ? `${edition.header.title} · ${C.name}` : C.name} description="Una muestra del trabajo de Efeonce: contenido, diseño y decisiones SEO/AEO." noindex canonical="/aeo-xray" analytics={false} lang={edition?.model.locale ?? 'es-PE'} ogTitle="AEO X-Ray · Efeonce" ogDescription="Contenido y decisiones SEO/AEO en una misma demostración.">
+  {status === 'ok' && edition && artifact ? <Experience d={sample!} step={step!} hrefForStep={(s:string)=>experienceHref(artifact.id,s)} kind={artifact.kind} landing={{artifact,model:edition.model}} artifactChoices={artifactChoices} /> : state && <StatusScreen kind={status as 'not_found' | 'gone' | 'rate_limited' | 'error'} title={state.title} body={state.body} />}
+</BaseLayout>
