@@ -146,6 +146,8 @@ export interface InsightSharedHeaderV1 {
   asOfMax: string | null
   /** 1.1 — logo del cliente por el proxy de Greenhouse; `variant` dice sobre qué fondo se diseñó. */
   clientLogo?: { href: string; variant: 'on_dark' | 'default' }
+  /** 1.2 — alcance de la portada: etiqueta y glifo Trazo (archivo `/branding/icons/trazo-<glyph>-dark.svg`). */
+  scopeChips?: Array<{ key: string; label: string; glyph: string; line: string }>
 }
 
 export interface InsightSharedDownloadV1 {

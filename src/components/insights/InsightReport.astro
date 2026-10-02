@@ -47,10 +47,8 @@ const partial = !!header?.asOfMax && civil(header.asOfMax) < dayBefore(header.pe
 const asOfShort = header?.asOfMax ? dayMonth(header.asOfMax) : null
 const expiresShort = edition ? dayMonth(edition.expiresAt, header?.timeZone) : null
 const expiresLong = edition ? longDate(edition.expiresAt, header?.timeZone) : null
-// El estado del enlace ya lo dice el pie; en la portada sólo avisa cuando vence pronto y el lector tiene que actuar
-// (revisión del operador, 2026-10-02).
-const EXPIRING_SOON_MS = 3 * 24 * 60 * 60 * 1000
-const expiringSoon = !!edition && new Date(edition.expiresAt).getTime() - Date.now() <= EXPIRING_SOON_MS
+// Portada con UNA sola fecha, la del período (revisión del operador, 2026-10-02): el vencimiento del enlace vive en
+// el pie y el corte de datos en «Cómo se midió»; si el corte no llega al fin del período, avisa la banda de parcial.
 
 const findings = model ? buildFindings(model) : []
 const modules = model ? buildModules(model) : []
@@ -64,8 +62,12 @@ const heroFigure = summary.headline?.figure ? { ...summary.headline.figure, disp
 const heroCaption = heroFigure && summary.headline?.figure && answer.rest
   ? answer.rest.replace(summary.headline.figure.display, '').replace(/\(\s*\)/g, '').replace(/[()]/g, '').replace(/\.\s*$/, '').replace(/\s+/g, ' ').trim() || null
   : null
-const HERO_MODULE_ICON: Record<string, string> = { seo: 'busqueda', aeo: 'ia', ico: 'reloj' }
-const heroModuleIcon = (module: string) => (HERO_MODULE_ICON[module] ? `/branding/icons/trazo-${HERO_MODULE_ICON[module]}-dark.svg` : null)
+// Alcance de la portada: lo resuelve Greenhouse (`header.scopeChips`, del encargo o de los módulos) con el glifo del
+// catálogo AXIS; un modelo previo sin chips cae a los módulos con el ícono de su módulo.
+const MODULE_GLYPH: Record<string, string> = { seo: 'busqueda', aeo: 'ia', ico: 'reloj' }
+const scopeChips = header?.scopeChips?.length
+  ? header.scopeChips
+  : modules.map((m) => ({ key: m.module, label: C.moduleLabel[m.module] ?? m.title, glyph: MODULE_GLYPH[m.module] ?? '' }))
 const leadModule = (claim: { factIds: string[] }) => claim.factIds.map((id) => model.facts[id]?.module).find(Boolean) ?? null
 const decision = model?.decision ? splitLead(model.decision.text) : null
 const downloads = sample ? [] : edition.downloads.filter((d) => d.output !== 'web')
@@ -130,9 +132,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       <ul class="ins-status" aria-label={C.statusLabel}>
         {sample ? (
           <li><span class="ins-status__dot" aria-hidden="true" />{C.sampleChip}</li>
-        ) : (
-          expiringSoon && expiresShort && <li class="ins-num"><span class="ins-status__dot" aria-hidden="true" />{C.expiresShort(expiresShort)}</li>
-        )}
+        ) : null}
       </ul>
     </div>
 
@@ -140,10 +140,10 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       {/* Chips de alcance: un módulo por chip con su ícono Trazo (catálogo AXIS) y el período. Reemplaza el antetítulo
           en mayúsculas de dos líneas (revisión del operador, Berel 2026-10-02). */}
       <ul class="ins-hero__tags" aria-label={C.scopeTitle}>
-        {modules.map((m) => (
-          <li class="ins-tag">
-            {heroModuleIcon(m.module) && <img src={heroModuleIcon(m.module)!} alt="" width="16" height="16" />}
-            {C.moduleLabel[m.module] ?? m.title}
+        {scopeChips.map((chip) => (
+          <li class="ins-tag" data-scope={chip.key}>
+            {chip.glyph && <img src={`/branding/icons/trazo-${chip.glyph}-dark.svg`} alt="" width="16" height="16" />}
+            {chip.label}
           </li>
         ))}
         <li class="ins-tag ins-tag--period ins-num">
@@ -183,12 +183,6 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
             <b>{header.organizationName}</b>
           </span>
         </div>
-        {asOfShort && (
-          <p class="ins-hero__asof ins-num">
-            <span class="ins-hero__asof-dot" aria-hidden="true" />
-            {C.dataAsOf(asOfShort)}
-          </p>
-        )}
       </div>
     </div>
 
