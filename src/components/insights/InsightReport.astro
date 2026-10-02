@@ -146,10 +146,6 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
             {chip.label}
           </li>
         ))}
-        <li class="ins-tag ins-tag--period ins-num">
-          <img src="/branding/icons/trazo-calendario-dark.svg" alt="" width="16" height="16" />
-          {header.periodLabel}
-        </li>
       </ul>
 
       {heroFigure ? (
@@ -181,6 +177,12 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
           <span class="ins-client__text">
             <span class="ins-client__label">{C.preparedFor}</span>
             <b>{header.organizationName}</b>
+          </span>
+          {/* La única fecha de la portada, junto al cliente y tras un filete (revisión del operador, 2026-10-02). */}
+          <span class="ins-client__rule" aria-hidden="true" />
+          <span class="ins-client__period ins-num">
+            <img src="/branding/icons/trazo-calendario-dark.svg" alt="" width="16" height="16" />
+            {header.periodLabel}
           </span>
         </div>
       </div>

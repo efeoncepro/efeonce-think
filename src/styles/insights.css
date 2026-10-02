@@ -99,6 +99,18 @@
 .ins-client__logo--plate { background: var(--ins-surface); box-shadow: 0 0 0 1px color-mix(in srgb, var(--ins-ink) 10%, transparent); }
 .ins-client__text { display: flex; flex-direction: column; gap: 2px; }
 .ins-client__label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ins-ink-soft-dark); }
+.ins-client__rule { align-self: stretch; width: 1px; margin: 6px 6px; background: var(--ins-rule-dark); }
+.ins-client__period { display: inline-flex; align-items: center; gap: 8px; font-size: 0.9375rem; color: var(--ins-ink-soft-dark); }
+.ins-client__period img { width: 16px; height: 16px; opacity: 0.9; }
+.ins-client__label, .ins-client__text b, .ins-client__period { white-space: nowrap; }
+/* El bloque se adapta a SU ancho (no al de la ventana): si no cabe en una línea, la fecha baja bajo el cliente sin
+   el filete. */
+.ins-hero__foot { container-type: inline-size; }
+@container (max-width: 520px) {
+  .ins-client { flex-wrap: wrap; row-gap: 14px; }
+  .ins-client__rule { display: none; }
+  .ins-client__period { flex-basis: 100%; }
+}
 .ins-client__text b { font-family: var(--ins-idea); font-size: 1.25rem; font-weight: 640; letter-spacing: -0.01em; color: var(--ins-ink); }
 .ins-hero__asof { margin: 0; display: inline-flex; align-items: center; gap: 10px; font-size: 0.875rem; color: var(--ins-ink-soft-dark); }
 .ins-hero__asof-dot { width: 8px; height: 8px; border-radius: 9999px; border: 1.5px solid var(--ins-accent-dark); }
