@@ -1,18 +1,23 @@
 ---
+import '@fontsource/poppins/300.css'
+import '@fontsource/poppins/400.css'
+import '@fontsource/poppins/500.css'
 import '@fontsource/poppins/600.css'
+import '@fontsource-variable/bricolage-grotesque/opsz.css'
 import BaseLayout from '@layouts/BaseLayout.astro'
 import BrandVisibilityFormDock from '@/components/BrandVisibilityFormDock.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import EngineAvatarGroup from '@/components/primitives/EngineAvatarGroup.astro'
-import HeroAnswerLens from '@/components/HeroAnswerLens.astro'
 import ReportIcon from '@/components/primitives/ReportIcon.astro'
 import { buildCopyrightNotice } from '@lib/legal'
 import { axis, LEVEL_COPY } from '@lib/report-tokens'
+import { landingCssVars, slogan, sloganFontPx } from '@lib/ai-visibility-landing-tokens'
 import { BadgeCheck, BookOpenText, MousePointerClick, ScanSearch, Trophy } from '@lucide/astro'
 
-const pageTitle = 'Brand Visibility Grader | Motores de respuesta y AEO'
+const productName = 'Efeonce AI Visibility Report'
+const pageTitle = `${productName} · ¿Te recomiendan las IA?`
 const pageDescription =
-  'Mide cómo ChatGPT, Perplexity, Claude, Gemini y Google AI Overviews entienden, citan y recomiendan tu marca. Recibe un informe privado con acciones.'
+  'Mide cómo ChatGPT, Claude, Gemini, Perplexity y Google entienden, citan y recomiendan tu marca. Recibe tu AI Visibility Report con acciones.'
 const siteUrl = 'https://think.efeoncepro.com'
 const organizationUrl = 'https://efeoncepro.com'
 const landingUrl = `${siteUrl}/brand-visibility`
@@ -139,7 +144,7 @@ const brandVisibilityJsonLd = {
       '@id': webpageId,
       url: landingUrl,
       name: pageTitle,
-      headline: 'Mide cómo los motores de respuesta entienden y recomiendan tu marca.',
+      headline: '¿Te recomiendan las IA? Averígualo.',
       description: pageDescription,
       inLanguage: 'es-CL',
       isPartOf: {
@@ -158,11 +163,12 @@ const brandVisibilityJsonLd = {
     {
       '@type': 'Service',
       '@id': serviceId,
-      name: 'Brand Visibility Grader',
+      name: productName,
+      alternateName: 'Brand Visibility Grader',
       serviceType: 'Análisis de visibilidad en motores de respuesta y búsqueda generativa',
       category: ['AEO', 'GEO', 'Brand visibility', 'Answer Engine Optimization'],
       description:
-        'Herramienta de Efeonce Think para evaluar presencia, citabilidad, exactitud y operabilidad de una marca en motores de respuesta y superficies generativas de búsqueda.',
+        'Diagnóstico de Efeonce para evaluar presencia, citabilidad, exactitud y operabilidad de una marca en motores de respuesta y superficies generativas de búsqueda.',
       provider: {
         '@id': organizationId,
       },
@@ -172,7 +178,7 @@ const brandVisibilityJsonLd = {
       },
       potentialAction: {
         '@type': 'Action',
-        name: 'Solicitar informe privado de Brand Visibility',
+        name: 'Solicitar mi AI Visibility Report',
         target: `${landingUrl}#brand-visibility-form`,
       },
     },
@@ -189,7 +195,7 @@ const brandVisibilityJsonLd = {
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'Brand Visibility Grader',
+          name: productName,
           item: landingUrl,
         },
       ],
@@ -208,7 +214,7 @@ const brandVisibilityJsonLd = {
     {
       '@type': 'ItemList',
       '@id': `${landingUrl}#report-modules`,
-      name: 'Módulos del informe privado de Brand Visibility',
+      name: 'Módulos del Efeonce AI Visibility Report',
       itemListElement: previewModules.map((module, index) => ({
         '@type': 'ListItem',
         position: index + 1,
@@ -219,6 +225,10 @@ const brandVisibilityJsonLd = {
   ],
 } as const
 const footerCopyrightNotice = buildCopyrightNotice()
+// Bloque de firma: el eslogan es un gráfico al 64 % del ancho del logo (logo negativo: 837,07 × 196,68).
+const footerLogoHeightPx = 44
+const footerLogoWidthPx = Number(((footerLogoHeightPx * 837.07) / 196.68).toFixed(2))
+const footerSloganPx = sloganFontPx(footerLogoWidthPx)
 ---
 
 <BaseLayout
@@ -230,46 +240,41 @@ const footerCopyrightNotice = buildCopyrightNotice()
   <main
     class="brand-visibility-page"
     data-capture="brand-visibility-landing"
-    style={`--axis-blue:${axis.accent[500]};--axis-blue-dark:${axis.accent[700]};--axis-navy:${axis.accent[900]};--axis-navy-soft:${axis.accent[800]};--axis-success:${axis.success[500]};--axis-warning:${axis.warning[500]};--axis-gray-50:${axis.gray[50]};--axis-gray-100:${axis.gray[100]};--axis-gray-200:${axis.gray[200]};--axis-gray-600:${axis.gray[600]};--axis-gray-800:${axis.gray[800]};--axis-gray-900:${axis.gray[900]};`}
+    style={`${landingCssVars};--axis-blue:${axis.accent[500]};--axis-blue-dark:${axis.accent[700]};--axis-navy:${axis.accent[900]};--axis-navy-soft:${axis.accent[800]};--axis-success:${axis.success[500]};--axis-warning:${axis.warning[500]};--axis-gray-50:${axis.gray[50]};--axis-gray-100:${axis.gray[100]};--axis-gray-200:${axis.gray[200]};--axis-gray-600:${axis.gray[600]};--axis-gray-800:${axis.gray[800]};--axis-gray-900:${axis.gray[900]};`}
   >
     <section class="hero-shell" data-capture="brand-visibility-hero" aria-labelledby="brand-visibility-title">
-      <header class="topbar" aria-label="Efeonce Think">
-        <a class="brand-link" href="/" aria-label="Ir a Efeonce Think">
-          <img class="efeonce-mark" src="/branding/efeonce-logo-negative.svg" alt="Efeonce" />
-          <span aria-hidden="true"></span>
-          <img class="think-mark" src="/branding/eo-think-2.svg" alt="Think" />
+      <div class="hero-orbit-frame" aria-hidden="true">
+        <img class="hero-orbit" src="/branding/products/orbit-engine-dark-screen.svg" alt="" width="1920" height="1080" decoding="async" />
+      </div>
+
+      <header class="topbar">
+        <a class="brand-link" href="/" aria-label="Efeonce AI Visibility Report, ir a Efeonce Think">
+          <img class="product-lockup" src="/branding/products/ai-visibility-report-lockup-negative.svg" alt="Efeonce AI Visibility Report" width="431" height="31" />
         </a>
+        <a class="topbar-link" href="#framework-title">Cómo funciona</a>
       </header>
 
       <div class="hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">Brand Visibility Grader</p>
           <h1 id="brand-visibility-title">
-            <span>Mide cómo los motores</span>
-            <span>de respuesta entienden</span>
-            <span>y recomiendan</span>
-            <span>tu marca.</span>
+            <span class="hero-question"><span class="hero-ring" aria-hidden="true"></span>¿Te recomiendan las IA?</span>
+            <span class="hero-answer">Averígualo<span class="hero-sphere" aria-hidden="true"></span></span>
           </h1>
           <p class="hero-lead">
-            Dejas tus datos en el formulario. Nuestro sistema analiza tu presencia,
-            citabilidad y operabilidad en motores de respuesta y superficies generativas de búsqueda.
-            Al finalizar, verás tu informe completo en pantalla.
+            Medimos cómo aparece tu marca en las respuestas de ChatGPT, Claude, Gemini, Perplexity y Google,
+            y <strong>quién ocupa el lugar que te toca.</strong>
           </p>
 
           <div class="engine-chips" data-capture="brand-visibility-signal-preview" aria-label="Motores de respuesta y superficies generativas analizadas">
-            <p class="mini-label">Motores y superficies</p>
-            <div class="engine-stack">
-              <EngineAvatarGroup providers={engines} size="md" max={5} />
-            </div>
+            <EngineAvatarGroup providers={engines} size="md" max={5} />
+          </div>
+
+          <div class="hero-cta-row">
+            <a class="hero-cta" href="#brand-visibility-form">Empezar mi análisis <span aria-hidden="true">→</span></a>
+            <p class="hero-cta-note">Recibes tu AI Visibility Report en pantalla.</p>
           </div>
         </div>
-
-        <HeroAnswerLens />
       </div>
-
-      <a class="scroll-cue" href="#brand-visibility-form" data-scroll-cue aria-label="Bajar al formulario para generar el informe">
-        <span class="scroll-cue-circle" aria-hidden="true"></span>
-      </a>
 
       <BrandVisibilityFormDock />
     </section>
@@ -433,24 +438,6 @@ const footerCopyrightNotice = buildCopyrightNotice()
   </main>
 </BaseLayout>
 
-<script is:inline>
-  const scrollCue = document.querySelector('[data-scroll-cue]')
-  const formDock = document.getElementById('brand-visibility-form')
-  const reduceScrollMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-
-  scrollCue?.addEventListener('click', (event) => {
-    if (!(formDock instanceof HTMLElement)) return
-
-    event.preventDefault()
-    formDock.scrollIntoView({
-      block: 'start',
-      inline: 'nearest',
-      behavior: reduceScrollMotion.matches ? 'auto' : 'smooth',
-    })
-
-    window.history?.pushState?.(null, '', '#brand-visibility-form')
-  })
-</script>
 
 <style>
   :global(html) {
@@ -467,27 +454,37 @@ const footerCopyrightNotice = buildCopyrightNotice()
     color: var(--axis-gray-900);
   }
 
+  /* ── Hero «La órbita», línea Engine (TASK-1966). Valores: @lib/ai-visibility-landing-tokens. ── */
   .hero-shell {
+    --hero-inset: max(1rem, 6.667vw); /* surfaces.web.chrome.desktop.textInsetOfWidth */
     position: relative;
     isolation: isolate;
     overflow: visible;
-    border-bottom-right-radius: var(--brand-hero-bottom-radius);
-    border-bottom-left-radius: var(--brand-hero-bottom-radius);
-    background: linear-gradient(160deg, var(--axis-navy-soft) 0%, var(--axis-navy) 62%, #001a33 100%);
-    color: #fff;
+    background: var(--engine-ground);
+    color: var(--engine-ink);
   }
 
-  .hero-shell::after {
-    content: '';
+  /* Recorta la órbita al hero sin recortar la tarjeta del formulario, que cuelga por debajo. */
+  .hero-orbit-frame {
     position: absolute;
-    inset: auto 0 0;
+    inset: 0;
     z-index: -1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(76, 141, 255, 0.72), transparent);
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .hero-orbit {
+    position: absolute;
+    top: clamp(64px, 7.6vw, 110px);
+    left: 59.7%;
+    width: 52.8%;
+    max-width: none;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
   }
 
   .topbar,
-  .hero-grid,
   .preview-flow-grid,
   .framework-band {
     width: var(--brand-shell-width);
@@ -496,201 +493,157 @@ const footerCopyrightNotice = buildCopyrightNotice()
 
   .topbar {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 26px 0 0;
+    width: auto;
+    margin: 0;
+    padding: clamp(28px, 4.4vw, 64px) var(--hero-inset) 0;
   }
 
   .brand-link {
-    display: inline-grid;
-    grid-template-columns: auto auto auto;
-    align-items: center;
-    column-gap: 0.8rem;
-    color: inherit;
-    text-decoration: none;
+    display: inline-flex;
+    border-radius: 4px;
+    line-height: 0;
   }
 
-  .brand-link .efeonce-mark {
-    width: 150px;
-    height: auto;
-  }
-
-  .brand-link > span {
-    width: 1px;
-    height: 2.05rem;
-    background: rgba(255, 255, 255, 0.48);
-  }
-
-  .brand-link .think-mark {
+  .product-lockup {
     display: block;
-    width: 70px;
-    height: auto;
+    width: auto;
+    height: 34px;
+  }
+
+  .topbar-link {
+    color: var(--engine-ink-soft);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-underline-offset: 4px;
+  }
+
+  .topbar-link:hover {
+    color: var(--engine-ink);
+    text-decoration: underline;
+  }
+
+  .brand-link:focus-visible,
+  .topbar-link:focus-visible,
+  .hero-cta:focus-visible {
+    outline: 2px solid var(--engine-ink);
+    outline-offset: 4px;
   }
 
   .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 720px) minmax(500px, 1fr);
-    gap: clamp(2.4rem, 4vw, 4.2rem);
-    align-items: center;
-    padding: clamp(34px, 3vw, 52px) 0 clamp(220px, 18vw, 252px);
+    padding: clamp(96px, 11vw, 160px) var(--hero-inset) calc(clamp(5.8rem, 9vw, 8rem) + clamp(72px, 7vw, 104px));
   }
 
   .hero-copy {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    gap: 18px;
+    width: min(660px, 100%);
     min-width: 0;
   }
 
-  .eyebrow,
-  .mini-label {
-    font-size: 0.72rem;
-    font-weight: 820;
-    letter-spacing: 0.1em;
-    line-height: 1.2;
-    text-transform: uppercase;
-  }
-
-  .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    border: 1px solid rgba(255, 179, 26, 0.34);
-    border-radius: 999px;
-    padding: 0.38rem 0.68rem;
-    background: linear-gradient(180deg, #ffd166 0%, var(--axis-warning) 100%);
-    color: #08203a;
-    box-shadow:
-      0 14px 34px -24px rgba(255, 179, 26, 0.95),
-      inset 0 1px 0 rgba(255, 255, 255, 0.48);
-  }
-
-  .mini-label {
-    color: rgba(255, 255, 255, 0.78);
-  }
-
   .hero-copy h1 {
-    max-width: 720px;
-    margin: 1.28rem 0 0;
-    color: #fff;
-    font-family: 'Poppins', 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: clamp(3rem, 3.55vw, 3.72rem);
-    font-weight: 600;
-    letter-spacing: 0;
-    line-height: 1.08;
-    text-wrap: normal;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin: 0;
+    color: var(--engine-ink);
   }
 
-  .hero-copy h1 span {
-    display: block;
+  .hero-question {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(1.375rem, 2.08vw, 1.875rem);
+    font-weight: 300;
+    line-height: 1.2;
   }
 
-  .hero-copy h1::after {
-    content: '';
-    display: block;
-    width: 42px;
-    height: 4px;
-    margin-top: 1.22rem;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #36d7c5 0%, #62f0df 100%);
-    box-shadow: 0 0 22px rgba(54, 215, 197, 0.42);
+  /* El anillo de la línea como viñeta: fino, en el acento, nunca un disco. */
+  .hero-ring {
+    display: inline-block;
+    width: 0.42em;
+    height: 0.42em;
+    margin-right: 0.35em;
+    border: max(1px, 0.06em) solid var(--engine-accent);
+    border-radius: 50%;
+    vertical-align: 0.08em;
+    box-sizing: border-box;
+  }
+
+  .hero-answer {
+    font-family: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(4.25rem, 8.9vw, 8rem); /* respuesta ≥ 3× la pregunta en todo ancho */
+    font-weight: 760;
+    letter-spacing: -0.035em;
+    line-height: 0.92;
+    white-space: nowrap;
+  }
+
+  /* La esfera cierra la palabra y es parte del texto. */
+  .hero-sphere {
+    display: inline-block;
+    width: 0.2em;
+    height: 0.2em;
+    margin-left: 0.035em;
+    border-radius: 50%;
+    background: var(--engine-accent);
   }
 
   .hero-lead {
-    max-width: 650px;
-    margin-top: 1.24rem;
-    color: rgba(255, 255, 255, 0.74);
-    font-size: 1.02rem;
-    line-height: 1.58;
+    max-width: 540px;
+    margin: 10px 0 0;
+    color: var(--engine-ink-soft);
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .hero-lead strong {
+    color: var(--engine-ink);
+    font-weight: 600;
   }
 
   .engine-chips {
-    position: relative;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.9rem;
-    margin-top: 1.92rem;
+    margin-top: 6px;
   }
 
-  .engine-stack {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.86rem;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 999px;
-    padding: 0.22rem 0.62rem 0.22rem 0.28rem;
-    background: rgba(255, 255, 255, 0.048);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  }
-
-  .engine-stack :global(.engine-avatar-group) {
+  .engine-chips :global(.engine-avatar-group) {
     padding-block: 0;
   }
 
-  .scroll-cue {
-    position: absolute;
-    inset: auto auto clamp(8rem, 10vw, 10.8rem) 50%;
-    z-index: 32;
+  .hero-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 18px;
+    margin-top: 18px;
+  }
+
+  .hero-cta {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    transform: translateX(-50%);
-    color: #fff;
+    gap: 0.5em;
+    min-height: 44px;
+    border-radius: 999px;
+    padding: 18px 32px;
+    background: var(--engine-ink);
+    color: var(--engine-ground);
+    font-size: 1.0625rem;
+    font-weight: 600;
     text-decoration: none;
+    transition: background-color 160ms ease;
   }
 
-  .scroll-cue-circle {
-    position: relative;
-    display: inline-grid;
-    place-items: center;
-    width: 46px;
-    height: 46px;
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    border-radius: 999px;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.055)),
-      rgba(0, 40, 77, 0.28);
-    box-shadow:
-      0 18px 42px -28px rgba(0, 0, 0, 0.72),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(12px);
-    animation: scrollCueFloat 1.8s ease-in-out infinite;
+  .hero-cta:hover {
+    background: var(--engine-ink-soft);
   }
 
-  .scroll-cue-circle::before {
-    content: '';
-    width: 11px;
-    height: 11px;
-    margin-top: -4px;
-    border-right: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
-    transform: rotate(45deg);
-  }
-
-  .scroll-cue:hover .scroll-cue-circle,
-  .scroll-cue:focus-visible .scroll-cue-circle {
-    border-color: rgba(54, 215, 197, 0.7);
-    background:
-      linear-gradient(180deg, rgba(54, 215, 197, 0.18), rgba(255, 255, 255, 0.06)),
-      rgba(0, 40, 77, 0.34);
-  }
-
-  .scroll-cue:focus-visible {
-    border-radius: 999px;
-    outline: 2px solid rgba(54, 215, 197, 0.86);
-    outline-offset: 4px;
-  }
-
-  @keyframes scrollCueFloat {
-    0%, 100% {
-      transform: translateY(0);
-      opacity: 0.78;
-    }
-    50% {
-      transform: translateY(7px);
-      opacity: 1;
-    }
+  .hero-cta-note {
+    margin: 0;
+    color: var(--engine-ink-soft);
+    font-size: 0.875rem;
   }
 
   .preview-icon {
@@ -1405,19 +1358,9 @@ const footerCopyrightNotice = buildCopyrightNotice()
       --brand-hero-bottom-radius: 0;
     }
 
-    .topbar,
-    .hero-grid,
     .preview-flow-grid,
     .framework-band {
       width: min(100% - 32px, 720px);
-    }
-
-    .hero-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .hero-grid {
-      padding-bottom: 1.4rem;
     }
 
     .framework-band {
@@ -1466,20 +1409,6 @@ const footerCopyrightNotice = buildCopyrightNotice()
       border-top: 0;
     }
 
-    .scroll-cue {
-      position: relative;
-      inset: auto;
-      display: flex;
-      width: max-content;
-      margin: -0.35rem auto 1rem;
-      transform: none;
-    }
-
-    .scroll-cue-circle {
-      width: 42px;
-      height: 42px;
-    }
-
     .framework-heading,
     .framework-ladder,
     .preview-report-layout {
@@ -1525,44 +1454,48 @@ const footerCopyrightNotice = buildCopyrightNotice()
     }
   }
 
-  @media (max-width: 640px) {
-    .topbar {
-      padding-top: 18px;
-      padding-bottom: 2px;
+  /* Teléfono: compuesto mobile-first (norma web §4.1). La órbita arriba a la derecha, la voz debajo de ella. */
+  @media (max-width: 980px) {
+    /* --orbit-w: ancho del archivo de la órbita (1920 × 1080; anillo r = 0,225 w, centro a 0,281 w). */
+    .hero-shell {
+      --orbit-w: min(120vw, 560px);
     }
 
-    .brand-link .efeonce-mark {
-      width: 82px;
+    .hero-orbit {
+      top: 48px;
+      left: auto;
+      right: calc(var(--orbit-w) * -0.308);
+      width: var(--orbit-w);
     }
 
-    .brand-link .think-mark {
-      width: 42px;
+    .topbar-link {
+      display: none;
     }
 
     .hero-grid {
-      gap: 1.5rem;
-      padding: 24px 0 32px;
+      padding-top: calc(var(--orbit-w) * 0.506 + 30px); /* la voz empieza bajo el anillo */
+      padding-bottom: calc(clamp(5.8rem, 9vw, 8rem) + 48px);
     }
 
-    .hero-copy h1 {
-      font-size: 2.45rem;
-      line-height: 1.06;
+    .hero-cta-row {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .hero-cta {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .product-lockup {
+      height: auto;
+      width: min(100%, 300px);
     }
 
     .hero-lead {
       font-size: 1rem;
-    }
-
-    .engine-stack {
-      align-items: center;
-      border-radius: 10px;
-      padding: 0.44rem 0.58rem;
-    }
-
-    .engine-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.65rem;
     }
   }
 
@@ -1574,10 +1507,6 @@ const footerCopyrightNotice = buildCopyrightNotice()
       animation-iteration-count: 1 !important;
       scroll-behavior: auto !important;
       transition-duration: 0.01ms !important;
-    }
-
-    .scroll-cue-circle {
-      animation: none !important;
     }
   }
 </style>
