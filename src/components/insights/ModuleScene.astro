@@ -69,7 +69,15 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
 
 <section class="ins-scene" id={`cap-${number}`} data-section data-module={chapter.module} data-capture={`chapter-${chapter.module}`} aria-labelledby={`cap-${number}-title`}>
   <header class="ins-scene__head" data-reveal>
-    <span class="ins-chip ins-num">{number} · {C.moduleLabel[chapter.module] ?? chapter.module}</span>
+    {chapter.productMark ? (
+      /* La marca de producto reemplaza la etiqueta del capítulo, nunca se suma a ella (línea gráfica, submarcas). */
+      <span class="ins-scene__mark">
+        <span class="ins-chip ins-num">{number}</span>
+        <img src={`/branding/products/${chapter.productMark.key.replace(/_/g, '-')}-lockup-positive.svg`} alt={chapter.productMark.label} height="26" />
+      </span>
+    ) : (
+      <span class="ins-chip ins-num">{number} · {C.moduleLabel[chapter.module] ?? chapter.module}</span>
+    )}
     <h2 class="ins-scene__title" id={`cap-${number}-title`} tabindex="-1">{chapter.title}</h2>
     {chapter.opening && <p class="ins-lead">{chapter.opening.text}</p>}
   </header>

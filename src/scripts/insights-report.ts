@@ -194,9 +194,15 @@ function mountFilters() {
           const module = item.dataset.module
           item.classList.toggle('is-filtered-out', filter !== 'all' && module !== 'all' && module !== filter)
         })
+        // Un tablero sin hallazgos del módulo filtrado no se muestra vacío: se oculta entero.
+        const anyFinding = items.some((item) => item.matches('[data-finding]') && !item.classList.contains('is-filtered-out'))
+        findings?.classList.toggle('is-filtered-out', !anyFinding)
       })
-      // Si el lector está más abajo, lo lleva al tablero para que vea el efecto del filtro.
-      if (findings && findings.getBoundingClientRect().top < 0) findings.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth' })
+      // Si el lector está más abajo, lo lleva al tablero (o, sin tablero, al primer capítulo visible) para que vea el efecto.
+      const landing = findings && !findings.classList.contains('is-filtered-out')
+        ? findings
+        : items.find((item) => item.matches('.ins-scene') && !item.classList.contains('is-filtered-out'))
+      if (landing && landing.getBoundingClientRect().top < 0) landing.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth' })
     }),
   )
 }

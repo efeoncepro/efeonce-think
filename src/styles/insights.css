@@ -502,6 +502,8 @@
 .ins-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
 .ins-fact { display: flex; flex-direction: column; gap: 10px; padding: 24px; border-radius: 20px; background: var(--ins-surface); border: 1px solid var(--ins-rule-light); }
 .ins-fact__head { display: flex; align-items: center; gap: 10px; }
+.ins-scene__mark { display: inline-flex; align-items: center; gap: 14px; }
+.ins-scene__mark img { height: 26px; width: auto; }
 .ins-fact__icon { flex: none; width: 22px; height: 22px; }
 .ins-fact__prior { font-size: 0.8125rem; color: var(--ins-ink-soft-light); }
 .ins-figure-md { font-family: var(--ins-idea); font-size: 3rem; line-height: 0.95; font-weight: 720; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }

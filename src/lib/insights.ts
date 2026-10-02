@@ -98,6 +98,8 @@ export interface InsightWebChartDerivedV1 {
 }
 
 export interface InsightWebChapterV1 {
+  /** 1.2 — marca de producto que encabeza el capítulo (lockup oficial `/branding/products/<clave>-lockup-*.svg`). */
+  productMark?: { key: string; label: string }
   chapterId: string
   module: InsightModule
   title: string
