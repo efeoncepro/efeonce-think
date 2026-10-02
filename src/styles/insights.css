@@ -526,6 +526,8 @@
 .ins-actions li { counter-increment: ins-action; display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: 20px; background: var(--ins-surface); border: 1px solid var(--ins-rule-light); font-size: 1.0625rem; line-height: 1.5; transition: transform var(--ins-duration-medium) var(--ins-ease-emphasized), border-color var(--ins-duration-short) var(--ins-ease-standard); }
 .ins-actions li:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--ins-navy) 30%, transparent); }
 .ins-actions li::before { content: counter(ins-action, decimal-leading-zero); font-family: var(--ins-idea); font-size: 2rem; line-height: 1; font-weight: 720; color: var(--ins-navy); }
+/* Una ruta larga (p. ej. /productos/arquitectonico/primarios/removedor) no tiene espacios: se corta en cualquier punto antes de desbordar la tarjeta. */
+.ins-actions__text { overflow-wrap: anywhere; min-width: 0; }
 .ins-actions .ins-chip { align-self: flex-start; margin-top: auto; }
 
 /* ── Cómo se midió ──────────────────────────────────────────────────────── */

@@ -69,6 +69,8 @@ const scopeChips = header?.scopeChips?.length
   ? header.scopeChips
   : modules.map((m) => ({ key: m.module, label: m.label, glyph: MODULE_GLYPH[m.module] ?? '' }))
 const decision = model?.decision ? splitLead(model.decision.text) : null
+// El plan existe si trae acciones, una petición o una medición (TASK-1962: Sky Blog sólo pide conectar Search Console).
+const hasPlan = Boolean(model && (model.actions.length > 0 || model.ask || model.measurement))
 const downloads = sample ? [] : edition.downloads.filter((d) => d.output !== 'web')
 const primaryDownload = downloads.find((d) => d.status === 'available')
 
@@ -213,7 +215,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
         {modules.map((m) => <button type="button" data-filter-btn={m.module} aria-pressed="false">{m.label}</button>)}
       </div>
       <div class="ins-topbar__actions">
-        {model.actions.length > 0 && <a class="ins-topbar__link" href="#plan">{C.filterPlan}</a>}
+        {hasPlan && <a class="ins-topbar__link" href="#plan">{C.filterPlan}</a>}
         <button type="button" class="ins-topbar__link ins-present-open" data-present-open aria-haspopup="dialog">
           <svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.5h13v9h-13zM9 12.5v3M6 15.5h6M7.5 6.3l3.5 1.7-3.5 1.7z" /></svg>{C.present}
         </button>
@@ -289,7 +291,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
         <span class="ins-label">{C.decisionTitle}</span>
         <p class="ins-decision__lead">{decision!.lead}</p>
         {decision!.rest && <p class="ins-decision__rest">{decision!.rest}</p>}
-        {model.actions.length > 0 && <a class="ins-decision__link" href="#plan">{C.planTitle} <span aria-hidden="true">→</span></a>}
+        {hasPlan && <a class="ins-decision__link" href="#plan">{C.planTitle} <span aria-hidden="true">→</span></a>}
       </div>
     )}
   </section>
@@ -297,15 +299,19 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
   <main class="ins-main" id="contenido">
     {model.chapters.map((chapter, i) => <ModuleScene chapter={chapter} index={i + 1} facts={model.facts} locale={locale} copy={C} />)}
 
-    {model.actions.length > 0 && (
+    {hasPlan && (
       <section class="ins-plan" id="plan" data-section aria-labelledby="plan-title">
-        <div class="ins-plan__head" data-reveal>
-          <span class="ins-plan__count" data-countup={model.actions.length} data-display={String(model.actions.length)}>{model.actions.length}</span>
-          <div>
-            <span class="ins-label">{C.planTitle}</span>
-            <h2 class="ins-plan__title" id="plan-title" tabindex="-1">{C.planLead}</h2>
+        {model.actions.length > 0 ? (
+          <div class="ins-plan__head" data-reveal>
+            <span class="ins-plan__count" data-countup={model.actions.length} data-display={String(model.actions.length)}>{model.actions.length}</span>
+            <div>
+              <span class="ins-label">{C.planTitle}</span>
+              <h2 class="ins-plan__title" id="plan-title" tabindex="-1">{C.planLead}</h2>
+            </div>
           </div>
-        </div>
+        ) : (
+          <h2 class="ins-visually-hidden" id="plan-title" tabindex="-1">{C.askTitle}</h2>
+        )}
         {(model.measurement || model.ask) && (
           <div class="ins-plan__terms" data-reveal>
             {model.measurement && <div><span class="ins-label">{C.measurementTitle}</span><p>{model.measurement.text}</p></div>}
