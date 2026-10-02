@@ -19,6 +19,8 @@ export type EvidenceUnit = 'count' | 'percent' | 'ratio' | 'position' | 'score' 
 export interface InsightWebFactV1 {
   factId: string
   module: InsightModule
+  /** 1.2 — métrica del hecho; sólo para elegir el ícono. */
+  metricId?: string
   label: string
   /** null = ausente (nunca un cero disfrazado). */
   value: number | null
@@ -27,7 +29,15 @@ export interface InsightWebFactV1 {
   display: string
   observation: 'observed' | 'estimated'
   source: string
+  /** 1.2 — unidad legible («Cantidad»); vacía si no tiene nombre de cara al lector. */
+  unitLabel?: string
   asOf: string | null
+  /** 1.2 — corte legible por locale («20 sept 2026»). */
+  asOfLabel?: string | null
+  /** 1.2 — canal (motor de respuesta, buscador). */
+  channelId?: string
+  /** 1.2 — hecho del período anterior con que se compara; nunca se muestra como tarjeta suelta. */
+  comparisonFactId?: string
   absentReason: 'no_data' | null
 }
 
@@ -35,6 +45,10 @@ export interface InsightWebClaimV1 {
   claimId: string
   text: string
   factIds: string[]
+  /** 1.2 — en capítulo: hallazgo (se dice) o respaldo (sólo su cifra). Ausente en modelos previos. */
+  role?: 'finding' | 'backing'
+  /** 1.2 — cifra protagonista de una esencial: el cambio frente al período anterior. */
+  figure?: { display: string; direction: 'up' | 'down' | 'flat'; kind?: 'change' | 'level' }
 }
 
 export interface ChartSeriesV1 {
@@ -63,7 +77,7 @@ export interface ChartSpecV1 {
   series: ChartSeriesV1[]
   dimensionLabels: string[]
   unit: string
-  scale: { kind: 'linear'; baseline: 0 | null }
+  scale: { kind: 'linear'; baseline: 0 | null; perDimension?: true }
   references: Array<{ label: string; factId: string | null; value: number | null }>
   /** v2 — obligatorio en las familias de datos propios; ausente en las de series. */
   data?: ChartFamilyDataV1
@@ -88,7 +102,7 @@ export interface InsightWebChapterV1 {
   module: InsightModule
   title: string
   claims: InsightWebClaimV1[]
-  charts: Array<{ spec: ChartSpecV1; table: { columns: string[]; rows: Array<Array<string | null>> }; derived?: InsightWebChartDerivedV1 }>
+  charts: Array<{ spec: ChartSpecV1; table: { columns: string[]; rows: Array<Array<string | null>> }; derived?: InsightWebChartDerivedV1; unitLabel?: string }>
   tables: Array<{ tableId: string; title: string; columns: string[]; rows: Array<Array<string | null>> }>
   limits: string[]
   /** v2 */

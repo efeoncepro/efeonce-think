@@ -47,12 +47,26 @@ const partial = !!header?.asOfMax && civil(header.asOfMax) < dayBefore(header.pe
 const asOfShort = header?.asOfMax ? dayMonth(header.asOfMax) : null
 const expiresShort = edition ? dayMonth(edition.expiresAt, header?.timeZone) : null
 const expiresLong = edition ? longDate(edition.expiresAt, header?.timeZone) : null
+// El estado del enlace ya lo dice el pie; en la portada sólo avisa cuando vence pronto y el lector tiene que actuar
+// (revisión del operador, 2026-10-02).
+const EXPIRING_SOON_MS = 3 * 24 * 60 * 60 * 1000
+const expiringSoon = !!edition && new Date(edition.expiresAt).getTime() - Date.now() <= EXPIRING_SOON_MS
 
 const findings = model ? buildFindings(model) : []
 const modules = model ? buildModules(model) : []
 const summary = splitSummary(model)
 // Titular en dos pesos: la respuesta y su consecuencia. El texto queda íntegro (la puntuación de unión se conserva).
 const answer = splitLead(summary.headline?.text ?? header.reportTitle)
+// Portada premium (2026-10-02): la cifra protagonista es el cambio que la tesis dice; su pie, el «de X a Y» sin el
+// paréntesis que repite la cifra. Sin cifra de cambio (una meta, un modelo previo) la tesis se dibuja como antes.
+const heroFigure = summary.headline?.figure ? { ...summary.headline.figure, display: summary.headline.figure.display.replace(/^-/, '−') } : null
+// Pie: la frase sin la cifra protagonista ni sus paréntesis («de 10.662 a 9.377», «meta 90,0 %»).
+const heroCaption = heroFigure && summary.headline?.figure && answer.rest
+  ? answer.rest.replace(summary.headline.figure.display, '').replace(/\(\s*\)/g, '').replace(/[()]/g, '').replace(/\.\s*$/, '').replace(/\s+/g, ' ').trim() || null
+  : null
+const HERO_MODULE_ICON: Record<string, string> = { seo: 'busqueda', aeo: 'ia', ico: 'reloj' }
+const heroModuleIcon = (module: string) => (HERO_MODULE_ICON[module] ? `/branding/icons/trazo-${HERO_MODULE_ICON[module]}-dark.svg` : null)
+const leadModule = (claim: { factIds: string[] }) => claim.factIds.map((id) => model.facts[id]?.module).find(Boolean) ?? null
 const decision = model?.decision ? splitLead(model.decision.text) : null
 const downloads = sample ? [] : edition.downloads.filter((d) => d.output !== 'web')
 const primaryDownload = downloads.find((d) => d.status === 'available')
@@ -117,31 +131,65 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
         {sample ? (
           <li><span class="ins-status__dot" aria-hidden="true" />{C.sampleChip}</li>
         ) : (
-          <>
-            <li><span class="ins-status__dot" aria-hidden="true" />{C.linkActive}</li>
-            {expiresShort && <li class="ins-num">{C.expiresShort(expiresShort)}</li>}
-          </>
+          expiringSoon && expiresShort && <li class="ins-num"><span class="ins-status__dot" aria-hidden="true" />{C.expiresShort(expiresShort)}</li>
         )}
       </ul>
     </div>
 
     <div class="ins-hero__body">
-      <p class="ins-hero__kicker"><span>{header.reportTitle}</span><span class="ins-num">{header.periodLabel}</span></p>
-      <h1 class="ins-hero__answer"><span class="ins-answer__lead">{answer.lead}{answer.joiner.trim()}</span>{answer.rest && <> <span class="ins-answer__rest">{answer.rest}</span></>}</h1>
-      {summary.rest.map((claim) => <p class="ins-hero__lead">{claim.text}</p>)}
-      {header.clientLogo && !sample && (
-        <p class="ins-hero__client">
-          <span>{C.preparedFor}</span>
-          <span class:list={['ins-hero__logo', { 'ins-hero__logo--plate': header.clientLogo.variant === 'default' }]}>
-            <img src="?logo=1" alt={C.clientLogoAlt(header.organizationName)} height="32" />
-          </span>
-        </p>
+      {/* Chips de alcance: un módulo por chip con su ícono Trazo (catálogo AXIS) y el período. Reemplaza el antetítulo
+          en mayúsculas de dos líneas (revisión del operador, Berel 2026-10-02). */}
+      <ul class="ins-hero__tags" aria-label={C.scopeTitle}>
+        {modules.map((m) => (
+          <li class="ins-tag">
+            {heroModuleIcon(m.module) && <img src={heroModuleIcon(m.module)!} alt="" width="16" height="16" />}
+            {C.moduleLabel[m.module] ?? m.title}
+          </li>
+        ))}
+        <li class="ins-tag ins-tag--period ins-num">
+          <img src="/branding/icons/trazo-calendario-dark.svg" alt="" width="16" height="16" />
+          {header.periodLabel}
+        </li>
+      </ul>
+
+      {heroFigure ? (
+        <>
+          <h1 class="ins-hero__answer ins-hero__answer--statement">{answer.lead}</h1>
+          <div class="ins-hero__kpi">
+            <span class="ins-hero__kpi-value ins-num" data-direction={heroFigure.direction}>{heroFigure.display}</span>
+            {heroCaption && <span class="ins-hero__kpi-caption ins-num">{heroCaption}</span>}
+          </div>
+        </>
+      ) : (
+        <h1 class="ins-hero__answer"><span class="ins-answer__lead">{answer.lead}{answer.joiner.trim()}</span>{answer.rest && <> <span class="ins-answer__rest">{answer.rest}</span></>}</h1>
       )}
-      <p class="ins-hero__meta ins-num">
-        <span>{header.clientLogo && !sample ? <b>{header.organizationName}</b> : <>{C.preparedFor} <b>{header.organizationName}</b></>}</span>
-        <span>{C.editionValue(header.reportCode, header.editionVersion)}</span>
-        {asOfShort && <span>{C.dataAsOf(asOfShort)}</span>}
-      </p>
+
+      {summary.rest.map((claim) => (
+        <p class="ins-hero__lead">
+          {modules.length > 1 && leadModule(claim) && <span class="ins-tag ins-tag--inline">{C.moduleLabel[leadModule(claim)!]}</span>}
+          <span>{claim.text}</span>
+        </p>
+      ))}
+
+      <div class="ins-hero__foot">
+        <div class="ins-client">
+          {header.clientLogo && !sample && (
+            <span class:list={['ins-client__logo', { 'ins-client__logo--plate': header.clientLogo.variant === 'default' }]}>
+              <img src="?logo=1" alt={C.clientLogoAlt(header.organizationName)} height="40" />
+            </span>
+          )}
+          <span class="ins-client__text">
+            <span class="ins-client__label">{C.preparedFor}</span>
+            <b>{header.organizationName}</b>
+          </span>
+        </div>
+        {asOfShort && (
+          <p class="ins-hero__asof ins-num">
+            <span class="ins-hero__asof-dot" aria-hidden="true" />
+            {C.dataAsOf(asOfShort)}
+          </p>
+        )}
+      </div>
     </div>
 
     <a class="ins-hero__cue" href="#hallazgos" aria-label={C.findingsTitle}>
@@ -197,8 +245,8 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
               <span class="ins-tile__plus" aria-hidden="true" set:html={plusIcon} />
             </span>
             {finding.fact && (
-              <span class="ins-tile__figure" data-countup={finding.fact.value ?? undefined} data-display={finding.fact.display}>
-                {finding.fact.value === null ? C.absent : finding.fact.display}
+              <span class="ins-tile__figure" data-countup={finding.claim.figure ? undefined : (finding.fact.value ?? undefined)} data-display={finding.claim.figure?.display ?? finding.fact.display} data-direction={finding.claim.figure?.direction}>
+                {finding.claim.figure ? finding.claim.figure.display : finding.fact.value === null ? C.absent : finding.fact.display}
               </span>
             )}
             <span class="ins-tile__claim">{finding.claim.text}</span>
@@ -312,7 +360,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       <p class="ins-sample-cta__body">{C.sampleCtaBody}</p>
       <a class="ins-decision__link" href="mailto:sales@efeoncepro.com?subject=Efeonce%20Insights">{C.sampleCtaButton} <span aria-hidden="true">→</span></a>
     </section>
-    ) : (
+    ) : downloads.length > 0 && (
     <section class="ins-downloads" id="descargas" data-reveal data-capture="downloads" aria-labelledby="descargas-title">
       <h2 class="ins-label" id="descargas-title">{C.downloadsTitle}</h2>
       <div class="ins-downloads__row">

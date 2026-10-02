@@ -65,6 +65,12 @@ const groups = spec.dimensionLabels.map((label, i) => ({
   label,
   bars: spec.series.map((series, s) => ({ s, label: series.label, fact: fv(series.factIds[i]), value: num(series.factIds[i]) })),
 }))
+// 1.2 — cada dimensión en su escala (métricas distintas contra su período anterior: clics junto a impresiones). Una
+// escala común dejaba invisibles las cifras chicas; cada grupo se mide contra su propio máximo y el eje no lleva cifras.
+const perDimension = family === 'bar_grouped' && spec.scale.perDimension === true
+const groupMax = groups.map((g) => Math.max(0, ...g.bars.map((b) => b.value ?? 0)))
+const barPct = (gi: number, value: number) => (perDimension ? (groupMax[gi] > 0 ? (value / groupMax[gi]) * 88 : 0) : barScale.pct(value))
+const barTicks = perDimension ? [0] : barScale.ticks
 const groupLabel = (g: (typeof groups)[number]) => `${g.label}: ${g.bars.map((b) => `${b.label} ${b.fact?.display ?? C.absent}`).join(', ')}`
 const lines = spec.series.map((series, s) => {
   const points = series.factIds.map((id, i) => {
@@ -227,20 +233,20 @@ const legend = SERIES_FAMILIES.includes(family) && spec.series.length > 1
     {(family === 'bar' || family === 'bar_grouped') && spec.series.length > 0 && (
       <>
         <div class="ins-plot">
-          <div class="ins-grid" aria-hidden="true">{barScale.ticks.map((t) => <span style={`bottom:${barScale.pct(t)}%`} data-zero={t === 0 ? '' : undefined}><em>{tickFormat.format(t)}</em></span>)}</div>
+          <div class="ins-grid" aria-hidden="true">{barTicks.map((t) => <span style={`bottom:${barScale.pct(t)}%`} data-zero={t === 0 ? '' : undefined}><em>{perDimension ? '' : tickFormat.format(t)}</em></span>)}</div>
           <div class="ins-groups">
             {groups.map((group, gi) => (
               <button type="button" class="ins-group" data-group={gi} data-last={gi === groups.length - 1 ? '' : undefined} aria-label={groupLabel(group)}>
                 {group.bars.map((bar) => bar.value === null
                   ? <span class="ins-bar ins-bar--absent" data-series={bar.s}><span class="ins-bar__val">{C.absent}</span></span>
-                  : <span class="ins-bar" data-series={bar.s} style={`--h:${barScale.pct(bar.value)}%;--c:${color(bar.s)}`}><span class="ins-bar__val">{bar.fact?.display}</span></span>)}
+                  : <span class="ins-bar" data-series={bar.s} style={`--h:${barPct(gi, bar.value)}%;--c:${color(bar.s)}`}><span class="ins-bar__val">{bar.fact?.display}</span></span>)}
                 <span class="ins-tip" aria-hidden="true"><b>{group.label}</b>{group.bars.map((bar) => <span><i style={`background:${color(bar.s)}`} />{bar.label}<em>{bar.fact?.display ?? C.absent}</em></span>)}</span>
               </button>
             ))}
           </div>
         </div>
         <div class="ins-xlabels" aria-hidden="true">{spec.dimensionLabels.map((l) => <span>{l}</span>)}</div>
-        <p class="ins-note">{C.chartBaseline}</p>
+        <p class="ins-note">{perDimension ? C.chartOwnScale : C.chartBaseline}</p>
       </>
     )}
 

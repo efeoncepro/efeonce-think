@@ -7,6 +7,8 @@
  * figuras, las afirmaciones, los hechos sueltos y los límites siguen debajo, compactos. Sin JS se lee de corrido.
  */
 import ChartFigure from './ChartFigure.astro'
+import EngineMark from '@/components/EngineMark.astro'
+import { insightIconFor } from '@lib/insights-icons'
 import FactMark from './FactMark.astro'
 import type { InsightWebChapterV1, InsightWebFactV1 } from '@lib/insights'
 import { INSIGHTS_COPY, type InsightsCopy } from '@lib/insights-copy'
@@ -42,13 +44,25 @@ const provenance = (factIds: string[]) => {
   const list = factIds.map((id) => facts[id]).filter(Boolean)
   return {
     sources: [...new Set(list.map((f) => f.source))].join(' y '),
-    asOf: shortDate(list.map((f) => f.asOf).filter((d): d is string => !!d).sort().at(-1) ?? null),
+    // 1.2 — el corte legible que manda Greenhouse («20 sept 2026»); el formato propio queda sólo para modelos previos.
+    asOf: (() => {
+      const latest = [...list].filter((f) => f.asOf).sort((a, b) => (a.asOf! < b.asOf! ? -1 : 1)).at(-1)
+      return latest ? latest.asOfLabel ?? shortDate(latest.asOf) : null
+    })(),
     estimated: list.some((f) => f.observation === 'estimated'),
   }
 }
 
 const shownFacts = new Set([...chapter.charts.flatMap((c) => chartFactIds(c.spec)), mainReading?.keyFigure?.factId])
-const looseFacts = [...new Set(chapter.claims.flatMap((claim) => claim.factIds))].filter((id) => !shownFacts.has(id)).map((id) => facts[id]).filter(Boolean)
+// 1.2 — la cifra del período anterior acompaña a la actual; nunca va como tarjeta suelta con la misma etiqueta.
+const comparisonIds = new Set(Object.values(facts).map((f) => f.comparisonFactId).filter((id): id is string => !!id))
+// 1.2 — con roles, se DICEN los hallazgos; el respaldo queda sólo como cifra. Sin roles (modelos previos), como antes.
+const hasRoles = chapter.claims.some((claim) => claim.role)
+// Y no se repite en frase lo que una figura ya dibuja (clics e impresiones están en la figura y en su lectura).
+const spokenClaims = hasRoles
+  ? chapter.claims.filter((claim) => claim.role !== 'backing' && claim.factIds.some((id) => !shownFacts.has(id) && !comparisonIds.has(id)))
+  : chapter.claims
+const looseFacts = [...new Set(chapter.claims.flatMap((claim) => claim.factIds))].filter((id) => !shownFacts.has(id) && !comparisonIds.has(id)).map((id) => facts[id]).filter(Boolean)
 const isEmpty = chapter.charts.length === 0 && chapter.claims.length === 0 && chapter.tables.length === 0
 const mainProv = main ? provenance(chartFactIds(main.spec)) : null
 ---
@@ -68,7 +82,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
         <ChartFigure spec={main.spec} table={main.table} derived={main.derived} copy={C} facts={facts} locale={locale} uid={`fig-${chapter.chapterId}`} />
         {mainProv && (
           <div class="ins-provrow" data-reveal>
-            <span><b>{C.provenanceUnit}</b>{main.spec.unit}</span>
+            {(main.unitLabel ?? '') !== '' && <span><b>{C.provenanceUnit}</b>{main.unitLabel}</span>}
             <span><b>{C.provenanceSource}</b>{mainProv.sources}</span>
             {mainProv.asOf && <span class="ins-num"><b>{C.asOf}</b>{mainProv.asOf}</span>}
             <FactMark copy={C} observation={mainProv.estimated ? 'estimated' : 'observed'} />
@@ -126,14 +140,19 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
     </div>
   )}
 
-  {(chapter.claims.length > 0 || looseFacts.length > 0) && (
+  {(spokenClaims.length > 0 || looseFacts.length > 0) && (
     <div class="ins-more" data-reveal>
-      {chapter.claims.length > 0 && <ul class="ins-claims" data-stagger>{chapter.claims.map((claim) => <li>{claim.text}</li>)}</ul>}
+      {spokenClaims.length > 0 && <ul class="ins-claims" data-stagger>{spokenClaims.map((claim) => <li>{claim.text}</li>)}</ul>}
       {looseFacts.length > 0 && (
         <div class="ins-facts" data-stagger>
           {looseFacts.map((fact) => (
             <div class="ins-fact">
-              <span class="ins-label">{fact.label}</span>
+              <span class="ins-fact__head">
+                {fact.channelId && fact.module === 'aeo'
+                  ? <EngineMark provider={fact.channelId} label={fact.label} size={22} />
+                  : insightIconFor(fact.metricId) && <img class="ins-fact__icon" src={insightIconFor(fact.metricId)!} alt="" width="22" height="22" />}
+                <span class="ins-label">{fact.label}</span>
+              </span>
               {fact.value === null ? (
                 <>
                   <span class="ins-fact__absent" role="img" aria-label={C.absent} />
@@ -142,6 +161,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
               ) : (
                 <>
                   <span class="ins-figure-md" data-countup={fact.value} data-display={fact.display}>{fact.display}</span>
+                  {fact.comparisonFactId && facts[fact.comparisonFactId] && <span class="ins-fact__prior ins-num">{C.priorValue(facts[fact.comparisonFactId].display)}</span>}
                   <span class="ins-prov"><FactMark copy={C} observation={fact.observation} /><span>{fact.source}</span></span>
                 </>
               )}

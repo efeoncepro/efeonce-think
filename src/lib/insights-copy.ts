@@ -31,6 +31,8 @@ export const INSIGHTS_COPY = {
   tableShow: 'Ver tabla equivalente',
   tableHide: 'Ocultar tabla equivalente',
   chartBaseline: 'Barras con origen en cero.',
+  priorValue: (value: string) => `período anterior: ${value}`,
+  chartOwnScale: 'Cada métrica en su propia escala: compara cada par actual contra anterior, no entre métricas.',
   chartTableOnly: 'Esta figura se lee en su tabla equivalente.',
   chartAutoScale: 'Eje ajustado al rango de los datos: no parte de cero.',
   scatterAxes: (x: string, y: string) => `Horizontal: ${x}. Vertical: ${y}.`,
@@ -66,7 +68,7 @@ export const INSIGHTS_COPY = {
   linkNotice: 'Este enlace es personal y puede revocarse.',
   linkExpires: (date: string) => `Vence el ${date}.`,
   confidential: (org: string, code: string, version: number) =>
-    `Efeonce Group SpA · Documento confidencial para uso exclusivo de ${org} · Edición ${code}, versión ${version}.`,
+    `Efeonce Group SpA · Documento confidencial para uso exclusivo de ${org} · Edición ${code}${version > 1 ? `, versión ${version}` : ''}.`,
   states: {
     not_found: { eyebrow: 'Enlace no encontrado', title: 'Este enlace no existe o expiró.', body: 'Pide un enlace nuevo a quien te lo compartió.' },
     gone: { eyebrow: 'Informe retirado', title: 'Este informe fue retirado.', body: 'Si necesitas una versión vigente, pídela a tu contacto en Efeonce.' },
@@ -151,6 +153,8 @@ export const INSIGHTS_COPY_EN: InsightsCopy = {
   tableShow: 'Show data table',
   tableHide: 'Hide data table',
   chartBaseline: 'Bars start at zero.',
+  priorValue: (value: string) => `previous period: ${value}`,
+  chartOwnScale: 'Each metric on its own scale: compare each current/previous pair, not across metrics.',
   chartTableOnly: 'This figure is read in its data table.',
   chartAutoScale: 'Axis fitted to the data range: it does not start at zero.',
   scatterAxes: (x: string, y: string) => `Horizontal: ${x}. Vertical: ${y}.`,
@@ -186,7 +190,7 @@ export const INSIGHTS_COPY_EN: InsightsCopy = {
   linkNotice: 'This link is personal and can be revoked.',
   linkExpires: (date: string) => `It expires on ${date}.`,
   confidential: (org: string, code: string, version: number) =>
-    `Efeonce Group SpA · Confidential document for the exclusive use of ${org} · Edition ${code}, version ${version}.`,
+    `Efeonce Group SpA · Confidential document for the exclusive use of ${org} · Edition ${code}${version > 1 ? `, version ${version}` : ''}.`,
   states: {
     not_found: { eyebrow: 'Link not found', title: 'This link does not exist or has expired.', body: 'Ask whoever shared it with you for a new link.' },
     gone: { eyebrow: 'Report withdrawn', title: 'This report was withdrawn.', body: 'If you need a current version, ask your Efeonce contact.' },
