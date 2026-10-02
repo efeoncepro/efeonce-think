@@ -76,7 +76,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
         <img src={`/branding/products/${chapter.productMark.key.replace(/_/g, '-')}-lockup-positive.svg`} alt={chapter.productMark.label} height="26" />
       </span>
     ) : (
-      <span class="ins-chip ins-num">{number} · {C.moduleLabel[chapter.module] ?? chapter.module}</span>
+      <span class="ins-chip ins-num">{number} · {chapter.label ?? chapter.title}</span>
     )}
     <h2 class="ins-scene__title" id={`cap-${number}-title`} tabindex="-1">{chapter.title}</h2>
     {chapter.opening && <p class="ins-lead">{chapter.opening.text}</p>}
@@ -87,7 +87,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
   {main && (
     <div class:list={['ins-story', { 'ins-story--plain': steps.length === 0 }]} data-story>
       <div class="ins-story__stage" data-reveal>
-        <ChartFigure spec={main.spec} table={main.table} derived={main.derived} copy={C} facts={facts} locale={locale} uid={`fig-${chapter.chapterId}`} />
+        <ChartFigure spec={main.spec} table={main.table} derived={main.derived} note={main.note} copy={C} facts={facts} locale={locale} uid={`fig-${chapter.chapterId}`} />
         {mainProv && (
           <div class="ins-provrow" data-reveal>
             {(main.unitLabel ?? '') !== '' && <span><b>{C.provenanceUnit}</b>{main.unitLabel}</span>}
@@ -140,7 +140,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
               )}
             </div>
             <div class="ins-beat__figure">
-              <ChartFigure spec={chart.spec} table={chart.table} derived={chart.derived} copy={C} facts={facts} locale={locale} uid={`fig-${chart.spec.chartId}`} compact />
+              <ChartFigure spec={chart.spec} table={chart.table} derived={chart.derived} note={chart.note} copy={C} facts={facts} locale={locale} uid={`fig-${chart.spec.chartId}`} compact />
             </div>
           </article>
         )
@@ -169,7 +169,7 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
               ) : (
                 <>
                   <span class="ins-figure-md" data-countup={fact.value} data-display={fact.display}>{fact.display}</span>
-                  {fact.comparisonFactId && facts[fact.comparisonFactId] && <span class="ins-fact__prior ins-num">{C.priorValue(facts[fact.comparisonFactId].display)}</span>}
+                  {fact.priorLabel && <span class="ins-fact__prior ins-num">{fact.priorLabel}</span>}
                   <span class="ins-prov"><FactMark copy={C} observation={fact.observation} /><span>{fact.source}</span></span>
                 </>
               )}

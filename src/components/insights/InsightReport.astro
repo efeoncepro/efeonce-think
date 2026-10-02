@@ -19,7 +19,7 @@ import '@styles/insights.css'
 import ModuleScene from '@/components/insights/ModuleScene.astro'
 import ChartFigure from '@/components/insights/ChartFigure.astro'
 import FactMark from '@/components/insights/FactMark.astro'
-import { buildFindings, buildModules, splitLead, splitSummary } from '@lib/insights-view'
+import { buildFindings, buildModules, moduleLabelOf, splitLead, splitSummary } from '@lib/insights-view'
 import { getInsightsCopy } from '@lib/insights-copy'
 import { insightsCssVars, orbitMeasure, motion } from '@lib/insights-tokens'
 import type { InsightSharedEditionResponseV1 } from '@lib/insights'
@@ -67,8 +67,7 @@ const heroCaption = heroFigure && summary.headline?.figure && answer.rest
 const MODULE_GLYPH: Record<string, string> = { seo: 'busqueda', aeo: 'ia', ico: 'reloj' }
 const scopeChips = header?.scopeChips?.length
   ? header.scopeChips
-  : modules.map((m) => ({ key: m.module, label: C.moduleLabel[m.module] ?? m.title, glyph: MODULE_GLYPH[m.module] ?? '' }))
-const leadModule = (claim: { factIds: string[] }) => claim.factIds.map((id) => model.facts[id]?.module).find(Boolean) ?? null
+  : modules.map((m) => ({ key: m.module, label: m.label, glyph: MODULE_GLYPH[m.module] ?? '' }))
 const decision = model?.decision ? splitLead(model.decision.text) : null
 const downloads = sample ? [] : edition.downloads.filter((d) => d.output !== 'web')
 const primaryDownload = downloads.find((d) => d.status === 'available')
@@ -89,7 +88,6 @@ const arcTo = polar(ARC_START + ARC_SWEEP)
 const arcPath = `M ${arcFrom.x.toFixed(2)} ${arcFrom.y.toFixed(2)} A ${R} ${R} 0 0 1 ${arcTo.x.toFixed(2)} ${arcTo.y.toFixed(2)}`
 const haloR = (R * orbitMeasure.haloRadiusRatio).toFixed(1)
 
-const moduleOf = (factIds: string[]) => (model ? factIds.map((id) => model.facts[id]?.module).find(Boolean) : undefined)
 const short = (iso: string | null) => (iso ? iso.slice(0, 10).split('-').reverse().join('-') : null)
 const cssVars = Object.entries(insightsCssVars).map(([name, value]) => `--${name}:${value}`).join(';')
 
@@ -162,7 +160,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
 
       {summary.rest.map((claim) => (
         <p class="ins-hero__lead">
-          {modules.length > 1 && leadModule(claim) && <span class="ins-tag ins-tag--inline">{C.moduleLabel[leadModule(claim)!]}</span>}
+          {modules.length > 1 && claim.module && <span class="ins-tag ins-tag--inline">{moduleLabelOf(model, claim.module)}</span>}
           <span>{claim.text}</span>
         </p>
       ))}
@@ -212,7 +210,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       </span>
       <div class="ins-filters" role="group" aria-label={C.filtersLabel}>
         <button type="button" data-filter-btn="all" aria-pressed="true">{C.filterAll}</button>
-        {modules.map((m) => <button type="button" data-filter-btn={m.module} aria-pressed="false">{C.moduleLabel[m.module] ?? m.title}</button>)}
+        {modules.map((m) => <button type="button" data-filter-btn={m.module} aria-pressed="false">{m.label}</button>)}
       </div>
       <div class="ins-topbar__actions">
         {model.actions.length > 0 && <a class="ins-topbar__link" href="#plan">{C.filterPlan}</a>}
@@ -227,7 +225,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
     </div>
   </nav>
 
-  <section class="ins-findings ins-dark" id="hallazgos" data-section data-capture="summary" aria-labelledby="hallazgos-title">
+  <section class="ins-findings ins-dark" id="hallazgos" data-section data-capture="summary" aria-labelledby="hallazgos-title" data-essentials-by-module={model.essentialsByModule ? JSON.stringify(model.essentialsByModule) : undefined}>
     <div class="ins-findings__head" data-reveal>
       <h2 class="ins-findings__title" id="hallazgos-title" tabindex="-1">{C.findingsTitle}</h2>
       <p class="ins-findings__lead">{C.findingsLead}</p>
@@ -237,7 +235,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
         <article class:list={['ins-tile', { 'ins-tile--lead': i === 0 }]} id={finding.id} data-module={finding.module ?? 'all'} data-finding>
           <button type="button" class="ins-tile__hit" aria-expanded="false" aria-controls={`${finding.id}-ev`}>
             <span class="ins-tile__top">
-              <span class="ins-chip ins-chip--dark">{finding.module ? C.moduleLabel[finding.module] : C.filterAll}</span>
+              <span class="ins-chip ins-chip--dark">{moduleLabelOf(model, finding.module) ?? C.filterAll}</span>
               <span class="ins-tile__plus" aria-hidden="true" set:html={plusIcon} />
             </span>
             {finding.fact && (
@@ -259,7 +257,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
             {finding.evidence ? (
               <>
                 {finding.evidence.reading?.conclusion && <p class="ins-tile__conclusion">{finding.evidence.reading.conclusion.text}</p>}
-                <ChartFigure copy={C} derived={finding.evidence.chart.derived} spec={finding.evidence.chart.spec} table={finding.evidence.chart.table} facts={model.facts} locale={locale} theme="dark" uid={`ev-${finding.id}`} compact />
+                <ChartFigure copy={C} derived={finding.evidence.chart.derived} note={finding.evidence.chart.note} spec={finding.evidence.chart.spec} table={finding.evidence.chart.table} facts={model.facts} locale={locale} theme="dark" uid={`ev-${finding.id}`} compact />
                 {(finding.evidence.reading?.meaning || finding.evidence.reading?.nextStep) && (
                   <div class="ins-tile__reading">
                     {finding.evidence.reading?.meaning && <div><span class="ins-label">{C.meaningTitle}</span><p>{finding.evidence.reading.meaning.text}</p></div>}
@@ -316,11 +314,11 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
         )}
         <ol class="ins-actions" data-stagger>
           {model.actions.map((action) => {
-            const module = moduleOf(action.factIds)
+            const actionLabel = moduleLabelOf(model, action.module)
             return (
               <li>
                 <span class="ins-actions__text">{action.text}</span>
-                {module && <span class="ins-chip">{C.moduleLabel[module]}</span>}
+                {actionLabel && <span class="ins-chip">{actionLabel}</span>}
               </li>
             )
           })}
@@ -411,7 +409,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
       </section>
       {findings.map((finding, i) => (
         <section class:list={['ins-slide', 'ins-slide--finding', { 'is-lead': i === 0 }]} data-slide>
-          <span class="ins-chip ins-chip--dark">{finding.module ? C.moduleLabel[finding.module] : C.filterAll}</span>
+          <span class="ins-chip ins-chip--dark">{moduleLabelOf(model, finding.module) ?? C.filterAll}</span>
           {finding.fact && <span class="ins-slide__figure ins-num">{finding.fact.value === null ? C.absent : finding.fact.display}</span>}
           <p class="ins-slide__claim">{finding.claim.text}</p>
           {finding.evidence?.reading?.nextStep && <p class="ins-slide__next"><span class="ins-label">{C.nextStepTitle}</span>{finding.evidence.reading.nextStep.text}</p>}

@@ -8,7 +8,7 @@ import { acceptSharedEdition } from './insights-accept'
  * render tonto: no calcula, no compara, no interpola. El fetch es SERVER-SIDE y SIN CACHE (revocar debe revocar en la
  * lectura siguiente, a diferencia del Grader); el token nunca se escribe en logs, HTML ni analytics.
  *
- * Los tipos son copia del contrato de Greenhouse (`src/lib/efeonce-insights/contracts/web-model.ts`, modelVersion 1.1).
+ * Los tipos son copia del contrato de Greenhouse (`src/lib/efeonce-insights/contracts/web-model.ts`, modelVersion 1.3).
  * Los campos marcados «v2» (editorial de TASK-1888) y «1.1» son OPCIONALES: un modelo 1.0 se dibuja igual.
  */
 
@@ -38,6 +38,8 @@ export interface InsightWebFactV1 {
   channelId?: string
   /** 1.2 — hecho del período anterior con que se compara; nunca se muestra como tarjeta suelta. */
   comparisonFactId?: string
+  /** 1.3 — «período anterior: X» listo para imprimir. */
+  priorLabel?: string
   absentReason: 'no_data' | null
 }
 
@@ -49,6 +51,9 @@ export interface InsightWebClaimV1 {
   role?: 'finding' | 'backing'
   /** 1.2 — cifra protagonista de una esencial: el cambio frente al período anterior. */
   figure?: { display: string; direction: 'up' | 'down' | 'flat'; kind?: 'change' | 'level' }
+  /** 1.3 — módulo de la frase y figura que la respalda, resueltos por Greenhouse (nunca se deducen aquí). */
+  module?: InsightModule
+  evidence?: { chapterId: string; chartId: string }
 }
 
 export interface ChartSeriesV1 {
@@ -100,11 +105,13 @@ export interface InsightWebChartDerivedV1 {
 export interface InsightWebChapterV1 {
   /** 1.2 — marca de producto que encabeza el capítulo (lockup oficial `/branding/products/<clave>-lockup-*.svg`). */
   productMark?: { key: string; label: string }
+  /** 1.3 — nombre corto del capítulo para navegación y filtros. */
+  label?: string
   chapterId: string
   module: InsightModule
   title: string
   claims: InsightWebClaimV1[]
-  charts: Array<{ spec: ChartSpecV1; table: { columns: string[]; rows: Array<Array<string | null>> }; derived?: InsightWebChartDerivedV1; unitLabel?: string }>
+  charts: Array<{ spec: ChartSpecV1; table: { columns: string[]; rows: Array<Array<string | null>> }; derived?: InsightWebChartDerivedV1; unitLabel?: string; note?: string }>
   tables: Array<{ tableId: string; title: string; columns: string[]; rows: Array<Array<string | null>> }>
   limits: string[]
   /** v2 */
@@ -118,13 +125,15 @@ export interface InsightWebModelV1 {
   locale: string
   executiveSummary: InsightWebClaimV1[]
   chapters: InsightWebChapterV1[]
-  actions: Array<{ actionId: string; text: string; factIds: string[] }>
+  actions: Array<{ actionId: string; text: string; factIds: string[]; module?: InsightModule }>
   limits: string[]
   methodology: string[]
   references: Array<{ referenceId: string; label: string }>
   facts: Record<string, InsightWebFactV1>
   /** v2 — «Lo esencial del mes». */
   essentials?: InsightWebClaimV1[]
+  /** 1.3 — esenciales por módulo, incluido 0: decide si el tablero se muestra con un filtro. */
+  essentialsByModule?: Partial<Record<InsightModule, number>>
   /** v2 — «Para decidir en la reunión». */
   decision?: InsightWebClaimV1
   /** v2 — «Qué mide este informe». */

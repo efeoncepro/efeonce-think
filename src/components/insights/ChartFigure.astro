@@ -38,10 +38,12 @@ interface Props {
   compact?: boolean
   /** 1.1 — cifras derivadas por Greenhouse (tasas del embudo). */
   derived?: { funnelStepRates?: Array<{ stageId: string; display: string | null }> }
+  /** 1.3 — nota de lectura redactada por Greenhouse (p. ej. la escala por métrica). */
+  note?: string
   copy?: InsightsCopy
 }
 
-const { spec, table, facts, locale, theme = 'light', uid, compact = false, derived, copy } = Astro.props
+const { spec, table, facts, locale, theme = 'light', uid, compact = false, derived, note, copy } = Astro.props
 const C = copy ?? INSIGHTS_COPY
 const data = spec.data
 const family = spec.family
@@ -246,7 +248,7 @@ const legend = SERIES_FAMILIES.includes(family) && spec.series.length > 1
           </div>
         </div>
         <div class="ins-xlabels" aria-hidden="true">{spec.dimensionLabels.map((l) => <span>{l}</span>)}</div>
-        <p class="ins-note">{perDimension ? C.chartOwnScale : C.chartBaseline}</p>
+        <p class="ins-note">{note ?? C.chartBaseline}</p>
       </>
     )}
 

@@ -24,48 +24,46 @@ export interface ModuleView {
   module: InsightModule
   chapterId: string
   title: string
+  /** Nombre corto para navegación (1.3); en un modelo previo, el título del capítulo. */
+  label: string
 }
 
-const chartHasFact = (spec: ChartSpecV1, factId: string) => chartFactIds(spec).includes(factId)
-
-/** Evidencia de un hecho: primero la figura cuya cifra principal ES ese hecho; si no, la figura que lo dibuja. */
-export const findEvidence = (model: InsightWebModelV1, factId: string): FindingEvidence | undefined => {
-  for (const chapter of model.chapters) {
-    for (const chart of chapter.charts) {
-      const reading = chapter.readings?.find((r) => r.chartId === chart.spec.chartId)
-      if (reading?.keyFigure?.factId === factId) return { chapterId: chapter.chapterId, chart, reading }
-    }
-  }
-  for (const chapter of model.chapters) {
-    for (const chart of chapter.charts) {
-      if (chartHasFact(chart.spec, factId)) {
-        return { chapterId: chapter.chapterId, chart, reading: chapter.readings?.find((r) => r.chartId === chart.spec.chartId) }
-      }
-    }
-  }
-  return undefined
+/**
+ * Evidencia de un hallazgo: la figura que Greenhouse declara en `claim.evidence` (modelo 1.3). Think la RESUELVE por
+ * ids; no la busca recorriendo capítulos. Un modelo previo sin referencia muestra el hallazgo sin figura.
+ */
+export const resolveEvidence = (model: InsightWebModelV1, ref: InsightWebClaimV1['evidence']): FindingEvidence | undefined => {
+  if (!ref) return undefined
+  const chapter = model.chapters.find((c) => c.chapterId === ref.chapterId)
+  const chart = chapter?.charts.find((c) => c.spec.chartId === ref.chartId)
+  if (!chapter || !chart) return undefined
+  return { chapterId: chapter.chapterId, chart, reading: chapter.readings?.find((r) => r.chartId === ref.chartId) }
 }
 
 /**
  * Hallazgos: «Lo esencial del mes» (v2). Un modelo v1 no lo trae: se usan las afirmaciones del resumen que citan
- * hechos, en su orden. Sin ninguna, no hay grilla.
+ * hechos, en su orden. Sin ninguna, no hay grilla. Módulo y evidencia vienen del modelo (1.3).
  */
 export const buildFindings = (model: InsightWebModelV1): FindingView[] => {
   const claims = model.essentials?.length ? model.essentials : model.executiveSummary.filter((claim) => claim.factIds.length > 0)
-  return claims.map((claim) => {
-    const fact = claim.factIds.map((id) => model.facts[id]).find(Boolean)
-    return {
-      id: `h-${claim.claimId}`,
-      module: fact?.module ?? null,
-      claim,
-      fact,
-      evidence: fact ? findEvidence(model, fact.factId) : undefined,
-    }
-  })
+  return claims.map((claim) => ({
+    id: `h-${claim.claimId}`,
+    module: claim.module ?? null,
+    claim,
+    fact: claim.factIds.map((id) => model.facts[id]).find(Boolean),
+    evidence: resolveEvidence(model, claim.evidence),
+  }))
 }
 
 export const buildModules = (model: InsightWebModelV1): ModuleView[] =>
-  model.chapters.map((chapter) => ({ module: chapter.module, chapterId: chapter.chapterId, title: chapter.title }))
+  model.chapters.map((chapter) => ({ module: chapter.module, chapterId: chapter.chapterId, title: chapter.title, label: chapter.label ?? chapter.title }))
+
+/** Nombre corto de un módulo según el capítulo que el modelo trae (1.3 `chapter.label`). */
+export const moduleLabelOf = (model: InsightWebModelV1, module: InsightModule | null | undefined): string | null => {
+  if (!module) return null
+  const chapter = model.chapters.find((c) => c.module === module)
+  return chapter ? (chapter.label ?? chapter.title) : null
+}
 
 /** El titular del informe es la primera afirmación del resumen; el resto es su bajada. */
 export const splitSummary = (model: InsightWebModelV1) => ({

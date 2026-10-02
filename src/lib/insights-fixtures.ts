@@ -9,6 +9,7 @@
  * `fixture-no-existe` (404), `fixture-retirado` (410), `fixture-limite` (429), `fixture-error` (5xx).
  */
 import type {
+  InsightModule,
   InsightSharedEditionResponseV1,
   InsightWebClaimV1,
   InsightWebFactV1,
@@ -256,7 +257,7 @@ const ICO_READINGS: Reading[] = [
   read('ico-waffle', 'Casi dos de cada tres piezas salieron a la primera'),
 ]
 
-const model: InsightWebModelV1 = {
+const rawModel: InsightWebModelV1 = {
   modelVersion: '1.0',
   locale: 'es-CL',
   executiveSummary: [
@@ -404,8 +405,49 @@ const model: InsightWebModelV1 = {
   facts,
 }
 
+/**
+ * SÓLO FIXTURES: emula la proyección 1.3 de Greenhouse (`sharing/web-model.ts`: módulo y figura de cada hallazgo,
+ * esenciales por módulo, nombre de capítulo, período anterior) sobre el modelo de muestra escrito a mano. Ningún
+ * modelo vivo pasa por aquí: los de verdad llegan resueltos del API y Think no deduce nada.
+ */
+const SAMPLE_LABELS: Record<InsightModule, string> = { seo: 'SEO', aeo: 'Respuestas de IA', ico: 'Entrega' }
+
+const annotateSampleLike13 = (m: InsightWebModelV1): InsightWebModelV1 => {
+  const context = (claim: InsightWebClaimV1): InsightWebClaimV1 => {
+    const cited = claim.factIds.map((id) => m.facts[id]).find(Boolean)
+    if (!cited) return claim
+    const byKey = m.chapters.flatMap((c) => (c.readings ?? []).filter((r) => r.keyFigure && claim.factIds.includes(r.keyFigure.factId)).map((r) => ({ chapterId: c.chapterId, chartId: r.chartId })))[0]
+    const byDraw = m.chapters.flatMap((c) => c.charts.filter((ch) => claim.factIds.some((id) => JSON.stringify(ch.spec).includes(`"${id}"`))).map((ch) => ({ chapterId: c.chapterId, chartId: ch.spec.chartId })))[0]
+    const evidence = byKey ?? byDraw
+    return { ...claim, module: cited.module, ...(evidence ? { evidence } : {}) }
+  }
+  const essentialsByModule: Partial<Record<InsightModule, number>> = Object.fromEntries(m.chapters.map((c) => [c.module, 0]))
+  for (const claim of m.essentials ?? []) {
+    const owner = claim.factIds.map((id) => m.facts[id]?.module).find(Boolean)
+    if (owner) essentialsByModule[owner] = (essentialsByModule[owner] ?? 0) + 1
+  }
+  const facts = Object.fromEntries(Object.entries(m.facts).map(([id, f]) => {
+    const prev = f.comparisonFactId ? m.facts[f.comparisonFactId] : undefined
+    return [id, prev && prev.value !== null ? { ...f, priorLabel: `período anterior: ${prev.display}` } : f]
+  }))
+  return {
+    ...m,
+    modelVersion: '1.3',
+    facts,
+    executiveSummary: m.executiveSummary.map(context),
+    ...(m.essentials ? { essentials: m.essentials.map(context), essentialsByModule } : {}),
+    chapters: m.chapters.map((c) => ({ ...c, label: SAMPLE_LABELS[c.module] })),
+    actions: m.actions.map((a) => {
+      const owner = a.factIds.map((id) => m.facts[id]?.module).find(Boolean)
+      return owner ? { ...a, module: owner } : a
+    }),
+  }
+}
+
+const model = annotateSampleLike13(rawModel)
+
 const base = (token: string): InsightSharedEditionResponseV1 => ({
-  modelVersion: '1.0',
+  modelVersion: '1.3',
   header: {
     organizationName: 'Greenhouse Demo',
     reportCode: 'EO-INS-000123',

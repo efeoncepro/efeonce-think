@@ -7,7 +7,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { resolveInsightFixture } from '../src/lib/insights-fixtures.ts'
 import { acceptSharedEdition, isSupportedModelVersion } from '../src/lib/insights-accept.ts'
-import { buildFindings, chartFactIds, findEvidence, splitLead, splitSummary } from '../src/lib/insights-view.ts'
+import { buildFindings, chartFactIds, moduleLabelOf, resolveEvidence, splitLead, splitSummary } from '../src/lib/insights-view.ts'
 import { bulletScale, gaugeAngle, GAUGE_START, GAUGE_SWEEP, heatmapIntensity, niceScale, slices, vennTwo, waffleCells, waterfallBars } from '../src/lib/insights-chart-geometry.ts'
 
 const model = (token: string) => {
@@ -23,8 +23,24 @@ test('hallazgos v2 salen de «Lo esencial», en su orden, con la cifra del prime
   for (const f of findings) {
     const first = f.claim.factIds.map((id) => m.facts[id]).find(Boolean)
     assert.equal(f.fact?.factId, first?.factId)
-    assert.equal(f.module, first?.module ?? null)
+    // 1.3 — el módulo lo trae el modelo (Greenhouse), no se infiere en Think.
+    assert.equal(f.module, f.claim.module ?? null)
   }
+})
+
+test('1.3 — un hallazgo sin módulo ni evidencia en el modelo se muestra sin chip ni figura (Think no los deduce)', () => {
+  const m = model('fixture-completo')
+  const bare = { ...m, essentials: m.essentials!.map(({ module: _m, evidence: _e, ...claim }) => claim) }
+  for (const f of buildFindings(bare)) {
+    assert.equal(f.module, null)
+    assert.equal(f.evidence, undefined)
+  }
+})
+
+test('1.3 — el nombre del módulo sale del capítulo del modelo', () => {
+  const m = model('fixture-completo')
+  for (const chapter of m.chapters) assert.equal(moduleLabelOf(m, chapter.module), chapter.label ?? chapter.title)
+  assert.equal(moduleLabelOf(m, null), null)
 })
 
 test('un modelo 1.0 sin «Lo esencial» usa sólo las afirmaciones del resumen que citan hechos', () => {
@@ -34,15 +50,17 @@ test('un modelo 1.0 sin «Lo esencial» usa sólo las afirmaciones del resumen q
   assert.deepEqual(findings.map((f) => f.claim.claimId), m.executiveSummary.filter((c) => c.factIds.length > 0).map((c) => c.claimId))
 })
 
-test('la evidencia prefiere la figura cuya cifra principal ES el hecho', () => {
+test('1.3 — la evidencia resuelve la figura que el modelo declara, con su lectura', () => {
   const m = model('fixture-completo')
   for (const chapter of m.chapters) {
     for (const reading of chapter.readings ?? []) {
-      if (!reading.keyFigure) continue
-      const evidence = findEvidence(m, reading.keyFigure.factId)
+      const evidence = resolveEvidence(m, { chapterId: chapter.chapterId, chartId: reading.chartId })
       assert.equal(evidence?.chart.spec.chartId, reading.chartId)
+      assert.equal(evidence?.reading, reading)
     }
   }
+  assert.equal(resolveEvidence(m, { chapterId: 'no-existe', chartId: 'x' }), undefined)
+  assert.equal(resolveEvidence(m, undefined), undefined)
 })
 
 test('toda figura del modelo declara hechos que existen en el modelo', () => {

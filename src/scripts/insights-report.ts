@@ -183,6 +183,12 @@ function mountFilters() {
   const items = Array.from(document.querySelectorAll<HTMLElement>('[data-finding], .ins-scene[data-module]'))
   const findings = document.getElementById('hallazgos')
   if (!page) return
+  let essentialsByModule: Record<string, number> | null = null
+  try {
+    essentialsByModule = findings?.dataset.essentialsByModule ? JSON.parse(findings.dataset.essentialsByModule) : null
+  } catch {
+    essentialsByModule = null
+  }
 
   buttons.forEach((button) =>
     button.addEventListener('click', () => {
@@ -194,9 +200,8 @@ function mountFilters() {
           const module = item.dataset.module
           item.classList.toggle('is-filtered-out', filter !== 'all' && module !== 'all' && module !== filter)
         })
-        // Un tablero sin hallazgos del módulo filtrado no se muestra vacío: se oculta entero.
-        const anyFinding = items.some((item) => item.matches('[data-finding]') && !item.classList.contains('is-filtered-out'))
-        findings?.classList.toggle('is-filtered-out', !anyFinding)
+        // Un módulo sin esenciales (lo declara el modelo, `essentialsByModule`) no muestra el tablero vacío: se oculta.
+        findings?.classList.toggle('is-filtered-out', filter !== 'all' && essentialsByModule?.[filter] === 0)
       })
       // Si el lector está más abajo, lo lleva al tablero (o, sin tablero, al primer capítulo visible) para que vea el efecto.
       const landing = findings && !findings.classList.contains('is-filtered-out')
