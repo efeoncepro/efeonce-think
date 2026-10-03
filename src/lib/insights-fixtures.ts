@@ -562,21 +562,21 @@ const statsEdition = (token: string): InsightSharedEditionResponseV1 => {
     itemId, label, factId, display, estimated: false, direction: 'higher_is_better', parts: { value: display }, ...extra,
   })
   const seoItems: InsightWebStatItemV1[] = [
-    item('clicks', 'Clics', 'st.clicks', '13.606', { change: worse('17,0 %', 'down'), versus: `vs 16.390 en ${AUG}`, count: { from: 16390, to: 13606, decimals: 0 } }),
-    item('impressions', 'Impresiones', 'st.impressions', '770.462', { change: worse('11,3 %', 'down'), versus: `vs 868.507 en ${AUG}`, count: { from: 868507, to: 770462, decimals: 0 } }),
-    item('ctr', 'CTR', 'st.ctr', '1,8 %', { parts: { value: '1,8', suffix: '%' }, change: worse('0,1 pp', 'down'), versus: `vs 1,9 % en ${AUG}`, count: { from: 1.9, to: 1.8, decimals: 1 } }),
-    item('position', 'Posición media', 'st.position', '#6,9', { direction: 'lower_is_better', parts: { prefix: '#', value: '6,9' }, change: worse('1,2 pos.', 'up'), versus: `vs #5,7 en ${AUG}`, lowerIsBetter: 'Menor es mejor', count: { from: 5.7, to: 6.9, decimals: 1 } }),
-    item('page_one_keywords', 'Primera página', 'st.page_one', '15 de 31 keywords', { parts: { value: '15', unitLabel: 'de 31 keywords' }, change: worse('28,6 %', 'down'), versus: `vs 21 en ${AUG}`, count: { from: 21, to: 15, decimals: 0 } }),
-    item('organic_etv', 'Tráfico estimado', 'st.etv', '130.166', { estimated: true, change: worse('3,6 %', 'down'), versus: `vs 135.014 en ${AUG}`, count: { from: 135014, to: 130166, decimals: 0 } }),
+    item('clicks', 'Clics', 'st.clicks', '13.606', { change: worse('17,0 %', 'down'), versus: `vs 16.390 en ${AUG}`, comparison: { display: '16.390', period: AUG }, count: { from: 16390, to: 13606, decimals: 0 } }),
+    item('impressions', 'Impresiones', 'st.impressions', '770.462', { change: worse('11,3 %', 'down'), versus: `vs 868.507 en ${AUG}`, comparison: { display: '868.507', period: AUG }, count: { from: 868507, to: 770462, decimals: 0 } }),
+    item('ctr', 'CTR', 'st.ctr', '1,8 %', { parts: { value: '1,8', suffix: '%' }, change: worse('0,1 pp', 'down'), versus: `vs 1,9 % en ${AUG}`, comparison: { display: '1,9 %', period: AUG }, count: { from: 1.9, to: 1.8, decimals: 1 } }),
+    item('position', 'Posición media', 'st.position', '#6,9', { direction: 'lower_is_better', parts: { prefix: '#', value: '6,9' }, change: worse('1,2 pos.', 'up'), versus: `vs #5,7 en ${AUG}`, comparison: { display: '#5,7', period: AUG }, lowerIsBetter: 'Menor es mejor', count: { from: 5.7, to: 6.9, decimals: 1 } }),
+    item('page_one_keywords', 'Primera página', 'st.page_one', '15 de 31 keywords', { parts: { value: '15', unitLabel: 'de 31 keywords' }, change: worse('28,6 %', 'down'), versus: `vs 21 en ${AUG}`, comparison: { display: '21', period: AUG }, count: { from: 21, to: 15, decimals: 0 } }),
+    item('organic_etv', 'Tráfico estimado', 'st.etv', '130.166', { estimated: true, change: worse('3,6 %', 'down'), versus: `vs 135.014 en ${AUG}`, comparison: { display: '135.014', period: AUG }, count: { from: 135014, to: 130166, decimals: 0 } }),
   ]
   const aeoItems: InsightWebStatItemV1[] = [
-    item('ai_sessions', 'Visitas desde IA', 'st.ai_sessions', '1.686', { change: { display: '23,4 %', direction: 'up', tone: 'better' }, versus: `vs 1.366 en ${AUG}`, count: { from: 1366, to: 1686, decimals: 0 } }),
-    item('share_of_model', 'Share of Model', 'st.som', '42,0 %', { parts: { value: '42,0', suffix: '%' } }),
+    item('ai_sessions', 'Visitas desde IA', 'st.ai_sessions', '1.686', { change: { display: '23,4 %', direction: 'up', tone: 'better' }, versus: `vs 1.366 en ${AUG}`, comparison: { display: '1.366', period: AUG }, count: { from: 1366, to: 1686, decimals: 0 } }),
+    item('share_of_model', 'Share of Model', 'st.som', '42,0 %', { parts: { value: '42,0', suffix: '%' }, firstPeriod: 'Primer período medido' }),
     item('citation_share', 'Respuestas con cita', 'st.citations', '—', { noData: `Sin dato en ${SEP}` }),
-    item('sov.brand', 'Share of Voice', 'st.sov', '18,4 %', { parts: { value: '18,4', suffix: '%' }, change: { display: '0,0 pp', direction: 'flat', tone: 'neutral' }, versus: `vs 18,4 % en ${AUG}`, count: { from: 18.4, to: 18.4, decimals: 1 } }),
+    item('sov.brand', 'Share of Voice', 'st.sov', '18,4 %', { parts: { value: '18,4', suffix: '%' }, change: { display: '0,0 pp', direction: 'flat', tone: 'neutral' }, versus: `vs 18,4 % en ${AUG}`, comparison: { display: '18,4 %', period: AUG }, count: { from: 18.4, to: 18.4, decimals: 1 } }),
   ]
   const icoItems: InsightWebStatItemV1[] = [
-    item('delivered.completed', 'Piezas entregadas', 'st.pieces', '64', { change: { display: '10,3 %', direction: 'up', tone: 'better' }, versus: `vs 58 en ${AUG}`, count: { from: 58, to: 64, decimals: 0 } }),
+    item('delivered.completed', 'Piezas entregadas', 'st.pieces', '64', { change: { display: '10,3 %', direction: 'up', tone: 'better' }, versus: `vs 58 en ${AUG}`, comparison: { display: '58', period: AUG }, count: { from: 58, to: 64, decimals: 0 } }),
   ]
   const ev = (chapterId: string, chartId: string) => ({ chapterId, chartId })
   const model14: InsightWebModelV1 = {

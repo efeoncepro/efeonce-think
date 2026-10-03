@@ -343,6 +343,8 @@
 .ins-stat__tri { display: inline-flex; align-items: center; }
 .ins-stat__tri svg { display: block; overflow: visible; }
 .ins-stat__vs { color: var(--ins-ink-soft-light); }
+.ins-stat__vs-figure { margin: 0 -3px; padding: 0 3px; border-radius: 4px; font-weight: 600; color: var(--ins-navy); }
+.ins-stat__first { color: var(--ins-ink-soft-light); }
 .ins-stat__nodata { font-weight: 600; color: var(--ins-ink-soft-light); }
 .ins-stat__lower { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ins-ink-soft-light); }
 /* Una sola cifra: en horizontal, a todo el ancho. */
@@ -358,6 +360,8 @@
 .ins-stats--dark .ins-stats__count, .ins-stats--dark .ins-stat__vs, .ins-stats--dark .ins-stat__nodata, .ins-stats--dark .ins-stat__lower, .ins-stats--dark .ins-stat__change { color: var(--ins-ink-soft-dark); }
 .ins-stats--dark .ins-stats__grid, .ins-stats--dark .ins-stat { border-color: var(--ins-rule-dark); }
 .ins-stats--dark .ins-stat__figure { color: var(--ins-accent-dark); }
+.ins-stats--dark .ins-stat__vs-figure { color: var(--ins-ink); }
+.ins-stats--dark .ins-stat__first { color: var(--ins-ink-soft-dark); }
 .ins-stats--dark .ins-stat__chip { background: color-mix(in srgb, var(--ins-ink) 10%, transparent); color: var(--ins-ink); }
 .ins-stats--dark .ins-stat__delta { height: auto; padding: 0; background: none; color: var(--ins-delta-lead-dark); }
 .ins-stats--dark .ins-stat__delta[data-tone='better'] .ins-stat__tri { color: var(--ins-delta-better-dark); }
@@ -375,6 +379,10 @@
   .ins-motion [data-stat-grid] .ins-stat__name { opacity: 0; transform: translateY(var(--ins-stat-rise)); transition: opacity var(--ins-stat-name) var(--ins-ease-emphasized) var(--wait), transform var(--ins-stat-name) var(--ins-ease-emphasized) var(--wait); }
   .ins-motion [data-stat-grid] .ins-stat__value { opacity: 0; transform: translateY(var(--ins-stat-rise)); transition: opacity 400ms var(--ins-ease-emphasized) calc(var(--wait) + var(--ins-stat-count-start)), transform 400ms var(--ins-ease-emphasized) calc(var(--wait) + var(--ins-stat-count-start)); }
   .ins-motion [data-stat-grid] .ins-stat[data-count] .ins-stat__value { transform: none; transition: opacity var(--ins-duration-short) var(--ins-ease-standard) var(--wait); }
+  /* Mientras la cifra corre, la del «vs» (su punto de partida) se resalta; se apaga al llegar. */
+  .ins-motion [data-stat-grid].is-in .ins-stat[data-count] .ins-stat__vs-figure { animation: ins-stat-hot var(--ins-stat-change-start) step-end var(--wait); }
+  .ins-motion [data-stat-grid] .ins-stat__first { opacity: 0; transition: opacity 400ms var(--ins-ease-emphasized) calc(var(--wait) + var(--ins-stat-count-start) * 2); }
+  .ins-motion [data-stat-grid].is-in .ins-stat__first { opacity: 1; }
   .ins-motion [data-stat-grid] .ins-stat__nodata { opacity: 0; transition: opacity 400ms var(--ins-ease-emphasized) calc(var(--wait) + var(--ins-stat-count-start) * 2); }
   .ins-motion [data-stat-grid] .ins-stat__delta { color: var(--ins-delta-neutral); background: var(--ins-delta-neutral-ground); transition: color var(--ins-duration-medium) var(--ins-ease-standard) calc(var(--wait) + var(--ins-stat-change-start)), background-color var(--ins-duration-medium) var(--ins-ease-standard) calc(var(--wait) + var(--ins-stat-change-start)); }
   .ins-motion [data-stat-grid] .ins-stat__tri, .ins-motion [data-stat-grid] .ins-stat__delta-text { opacity: 0; transition: opacity var(--ins-stat-change) var(--ins-ease-emphasized) calc(var(--wait) + var(--ins-stat-change-start)), transform var(--ins-stat-change) var(--ins-ease-emphasized) calc(var(--wait) + var(--ins-stat-change-start)); }
@@ -722,6 +730,7 @@
 .ins-motion .ins-hero__body > *:nth-child(3) { animation-delay: 360ms; }
 .ins-motion .ins-hero__body > *:nth-child(4) { animation-delay: 460ms; }
 @keyframes ins-rise { to { opacity: 1; transform: none; } }
+@keyframes ins-stat-hot { 0% { background-color: color-mix(in srgb, var(--ins-accent-light) 12%, transparent); } 100% { background-color: transparent; } }
 
 @media (prefers-reduced-motion: reduce) {
   .ins-page *, .ins-page *::before, .ins-page *::after { transition: none !important; animation: none !important; }

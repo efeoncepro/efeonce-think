@@ -224,12 +224,16 @@ test('1.4 — sin dato: «—», «Sin dato en …» y ninguna píldora ni recor
   assert.equal(absent.versus, undefined)
   assert.match(absent.noData!, /^Sin dato en /)
   const first = items.find((i) => i.itemId === 'share_of_model')!
+  assert.equal(first.firstPeriod, 'Primer período medido')
+  assert.equal(absent.firstPeriod, undefined)
   assert.equal(first.change, undefined)
   assert.equal(first.versus, undefined)
   assert.equal(first.count, undefined)
   // Toda cifra con variación trae su recorrido y su «vs»; el recorrido termina en la cifra impresa.
   for (const item of items.filter((i) => i.change)) {
     assert.ok(item.versus && item.count, item.itemId)
+    // La pieza que se destaca está dentro del texto completo de «vs».
+    assert.ok(item.comparison && item.versus!.includes(item.comparison.display), item.itemId)
     const printed = Number(item.parts!.value.replace(/\./g, '').replace(',', '.'))
     assert.equal(item.count!.to, printed, item.itemId)
   }

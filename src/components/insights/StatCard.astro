@@ -54,6 +54,14 @@ const engineOf = (factId: string) => {
   const fact = facts[factId]
   return fact?.channelId && fact.module === 'aeo' ? fact.channelId : null
 }
+// «vs <b>16.390</b> en agosto de 2026»: la cifra se destaca con la pieza que trae el modelo (`comparison.display`)
+// dentro del texto completo `versus`; sin piezas, o si la pieza no está en el texto, el texto va tal cual.
+const versusParts = (item: InsightWebStatFigureV1['items'][number]) => {
+  const text = item.versus ?? ''
+  const figure = item.comparison?.display
+  const at = figure ? text.indexOf(figure) : -1
+  return at < 0 || !figure ? { before: text, figure: null, after: '' } : { before: text.slice(0, at), figure, after: text.slice(at + figure.length) }
+}
 const conclusion = compact ? undefined : reading?.conclusion?.text
 const lead = compact ? undefined : reading?.meaning?.text
 ---
@@ -110,13 +118,18 @@ const lead = compact ? undefined : reading?.meaning?.text
                   </span>
                   <span class="ins-stat__delta-text">{item.change.display}</span>
                 </span>
-                {item.versus && <span class="ins-stat__vs ins-num" aria-hidden="true">{item.versus}</span>}
+                {item.versus && (() => {
+                  const vs = versusParts(item)
+                  return <span class="ins-stat__vs ins-num" aria-hidden="true">{vs.before}{vs.figure && <b class="ins-stat__vs-figure">{vs.figure}</b>}{vs.after}</span>
+                })()}
                 <span class="ins-visually-hidden">{C.statChangeSentence(item.change.direction, item.change.display, item.versus, item.change.tone)}</span>
               </dd>
             ) : absent ? (
               <dd class="ins-stat__change ins-stat__nodata">{item.noData}</dd>
             ) : item.versus ? (
               <dd class="ins-stat__change"><span class="ins-stat__vs ins-num">{item.versus}</span></dd>
+            ) : item.firstPeriod ? (
+              <dd class="ins-stat__change ins-stat__first">{item.firstPeriod}</dd>
             ) : null}
             {item.lowerIsBetter && <dd class="ins-stat__lower"><span aria-hidden="true">↓ </span>{item.lowerIsBetter}</dd>}
           </div>

@@ -70,6 +70,8 @@ for (const display of ['13.606', '770.462', '130.166', '17,0 %', '1,2 pos.', 'vs
 check(['data-cols="3"', 'data-cols="2"', 'data-cols="1"'].every((attr) => cifras.includes(attr)), 'cifras: 6 cifras en tres columnas, 4 en dos y 1 en horizontal')
 check(cifras.includes('baja 17,0 %, vs 16.390 en agosto de 2026; empeora') && cifras.includes('sube 1,2 pos., vs #5,7 en agosto de 2026; empeora'), 'cifras: la variación se lee como frase completa')
 check(/<dt class="ins-stat__name"/.test(cifras) && /<dd class="ins-stat__value"/.test(cifras), 'cifras: semántica <dl> (nombre en <dt>, valor en <dd>)')
+check(cifras.includes('vs <b class="ins-stat__vs-figure">16.390</b> en agosto de 2026') && cifras.includes('vs <b class="ins-stat__vs-figure">#5,7</b> en agosto de 2026'), 'cifras: la cifra del «vs» en negrita, con la pieza del modelo')
+check(cifras.includes('Primer período medido'), 'cifras: sin período anterior, «Primer período medido» del modelo')
 check(cifras.indexOf('data-capture="stats-stats.seo"') < cifras.indexOf('data-capture="chapter-aeo"'), 'cifras: la tarjeta abre su capítulo')
 {
   const absent = cifras.slice(cifras.indexOf('Respuestas con cita'), cifras.indexOf('Sin dato en septiembre de 2026'))
