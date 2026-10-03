@@ -331,6 +331,16 @@
 .ins-stat dd { margin: 0; }
 .ins-stat__name { display: flex; align-items: center; gap: 8px; min-height: 24px; margin: 0; font-size: 0.9375rem; font-weight: 600; line-height: 1.3; color: var(--ins-navy); }
 .ins-stat__icon { flex: none; width: 18px; height: 18px; }
+/* Tarjeta con isotipo de canal (TASK-1996, contrato AXIS 0.2.0): disco blanco de 30 px con el isotipo al 60 %, filete fino
+ * sobre papel y sin filete sobre navy. Reemplaza al ícono de la métrica; junto al título, 22 px. */
+.ins-disc { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 9999px; background: #ffffff; border: 1px solid var(--ins-rule-light); box-sizing: border-box; }
+.ins-disc img { display: block; width: 18px; height: 18px; object-fit: contain; }
+.ins-disc--title { width: 22px; height: 22px; }
+.ins-disc--title img { width: 13px; height: 13px; }
+.ins-stats__title-group { display: inline-flex; align-items: center; gap: 8px; }
+.ins-stats__title-marks { display: inline-flex; gap: 4px; }
+.ins-stat__name:has(.ins-stat__context) { flex-wrap: wrap; }
+.ins-stat__context { flex-basis: 100%; font-size: 0.8125rem; font-weight: 400; color: var(--ins-ink-soft-light); }
 .ins-stat__chip { margin-left: auto; flex: none; padding: 4px 10px; border-radius: 9999px; background: color-mix(in srgb, var(--ins-navy) 8%, transparent); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ins-navy); }
 .ins-stat__figure { display: inline-block; font-family: var(--ins-idea); font-size: clamp(2.75rem, 4.4vw, 4rem); font-weight: 720; line-height: 0.95; letter-spacing: -0.035em; color: var(--ins-navy); white-space: nowrap; }
 .ins-stat__pre { font-size: 0.55em; margin-right: 0.06em; letter-spacing: 0; }
@@ -360,6 +370,8 @@
 .ins-stats--dark .ins-stats__count, .ins-stats--dark .ins-stat__vs, .ins-stats--dark .ins-stat__nodata, .ins-stats--dark .ins-stat__lower, .ins-stats--dark .ins-stat__change { color: var(--ins-ink-soft-dark); }
 .ins-stats--dark .ins-stats__grid, .ins-stats--dark .ins-stat { border-color: var(--ins-rule-dark); }
 .ins-stats--dark .ins-stat__figure { color: var(--ins-accent-dark); }
+.ins-stats--dark .ins-disc { border-color: transparent; }
+.ins-stats--dark .ins-stat__context { color: var(--ins-ink-soft-dark); }
 .ins-stats--dark .ins-stat__vs-figure { color: var(--ins-ink); }
 .ins-stats--dark .ins-stat__first { color: var(--ins-ink-soft-dark); }
 .ins-stats--dark .ins-stat__chip { background: color-mix(in srgb, var(--ins-ink) 10%, transparent); color: var(--ins-ink); }

@@ -599,7 +599,7 @@ const statsEdition = (token: string): InsightSharedEditionResponseV1 => {
         chapterId: 'ch-seo', module: 'seo', label: 'SEO', title: 'Visibilidad orgánica',
         opening: claim('cs-open-seo', 'Las impresiones bajaron de 868.507 a 770.462 y la posición media pasó de #5,7 a #6,9. Las keywords en primera página de Google bajaron de 21 a 15 de las 31 que medimos.'),
         claims: [{ ...claim('cs-seo-c1', 'Los clics bajaron 17,0 %.', ['st.clicks']), role: 'backing' }],
-        stats: [{ figureId: 'stats.seo', question: 'value_change', title: 'Search Console y posiciones', items: seoItems, note: claim('stats.seo.note', 'El tráfico estimado se calcula con la posición y el volumen de búsqueda de cada keyword.') }],
+        stats: [{ figureId: 'stats.seo', question: 'value_change', title: 'Search Console y posiciones', titlePlatforms: ['google_search_console', 'google'], items: seoItems, note: claim('stats.seo.note', 'El tráfico estimado se calcula con la posición y el volumen de búsqueda de cada keyword.') }],
         charts: [], tables: [],
         readings: [{ chartId: 'stats.seo', conclusion: claim('stats.seo.conclusion', 'El mayor cambio fue en clics orgánicos: de 16.390 a 13.606', ['st.clicks', 'st.clicks.aug']), nextStep: null }],
         limits: [],
@@ -629,7 +629,7 @@ const statsEdition = (token: string): InsightSharedEditionResponseV1 => {
       {
         chapterId: 'ch-ico', module: 'ico', label: 'Entrega', title: 'Entrega creativa',
         claims: [],
-        stats: [{ figureId: 'stats.ico', question: 'value_change', title: 'Producción creativa', items: icoItems }],
+        stats: [{ figureId: 'stats.ico', question: 'value_change', title: 'Producción creativa', titlePlatforms: ['greenhouse'], items: icoItems }],
         charts: [], tables: [], readings: [], limits: [],
       },
     ],

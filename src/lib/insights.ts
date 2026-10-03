@@ -132,6 +132,13 @@ export interface InsightWebStatItemV1 {
   parts?: { prefix?: string; value: string; suffix?: string; unitLabel?: string }
   /** TASK-1975 — recorrido del valor anterior al actual en el Live; ausente sin comparable o sin dato. */
   count?: { from: number; to: number; decimals: number }
+  /**
+   * TASK-1996 — isotipo de canal en la celda (contrato AXIS efeonce.insights-stat-card 0.2.0): sólo cuando el tablero
+   * mezcla motores de respuesta. `label` ya es el nombre del canal; el isotipo reemplaza al ícono de la métrica.
+   */
+  channel?: { platform: string; name: string }
+  /** La métrica bajo el nombre del canal («de las respuestas menciona la marca»). Sólo con `channel`. */
+  context?: string
 }
 
 /** 1.4 (TASK-1974) — tarjeta de cifra («¿cuánto es y cómo cambió?»). Abre el capítulo, antes de los gráficos. */
@@ -139,6 +146,8 @@ export interface InsightWebStatFigureV1 {
   figureId: string
   question: 'value_change'
   title: string
+  /** TASK-1996 — plataformas de las que salen todas las cifras (Search Console primero): su isotipo va junto al título. */
+  titlePlatforms?: string[]
   items: InsightWebStatItemV1[]
   note?: InsightWebClaimV1
 }

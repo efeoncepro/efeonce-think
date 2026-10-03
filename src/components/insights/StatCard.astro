@@ -19,7 +19,6 @@
  * HTML ya es el estado final.
  */
 import FactMark from './FactMark.astro'
-import EngineMark from '@/components/EngineMark.astro'
 import type { InsightWebFactV1, InsightWebReadingV1, InsightWebStatFigureV1 } from '@lib/insights'
 import { INSIGHTS_COPY, type InsightsCopy } from '@lib/insights-copy'
 import { insightIconFor } from '@lib/insights-icons'
@@ -50,10 +49,23 @@ const iconOf = (factId: string) => {
   const icon = insightIconFor(facts[factId]?.metricId)
   return icon && dark ? icon.replace(/\.svg$/, '-dark.svg') : icon
 }
-const engineOf = (factId: string) => {
-  const fact = facts[factId]
-  return fact?.channelId && fact.module === 'aeo' ? fact.channelId : null
+/**
+ * Isotipos de plataforma (TASK-1996, contrato AXIS efeonce.insights-stat-card 0.2.0): copias de AXIS_PLATFORM_ASSETS
+ * (@efeoncepro/axis-brand-assets 0.4.15) en `public/logos/platforms/`. Greenhouse decide dónde van (`titlePlatforms` o
+ * `items[].channel`); Think sólo los dibuja. Una plataforma sin archivo queda con su nombre, sin disco.
+ */
+const PLATFORM_LOGO: Record<string, string> = {
+  chatgpt: '/logos/platforms/chatgpt.svg',
+  gemini: '/logos/platforms/gemini.svg',
+  claude: '/logos/platforms/claude.svg',
+  perplexity: '/logos/platforms/perplexity.svg',
+  google: '/logos/platforms/google.svg',
+  google_ai_overview: '/logos/platforms/google-ai-overview.svg',
+  google_search_console: '/logos/platforms/search-console.svg',
+  google_analytics: '/logos/platforms/google-analytics.svg',
+  greenhouse: '/logos/platforms/greenhouse.svg'
 }
+const titleLogos = (stat.titlePlatforms ?? []).flatMap((platform) => (PLATFORM_LOGO[platform] ? [PLATFORM_LOGO[platform]] : []))
 // «vs <b>16.390</b> en agosto de 2026»: la cifra se destaca con la pieza que trae el modelo (`comparison.display`)
 // dentro del texto completo `versus`; sin piezas, o si la pieza no está en el texto, el texto va tal cual.
 const versusParts = (item: InsightWebStatFigureV1['items'][number]) => {
@@ -77,7 +89,14 @@ const lead = compact ? undefined : reading?.meaning?.text
 
   <section class="ins-stats__panel" aria-labelledby={`${uid}-title`} data-reveal={compact ? undefined : ''}>
     <div class="ins-stats__top">
-      <span class="ins-stats__title" id={`${uid}-title`}>{stat.title}</span>
+      <span class="ins-stats__title-group">
+        {titleLogos.length > 0 && (
+          <span class="ins-stats__title-marks" aria-hidden="true">
+            {titleLogos.map((logo) => <span class="ins-disc ins-disc--title"><img src={logo} alt="" width="13" height="13" /></span>)}
+          </span>
+        )}
+        <span class="ins-stats__title" id={`${uid}-title`}>{stat.title}</span>
+      </span>
       <span class="ins-stats__count ins-num">{C.statCount(items.length)}</span>
     </div>
 
@@ -87,13 +106,16 @@ const lead = compact ? undefined : reading?.meaning?.text
         const parts = item.parts ?? { value: item.display }
         const absent = !!item.noData
         const icon = iconOf(item.factId)
-        const engine = engineOf(item.factId)
+        const channelLogo = item.channel ? PLATFORM_LOGO[item.channel.platform] : undefined
         return (
           <div class="ins-stat" style={`--i:${i}`} data-first-col={place.firstColumn ? '' : undefined} data-last-row={place.lastRow ? '' : undefined} data-count={animate && item.count ? '' : undefined}>
             <dt class="ins-stat__name">
-              {engine ? <EngineMark provider={engine} label={item.label} size={18} /> : icon && <img class="ins-stat__icon" src={icon} alt="" width="18" height="18" />}
+              {channelLogo
+                ? <span class="ins-disc" aria-hidden="true"><img src={channelLogo} alt="" width="18" height="18" /></span>
+                : !item.channel && icon && <img class="ins-stat__icon" src={icon} alt="" width="18" height="18" />}
               <span>{item.label}</span>
               {item.estimated && <span class="ins-stat__chip">{C.estimated}</span>}
+              {item.context && <span class="ins-stat__context">{item.context}</span>}
             </dt>
             <dd class="ins-stat__value">
               <span class="ins-stat__figure ins-num" aria-hidden="true">
