@@ -1,6 +1,8 @@
 ---
-// Eslogan canónico de Efeonce "Empower your Growth" (SSOT efeonce-brand.ts).
-// Poppins: Empower=ExtraBold Italic (800i), your=ExtraBold (800), Growth=Black Italic (900i).
+// Eslogan canónico de Efeonce «Empower your <palabra de la línea>» (SSOT efeonce-brand.ts + AXIS
+// `efeonceGraphicLine.slogan`). Poppins: Empower=ExtraBold Italic (800i), your=ExtraBold (800), palabra=Black Italic (900i).
+// La palabra es de la línea de servicio (Growth, Brand, Engine, Voice, Revenue); va en el acento sólo si el eslogan
+// mide 24 px o más: más chico, va en blanco sobre oscuro (`wordColor`).
 import '@fontsource/poppins/800.css'
 import '@fontsource/poppins/800-italic.css'
 import '@fontsource/poppins/900-italic.css'
@@ -9,12 +11,16 @@ interface Props {
   /** Color base del eslogan. Default gris de marca #848484; sobre fondo oscuro, pasar claro. */
   color?: string
   size?: string
+  /** Palabra de la línea de servicio. Default «Growth» (Efeonce). */
+  word?: 'Growth' | 'Brand' | 'Engine' | 'Voice' | 'Revenue'
+  /** Color de la palabra; por defecto el mismo que `color`. */
+  wordColor?: string
 }
-const { color = '#848484', size = '1.125rem' } = Astro.props
+const { color = '#848484', size = '1.125rem', word = 'Growth', wordColor } = Astro.props
 ---
 
 <span style={`font-family:'Poppins',sans-serif;color:${color};font-size:${size};letter-spacing:-0.01em;white-space:nowrap`}>
   <span style="font-weight:800;font-style:italic">Empower</span>
   <span style="font-weight:800;font-style:normal"> your </span>
-  <span style="font-weight:900;font-style:italic">Growth</span>
+  <span style={`font-weight:900;font-style:italic${wordColor ? `;color:${wordColor}` : ''}`}>{word}</span>
 </span>
