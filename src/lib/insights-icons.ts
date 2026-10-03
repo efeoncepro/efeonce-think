@@ -9,13 +9,16 @@ const ICON_BY_METRIC: Record<string, string> = {
   position: 'busqueda',
   keywords_tracked: 'busqueda',
   keywords_top10: 'objetivo',
+  page_one_keywords: 'objetivo',
   organic_etv: 'medicion',
   share_of_model: 'ia',
+  ai_sessions: 'ia',
   citation_share: 'web',
   overall_score: 'medicion',
   otd: 'reloj',
   ftr: 'checklist',
   rpa: 'reunion',
+  'delivered.completed': 'checklist',
 }
 
 /** Familias con prefijo (`sov.brand`, `sov.competitor.x`). */

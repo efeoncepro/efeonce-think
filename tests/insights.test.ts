@@ -7,8 +7,9 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { resolveInsightFixture } from '../src/lib/insights-fixtures.ts'
 import { acceptSharedEdition, isSupportedModelVersion } from '../src/lib/insights-accept.ts'
-import { buildFindings, chartFactIds, moduleLabelOf, resolveEvidence, splitLead, splitSummary } from '../src/lib/insights-view.ts'
+import { buildFindings, chartFactIds, chartsArriveOrdered, moduleLabelOf, resolveEvidence, splitLead, splitSummary, statCellPlacement, statColumns } from '../src/lib/insights-view.ts'
 import { bulletScale, gaugeAngle, GAUGE_START, GAUGE_SWEEP, heatmapIntensity, niceScale, slices, vennTwo, waffleCells, waterfallBars } from '../src/lib/insights-chart-geometry.ts'
+import { INSIGHTS_COPY, INSIGHTS_COPY_EN } from '../src/lib/insights-copy.ts'
 
 const model = (token: string) => {
   const result = resolveInsightFixture(token)
@@ -55,7 +56,7 @@ test('1.3 — la evidencia resuelve la figura que el modelo declara, con su lect
   for (const chapter of m.chapters) {
     for (const reading of chapter.readings ?? []) {
       const evidence = resolveEvidence(m, { chapterId: chapter.chapterId, chartId: reading.chartId })
-      assert.equal(evidence?.chart.spec.chartId, reading.chartId)
+      if (chapter.charts.some((c) => c.spec.chartId === reading.chartId)) assert.equal(evidence?.chart?.spec.chartId, reading.chartId)
       assert.equal(evidence?.reading, reading)
     }
   }
@@ -127,17 +128,25 @@ test('heatmap: intensidad entre mínimo y máximo; sin dato no es cero', () => {
   assert.equal(heatmapIntensity([5, 5])(5), 100)
 })
 
-test('waffle: siempre 100 celdas y cada parte redondea por restos mayores', () => {
-  for (const values of [[1, 1, 1], [60.1, 39.9], [33, 33, 34], [0, 7]]) {
-    const cells = waffleCells(values)
-    assert.equal(cells.length, 100)
-    assert.equal(cells.filter((c) => c !== null).length, 100)
-    values.forEach((v, i) => {
-      const exact = (v / values.reduce((a, b) => a + b, 0)) * 100
-      const got = cells.filter((c) => c === i).length
-      assert.ok(Math.abs(got - exact) < 1, `${values}: parte ${i} = ${got}, exacto ${exact}`)
-    })
-  }
+test('waffle por unidad: 8 unidades son 8 cuadros, en el orden de las partes', () => {
+  const grid = waffleCells([4, 3, 1])
+  assert.ok(grid)
+  assert.equal(grid.cells.length, 8)
+  assert.deepEqual(grid.cells, [0, 0, 0, 0, 1, 1, 1, 2])
+  assert.equal(grid.columns, 5)
+  assert.equal(grid.rows, 2)
+})
+
+test('waffle por unidad: 5 columnas hasta 30 unidades, 10 hasta 100; más de 100, decimales o vacío no se dibujan', () => {
+  assert.equal(waffleCells([30])?.columns, 5)
+  assert.equal(waffleCells([20, 11])?.columns, 10)
+  assert.equal(waffleCells([41, 17, 6])?.columns, 10)
+  assert.equal(waffleCells([41, 17, 6])?.cells.length, 64)
+  assert.equal(waffleCells([100])?.rows, 10)
+  assert.equal(waffleCells([60, 41]), null)
+  assert.equal(waffleCells([60.1, 39.9]), null)
+  assert.equal(waffleCells([0, 0]), null)
+  assert.equal(waffleCells([5, -1]), null)
 })
 
 test('venn: áreas proporcionales a cada conjunto y a la intersección', () => {
@@ -177,4 +186,81 @@ test('sólo la familia 1.x del modelo llega al render; otro major o un payload i
   } finally {
     console.error = silence
   }
+})
+
+// ── Modelo 1.4: tarjeta de cifra (TASK-1975) ────────────────────────────────
+
+const statsOf = (token: string) => model(token).chapters.flatMap((c) => c.stats ?? [])
+
+test('1.4 — la retícula de cifras: 1 en horizontal; 2 o 4 en dos columnas; 3, 5 o 6 en tres', () => {
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(statColumns), [1, 2, 3, 2, 3, 3, 3])
+  // Filetes: primera columna sin filete izquierdo y última fila sin filete inferior.
+  const six = Array.from({ length: 6 }, (_, i) => statCellPlacement(i, 6))
+  assert.deepEqual(six.map((p) => p.firstColumn), [true, false, false, true, false, false])
+  assert.deepEqual(six.map((p) => p.lastRow), [false, false, false, true, true, true])
+  const five = Array.from({ length: 5 }, (_, i) => statCellPlacement(i, 5))
+  assert.deepEqual(five.map((p) => p.lastRow), [false, false, false, true, true])
+  const four = Array.from({ length: 4 }, (_, i) => statCellPlacement(i, 4))
+  assert.deepEqual(four.map((p) => p.firstColumn), [true, false, true, false])
+  assert.deepEqual(statCellPlacement(0, 1), { column: 0, firstColumn: true, lastRow: true })
+})
+
+test('1.4 — el fixture de cifras trae las seis de visibilidad orgánica, en tres columnas, todas con su hecho', () => {
+  const m = model('fixture-cifras')
+  const seo = m.chapters.find((c) => c.module === 'seo')!.stats![0]!
+  assert.deepEqual(seo.items.map((i) => i.label), ['Clics', 'Impresiones', 'CTR', 'Posición media', 'Primera página', 'Tráfico estimado'])
+  assert.equal(statColumns(seo.items.length), 3)
+  for (const stat of statsOf('fixture-cifras')) for (const item of stat.items) assert.ok(m.facts[item.factId], `${item.itemId} cita ${item.factId}`)
+  const sizes = statsOf('fixture-cifras').map((s) => s.items.length)
+  assert.deepEqual(sizes, [6, 4, 1])
+})
+
+test('1.4 — sin dato: «—», «Sin dato en …» y ninguna píldora ni recorrido; sin anterior: ni variación ni «vs»', () => {
+  const items = statsOf('fixture-cifras').flatMap((s) => s.items)
+  const absent = items.find((i) => i.noData)!
+  assert.equal(absent.display, '—')
+  assert.equal(absent.change, undefined)
+  assert.equal(absent.count, undefined)
+  assert.equal(absent.versus, undefined)
+  assert.match(absent.noData!, /^Sin dato en /)
+  const first = items.find((i) => i.itemId === 'share_of_model')!
+  assert.equal(first.change, undefined)
+  assert.equal(first.versus, undefined)
+  assert.equal(first.count, undefined)
+  // Toda cifra con variación trae su recorrido y su «vs»; el recorrido termina en la cifra impresa.
+  for (const item of items.filter((i) => i.change)) {
+    assert.ok(item.versus && item.count, item.itemId)
+    const printed = Number(item.parts!.value.replace(/\./g, '').replace(',', '.'))
+    assert.equal(item.count!.to, printed, item.itemId)
+  }
+})
+
+test('1.4 — la variación se lee como frase completa (dirección, cifra, «vs …» y si mejora o empeora)', () => {
+  assert.equal(INSIGHTS_COPY.statChangeSentence('down', '17,0 %', 'vs 16.390 en agosto de 2026', 'worse'), 'baja 17,0 %, vs 16.390 en agosto de 2026; empeora')
+  assert.equal(INSIGHTS_COPY.statChangeSentence('up', '1,2 pos.', 'vs #5,7 en agosto de 2026', 'worse'), 'sube 1,2 pos., vs #5,7 en agosto de 2026; empeora')
+  assert.equal(INSIGHTS_COPY.statChangeSentence('up', '23,4 %', undefined, 'better'), 'sube 23,4 %; mejora')
+  assert.equal(INSIGHTS_COPY.statChangeSentence('flat', '0,0 pp', 'vs 18,4 % en agosto de 2026', 'neutral'), 'sin cambio (0,0 pp), vs 18,4 % en agosto de 2026')
+  assert.equal(INSIGHTS_COPY_EN.statChangeSentence('down', '17.0%', 'vs 16,390 in August 2026', 'worse'), 'down 17.0%, vs 16,390 in August 2026; worse')
+  assert.equal(INSIGHTS_COPY.statCount(1), '1 cifra')
+  assert.equal(INSIGHTS_COPY.statCount(6), '6 cifras')
+})
+
+test('1.4 — un hallazgo puede apuntar a la tarjeta de cifra del capítulo', () => {
+  const m = model('fixture-cifras')
+  const evidence = resolveEvidence(m, { chapterId: 'ch-seo', chartId: 'stats.seo' })
+  assert.equal(evidence?.stat?.figureId, 'stats.seo')
+  assert.equal(evidence?.chart, undefined)
+  assert.equal(evidence?.reading?.chartId, 'stats.seo')
+  const waffle = resolveEvidence(m, { chapterId: 'ch-aeo', chartId: 'aeo-cite-waffle' })
+  assert.equal(waffle?.chart?.spec.family, 'waffle')
+  assert.equal(waffle?.stat, undefined)
+})
+
+test('1.4 — los gráficos llegan ordenados: Think respeta el orden desde 1.4 y acepta la familia 1.x', () => {
+  assert.equal(chartsArriveOrdered('1.4'), true)
+  assert.equal(chartsArriveOrdered('1.12'), true)
+  assert.equal(chartsArriveOrdered('1.3'), false)
+  assert.equal(chartsArriveOrdered(undefined), false)
+  const ok = resolveInsightFixture('fixture-cifras')
+  assert.equal(acceptSharedEdition((ok as Extract<typeof ok, { status: 'ok' }>).edition).status, 'ok')
 })

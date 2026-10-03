@@ -8,8 +8,8 @@ import { acceptSharedEdition } from './insights-accept'
  * render tonto: no calcula, no compara, no interpola. El fetch es SERVER-SIDE y SIN CACHE (revocar debe revocar en la
  * lectura siguiente, a diferencia del Grader); el token nunca se escribe en logs, HTML ni analytics.
  *
- * Los tipos son copia del contrato de Greenhouse (`src/lib/efeonce-insights/contracts/web-model.ts`, modelVersion 1.3).
- * Los campos marcados «v2» (editorial de TASK-1888) y «1.1» son OPCIONALES: un modelo 1.0 se dibuja igual.
+ * Los tipos son copia del contrato de Greenhouse (`src/lib/efeonce-insights/contracts/web-model.ts`, modelVersion 1.4).
+ * Los campos marcados «v2» (editorial de TASK-1888), «1.1» … «1.4» son OPCIONALES: un modelo 1.0 se dibuja igual.
  */
 
 export type InsightModule = 'seo' | 'aeo' | 'ico'
@@ -86,6 +86,8 @@ export interface ChartSpecV1 {
   references: Array<{ label: string; factId: string | null; value: number | null }>
   /** v2 — obligatorio en las familias de datos propios; ausente en las de series. */
   data?: ChartFamilyDataV1
+  /** 1.4 — pregunta que responde la figura (criterio de selección §5); los gráficos llegan ordenados por ella. */
+  question?: string
 }
 
 /** v2 — lectura de una figura: cifra principal, conclusión, «Lo que significa» y «Próximo paso». */
@@ -102,6 +104,41 @@ export interface InsightWebChartDerivedV1 {
   funnelStepRates?: Array<{ stageId: string; display: string | null }>
 }
 
+/**
+ * 1.4 (TASK-1974) — una cifra de la tarjeta, ya resuelta por Greenhouse (`presentation/stat-card.ts`): Think imprime
+ * estos textos tal cual; nunca calcula la variación, su tono, el período ni parte la cifra.
+ */
+export interface InsightWebStatItemV1 {
+  itemId: string
+  label: string
+  factId: string
+  /** Valor formateado («13.606», «1,8 %»); «—» sin dato. */
+  display: string
+  estimated: boolean
+  direction: 'higher_is_better' | 'lower_is_better' | null
+  /** Variación SIN signo + dirección del triángulo + tono semántico (mejor, peor, neutro). */
+  change?: { display: string; direction: 'up' | 'down' | 'flat'; tone: 'better' | 'worse' | 'neutral' }
+  /** «vs 16.390 en agosto de 2026». Ausente sin comparable. */
+  versus?: string
+  /** «Sin dato en septiembre de 2026». Sólo sin valor. */
+  noData?: string
+  /** «Menor es mejor». Sólo cuando subir es malo. */
+  lowerIsBetter?: string
+  /** Piezas de `display` para dibujar la cifra grande y su unidad pequeña. */
+  parts?: { prefix?: string; value: string; suffix?: string; unitLabel?: string }
+  /** TASK-1975 — recorrido del valor anterior al actual en el Live; ausente sin comparable o sin dato. */
+  count?: { from: number; to: number; decimals: number }
+}
+
+/** 1.4 (TASK-1974) — tarjeta de cifra («¿cuánto es y cómo cambió?»). Abre el capítulo, antes de los gráficos. */
+export interface InsightWebStatFigureV1 {
+  figureId: string
+  question: 'value_change'
+  title: string
+  items: InsightWebStatItemV1[]
+  note?: InsightWebClaimV1
+}
+
 export interface InsightWebChapterV1 {
   /** 1.2 — marca de producto que encabeza el capítulo (lockup oficial `/branding/products/<clave>-lockup-*.svg`). */
   productMark?: { key: string; label: string }
@@ -111,8 +148,11 @@ export interface InsightWebChapterV1 {
   module: InsightModule
   title: string
   claims: InsightWebClaimV1[]
+  /** 1.4 — tarjetas de cifra; van ANTES de los gráficos. Un consumer anterior las ignora. */
+  stats?: InsightWebStatFigureV1[]
+  /** 1.4 — llegan ordenados por su pregunta (`spec.question`): Think no los reordena. */
   charts: Array<{ spec: ChartSpecV1; table: { columns: string[]; rows: Array<Array<string | null>> }; derived?: InsightWebChartDerivedV1; unitLabel?: string; note?: string }>
-  tables: Array<{ tableId: string; title: string; columns: string[]; rows: Array<Array<string | null>> }>
+  tables: Array<{ tableId: string; title: string; columns: string[]; rows: Array<Array<string | null>>; lead?: string }>
   limits: string[]
   /** v2 */
   opening?: InsightWebClaimV1

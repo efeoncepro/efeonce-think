@@ -1,0 +1,146 @@
+---
+/**
+ * Tarjeta de cifra del informe de Insights (modelo 1.4, TASK-1975): la figura de «¿cuánto es y cómo cambió?», que abre
+ * el capítulo antes de los gráficos. Diseño aprobado en el canvas «TASK-1975 · Tarjeta de cifra» (tableros
+ * Think-Cifras-Desktop y Think-Cifras-Mobile).
+ *
+ * Render tonto de `InsightWebStatFigureV1`: nombre, cifra y sus piezas, variación (cifra sin signo, dirección y tono),
+ * «vs …», «Sin dato en …» y «Menor es mejor» llegan escritos por Greenhouse (`presentation/stat-card.ts`). Think sólo
+ * decide la retícula (1 cifra en horizontal; 2 o 4 en dos columnas; 3, 5 o 6 en tres; una columna a 390 px) y el
+ * tratamiento por fondo: sobre papel, píldora teñida con la cifra en el tono (variante A); sobre navy, el tono sólo en
+ * el triángulo y la cifra en tinta suave (variante C).
+ *
+ * Semántica `<dl>`: el nombre es el `<dt>`; valor y variación, los `<dd>`. La variación se lee como una frase completa
+ * («baja 17,0 %, vs 16.390 en agosto de 2026; empeora»); la cifra que corre en el motion es `aria-hidden` y el lector
+ * de pantalla recibe siempre el valor final.
+ *
+ * Motion (`data-animate`, `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`): lo arma
+ * `src/scripts/insights-report.ts` al entrar la retícula en pantalla. Sin JS, con movimiento reducido o al imprimir, el
+ * HTML ya es el estado final.
+ */
+import FactMark from './FactMark.astro'
+import EngineMark from '@/components/EngineMark.astro'
+import type { InsightWebFactV1, InsightWebReadingV1, InsightWebStatFigureV1 } from '@lib/insights'
+import { INSIGHTS_COPY, type InsightsCopy } from '@lib/insights-copy'
+import { insightIconFor } from '@lib/insights-icons'
+import { variation } from '@lib/insights-tokens'
+import { provenanceOf, statCellPlacement, statColumns } from '@lib/insights-view'
+
+interface Props {
+  stat: InsightWebStatFigureV1
+  facts: Record<string, InsightWebFactV1>
+  uid: string
+  copy?: InsightsCopy
+  /** Lectura de la figura (`chapter.readings` con `chartId === stat.figureId`): conclusión y, si la trae, su bajada. */
+  reading?: InsightWebReadingV1
+  theme?: 'light' | 'dark'
+  /** Dentro de un hallazgo: sin encabezado propio (el hallazgo ya muestra la conclusión) y sin motion. */
+  compact?: boolean
+  /** Recorrido de las cifras al entrar en pantalla (sólo en la escena del capítulo). */
+  animate?: boolean
+}
+
+const { stat, facts, uid, copy, reading, theme = 'light', compact = false, animate = false } = Astro.props
+const C = copy ?? INSIGHTS_COPY
+const dark = theme === 'dark'
+const items = stat.items
+const columns = statColumns(items.length)
+const prov = provenanceOf(facts, items.map((item) => item.factId))
+const iconOf = (factId: string) => {
+  const icon = insightIconFor(facts[factId]?.metricId)
+  return icon && dark ? icon.replace(/\.svg$/, '-dark.svg') : icon
+}
+const engineOf = (factId: string) => {
+  const fact = facts[factId]
+  return fact?.channelId && fact.module === 'aeo' ? fact.channelId : null
+}
+const conclusion = compact ? undefined : reading?.conclusion?.text
+const lead = compact ? undefined : reading?.meaning?.text
+---
+
+<div class:list={['ins-stats', `ins-stats--${theme}`, { 'ins-stats--compact': compact }]} data-capture={compact ? undefined : `stats-${stat.figureId}`}>
+  {!compact && (
+    <header class="ins-stats__head" data-reveal>
+      <span class="ins-label">{C.statEyebrow}</span>
+      {conclusion && <h3 class="ins-h3 ins-stats__conclusion">{conclusion}</h3>}
+      {lead && <p class="ins-lead">{lead}</p>}
+    </header>
+  )}
+
+  <section class="ins-stats__panel" aria-labelledby={`${uid}-title`} data-reveal={compact ? undefined : ''}>
+    <div class="ins-stats__top">
+      <span class="ins-stats__title" id={`${uid}-title`}>{stat.title}</span>
+      <span class="ins-stats__count ins-num">{C.statCount(items.length)}</span>
+    </div>
+
+    <dl class="ins-stats__grid" data-cols={columns} data-stat-grid={animate ? '' : undefined}>
+      {items.map((item, i) => {
+        const place = statCellPlacement(i, items.length)
+        const parts = item.parts ?? { value: item.display }
+        const absent = !!item.noData
+        const icon = iconOf(item.factId)
+        const engine = engineOf(item.factId)
+        return (
+          <div class="ins-stat" style={`--i:${i}`} data-first-col={place.firstColumn ? '' : undefined} data-last-row={place.lastRow ? '' : undefined} data-count={animate && item.count ? '' : undefined}>
+            <dt class="ins-stat__name">
+              {engine ? <EngineMark provider={engine} label={item.label} size={18} /> : icon && <img class="ins-stat__icon" src={icon} alt="" width="18" height="18" />}
+              <span>{item.label}</span>
+              {item.estimated && <span class="ins-stat__chip">{C.estimated}</span>}
+            </dt>
+            <dd class="ins-stat__value">
+              <span class="ins-stat__figure ins-num" aria-hidden="true">
+                {parts.prefix && <span class="ins-stat__pre">{parts.prefix}</span>}
+                <span class="ins-stat__run" data-from={animate && item.count ? item.count.from : undefined} data-to={animate && item.count ? item.count.to : undefined} data-decimals={animate && item.count ? item.count.decimals : undefined}>{parts.value}</span>
+                {parts.suffix && <span class="ins-stat__suf">{parts.suffix}</span>}
+                {parts.unitLabel && <span class="ins-stat__suf">{parts.unitLabel}</span>}
+              </span>
+              <span class="ins-visually-hidden">{absent ? C.absent : item.display}</span>
+            </dd>
+            {item.change ? (
+              <dd class="ins-stat__change">
+                <span class="ins-stat__delta ins-num" data-tone={item.change.tone} aria-hidden="true">
+                  <span class="ins-stat__tri" data-dir={item.change.direction}>
+                    {item.change.direction === 'flat' ? (
+                      <svg width="8" height="8" viewBox="0 0 9 9" aria-hidden="true"><rect x="1" y="1" width="7" height="7" rx="1.8" fill="currentColor" /></svg>
+                    ) : (
+                      <svg width="10" height="9" viewBox={variation.shape.viewBox} aria-hidden="true" overflow="visible">
+                        <path d={variation.shape[item.change.direction]} fill="currentColor" stroke="currentColor" stroke-width={variation.shape.strokePx} stroke-linejoin="round" />
+                      </svg>
+                    )}
+                  </span>
+                  <span class="ins-stat__delta-text">{item.change.display}</span>
+                </span>
+                {item.versus && <span class="ins-stat__vs ins-num" aria-hidden="true">{item.versus}</span>}
+                <span class="ins-visually-hidden">{C.statChangeSentence(item.change.direction, item.change.display, item.versus, item.change.tone)}</span>
+              </dd>
+            ) : absent ? (
+              <dd class="ins-stat__change ins-stat__nodata">{item.noData}</dd>
+            ) : item.versus ? (
+              <dd class="ins-stat__change"><span class="ins-stat__vs ins-num">{item.versus}</span></dd>
+            ) : null}
+            {item.lowerIsBetter && <dd class="ins-stat__lower"><span aria-hidden="true">↓ </span>{item.lowerIsBetter}</dd>}
+          </div>
+        )
+      })}
+    </dl>
+
+    {(stat.note || prov.sources) && (
+      <div class="ins-stats__foot">
+        {stat.note && (
+          <p class="ins-stats__note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10" /><path d="M7 16v-9h9" /></svg>
+            {stat.note.text}
+          </p>
+        )}
+        {!compact && prov.sources && (
+          <div class="ins-provrow">
+            {items.length > 1 && <span><b>{C.provenanceUnit}</b>{C.statUnitEach}</span>}
+            <span><b>{C.provenanceSource}</b>{prov.sources}</span>
+            {prov.asOf && <span class="ins-num"><b>{C.asOf}</b>{prov.asOf}</span>}
+            <FactMark copy={C} observation={prov.estimated ? 'estimated' : 'observed'} />
+          </div>
+        )}
+      </div>
+    )}
+  </section>
+</div>

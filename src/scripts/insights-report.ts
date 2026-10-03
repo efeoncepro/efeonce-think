@@ -11,6 +11,8 @@
  * - Filtros: la barra deja sólo lo del módulo elegido.
  * - Escenas: el gráfico principal queda fijo y cambia de estado con cada paso del relato.
  * - Cifras: cuentan hasta su valor y terminan EXACTAMENTE en el `display` del modelo.
+ * - Tarjeta de cifra (1.4): cada cifra recorre su cambio, del valor anterior al actual (`count` del modelo), y la
+ *   variación toma su tono al llegar. Un solo `requestAnimationFrame` por retícula, una vez por carga.
  */
 
 type Win = Window & { __insMounted?: boolean }
@@ -117,20 +119,88 @@ function countUp(el: HTMLElement) {
   requestAnimationFrame(frame)
 }
 
+// ── Tarjeta de cifra (TASK-1975) ────────────────────────────────────────────
+// Contrato: docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md (greenhouse-eo). Los tiempos son los de
+// `statMotion` (insights-tokens.ts) y llegan como variables CSS en `.ins-page`; las piezas que no cuentan (nombre,
+// triángulo, tono, «Menor es mejor») las mueve el CSS con esos mismos tiempos.
+const STAT_EASE = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3.2)
+const msVar = (el: Element, name: string, fallback: number) => {
+  const value = parseFloat(getComputedStyle(el).getPropertyValue(name))
+  return Number.isFinite(value) ? value : fallback
+}
+
+/** Deja cada cifra en su texto final (el `display` del modelo, partido en piezas por Greenhouse). */
+function finishStatGrid(grid: HTMLElement) {
+  grid.querySelectorAll<HTMLElement>('.ins-stat__run[data-final]').forEach((run) => {
+    run.textContent = run.dataset.final ?? run.textContent
+  })
+  grid.querySelectorAll<HTMLElement>('.ins-stat__figure').forEach((figure) => (figure.style.minWidth = ''))
+  grid.dataset.ran = 'done'
+}
+
+function runStatGrid(grid: HTMLElement) {
+  if (grid.dataset.ran) return
+  grid.dataset.ran = 'running'
+  const lang = document.documentElement.lang || 'es-CL'
+  const stagger = msVar(grid, '--ins-stat-stagger', 70)
+  const start = msVar(grid, '--ins-stat-count-start', 150)
+  const end = msVar(grid, '--ins-stat-change-start', 1250)
+  const runs = [...grid.querySelectorAll<HTMLElement>('.ins-stat')].flatMap((cell, i) => {
+    const run = cell.querySelector<HTMLElement>('.ins-stat__run[data-from]')
+    const figure = cell.querySelector<HTMLElement>('.ins-stat__figure')
+    if (!run || !figure) return []
+    const from = Number(run.dataset.from)
+    const to = Number(run.dataset.to)
+    const decimals = Number(run.dataset.decimals)
+    if (![from, to, decimals].every(Number.isFinite)) return []
+    run.dataset.final = run.textContent ?? ''
+    // La cifra conserva su ancho final durante el recorrido (cifras tabulares + ancho mínimo medido).
+    figure.style.minWidth = `${figure.getBoundingClientRect().width}px`
+    const format = new Intl.NumberFormat(lang, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+    run.textContent = format.format(from)
+    return [{ run, from, to, format, delay: i * stagger }]
+  })
+  grid.classList.add('is-in')
+  if (runs.length === 0) {
+    grid.dataset.ran = 'done'
+    return
+  }
+  const total = end + runs[runs.length - 1]!.delay
+  const t0 = performance.now()
+  const frame = (now: number) => {
+    const elapsed = now - t0
+    for (const r of runs) {
+      const t = (elapsed - r.delay - start) / (end - start)
+      if (t >= 1) r.run.textContent = r.run.dataset.final ?? ''
+      else r.run.textContent = r.format.format(r.from + (r.to - r.from) * STAT_EASE(t))
+    }
+    if (elapsed < total) requestAnimationFrame(frame)
+    else finishStatGrid(grid)
+  }
+  requestAnimationFrame(frame)
+}
+
+function mountStatGrids() {
+  const grids = [...document.querySelectorAll<HTMLElement>('[data-stat-grid]')]
+  // Imprimir a mitad del recorrido deja el estado final, nunca una cifra intermedia.
+  window.addEventListener('beforeprint', () => grids.forEach((grid) => { grid.classList.add('is-in'); finishStatGrid(grid) }))
+}
+
 function mountReveals() {
   const io = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue
         const el = entry.target as HTMLElement
-        el.classList.add('is-in')
+        if (el.matches('[data-stat-grid]')) runStatGrid(el)
+        else el.classList.add('is-in')
         if (el.dataset.countup !== undefined) countUp(el)
         io.unobserve(el)
       }
     },
     { rootMargin: '0px 0px -10% 0px', threshold: 0.12 },
   )
-  document.querySelectorAll<HTMLElement>('[data-reveal], [data-stagger], [data-chart], [data-countup]').forEach((el) => {
+  document.querySelectorAll<HTMLElement>('[data-reveal], [data-stagger], [data-chart], [data-countup], [data-stat-grid]').forEach((el) => {
     // Lo que está dentro de un hallazgo cerrado o de una escena se arma al abrirlo o al llegar al paso.
     if (el.closest('.ins-tile__evidence') || (el.matches('[data-chart]') && el.closest('[data-story]'))) return
     io.observe(el)
@@ -408,6 +478,7 @@ export function mountInsightsReport() {
   mountCopyLinks()
   mountPresentation()
   if (animate) {
+    mountStatGrids()
     mountReveals()
     mountStories()
   }

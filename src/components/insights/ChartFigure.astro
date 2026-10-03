@@ -4,7 +4,7 @@
  *
  * Dibuja las 15 familias de Insights (TASK-1845 + TASK-1888) en el servidor, sin librería de gráficos:
  * series → barras, agrupadas, apiladas, línea, torta, dona y dispersión; datos propios → bullet, medidor, cascada,
- * embudo, heatmap, waffle, Venn de dos conjuntos y UpSet. Geometría en `insights-chart-geometry.ts` (mismas
+ * embudo, heatmap, waffle (un cuadro por unidad), Venn de dos conjuntos y UpSet. Geometría en `insights-chart-geometry.ts` (mismas
  * convenciones que los PDF); toda cifra impresa sale de `fact.display`.
  *
  * - Cada grupo de barras es un botón con su detalle al pasar o enfocar.
@@ -167,10 +167,13 @@ const heatmap = data?.kind === 'heatmap'
     })()
   : null
 
+// Waffle por unidad (TASK-1975): un cuadro por unidad. Una parte sin dato o un conteo que no se puede contar en
+// cuadros deja la figura en su tabla equivalente (nunca un cuadro inventado).
 const waffle = data?.kind === 'waffle'
   ? (() => {
-      const values = data.parts.map((p) => num(p.factId) ?? 0)
-      return { parts: data.parts.map((p, i) => ({ ...p, display: disp(p.factId), i })), cells: waffleCells(values), totalDisplay: data.totalFactId ? disp(data.totalFactId) : null }
+      const values = data.parts.map((p) => num(p.factId))
+      const grid = values.every((v): v is number => v !== null) ? waffleCells(values) : null
+      return grid ? { parts: data.parts.map((p, i) => ({ ...p, display: disp(p.factId), i })), ...grid, totalDisplay: data.totalFactId ? disp(data.totalFactId) : null } : null
     })()
   : null
 
@@ -406,11 +409,14 @@ const legend = SERIES_FAMILIES.includes(family) && spec.series.length > 1
       </div>
     )}
 
-    {/* Waffle: 100 celdas */}
+    {/* Waffle: un cuadro por unidad, 5 columnas hasta 30 unidades y 10 hasta 100 */}
     {waffle && (
-      <div class="ins-waffle" role="img" aria-label={`${spec.title}. ${waffle.parts.map((p) => `${p.label} ${p.display}`).join(', ')}`}>
-        {waffle.cells.map((part, i) => <span class="ins-waffle__cell" style={`--c:${part === null ? 'transparent' : color(part)};--d:${i * 6}ms`} data-empty={part === null ? '' : undefined} />)}
-      </div>
+      <>
+        <div class="ins-waffle" style={`--cols:${waffle.columns}`} data-units={waffle.cells.length} role="img" aria-label={`${spec.title}. ${waffle.parts.map((p) => `${p.label} ${p.display}`).join(', ')}`}>
+          {waffle.cells.map((part, i) => <span class="ins-waffle__cell" style={`--c:${color(part)};--d:${i * 12}ms`} />)}
+        </div>
+        <p class="ins-note">{C.waffleUnitNote(waffle.totalDisplay)}</p>
+      </>
     )}
 
     {/* Venn de dos conjuntos, áreas proporcionales */}

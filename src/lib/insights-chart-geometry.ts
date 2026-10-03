@@ -3,7 +3,7 @@
  *
  * Mismas convenciones que `src/lib/artifact-composer/chart-geometry.ts` de greenhouse-eo (la fuente de los PDF):
  * barras con origen cero, pie/donut hasta 3 partes, medidor de 270° abierto, heatmap por INTENSIDAD (luminancia, nunca
- * tono), waffle de 100 celdas por restos mayores, Venn con áreas proporcionales. Sólo produce POSICIONES y TAMAÑOS: toda
+ * tono), waffle de un cuadro por unidad, Venn con áreas proporcionales. Sólo produce POSICIONES y TAMAÑOS: toda
  * cifra impresa sigue saliendo de `display` del modelo.
  */
 
@@ -98,25 +98,22 @@ export const heatmapIntensity = (values: Array<number | null>) => {
 }
 
 /**
- * Waffle: 100 celdas repartidas por restos mayores sobre la SUMA de las partes (la suma siempre da 100), igual que
- * `waffleGeometry` de los PDF. El total declarado no entra: Greenhouse rechaza el plan si las partes no lo suman
- * (`waffle_parts_sum_total`), así que usarlo acá sólo podría desalinear la web del PDF.
+ * Waffle por unidad (TASK-1975): un cuadro es UNA unidad — 8 respuestas son 8 cuadros, no cien repartidos por
+ * participación. Misma regla que `waffleUnitGeometry` de los PDF (greenhouse-eo `artifact-composer/chart-geometry.ts`):
+ * hasta 30 unidades en 5 columnas, de 31 a 100 en 10; un conteo no entero o negativo, un total vacío o de más de cien
+ * unidades no se dibuja (null: la figura queda en su tabla equivalente). Cada celda lleva el índice de su parte, en el
+ * orden de las partes y llenando fila por fila.
  */
-export const WAFFLE_CELLS = 100
-export const waffleCells = (values: number[]) => {
-  const sum = values.reduce((a, b) => a + b, 0)
-  const exact = values.map((v, i) => ({ i, exact: sum ? (v / sum) * WAFFLE_CELLS : 0 }))
-  const floors = exact.map((e) => ({ ...e, cells: Math.floor(e.exact), rest: e.exact - Math.floor(e.exact) }))
-  let remaining = WAFFLE_CELLS - floors.reduce((a, f) => a + f.cells, 0)
-  for (const f of [...floors].sort((a, b) => b.rest - a.rest)) {
-    if (remaining <= 0) break
-    f.cells += 1
-    remaining -= 1
-  }
-  const cells: Array<number | null> = []
-  for (const f of floors) for (let k = 0; k < f.cells; k += 1) cells.push(f.i)
-  while (cells.length < WAFFLE_CELLS) cells.push(null)
-  return cells.slice(0, WAFFLE_CELLS)
+export const WAFFLE_MAX_UNITS = 100
+export const WAFFLE_NARROW_MAX_UNITS = 30
+export const waffleCells = (values: number[]): { columns: number; rows: number; cells: number[] } | null => {
+  if (values.some((v) => !Number.isInteger(v) || v < 0)) return null
+  const total = values.reduce((a, b) => a + b, 0)
+  if (total === 0 || total > WAFFLE_MAX_UNITS) return null
+  const columns = total <= WAFFLE_NARROW_MAX_UNITS ? 5 : 10
+  const cells: number[] = []
+  values.forEach((v, i) => { for (let k = 0; k < v; k += 1) cells.push(i) })
+  return { columns, rows: Math.ceil(total / columns), cells }
 }
 
 /** Venn de dos conjuntos con áreas proporcionales (distancia entre centros por bisección del área de la lente). */

@@ -114,7 +114,7 @@ Proyecto `efeonce-think` (`prj_F4gvS8jmWjvdJ8cTwM6k60R1XydV`). Gobernable desde 
 
 ## Efeonce Insights — informe compartido (`/insights/r/<token>`)
 
-Render tonto de `InsightWebModelV1` (modelVersion `1.x`; `1.1` es aditivo) que Greenhouse sirve en
+Render tonto de `InsightWebModelV1` (modelVersion `1.x`, hoy `1.4`; cada menor es aditivo) que Greenhouse sirve en
 `GET /api/public/insights/shared/{token}`. Owner: `TASK-1875` (greenhouse-eo). Resolución por request, sin cache:
 revocar en Greenhouse revoca en la lectura siguiente. Estados `404`/`410`/`429`/`502` con `StatusScreen`.
 
@@ -127,7 +127,11 @@ revocar en Greenhouse revoca en la lectura siguiente. Estados `404`/`410`/`429`/
   `X-Robots-Tag: noindex, nofollow`, `Referrer-Policy: no-referrer`.
 - Assets: `public/branding/insights/*` (de `@efeoncepro/axis-brand-assets` 0.4.0); OG genérica sin datos del informe,
   generada con `node scripts/build-insights-og.mjs`.
-- Fixtures sólo en `astro dev` con tokens `fixture-*` (`src/lib/insights-fixtures.ts`).
+- Fixtures sólo en `astro dev` con tokens `fixture-*` (`src/lib/insights-fixtures.ts`); `fixture-cifras` es el modelo 1.4.
+- Modelo 1.4 (TASK-1975): la tarjeta de cifra (`StatCard.astro`) abre el capítulo antes de los gráficos, que Think
+  dibuja en el orden en que llegan. Retícula 1 / 2 / 3 columnas según la cantidad (una a 390 px), variación con
+  triángulo redondeado (píldora teñida sobre papel; sólo el triángulo sobre navy) y el recorrido aprobado de la cifra
+  (`count` del modelo). El waffle dibuja un cuadro por unidad (5 columnas hasta 30, 10 hasta 100; más, sólo tabla).
 
 Verificación (con `pnpm dev --port 4331` corriendo):
 

@@ -7,12 +7,13 @@
  * figuras, las afirmaciones, los hechos sueltos y los límites siguen debajo, compactos. Sin JS se lee de corrido.
  */
 import ChartFigure from './ChartFigure.astro'
+import StatCard from './StatCard.astro'
 import EngineMark from '@/components/EngineMark.astro'
 import { insightIconFor } from '@lib/insights-icons'
 import FactMark from './FactMark.astro'
 import type { InsightWebChapterV1, InsightWebFactV1 } from '@lib/insights'
 import { INSIGHTS_COPY, type InsightsCopy } from '@lib/insights-copy'
-import { chartFactIds } from '@lib/insights-view'
+import { chartFactIds, provenanceOf } from '@lib/insights-view'
 
 interface Props {
   chapter: InsightWebChapterV1
@@ -20,14 +21,18 @@ interface Props {
   facts: Record<string, InsightWebFactV1>
   locale: string
   copy?: InsightsCopy
+  /** 1.4 — los gráficos llegan ordenados por su pregunta: la escena narra el primero, no el primero con lectura. */
+  ordered?: boolean
 }
 
-const { chapter, index, facts, locale, copy } = Astro.props
+const { chapter, index, facts, locale, copy, ordered = false } = Astro.props
 const C = copy ?? INSIGHTS_COPY
 const number = String(index).padStart(2, '0')
-const shortDate = (iso: string | null) => (iso ? iso.slice(0, 10).split('-').reverse().join('-') : null)
+// 1.4 — tarjetas de cifra: abren el capítulo, antes de los gráficos (cifras → metas → evolución → explicación →
+// composición → comparación). Su lectura es la de su `figureId`.
+const stats = chapter.stats ?? []
 
-const mainIndex = chapter.charts.findIndex((chart) => chapter.readings?.some((r) => r.chartId === chart.spec.chartId))
+const mainIndex = ordered ? 0 : chapter.charts.findIndex((chart) => chapter.readings?.some((r) => r.chartId === chart.spec.chartId))
 const main = mainIndex >= 0 ? chapter.charts[mainIndex] : chapter.charts[0]
 const mainReading = main ? chapter.readings?.find((r) => r.chartId === main.spec.chartId) : undefined
 const others = chapter.charts.filter((chart) => chart !== main)
@@ -40,20 +45,14 @@ const steps = [
   mainReading?.nextStep && { kind: 'next' as const, state: 3 },
 ].filter(Boolean) as Array<{ kind: 'key' | 'conclusion' | 'meaning' | 'next'; state: number }>
 
-const provenance = (factIds: string[]) => {
-  const list = factIds.map((id) => facts[id]).filter(Boolean)
-  return {
-    sources: [...new Set(list.map((f) => f.source))].join(' y '),
-    // 1.2 — el corte legible que manda Greenhouse («20 sept 2026»); el formato propio queda sólo para modelos previos.
-    asOf: (() => {
-      const latest = [...list].filter((f) => f.asOf).sort((a, b) => (a.asOf! < b.asOf! ? -1 : 1)).at(-1)
-      return latest ? latest.asOfLabel ?? shortDate(latest.asOf) : null
-    })(),
-    estimated: list.some((f) => f.observation === 'estimated'),
-  }
-}
+const provenance = (factIds: string[]) => provenanceOf(facts, factIds)
 
-const shownFacts = new Set([...chapter.charts.flatMap((c) => chartFactIds(c.spec)), mainReading?.keyFigure?.factId])
+const shownFacts = new Set([
+  ...chapter.charts.flatMap((c) => chartFactIds(c.spec)),
+  mainReading?.keyFigure?.factId,
+  // Lo que la tarjeta de cifra ya muestra (con su período anterior) no se repite como cifra suelta.
+  ...stats.flatMap((st) => st.items.flatMap((item) => [item.factId, facts[item.factId]?.comparisonFactId])),
+])
 // 1.2 — la cifra del período anterior acompaña a la actual; nunca va como tarjeta suelta con la misma etiqueta.
 const comparisonIds = new Set(Object.values(facts).map((f) => f.comparisonFactId).filter((id): id is string => !!id))
 // 1.2 — con roles, se DICEN los hallazgos; el respaldo queda sólo como cifra. Sin roles (modelos previos), como antes.
@@ -63,7 +62,7 @@ const spokenClaims = hasRoles
   ? chapter.claims.filter((claim) => claim.role !== 'backing' && claim.factIds.some((id) => !shownFacts.has(id) && !comparisonIds.has(id)))
   : chapter.claims
 const looseFacts = [...new Set(chapter.claims.flatMap((claim) => claim.factIds))].filter((id) => !shownFacts.has(id) && !comparisonIds.has(id)).map((id) => facts[id]).filter(Boolean)
-const isEmpty = chapter.charts.length === 0 && chapter.claims.length === 0 && chapter.tables.length === 0
+const isEmpty = chapter.charts.length === 0 && stats.length === 0 && chapter.claims.length === 0 && chapter.tables.length === 0
 const mainProv = main ? provenance(chartFactIds(main.spec)) : null
 ---
 
@@ -83,6 +82,10 @@ const mainProv = main ? provenance(chartFactIds(main.spec)) : null
   </header>
 
   {isEmpty && <div class="ins-empty" data-reveal><p>{C.chapterEmpty}</p></div>}
+
+  {stats.map((stat) => (
+    <StatCard stat={stat} facts={facts} copy={C} uid={`st-${chapter.chapterId}-${stat.figureId}`.replace(/[^\w-]/g, '-')} reading={chapter.readings?.find((r) => r.chartId === stat.figureId)} animate />
+  ))}
 
   {main && (
     <div class:list={['ins-story', { 'ins-story--plain': steps.length === 0 }]} data-story>

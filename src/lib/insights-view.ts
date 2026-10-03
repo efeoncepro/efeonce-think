@@ -3,11 +3,13 @@
  * crea una cifra, una comparación ni un texto. Una función pura para que el layout nativo web (hallazgos que se
  * expanden, filtros por módulo, escenas por capítulo) no meta lógica en el template.
  */
-import type { ChartSpecV1, InsightModule, InsightWebChapterV1, InsightWebClaimV1, InsightWebFactV1, InsightWebModelV1, InsightWebReadingV1 } from './insights'
+import type { ChartSpecV1, InsightModule, InsightWebChapterV1, InsightWebClaimV1, InsightWebFactV1, InsightWebModelV1, InsightWebReadingV1, InsightWebStatFigureV1 } from './insights'
 
+/** La figura que respalda un hallazgo: un gráfico o, desde 1.4, una tarjeta de cifra. Siempre una de las dos. */
 export interface FindingEvidence {
   chapterId: string
-  chart: InsightWebChapterV1['charts'][number]
+  chart?: InsightWebChapterV1['charts'][number]
+  stat?: InsightWebStatFigureV1
   reading?: InsightWebReadingV1
 }
 
@@ -35,9 +37,49 @@ export interface ModuleView {
 export const resolveEvidence = (model: InsightWebModelV1, ref: InsightWebClaimV1['evidence']): FindingEvidence | undefined => {
   if (!ref) return undefined
   const chapter = model.chapters.find((c) => c.chapterId === ref.chapterId)
-  const chart = chapter?.charts.find((c) => c.spec.chartId === ref.chartId)
-  if (!chapter || !chart) return undefined
-  return { chapterId: chapter.chapterId, chart, reading: chapter.readings?.find((r) => r.chartId === ref.chartId) }
+  if (!chapter) return undefined
+  const reading = chapter.readings?.find((r) => r.chartId === ref.chartId)
+  const chart = chapter.charts.find((c) => c.spec.chartId === ref.chartId)
+  if (chart) return { chapterId: chapter.chapterId, chart, reading }
+  // 1.4 — la figura de un hallazgo puede ser la tarjeta de cifra del capítulo (`stat.figureId`).
+  const stat = chapter.stats?.find((st) => st.figureId === ref.chartId)
+  return stat ? { chapterId: chapter.chapterId, stat, reading } : undefined
+}
+
+/** Menor de la versión del modelo («1.4» → 4); 0 si no se lee. */
+export const modelMinor = (version: string | undefined): number => {
+  const match = /^1\.(\d+)$/.exec(version ?? '')
+  return match ? Number(match[1]) : 0
+}
+
+/**
+ * 1.4 — desde esta versión los gráficos llegan ordenados por su pregunta (cifras → metas → evolución → explicación →
+ * composición → comparación): Think respeta ese orden y no sube al frente el que tenga lectura.
+ */
+export const chartsArriveOrdered = (version: string | undefined): boolean => modelMinor(version) >= 4
+
+/**
+ * Columnas de la retícula de cifras: 1 cifra en horizontal; 2 o 4 en dos columnas; 3, 5 o 6 (y más) en tres. Es la
+ * misma regla del A4 y del deck (`efeonceInsights.statCard.columns`). A 390 px el CSS la deja en una columna.
+ */
+export const statColumns = (count: number): number => (count <= 1 ? 1 : count === 2 || count === 4 ? 2 : 3)
+
+/** Posición de cada celda en la retícula (para los filetes): primera columna y última fila. */
+export const statCellPlacement = (index: number, count: number) => {
+  const columns = statColumns(count)
+  const rows = Math.ceil(count / columns)
+  return { column: index % columns, firstColumn: index % columns === 0, lastRow: Math.floor(index / columns) === rows - 1 }
+}
+
+/** Procedencia de un grupo de hechos: fuentes únicas, el corte más reciente (legible desde 1.2) y si alguno es estimado. */
+export const provenanceOf = (facts: Record<string, InsightWebFactV1>, factIds: string[]) => {
+  const list = factIds.map((id) => facts[id]).filter(Boolean)
+  const latest = [...list].filter((f) => f.asOf).sort((a, b) => (a.asOf! < b.asOf! ? -1 : 1)).at(-1)
+  return {
+    sources: [...new Set(list.map((f) => f.source))].join(' y '),
+    asOf: latest ? latest.asOfLabel ?? latest.asOf!.slice(0, 10).split('-').reverse().join('-') : null,
+    estimated: list.some((f) => f.observation === 'estimated'),
+  }
 }
 
 /**

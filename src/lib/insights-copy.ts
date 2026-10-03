@@ -40,7 +40,7 @@ export const INSIGHTS_COPY = {
   familyLabel: {
     bar: 'Comparación', bar_grouped: 'Comparación', bar_stacked: 'Composición', line: 'Tendencia', pie: 'Composición', donut: 'Composición',
     scatter: 'Relación', bullet: 'Contra la meta', gauge: 'Contra la meta', waterfall: 'Qué explica el cambio', funnel: 'Conversión',
-    heatmap: 'Distribución', waffle: 'Composición', venn_two: 'Coincidencia', upset: 'Coincidencia',
+    heatmap: 'Distribución', waffle: 'Composición', venn_two: 'Coincidencia', upset: 'Coincidencia', stat: 'Cifras del período',
   } as Record<string, string>,
   provenanceUnit: 'Unidad',
   provenanceSource: 'Fuente',
@@ -120,6 +120,14 @@ export const INSIGHTS_COPY = {
   presentCounter: (current: number | string, total: number | string) => `${current} de ${total}`,
   presentHint: 'Flechas para avanzar · Esc para salir',
   groupDetail: 'Detalle',
+  // Tarjeta de cifra (modelo 1.4, TASK-1975). Las cifras, la variación y el período vienen escritos en el modelo.
+  statEyebrow: 'Cifras del período',
+  statCount: (count: number) => (count === 1 ? '1 cifra' : `${count} cifras`),
+  statUnitEach: 'cada cifra en la suya',
+  /** Frase completa de la variación para lector de pantalla («baja 17,0 %, vs 16.390 en agosto de 2026; empeora»). */
+  statChangeSentence: (direction: 'up' | 'down' | 'flat', change: string, versus: string | undefined, tone: 'better' | 'worse' | 'neutral') =>
+    `${direction === 'up' ? `sube ${change}` : direction === 'down' ? `baja ${change}` : `sin cambio (${change})`}${versus ? `, ${versus}` : ''}${tone === 'better' ? '; mejora' : tone === 'worse' ? '; empeora' : ''}`,
+  waffleUnitNote: (total: string | null) => (total ? `Cada cuadro es una unidad; el total es ${total}.` : 'Cada cuadro es una unidad.'),
 }
 
 export type InsightsCopy = typeof INSIGHTS_COPY
@@ -159,7 +167,7 @@ export const INSIGHTS_COPY_EN: InsightsCopy = {
   familyLabel: {
     bar: 'Comparison', bar_grouped: 'Comparison', bar_stacked: 'Composition', line: 'Trend', pie: 'Composition', donut: 'Composition',
     scatter: 'Relationship', bullet: 'Against target', gauge: 'Against target', waterfall: 'What drove the change', funnel: 'Conversion',
-    heatmap: 'Distribution', waffle: 'Composition', venn_two: 'Overlap', upset: 'Overlap',
+    heatmap: 'Distribution', waffle: 'Composition', venn_two: 'Overlap', upset: 'Overlap', stat: 'Figures for the period',
   },
   provenanceUnit: 'Unit',
   provenanceSource: 'Source',
@@ -237,6 +245,12 @@ export const INSIGHTS_COPY_EN: InsightsCopy = {
   presentCounter: (current: number | string, total: number | string) => `${current} of ${total}`,
   presentHint: 'Arrows to move · Esc to exit',
   groupDetail: 'Detail',
+  statEyebrow: 'Figures for the period',
+  statCount: (count: number) => (count === 1 ? '1 figure' : `${count} figures`),
+  statUnitEach: 'each figure in its own',
+  statChangeSentence: (direction: 'up' | 'down' | 'flat', change: string, versus: string | undefined, tone: 'better' | 'worse' | 'neutral') =>
+    `${direction === 'up' ? `up ${change}` : direction === 'down' ? `down ${change}` : `no change (${change})`}${versus ? `, ${versus}` : ''}${tone === 'better' ? '; better' : tone === 'worse' ? '; worse' : ''}`,
+  waffleUnitNote: (total: string | null) => (total ? `Each square is one unit; the total is ${total}.` : 'Each square is one unit.'),
 }
 
 /** Diccionario del chrome según el idioma de la edición (por defecto, es-CL). */

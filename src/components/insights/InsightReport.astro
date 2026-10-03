@@ -18,8 +18,9 @@ import '@styles/insights.css'
 
 import ModuleScene from '@/components/insights/ModuleScene.astro'
 import ChartFigure from '@/components/insights/ChartFigure.astro'
+import StatCard from '@/components/insights/StatCard.astro'
 import FactMark from '@/components/insights/FactMark.astro'
-import { buildFindings, buildModules, moduleLabelOf, splitLead, splitSummary } from '@lib/insights-view'
+import { buildFindings, buildModules, chartsArriveOrdered, moduleLabelOf, splitLead, splitSummary } from '@lib/insights-view'
 import { getInsightsCopy } from '@lib/insights-copy'
 import { insightsCssVars, orbitMeasure, motion } from '@lib/insights-tokens'
 import type { InsightSharedEditionResponseV1 } from '@lib/insights'
@@ -259,7 +260,8 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
             {finding.evidence ? (
               <>
                 {finding.evidence.reading?.conclusion && <p class="ins-tile__conclusion">{finding.evidence.reading.conclusion.text}</p>}
-                <ChartFigure copy={C} derived={finding.evidence.chart.derived} note={finding.evidence.chart.note} spec={finding.evidence.chart.spec} table={finding.evidence.chart.table} facts={model.facts} locale={locale} theme="dark" uid={`ev-${finding.id}`} compact />
+                {finding.evidence.chart && <ChartFigure copy={C} derived={finding.evidence.chart.derived} note={finding.evidence.chart.note} spec={finding.evidence.chart.spec} table={finding.evidence.chart.table} facts={model.facts} locale={locale} theme="dark" uid={`ev-${finding.id}`} compact />}
+                {finding.evidence.stat && <StatCard stat={finding.evidence.stat} facts={model.facts} copy={C} uid={`ev-${finding.id}`} theme="dark" compact />}
                 {(finding.evidence.reading?.meaning || finding.evidence.reading?.nextStep) && (
                   <div class="ins-tile__reading">
                     {finding.evidence.reading?.meaning && <div><span class="ins-label">{C.meaningTitle}</span><p>{finding.evidence.reading.meaning.text}</p></div>}
@@ -297,7 +299,7 @@ const plusIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
   </section>
 
   <main class="ins-main" id="contenido">
-    {model.chapters.map((chapter, i) => <ModuleScene chapter={chapter} index={i + 1} facts={model.facts} locale={locale} copy={C} />)}
+    {model.chapters.map((chapter, i) => <ModuleScene chapter={chapter} index={i + 1} facts={model.facts} locale={locale} copy={C} ordered={chartsArriveOrdered(model.modelVersion)} />)}
 
     {hasPlan && (
       <section class="ins-plan" id="plan" data-section aria-labelledby="plan-title">

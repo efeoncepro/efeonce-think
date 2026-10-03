@@ -33,6 +33,43 @@ export const dataRoles = {
   previousOnNavy: '#8aa8d8', // --axis-deck-role-dataPriorOnNavy (--axis-deck-blue-310)
 } as const
 
+/**
+ * Variación de la tarjeta de cifra (TASK-1975): tonos semánticos, nunca roles de dato (una serie no se pinta de rojo
+ * porque bajó). Copiados de `efeonceInsights.variation` y `efeonceInsights.ink` de AXIS (`packages/tokens/src/tokens.ts`,
+ * aprobados el 2026-10-03; el paquete aún no se publica con ellos). Sobre papel, variante A: píldora teñida con la cifra
+ * en el tono. Sobre navy, variante C: sin píldora rellena, el tono sólo en el triángulo y la cifra en tinta suave.
+ */
+export const variation = {
+  betterOnPaper: '#0d6b3f', // --axis-ppt-green-900 · deltaBetterOnPaper
+  betterTintPct: '12%', // tintOpacity 0.12
+  worseOnPaper: '#b91954', // --axis-ppt-red-800 · deltaWorseOnPaper
+  worseTintPct: '10%', // tintOpacity 0.1
+  neutralOnPaper: '#020061', // --axis-ppt-indigo-950 · paperInk (neutral.onPaper.ink)
+  neutralGroundOnPaper: '#e9edf3', // --axis-deck-surface-70 · ruleSoft (neutral.onPaper.ground)
+  betterOnNavy: '#28c76f', // --axis-ppt-green-400 · deltaBetterOnNavy (sólo el triángulo)
+  worseOnNavy: '#ff7063', // --axis-ppt-red-300 · deltaWorseOnNavy (sólo el triángulo)
+  neutralOnNavy: '#b9c9e9', // --axis-deck-ice-200 · navyMuted
+  leadOnNavy: '#d0f3ff', // --axis-deck-cyan-100 · navyLead: la cifra de la variación sobre navy
+  /** Triángulo de puntas redondeadas (`variation.shape`): mismo color en relleno y trazo, unión redondeada. */
+  shape: { viewBox: '0 0 9 8', up: 'M4.5 0.5 L8.5 7.5 H0.5 Z', down: 'M4.5 7.5 L8.5 0.5 H0.5 Z', strokePx: 1.4 },
+} as const
+
+/**
+ * Movimiento de la tarjeta de cifra (`docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`, aprobado el
+ * 2026-10-03): la cifra recorre del valor anterior al actual y, al llegar, la variación toma su tono.
+ */
+export const statMotion = {
+  staggerMs: 70, // cada tarjeta, 70 ms después de la anterior
+  nameMs: 300, // nombre, ícono y «Estimado» suben 8 px (0–300 ms)
+  countStartMs: 150, // la cifra recorre de 150 a 1.250 ms
+  countMs: 1100,
+  changeStartMs: 1250, // la variación pasa de gris a su tono (1.250–1.600 ms)
+  changeMs: 350,
+  lowerStartMs: 1600, // «Menor es mejor» al final (1.600–1.900 ms)
+  lowerMs: 300,
+  risePx: 8,
+} as const
+
 /** Anatomía de la órbita que mide (`efeonceGraphicLine.trajectory.measure` + `lens.anatomy`, escalada por ancho). */
 export const orbitMeasure = {
   degreesPerUnit: 360, // valor × 360°, desde las 12 en sentido horario
@@ -74,4 +111,22 @@ export const insightsCssVars = {
   'ins-ease-standard': motion.easeStandard,
   'ins-duration-short': motion.durationShort,
   'ins-duration-medium': motion.durationMedium,
+  'ins-delta-better': variation.betterOnPaper,
+  'ins-delta-better-tint': variation.betterTintPct,
+  'ins-delta-worse': variation.worseOnPaper,
+  'ins-delta-worse-tint': variation.worseTintPct,
+  'ins-delta-neutral': variation.neutralOnPaper,
+  'ins-delta-neutral-ground': variation.neutralGroundOnPaper,
+  'ins-delta-better-dark': variation.betterOnNavy,
+  'ins-delta-worse-dark': variation.worseOnNavy,
+  'ins-delta-neutral-dark': variation.neutralOnNavy,
+  'ins-delta-lead-dark': variation.leadOnNavy,
+  'ins-stat-stagger': `${statMotion.staggerMs}ms`,
+  'ins-stat-name': `${statMotion.nameMs}ms`,
+  'ins-stat-count-start': `${statMotion.countStartMs}ms`,
+  'ins-stat-change-start': `${statMotion.changeStartMs}ms`,
+  'ins-stat-change': `${statMotion.changeMs}ms`,
+  'ins-stat-lower-start': `${statMotion.lowerStartMs}ms`,
+  'ins-stat-lower': `${statMotion.lowerMs}ms`,
+  'ins-stat-rise': `${statMotion.risePx}px`,
 } as const

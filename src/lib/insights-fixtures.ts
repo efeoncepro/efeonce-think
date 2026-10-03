@@ -6,7 +6,8 @@
  * de `display`, con el formato que produce Greenhouse (`formatFactValue`, es-CL): el render nunca formatea.
  *
  * Tokens: `fixture-completo`, `fixture-parcial`, `fixture-v1` (sin campos editoriales v2), `fixture-sin-descargas`,
- * `fixture-no-existe` (404), `fixture-retirado` (410), `fixture-limite` (429), `fixture-error` (5xx).
+ * `fixture-cifras` (modelo 1.4: tarjetas de cifra y waffle por unidad), `fixture-no-existe` (404), `fixture-retirado`
+ * (410), `fixture-limite` (429), `fixture-error` (5xx).
  */
 import type {
   InsightModule,
@@ -14,6 +15,7 @@ import type {
   InsightWebClaimV1,
   InsightWebFactV1,
   InsightWebModelV1,
+  InsightWebStatItemV1,
   SharedInsightResult,
 } from './insights'
 
@@ -507,6 +509,141 @@ const extreme = (token: string): InsightSharedEditionResponseV1 => {
   }
 }
 
+/**
+ * Modelo 1.4 (TASK-1974/1975): tarjetas de cifra que abren cada capítulo y un waffle de un cuadro por unidad. Las seis
+ * cifras de visibilidad orgánica son las del tablero aprobado en el canvas (Think-Cifras-Desktop); cada texto de la
+ * tarjeta va escrito como lo proyecta Greenhouse (`presentation/stat-card.ts`), incluidos un caso sin dato, uno sin
+ * período anterior, uno sin cambio y una tarjeta de una sola cifra. Vive SÓLO en este token de desarrollo: la muestra
+ * pública (`/insights/muestra`) no lo usa.
+ */
+const statsEdition = (token: string): InsightSharedEditionResponseV1 => {
+  const edition = base(token)
+  const SEP = 'septiembre de 2026'
+  const AUG = 'agosto de 2026'
+  const POS = 'posiciones en buscadores'
+  const PANEL_SEP = 'Panel de 50 consultas'
+  const f: Record<string, InsightWebFactV1> = {}
+  const fact = (factId: string, module: InsightModule, metricId: string, label: string, value: number | null, unit: InsightWebFactV1['unit'], display: string, source: string, observation: InsightWebFactV1['observation'] = 'observed', comparisonFactId?: string, september = true) => {
+    f[factId] = {
+      factId, module, metricId, label, value, unit, display, observation, source, unitLabel: unit === 'percent' ? 'Porcentaje' : unit === 'position' ? 'Posición' : 'Cantidad',
+      asOf: value === null ? null : september ? '2026-09-30' : '2026-08-31', asOfLabel: value === null ? null : september ? '30 sept 2026' : '31 ago 2026',
+      ...(comparisonFactId ? { comparisonFactId } : {}), absentReason: value === null ? 'no_data' : null,
+    }
+  }
+  // Visibilidad orgánica: septiembre contra agosto.
+  const pair = (id: string, metricId: string, label: string, now: number, prev: number, unit: InsightWebFactV1['unit'], dNow: string, dPrev: string, source: string, observation: InsightWebFactV1['observation'] = 'observed') => {
+    fact(`${id}.aug`, 'seo', metricId, `${label} en agosto`, prev, unit, dPrev, source, observation, undefined, false)
+    fact(id, 'seo', metricId, label, now, unit, dNow, source, observation, `${id}.aug`)
+  }
+  pair('st.clicks', 'clicks', 'Clics', 13606, 16390, 'count', '13.606', '16.390', GSC)
+  pair('st.impressions', 'impressions', 'Impresiones', 770462, 868507, 'count', '770.462', '868.507', GSC)
+  pair('st.ctr', 'ctr', 'CTR', 1.8, 1.9, 'percent', '1,8 %', '1,9 %', GSC)
+  pair('st.position', 'position', 'Posición media', 6.9, 5.7, 'position', '#6,9', '#5,7', GSC)
+  pair('st.page_one', 'page_one_keywords', 'Primera página', 15, 21, 'count', '15', '21', POS)
+  pair('st.etv', 'organic_etv', 'Tráfico estimado', 130166, 135014, 'visits_estimated', '130.166', '135.014', POS, 'estimated')
+  // Motores de respuesta: una que mejora, una sin período anterior, una sin dato y una sin cambio.
+  fact('st.ai_sessions.aug', 'aeo', 'ai_sessions', 'Visitas desde IA en agosto', 1366, 'count', '1.366', 'GA4', 'observed', undefined, false)
+  fact('st.ai_sessions', 'aeo', 'ai_sessions', 'Visitas desde IA', 1686, 'count', '1.686', 'GA4', 'observed', 'st.ai_sessions.aug')
+  fact('st.som', 'aeo', 'share_of_model', 'Share of Model', 42, 'percent', '42,0 %', PANEL_SEP)
+  fact('st.citations', 'aeo', 'citation_share', 'Respuestas con cita', null, 'percent', '—', PANEL_SEP)
+  fact('st.sov.aug', 'aeo', 'sov.brand', 'Share of Voice en agosto', 18.4, 'percent', '18,4 %', PANEL_SEP, 'observed', undefined, false)
+  fact('st.sov', 'aeo', 'sov.brand', 'Share of Voice', 18.4, 'percent', '18,4 %', PANEL_SEP, 'observed', 'st.sov.aug')
+  // Waffle por unidad: 8 respuestas que enlazan al sitio = 8 cuadros.
+  fact('st.cite.chatgpt', 'aeo', 'cited_by.chatgpt', 'Respuestas de ChatGPT que enlazan al sitio', 4, 'count', '4', PANEL_SEP)
+  fact('st.cite.gemini', 'aeo', 'cited_by.gemini', 'Respuestas de Gemini que enlazan al sitio', 3, 'count', '3', PANEL_SEP)
+  fact('st.cite.perplexity', 'aeo', 'cited_by.perplexity', 'Respuestas de Perplexity que enlazan al sitio', 1, 'count', '1', PANEL_SEP)
+  fact('st.cite.total', 'aeo', 'cited_links', 'Respuestas que enlazan al sitio', 8, 'count', '8', PANEL_SEP)
+  // Entrega: una sola cifra (la tarjeta va en horizontal).
+  fact('st.pieces.aug', 'ico', 'delivered.completed', 'Piezas entregadas en agosto', 58, 'count', '58', ICO, 'observed', undefined, false)
+  fact('st.pieces', 'ico', 'delivered.completed', 'Piezas entregadas', 64, 'count', '64', ICO, 'observed', 'st.pieces.aug')
+
+  const worse = (display: string, direction: 'up' | 'down') => ({ display, direction, tone: 'worse' as const })
+  const item = (itemId: string, label: string, factId: string, display: string, extra: Partial<InsightWebStatItemV1> = {}): InsightWebStatItemV1 => ({
+    itemId, label, factId, display, estimated: false, direction: 'higher_is_better', parts: { value: display }, ...extra,
+  })
+  const seoItems: InsightWebStatItemV1[] = [
+    item('clicks', 'Clics', 'st.clicks', '13.606', { change: worse('17,0 %', 'down'), versus: `vs 16.390 en ${AUG}`, count: { from: 16390, to: 13606, decimals: 0 } }),
+    item('impressions', 'Impresiones', 'st.impressions', '770.462', { change: worse('11,3 %', 'down'), versus: `vs 868.507 en ${AUG}`, count: { from: 868507, to: 770462, decimals: 0 } }),
+    item('ctr', 'CTR', 'st.ctr', '1,8 %', { parts: { value: '1,8', suffix: '%' }, change: worse('0,1 pp', 'down'), versus: `vs 1,9 % en ${AUG}`, count: { from: 1.9, to: 1.8, decimals: 1 } }),
+    item('position', 'Posición media', 'st.position', '#6,9', { direction: 'lower_is_better', parts: { prefix: '#', value: '6,9' }, change: worse('1,2 pos.', 'up'), versus: `vs #5,7 en ${AUG}`, lowerIsBetter: 'Menor es mejor', count: { from: 5.7, to: 6.9, decimals: 1 } }),
+    item('page_one_keywords', 'Primera página', 'st.page_one', '15 de 31 keywords', { parts: { value: '15', unitLabel: 'de 31 keywords' }, change: worse('28,6 %', 'down'), versus: `vs 21 en ${AUG}`, count: { from: 21, to: 15, decimals: 0 } }),
+    item('organic_etv', 'Tráfico estimado', 'st.etv', '130.166', { estimated: true, change: worse('3,6 %', 'down'), versus: `vs 135.014 en ${AUG}`, count: { from: 135014, to: 130166, decimals: 0 } }),
+  ]
+  const aeoItems: InsightWebStatItemV1[] = [
+    item('ai_sessions', 'Visitas desde IA', 'st.ai_sessions', '1.686', { change: { display: '23,4 %', direction: 'up', tone: 'better' }, versus: `vs 1.366 en ${AUG}`, count: { from: 1366, to: 1686, decimals: 0 } }),
+    item('share_of_model', 'Share of Model', 'st.som', '42,0 %', { parts: { value: '42,0', suffix: '%' } }),
+    item('citation_share', 'Respuestas con cita', 'st.citations', '—', { noData: `Sin dato en ${SEP}` }),
+    item('sov.brand', 'Share of Voice', 'st.sov', '18,4 %', { parts: { value: '18,4', suffix: '%' }, change: { display: '0,0 pp', direction: 'flat', tone: 'neutral' }, versus: `vs 18,4 % en ${AUG}`, count: { from: 18.4, to: 18.4, decimals: 1 } }),
+  ]
+  const icoItems: InsightWebStatItemV1[] = [
+    item('delivered.completed', 'Piezas entregadas', 'st.pieces', '64', { change: { display: '10,3 %', direction: 'up', tone: 'better' }, versus: `vs 58 en ${AUG}`, count: { from: 58, to: 64, decimals: 0 } }),
+  ]
+  const ev = (chapterId: string, chartId: string) => ({ chapterId, chartId })
+  const model14: InsightWebModelV1 = {
+    ...edition.model,
+    modelVersion: '1.4',
+    facts: f,
+    executiveSummary: [
+      { ...claim('cs-1', 'Septiembre bajó en clics orgánicos; la IA ya trae más visitas que en agosto.'), module: 'seo' },
+      { ...claim('cs-2', 'Los clics bajaron 17,0 % y la posición media pasó de #5,7 a #6,9; las visitas desde IA subieron 23,4 %.', ['st.clicks', 'st.ai_sessions']), module: 'seo', evidence: ev('ch-seo', 'stats.seo') },
+    ],
+    essentials: [
+      { ...claim('ce-1', 'Los clics orgánicos bajaron 17,0 %: de 16.390 a 13.606.', ['st.clicks']), module: 'seo', evidence: ev('ch-seo', 'stats.seo'), figure: { display: '-17,0 %', direction: 'down', kind: 'change' } },
+      { ...claim('ce-2', 'Las visitas que llegan desde la IA subieron 23,4 %.', ['st.ai_sessions']), module: 'aeo', evidence: ev('ch-aeo', 'stats.aeo'), figure: { display: '23,4 %', direction: 'up', kind: 'change' } },
+      { ...claim('ce-3', 'Ocho respuestas de IA enlazan al sitio; la mitad viene de ChatGPT.', ['st.cite.total']), module: 'aeo', evidence: ev('ch-aeo', 'aeo-cite-waffle') },
+    ],
+    essentialsByModule: { seo: 1, aeo: 2, ico: 0 },
+    decision: undefined,
+    chapters: [
+      {
+        chapterId: 'ch-seo', module: 'seo', label: 'SEO', title: 'Visibilidad orgánica',
+        opening: claim('cs-open-seo', 'Las impresiones bajaron de 868.507 a 770.462 y la posición media pasó de #5,7 a #6,9. Las keywords en primera página de Google bajaron de 21 a 15 de las 31 que medimos.'),
+        claims: [{ ...claim('cs-seo-c1', 'Los clics bajaron 17,0 %.', ['st.clicks']), role: 'backing' }],
+        stats: [{ figureId: 'stats.seo', question: 'value_change', title: 'Search Console y posiciones', items: seoItems, note: claim('stats.seo.note', 'El tráfico estimado se calcula con la posición y el volumen de búsqueda de cada keyword.') }],
+        charts: [], tables: [],
+        readings: [{ chartId: 'stats.seo', conclusion: claim('stats.seo.conclusion', 'El mayor cambio fue en clics orgánicos: de 16.390 a 13.606', ['st.clicks', 'st.clicks.aug']), nextStep: null }],
+        limits: [],
+      },
+      {
+        chapterId: 'ch-aeo', module: 'aeo', label: 'Respuestas de IA', title: 'Respuestas de IA',
+        opening: claim('cs-open-aeo', 'La IA trae más visitas que en agosto; el panel de citas no cerró a tiempo para esta edición.'),
+        claims: [],
+        stats: [{ figureId: 'stats.aeo', question: 'value_change', title: 'Visibilidad en motores de respuesta', items: aeoItems }],
+        charts: [{
+          spec: spec({ chartId: 'aeo-cite-waffle', family: 'waffle', relation: 'composition', title: 'Las 8 respuestas que enlazan al sitio, por motor', unit: 'respuestas', question: 'composition',
+            data: { kind: 'waffle', parts: [
+              { partId: 'chatgpt', label: 'ChatGPT', factId: 'st.cite.chatgpt' },
+              { partId: 'gemini', label: 'Gemini', factId: 'st.cite.gemini' },
+              { partId: 'perplexity', label: 'Perplexity', factId: 'st.cite.perplexity' },
+            ], totalFactId: 'st.cite.total' } }),
+          table: { columns: ['Motor', 'Respuestas'], rows: [['ChatGPT', '4'], ['Gemini', '3'], ['Perplexity', '1'], ['Total', '8']] },
+          unitLabel: 'Cantidad',
+        }],
+        tables: [],
+        readings: [
+          { chartId: 'stats.aeo', conclusion: claim('stats.aeo.conclusion', 'Las visitas desde IA subieron de 1.366 a 1.686', ['st.ai_sessions', 'st.ai_sessions.aug']), nextStep: null },
+          read('aeo-cite-waffle', 'La mitad de las respuestas que enlazan al sitio son de ChatGPT', { meaning: claim('m-cite', 'Perplexity enlaza una sola vez: es el motor donde falta contenido citable.') }),
+        ],
+        limits: ['Respuestas con cita no entra en septiembre: el panel cerró después del corte.'],
+      },
+      {
+        chapterId: 'ch-ico', module: 'ico', label: 'Entrega', title: 'Entrega creativa',
+        claims: [],
+        stats: [{ figureId: 'stats.ico', question: 'value_change', title: 'Producción creativa', items: icoItems }],
+        charts: [], tables: [], readings: [], limits: [],
+      },
+    ],
+    actions: [{ actionId: 'ca-1', text: 'Recuperar las 6 keywords que salieron de la primera página.', factIds: ['st.page_one'], module: 'seo' }],
+  }
+  return {
+    ...edition,
+    modelVersion: '1.4',
+    header: { ...edition.header, periodLabel: '1 al 30 de septiembre de 2026', periodStart: '2026-09-01', periodEndExclusive: '2026-10-01', issuedAt: '2026-10-02T12:00:00-03:00', asOfMax: '2026-09-30' },
+    model: model14,
+    expiresAt: '2026-10-31T23:59:59-03:00',
+  }
+}
+
 export const resolveInsightFixture = (token: string): SharedInsightResult | null => {
   switch (token) {
     case 'fixture-completo':
@@ -526,6 +663,8 @@ export const resolveInsightFixture = (token: string): SharedInsightResult | null
       return { status: 'ok', edition: withoutV2(base(token)) }
     case 'fixture-sin-descargas':
       return { status: 'ok', edition: { ...base(token), downloads: base(token).downloads.map((download) => ({ output: download.output, status: 'unavailable' as const })) } }
+    case 'fixture-cifras':
+      return { status: 'ok', edition: statsEdition(token) }
     case 'fixture-extremo':
       return { status: 'ok', edition: extreme(token) }
     case 'fixture-version-2':
