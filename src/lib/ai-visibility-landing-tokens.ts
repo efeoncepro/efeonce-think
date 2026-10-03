@@ -37,6 +37,9 @@ export const slogan = {
   widthEm: 11.263, // slogan.widthEmByWord.Engine
 } as const
 
+/** Geometría del lockup oficial (431,19 × 31,13) a los 24 px de alto del wireframe móvil aprobado. */
+export const mobileLockupWidthPx = (24 * 431.19) / 31.13
+
 /** Cuerpo del eslogan en px para un logo de `logoWidthPx` de ancho. */
 export const sloganFontPx = (logoWidthPx: number): number =>
   Number(((slogan.ofLogo * logoWidthPx) / slogan.widthEm).toFixed(3))
@@ -52,4 +55,5 @@ export const landingCssVars = [
   `--engine-paper-ink-soft:${engine.paperInkSoft}`,
   `--engine-paper:${engine.paper}`,
   `--engine-line:${engine.line}`,
+  `--engine-mobile-lockup-width:${mobileLockupWidthPx}px`,
 ].join(';')

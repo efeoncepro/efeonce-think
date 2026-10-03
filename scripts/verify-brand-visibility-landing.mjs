@@ -3,7 +3,7 @@
 // Uso:
 //   node scripts/verify-brand-visibility-landing.mjs <url> <label>
 //
-// Cubre TASK-1327:
+// Cubre TASK-1327 y la composición Engine de TASK-1966:
 // - capturas desktop 1440, laptop 1280 y mobile 390;
 // - scrollWidth <= clientWidth;
 // - landing indexable;
@@ -88,6 +88,17 @@ try {
       const form = document.querySelector('greenhouse-form')
       const localInputs = Array.from(document.querySelectorAll('input, textarea, select')).filter((node) => !node.closest('greenhouse-form'))
       const leaks = forbiddenPatterns.filter((pattern) => new RegExp(pattern.source, pattern.flags).test(text))
+      const question = document.querySelector('.hero-question')
+      const answer = document.querySelector('.hero-answer')
+      const orbit = document.querySelector('.hero-orbit')
+      const box = orbit?.getBoundingClientRect()
+      // El SVG oficial incluye lienzo transparente; medimos el círculo cx=960, cy=540, r=432 (1920×1080).
+      const ring = box && { left: box.left + box.width * 528 / 1920, right: box.left + box.width * 1392 / 1920,
+        top: box.top + box.height * 108 / 1080, bottom: box.top + box.height * 972 / 1080 }
+      const textIntersections = ring ? ['.hero-question', '.hero-answer', '.hero-lead', '.hero-cta'].filter((selector) => {
+        const rect = document.querySelector(selector)?.getBoundingClientRect()
+        return rect && rect.left < ring.right && rect.right > ring.left && rect.top < ring.bottom && rect.bottom > ring.top
+      }) : []
 
       return {
         scrollWidth: document.documentElement.scrollWidth,
@@ -100,6 +111,14 @@ try {
         localInputCount: localInputs.length,
         hasAnalysisPanel: Boolean(document.querySelector('[data-analysis-panel]')),
         visibleForbiddenText: leaks.map((pattern) => pattern.source),
+        h1Count: document.querySelectorAll('h1').length,
+        lockup: document.querySelector('.product-lockup')?.getAttribute('src'),
+        answerQuestionRatio: question && answer ? parseFloat(getComputedStyle(answer).fontSize) / parseFloat(getComputedStyle(question).fontSize) : 0,
+        oldVisibleName: /Brand Visibility Grader/i.test(text),
+        orbitCount: document.querySelectorAll('.hero-orbit').length,
+        oldOrbitCount: document.querySelectorAll('.snapshot-orbit').length,
+        ring,
+        textIntersections,
       }
     }, {
       requiredMarkers,
@@ -108,6 +127,16 @@ try {
 
     const screenshot = resolve(OUT_DIR, `${label}-${viewport.name}.png`)
     await page.screenshot({ path: screenshot, fullPage: true })
+
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.locator('.hero-cta').focus()
+    const focusScreenshot = resolve(OUT_DIR, `${label}-${viewport.name}-focus.png`)
+    await page.screenshot({ path: focusScreenshot })
+    await page.locator('.hero-cta').press('Enter')
+    const focusMetrics = await page.evaluate(() => ({
+      activeId: document.activeElement?.id,
+      scrollBehavior: getComputedStyle(document.documentElement).scrollBehavior,
+    }))
 
     await page.evaluate(() => {
       document.querySelector('greenhouse-form')?.dispatchEvent(
@@ -147,6 +176,14 @@ try {
     if (!analysisMetrics.formHidden) errors.push('form panel did not hide after accepted event')
     if (analysisMetrics.reportLinkVisible) errors.push('report link visible without reportToken')
     if (metrics.visibleForbiddenText.length > 0) errors.push(`forbidden text: ${metrics.visibleForbiddenText.join(', ')}`)
+    if (metrics.h1Count !== 1) errors.push(`h1 count ${metrics.h1Count}`)
+    if (!metrics.lockup?.endsWith('/ai-visibility-report-lockup-negative.svg')) errors.push('official product lockup missing')
+    if (metrics.answerQuestionRatio < 3) errors.push(`answer/question ratio ${metrics.answerQuestionRatio}`)
+    if (metrics.oldVisibleName) errors.push('historical name visible')
+    if (metrics.orbitCount !== 1 || metrics.oldOrbitCount) errors.push('orbit count differs from one')
+    if (metrics.textIntersections.length) errors.push(`orbit crosses ${metrics.textIntersections.join(', ')}`)
+    if (focusMetrics.activeId !== 'brand-visibility-form-title') errors.push('CTA did not focus form heading')
+    if (focusMetrics.scrollBehavior !== 'auto') errors.push('reduced motion scroll is not auto')
 
     if (errors.length > 0) failed = true
 
@@ -155,6 +192,8 @@ try {
       httpStatus: response?.status() ?? null,
       screenshot,
       analysisScreenshot,
+      focusScreenshot,
+      focusMetrics,
       metrics,
       analysisMetrics,
       errors,

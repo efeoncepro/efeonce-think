@@ -1,0 +1,18 @@
+---
+import orbitSvg from '../../public/branding/products/orbit-engine-dark-screen.svg?raw'
+import { orbitMotionCss } from '@lib/engine-orbit-motion'
+---
+
+<!-- The official asset stays byte-identical. Inline markup exposes AXIS animation hooks without client JS. -->
+<div class="hero-orbit axis-orbit-animate" data-capture="brand-visibility-orbit-motion" aria-hidden="true">
+  <Fragment set:html={orbitSvg} />
+</div>
+<Fragment set:html={`<style>${orbitMotionCss}</style>`} />
+
+<style>
+  .hero-orbit :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>
