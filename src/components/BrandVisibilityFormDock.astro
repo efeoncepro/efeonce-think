@@ -864,8 +864,8 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     box-shadow: 0 0 0 3px color-mix(in srgb,var(--engine-accent) 18%,transparent) !important;
   }
   .form-card greenhouse-form :global(.ghf-form .ghf-btn:not(.ghf-btn--ghost):not(.ghf-btn--skip):hover:not(:disabled)) {
-    background: var(--engine-ink-soft) !important;
-    color: var(--engine-ground) !important;
+    background: color-mix(in srgb, var(--engine-accent) 70%, var(--engine-ground)) !important;
+    color: var(--engine-ink) !important;
   }
   .form-card greenhouse-form :global(.ghf-form .ghf-btn:active:not(:disabled)) {
     transform: none;
