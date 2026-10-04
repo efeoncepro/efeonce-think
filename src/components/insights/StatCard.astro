@@ -22,6 +22,7 @@ import FactMark from './FactMark.astro'
 import type { InsightWebFactV1, InsightWebReadingV1, InsightWebStatFigureV1 } from '@lib/insights'
 import { INSIGHTS_COPY, type InsightsCopy } from '@lib/insights-copy'
 import { insightIconFor } from '@lib/insights-icons'
+import { PLATFORM_LOGO } from '@lib/insights-platforms'
 import { variation } from '@lib/insights-tokens'
 import { provenanceOf, statCellPlacement, statColumns } from '@lib/insights-view'
 
@@ -45,26 +46,13 @@ const dark = theme === 'dark'
 const items = stat.items
 const columns = statColumns(items.length)
 const prov = provenanceOf(facts, items.map((item) => item.factId))
-const iconOf = (factId: string) => {
-  const icon = insightIconFor(facts[factId]?.metricId)
+// TASK-1990/1996 — el glifo lo decide Greenhouse (`metricIcon`, el mismo del PDF); el mapa local es el respaldo de
+// ediciones anteriores al campo.
+const iconOf = (factId: string, metricIcon?: string) => {
+  const icon = metricIcon ? `/branding/icons/trazo-${metricIcon}.svg` : insightIconFor(facts[factId]?.metricId)
   return icon && dark ? icon.replace(/\.svg$/, '-dark.svg') : icon
 }
-/**
- * Isotipos de plataforma (TASK-1996, contrato AXIS efeonce.insights-stat-card 0.2.0): copias de AXIS_PLATFORM_ASSETS
- * (@efeoncepro/axis-brand-assets 0.4.15) en `public/logos/platforms/`. Greenhouse decide dónde van (`titlePlatforms` o
- * `items[].channel`); Think sólo los dibuja. Una plataforma sin archivo queda con su nombre, sin disco.
- */
-const PLATFORM_LOGO: Record<string, string> = {
-  chatgpt: '/logos/platforms/chatgpt.svg',
-  gemini: '/logos/platforms/gemini.svg',
-  claude: '/logos/platforms/claude.svg',
-  perplexity: '/logos/platforms/perplexity.svg',
-  google: '/logos/platforms/google.svg',
-  google_ai_overview: '/logos/platforms/google-ai-overview.svg',
-  google_search_console: '/logos/platforms/search-console.svg',
-  google_analytics: '/logos/platforms/google-analytics.svg',
-  greenhouse: '/logos/platforms/greenhouse.svg'
-}
+// Isotipos de plataforma: mapa compartido (`@lib/insights-platforms`, TASK-1996).
 const titleLogos = (stat.titlePlatforms ?? []).flatMap((platform) => (PLATFORM_LOGO[platform] ? [PLATFORM_LOGO[platform]] : []))
 // «vs <b>16.390</b> en agosto de 2026»: la cifra se destaca con la pieza que trae el modelo (`comparison.display`)
 // dentro del texto completo `versus`; sin piezas, o si la pieza no está en el texto, el texto va tal cual.
@@ -105,7 +93,7 @@ const lead = compact ? undefined : reading?.meaning?.text
         const place = statCellPlacement(i, items.length)
         const parts = item.parts ?? { value: item.display }
         const absent = !!item.noData
-        const icon = iconOf(item.factId)
+        const icon = iconOf(item.factId, item.metricIcon)
         const channelLogo = item.channel ? PLATFORM_LOGO[item.channel.platform] : undefined
         return (
           <div class="ins-stat" style={`--i:${i}`} data-first-col={place.firstColumn ? '' : undefined} data-last-row={place.lastRow ? '' : undefined} data-count={animate && item.count ? '' : undefined}>

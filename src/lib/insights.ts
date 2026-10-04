@@ -81,6 +81,8 @@ export interface ChartSpecV1 {
   title: string
   series: ChartSeriesV1[]
   dimensionLabels: string[]
+  /** Canal de cada dimensión (`channelId` de Greenhouse) o null; con él, la leyenda lleva el isotipo (TASK-1996). */
+  dimensionChannelIds?: Array<string | null>
   unit: string
   scale: { kind: 'linear'; baseline: 0 | null; perDimension?: true }
   references: Array<{ label: string; factId: string | null; value: number | null }>
@@ -139,6 +141,8 @@ export interface InsightWebStatItemV1 {
   channel?: { platform: string; name: string }
   /** La métrica bajo el nombre del canal («de las respuestas menciona la marca»). Sólo con `channel`. */
   context?: string
+  /** TASK-1990/1996 — glifo Trazo de la métrica (clave de AXIS), resuelto por Greenhouse. Ausente con `channel`. */
+  metricIcon?: string
 }
 
 /** 1.4 (TASK-1974) — tarjeta de cifra («¿cuánto es y cómo cambió?»). Abre el capítulo, antes de los gráficos. */

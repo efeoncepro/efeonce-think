@@ -415,6 +415,9 @@
 .ins-chart__tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .ins-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: 0.8125rem; color: var(--soft); }
 .ins-legend li { display: flex; align-items: center; gap: 8px; }
+/* TASK-1996 — la parte que es una plataforma (asistente, motor) lleva su isotipo en la leyenda. */
+.ins-disc--legend { width: 20px; height: 20px; }
+.ins-disc--legend img { width: 12px; height: 12px; }
 .ins-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
 .ins-switch { display: none; padding: 3px; border-radius: 9999px; border: 1px solid var(--grid); }
 .ins-js .ins-switch { display: inline-flex; }

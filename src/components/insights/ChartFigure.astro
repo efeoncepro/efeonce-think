@@ -11,6 +11,7 @@
  * - Gráfico y tabla son el mismo componente con un interruptor (sin JS se ven los dos).
  * - `data-step` permite narrarlo por pasos en una escena; sin JS queda en su estado final.
  */
+import { platformLogoOf } from '@lib/insights-platforms'
 import type { ChartSpecV1, InsightWebFactV1 } from '@lib/insights'
 import { INSIGHTS_COPY, type InsightsCopy } from '@lib/insights-copy'
 import {
@@ -206,12 +207,13 @@ const upset = data?.kind === 'upset'
 
 const SERIES_FAMILIES = ['bar', 'bar_grouped', 'bar_stacked', 'line']
 const drawn = (SERIES_FAMILIES.includes(family) && spec.series.length > 0) || pieSlices.length > 0 || !!scatter || !!bullet || !!gauge || !!waterfall || !!funnel || !!heatmap || !!waffle || !!venn || !!upset
-const legend = SERIES_FAMILIES.includes(family) && spec.series.length > 1
+type LegendItem = { label: string; color: string; value?: string; logo?: string | null }
+const legend: LegendItem[] = SERIES_FAMILIES.includes(family) && spec.series.length > 1
   ? spec.series.map((s, i) => ({ label: s.label, color: color(i) }))
   : waffle
     ? waffle.parts.map((p) => ({ label: p.label, color: color(p.i), value: p.display }))
     : composition.length
-      ? composition.map((p, i) => ({ label: p.label, color: color(i), value: p.fact?.display }))
+      ? composition.map((p, i) => ({ label: p.label, color: color(i), value: p.fact?.display, logo: platformLogoOf(spec.dimensionChannelIds?.[i]) }))
       : []
 ---
 
@@ -221,7 +223,7 @@ const legend = SERIES_FAMILIES.includes(family) && spec.series.length > 1
     <div class="ins-chart__tools">
       {legend.length > 0 && (
         <ul class="ins-legend">
-          {legend.map((item) => <li><span class="ins-swatch" style={`background:${item.color}`} />{item.label}{'value' in item && item.value && <b class="ins-num">{item.value}</b>}</li>)}
+          {legend.map((item) => <li><span class="ins-swatch" style={`background:${item.color}`} />{item.logo && <span class="ins-disc ins-disc--legend"><img src={item.logo} alt="" width="12" height="12" /></span>}{item.label}{item.value && <b class="ins-num">{item.value}</b>}</li>)}
         </ul>
       )}
       <div class="ins-switch" role="group" aria-label={C.viewSwitch}>
