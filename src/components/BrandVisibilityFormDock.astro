@@ -24,8 +24,8 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   aria-labelledby="brand-visibility-form-title"
 >
   <div class="form-intro">
-    <h2 id="brand-visibility-form-title">Completa tus datos y comienza el análisis</h2>
-    <p>Calibramos mercado, categoría y competidores para mostrarte tu informe en pantalla.</p>
+    <h2 id="brand-visibility-form-title">Conoce la visibilidad de tu marca</h2>
+    <p>Cuéntanos sobre tu marca y su mercado. Al terminar, verás el informe y podrás descargar el PDF.</p>
   </div>
 
   <div class="form-state form-state-ready" data-form-state="ready">
@@ -46,6 +46,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
       </div>
     </greenhouse-form>
     <noscript>Activa JavaScript para cargar el formulario.</noscript>
+    <p class="form-delivery-note">Tu correo corporativo permite recibir y recuperar el informe. El resultado se consulta mediante un enlace de acceso: compártelo sólo con tu equipo.</p>
   </div>
 
   <section
@@ -730,7 +731,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     color: var(--axis-gray-900);
     scroll-margin-top: 1rem;
     box-shadow:
-      0 36px 86px -46px rgba(0, 0, 0, 0.68),
+      0 24px 56px -32px color-mix(in srgb, var(--engine-ground) 24%, transparent),
       0 1px 0 rgba(255, 255, 255, 0.78) inset;
     transform: translateY(calc(100% - clamp(5.8rem, 9vw, 8rem)));
   }
@@ -770,7 +771,7 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     margin: 0;
     color: var(--axis-gray-900);
     font-size: 1.32rem;
-    font-weight: 740;
+    font-weight: 600;
     letter-spacing: 0;
     line-height: 1.25;
   }
@@ -831,8 +832,28 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   greenhouse-form {
     display: block;
     min-width: 0;
-    --ghf-font: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
   }
+
+  /* Supported host tokens: target the renderer's scope, where variant defaults are declared. */
+  greenhouse-form :global(.ghf-root[data-ghf-style-variant="diagnostic_premium"]) {
+    --ghf-font: 'Poppins', sans-serif;
+    font-family: var(--ghf-font);
+    --ghf-accent: var(--engine-ground);
+    --ghf-accent-contrast: var(--engine-ink);
+    --ghf-fg: var(--engine-paper-ink);
+    --ghf-muted: var(--engine-paper-ink-soft);
+    --ghf-focus: var(--engine-accent);
+    --ghf-field-shadow-focus: 0 0 0 3px color-mix(in srgb,var(--engine-accent) 18%,transparent);
+    --ghf-action-shadow: 0 8px 20px color-mix(in srgb,var(--engine-ground) 12%,transparent);
+    --ghf-action-shadow-hover: 0 10px 24px color-mix(in srgb,var(--engine-ground) 18%,transparent);
+  }
+  /* Field layout only; order and membership remain in the governed contract. */
+  @media (min-width: 981px) {
+    greenhouse-form :global(.ghf-field[data-ghf-field-key="websiteUrl"]) { grid-column: auto; }
+  }
+  greenhouse-form :global(.ghf-stepper-label) { font-weight: 500; }
+  .form-delivery-note { margin: 1rem 0 0; color: var(--engine-paper-ink-soft); font-size: .75rem; line-height: 1.65; text-align: center; }
 
   greenhouse-form :global(.ghf-root),
   greenhouse-form :global(.ghf-form),

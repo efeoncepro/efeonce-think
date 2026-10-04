@@ -1,0 +1,119 @@
+---
+const pages = [
+  { page: 1, title: 'Tu punto de partida', body: 'Un puntaje y un veredicto para entender dónde estás.', alt: 'Ejemplo sintético: puntaje 63 de 100, estado Atención y veredicto «Te encuentran, pero casi no te citan».' },
+  { page: 4, title: 'Motor por motor', body: 'Compara tu presencia y distingue los canales sin evaluar.', alt: 'Ejemplo sintético: comparación de ChatGPT, Claude, Gemini y Perplexity; Google AI Overview figura como no evaluado.' },
+  { page: 2, title: 'Qué mover primero', body: 'Acciones priorizadas según las brechas del análisis.', alt: 'Ejemplo sintético: plan prioritario para conseguir citas creíbles, apropiar la categoría y cubrir la intención de compra.' },
+]
+---
+<section class="sample-section" data-capture="brand-visibility-report-preview" aria-labelledby="preview-title">
+  <div class="sample-shell" data-report-sample>
+    <div class="sample-copy">
+      <p class="eyebrow">Así se ve tu informe</p>
+      <h2 id="preview-title">Del diagnóstico<br />a la próxima acción.</h2>
+      <p class="sample-lead">Una lectura para entender cómo aparece tu marca, qué la limita y por dónde empezar a mejorar.</p>
+      <p class="sample-disclosure">Ejemplo ilustrativo con datos sintéticos. Las páginas muestran el diseño real del PDF; los resultados de tu marca serán distintos.</p>
+      <div class="sample-controls" aria-label="Páginas del informe de ejemplo" hidden>
+        {pages.map((page, index) => (
+          <button type="button" data-sample-select={page.page} aria-pressed={index === 0 ? 'true' : 'false'} aria-controls={`sample-page-${page.page}`}>
+            <span class="sample-number" aria-hidden="true">0{index + 1}</span>
+            <span><strong>{page.title}</strong><small>{page.body}</small></span>
+            <span class="sample-arrow" aria-hidden="true">→</span>
+          </button>
+        ))}
+      </div>
+      <a class="sample-cta" href="#brand-visibility-form" data-start-analysis>Empezar mi análisis <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="sample-pages">
+      {pages.map((page) => (
+        <figure id={`sample-page-${page.page}`} data-sample-page={page.page}>
+          <a href={`/branding/ai-visibility-sample/page-${page.page}.webp`} data-sample-enlarge aria-label={`Ampliar ejemplo: ${page.title}`}>
+            <img src={`/branding/ai-visibility-sample/page-${page.page}.webp`} alt={page.alt} width="1190" height="1684" loading="lazy" decoding="async" />
+            <span class="enlarge-label" aria-hidden="true">Ampliar página ↗</span>
+          </a>
+          <figcaption>{page.title} · Página {page.page} de 6 · Datos sintéticos</figcaption>
+        </figure>
+      ))}
+    </div>
+    <dialog aria-labelledby="sample-dialog-title">
+      <div class="dialog-bar"><p id="sample-dialog-title">Ejemplo de informe · Datos sintéticos</p><div class="dialog-actions"><button type="button" data-sample-zoom aria-pressed="false">Acercar</button><button type="button" data-sample-close autofocus>Cerrar <span aria-hidden="true">×</span></button></div></div>
+      <div class="dialog-page"><img data-sample-expanded alt="" width="1190" height="1684" /></div>
+    </dialog>
+  </div>
+</section>
+<script>
+  const sample = document.querySelector('[data-report-sample]')
+  if (sample instanceof HTMLElement) {
+    const controls = sample.querySelector<HTMLElement>('.sample-controls')
+    const figures = Array.from(sample.querySelectorAll<HTMLElement>('[data-sample-page]'))
+    const buttons = Array.from(sample.querySelectorAll<HTMLButtonElement>('[data-sample-select]'))
+    const dialog = sample.querySelector('dialog')
+    const expanded = sample.querySelector<HTMLImageElement>('[data-sample-expanded]')
+    const zoom = sample.querySelector<HTMLButtonElement>('[data-sample-zoom]')
+    const viewport = sample.querySelector<HTMLElement>('.dialog-page')
+    let opener: HTMLAnchorElement | null = null
+    if (controls) controls.hidden = false
+    figures.forEach((figure, index) => { figure.hidden = index !== 0 })
+    buttons.forEach((button) => button.addEventListener('click', () => {
+      figures.forEach((figure) => { figure.hidden = figure.dataset.samplePage !== button.dataset.sampleSelect })
+      buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)))
+    }))
+    sample.querySelectorAll<HTMLAnchorElement>('[data-sample-enlarge]').forEach((link) => link.addEventListener('click', (event) => {
+      if (!dialog || !expanded || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+      event.preventDefault()
+      opener = link
+      expanded.src = link.href
+      expanded.alt = link.querySelector('img')?.alt ?? 'Ejemplo de informe con datos sintéticos'
+      if (zoom) { zoom.setAttribute('aria-pressed', 'false'); zoom.textContent = 'Acercar' }
+      if (viewport) { viewport.dataset.zoom = 'false'; viewport.scrollTop = 0; viewport.scrollLeft = 0 }
+      dialog.showModal()
+      dialog.scrollTop = 0
+    }))
+    zoom?.addEventListener('click', () => {
+      const active = zoom.getAttribute('aria-pressed') !== 'true'
+      zoom.setAttribute('aria-pressed', String(active))
+      zoom.textContent = active ? 'Ajustar página' : 'Acercar'
+      if (viewport) viewport.dataset.zoom = String(active)
+    })
+    sample.querySelector('[data-sample-close]')?.addEventListener('click', () => dialog?.close())
+    dialog?.addEventListener('close', () => opener?.focus({ preventScroll: true }))
+    dialog?.addEventListener('click', (event) => { if (event.target === dialog) dialog.close() })
+  }
+</script>
+<style>
+  .sample-section { background: var(--engine-ink); border-block: 1px solid var(--engine-line); }
+  .sample-shell { width: var(--brand-shell-width); margin-inline: auto; padding-block: clamp(3rem,6vw,6rem); display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: clamp(2rem,6vw,6rem); align-items: center; }
+  .eyebrow { margin: 0 0 1rem; font-size: .8rem; font-weight: 500; color: var(--engine-paper-ink-soft); }
+  h2 { font-family: 'Bricolage Grotesque Variable', sans-serif; font-size: clamp(2rem,3.6vw,3.2rem); font-weight: 600; letter-spacing: -.035em; line-height: 1.08; margin: 0; color: var(--engine-paper-ink); }
+  .sample-lead { font-size: 1rem; line-height: 1.75; max-width: 34rem; color: var(--engine-paper-ink-soft); margin: 1.25rem 0; }
+  .sample-disclosure { font-size: .78rem; line-height: 1.65; color: var(--engine-paper-ink-soft); max-width: 32rem; }
+  .sample-controls { display: grid; margin-block: 1.75rem; }
+  .sample-controls[hidden], figure[hidden] { display: none; }
+  .sample-controls button { font: inherit; text-align: left; border: 0; border-top: 1px solid var(--engine-line); background: transparent; color: var(--engine-paper-ink); padding: 1.15rem .75rem; display: grid; grid-template-columns: 1.7rem 1fr 1rem; gap: .75rem; cursor: pointer; border-radius: 0; }
+  .sample-controls button:last-child { border-bottom: 1px solid var(--engine-line); }
+  .sample-controls button[aria-pressed='true'] { background: var(--engine-paper); box-shadow: inset 3px 0 var(--engine-paper-ink); }
+  .sample-number { font-size: .72rem; color: var(--engine-paper-ink-soft); padding-top: .25rem; }
+  .sample-controls strong { display: block; font-weight: 500; font-size: 1rem; }
+  .sample-controls small { display: block; color: var(--engine-paper-ink-soft); font-size: .82rem; line-height: 1.6; margin-top: .35rem; }
+  .sample-arrow { align-self: center; }
+  .sample-cta { display: inline-flex; gap: 1rem; padding-block: .75rem; min-height: 44px; align-items: center; color: var(--engine-paper-ink); font-weight: 500; font-size: .95rem; text-underline-offset: .3em; }
+  .sample-pages { min-width: 0; border-radius: 1rem; padding: clamp(1rem,2.5vw,2rem); background: var(--engine-paper); }
+  figure { margin: 0; }
+  figure + figure:not([hidden]) { margin-top: 1rem; }
+  figure a { display: block; position: relative; background: var(--engine-ink); box-shadow: 0 12px 36px color-mix(in srgb,var(--engine-ground) 12%,transparent); }
+  figure img { display: block; width: 100%; height: auto; }
+  .enlarge-label { position: absolute; bottom: 1rem; right: 1rem; background: var(--engine-ground); color: var(--engine-ink); font-size: .75rem; padding: .65rem .9rem; border-radius: 2rem; }
+  figcaption { text-align: center; color: var(--engine-paper-ink-soft); font-size: .72rem; line-height: 1.5; margin-top: 1rem; }
+  dialog { margin: auto; padding: 0; border: 1px solid var(--engine-line); border-radius: .75rem; background: var(--engine-paper); color: var(--engine-paper-ink); width: min(900px,calc(100vw - 24px)); max-height: calc(100dvh - 24px); }
+  dialog::backdrop { background: color-mix(in srgb,var(--engine-ground) 85%,transparent); }
+  .dialog-bar { position: sticky; top: 0; z-index: 1; display: flex; gap: 1rem; align-items: center; justify-content: space-between; padding: .5rem 1rem; background: var(--engine-paper); border-bottom: 1px solid var(--engine-line); }
+  .dialog-bar p { font-size: .75rem; line-height: 1.4; margin: 0; }
+  .dialog-bar button { border: 0; background: var(--engine-ground); color: var(--engine-ink); font: inherit; font-size: .85rem; padding: .7rem 1rem; min-height: 44px; border-radius: 2rem; cursor: pointer; white-space: nowrap; }
+  .dialog-actions { display: flex; flex-shrink: 0; gap: .5rem; }
+  .dialog-page { overflow: auto; max-height: calc(100dvh - 110px); overscroll-behavior: contain; }
+  .dialog-page img { display: block; width: 100%; height: auto; }
+  .dialog-page[data-zoom='true'] img { width: 1190px; max-width: none; }
+  @media(max-width:480px) { .dialog-bar { flex-wrap: wrap; gap: .5rem; } .dialog-bar p { width: 100%; } .dialog-page { max-height: calc(100dvh - 140px); } }
+
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--engine-accent); outline-offset: 4px; }
+  @media(max-width:980px) { .sample-shell { width: min(100% - 32px,720px); grid-template-columns: 1fr; gap: 1.5rem; } .sample-controls { margin-block: 1.5rem 1rem; } }
+</style>

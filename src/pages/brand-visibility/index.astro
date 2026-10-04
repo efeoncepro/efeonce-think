@@ -9,6 +9,7 @@ import BrandVisibilityFormDock from '@/components/BrandVisibilityFormDock.astro'
 import EfeonceSlogan from '@/components/EfeonceSlogan.astro'
 import EngineAvatarGroup from '@/components/primitives/EngineAvatarGroup.astro'
 import EngineHeroOrbit from '@/components/EngineHeroOrbit.astro'
+import AIVisibilityReportSample from '@/components/AIVisibilityReportSample.astro'
 import { buildCopyrightNotice } from '@lib/legal'
 import { axis, LEVEL_COPY } from '@lib/report-tokens'
 import { engine, landingCssVars, slogan, sloganFontPx } from '@lib/ai-visibility-landing-tokens'
@@ -25,36 +26,6 @@ const websiteId = `${siteUrl}/#website`
 const webpageId = `${landingUrl}#webpage`
 const serviceId = `${landingUrl}#service`
 const engines = ['chatgpt', 'gemini', 'claude', 'perplexity', 'google_ai_overview']
-const previewModules = [
-  {
-    title: 'Mapa de presencia',
-    glyph: 'ubicacion',
-    tone: 'presence',
-    label: 'Dónde apareces',
-    body: 'Identifica qué canales recuperan tu marca, con qué frecuencia y frente a qué alternativas de la categoría.',
-  },
-  {
-    title: 'Lectura competitiva',
-    glyph: 'prensa',
-    tone: 'citation',
-    label: 'Por qué te citan',
-    body: 'Muestra qué fuentes sostienen la confianza, qué señales faltan y qué competidores están ganando la respuesta.',
-  },
-  {
-    title: 'Exactitud de marca',
-    glyph: 'ia',
-    tone: 'category',
-    label: 'Qué interpreta cada canal',
-    body: 'Detecta si tu oferta se entiende con precisión o si el motor mezcla claims, categorías o competidores.',
-  },
-  {
-    title: 'Prioridad de acción',
-    glyph: 'medicion',
-    tone: 'operability',
-    label: 'Qué mejorar primero',
-    body: 'Ordena el siguiente movimiento: corregir presencia, estructura, narrativa, exactitud o capacidad operable.',
-  },
-] as const
 const levels = [
   {
     key: 'found',
@@ -91,34 +62,6 @@ const frameworkGlyphs = {
   actionable: 'web',
   intrinsic: 'objetivo',
 } as const
-const reportProofPoints = [
-  {
-    title: 'Privado',
-    body: 'El resultado se abre en una ruta no indexable para revisión interna.',
-  },
-  {
-    title: 'Con evidencia',
-    body: 'Sólo muestra hallazgos cuando hay señales suficientes para sostenerlos.',
-  },
-  {
-    title: 'Con siguiente paso',
-    body: 'Separa diagnóstico, riesgo y acción recomendada para decidir qué corregir primero.',
-  },
-] as const
-const reportSignals = [
-  {
-    label: 'Presencia',
-    value: 'dónde te recuperan',
-  },
-  {
-    label: 'Citabilidad',
-    value: 'por qué te nombran',
-  },
-  {
-    label: 'Acción',
-    value: 'qué corregir primero',
-  },
-] as const
 const brandVisibilityJsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -212,17 +155,7 @@ const brandVisibilityJsonLd = {
         description: level.signal,
       })),
     },
-    {
-      '@type': 'ItemList',
-      '@id': `${landingUrl}#report-modules`,
-      name: 'Módulos del Efeonce AI Visibility Report',
-      itemListElement: previewModules.map((module, index) => ({
-        '@type': 'ListItem',
-        position: index + 1,
-        name: module.title,
-        description: module.body,
-      })),
-    },
+
   ],
 } as const
 const footerCopyrightNotice = buildCopyrightNotice()
@@ -244,7 +177,7 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
     style={`${landingCssVars};--axis-blue:${axis.accent[500]};--axis-blue-dark:${axis.accent[700]};--axis-navy:${axis.accent[900]};--axis-navy-soft:${axis.accent[800]};--axis-success:${axis.success[500]};--axis-warning:${axis.warning[500]};--axis-gray-50:${axis.gray[50]};--axis-gray-100:${axis.gray[100]};--axis-gray-200:${axis.gray[200]};--axis-gray-600:${axis.gray[600]};--axis-gray-800:${axis.gray[800]};--axis-gray-900:${axis.gray[900]};`}
   >
     <section class="hero-shell" data-capture="brand-visibility-hero" aria-labelledby="brand-visibility-title">
-      <div class="hero-orbit-frame" aria-hidden="true">
+      <div class="hero-orbit-frame">
         <EngineHeroOrbit />
       </div>
 
@@ -272,7 +205,7 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
 
           <div class="hero-cta-row">
             <a class="hero-cta" href="#brand-visibility-form">Empezar mi análisis <span aria-hidden="true">→</span></a>
-            <p class="hero-cta-note">Recibes tu AI Visibility Report en pantalla.</p>
+            <p class="hero-cta-note">Informe en pantalla y descarga en PDF.</p>
           </div>
         </div>
       </div>
@@ -297,105 +230,39 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
         {levels.map((level) => {
           return (
             <li>
-              <div class="framework-card-body">
-                <div class="framework-card-top">
-                  <span class="framework-step">{LEVEL_COPY[level.key].ordinal}</span>
-                  <div class="framework-card-heading">
-                    <span class="framework-title-row">
-                      <img class="framework-icon" src={`/branding/icons/trazo-${frameworkGlyphs[level.key]}.svg`} alt="" width="20" height="20" />
-                      <strong>{LEVEL_COPY[level.key].labelEn}</strong>
-                    </span>
-                    <span class="framework-card-subtitle">{LEVEL_COPY[level.key].label}</span>
-                  </div>
-                </div>
-                <p class="framework-question">{LEVEL_COPY[level.key].question}</p>
-                <p>{level.signal}</p>
-                <em>{level.diagnostic}</em>
-              </div>
+              <details class="method-detail">
+                <summary>
+                  <span class="method-number">{LEVEL_COPY[level.key].ordinal}</span>
+                  <span class="method-title">
+                    <span class="method-question">{LEVEL_COPY[level.key].question}</span>
+                    <span class="method-subtitle">{LEVEL_COPY[level.key].label} · {LEVEL_COPY[level.key].labelEn}</span>
+                  </span>
+                  <img src={`/branding/icons/trazo-${frameworkGlyphs[level.key]}.svg`} alt="" width="24" height="24" />
+                  <span class="method-expand" aria-hidden="true">+</span>
+                </summary>
+                <div class="method-answer"><p>{level.signal}</p><p>{level.diagnostic}</p></div>
+              </details>
             </li>
           )
         })}
       </ol>
 
-      <div class="framework-bridge" aria-label="Cómo interpreta Efeonce el framework">
-        <div>
-          <strong>La lectura útil no pregunta sólo si apareces.</strong>
-          <p>
-            Pregunta dónde se corta la cadena entre presencia, comprensión,
-            exactitud y capacidad de ser citado o recomendado con confianza.
-          </p>
-        </div>
-        <span aria-hidden="true">Found → Readable → Correct → Actionable → Intrinsic</span>
-      </div>
     </section>
 
-    <section class="preview-flow-section" data-capture="brand-visibility-report-preview" aria-labelledby="preview-title">
-      <span class="capture-only" data-capture="brand-visibility-flow" aria-hidden="true"></span>
-      <div class="preview-flow-grid">
-        <article class="report-preview">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">Informe privado</p>
-              <h2 id="preview-title">Del diagnóstico a la próxima acción</h2>
-              <p>
-                El reporte cruza presencia, citabilidad, exactitud y operabilidad
-                para mostrar dónde tu marca se pierde, se confunde o puede ganar prioridad.
-              </p>
-            </div>
-            <div class="report-signal-strip" aria-label="Señales principales del informe">
-              {reportSignals.map((signal) => (
-                <span>
-                  <strong>{signal.label}</strong>
-                  <small>{signal.value}</small>
-                </span>
-              ))}
-            </div>
-          </div>
+    <AIVisibilityReportSample />
 
-          <div class="preview-report-layout">
-            <div class="preview-module-strip">
-              {previewModules.map((module) => (
-                <div class="preview-module">
-                  <div class="preview-module-top">
-                    <span class="preview-icon" aria-hidden="true">
-                      <img src={`/branding/icons/trazo-${module.glyph}.svg`} alt="" width="24" height="24" />
-                    </span>
-                    <small>{module.label}</small>
-                  </div>
-                  <h3>{module.title}</h3>
-                  <p>{module.body}</p>
-                </div>
-              ))}
-            </div>
-
-            <div class="report-snapshot" aria-label="Vista conceptual del informe">
-              <div class="snapshot-header">
-                <img src="/branding/products/ai-visibility-report-lockup-negative.svg" alt="Efeonce AI Visibility Report" width="431" height="31" />
-                <span>Qué recibirás</span>
-              </div>
-              <div class="snapshot-badge-row" aria-hidden="true">
-                <span>Lectura ejecutiva</span>
-                <span>Señal prioritaria</span>
-              </div>
-              <div class="snapshot-score">
-                <div>
-                  <small>Resultado accionable</small>
-                  <strong>Presencia + precisión + siguiente paso</strong>
-                </div>
-              </div>
-              <div class="snapshot-notes">
-                <p><strong>Primero:</strong> ubicar dónde no estás siendo recuperado ni citado.</p>
-                <p><strong>Luego:</strong> corregir la señal que más limita la recomendación.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="report-proof-row" aria-label="Características del informe">
-            {reportProofPoints.map((point) => (
-              <p><strong>{point.title}.</strong> {point.body}</p>
-            ))}
-          </div>
-        </article>
+    <section class="decision-section" aria-labelledby="decision-title">
+      <div class="decision-copy">
+        <p class="section-kicker">Antes de empezar</p>
+        <h2 id="decision-title">Tu marca, con más claridad.</h2>
+        <p>Obtén una lectura de tu presencia en IA y un siguiente paso respaldado por las señales del análisis.</p>
+        <a class="hero-cta final-cta" href="#brand-visibility-form" data-start-analysis>Empezar mi análisis <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="decision-questions">
+        <details open><summary>¿Qué voy a recibir?</summary><p>Un informe con puntaje, presencia por motor, brechas y acciones priorizadas. Cuando una señal no tiene datos suficientes, se indica en el resultado.</p></details>
+        <details><summary>¿Cómo veo y descargo el informe?</summary><p>Cuando termine el análisis, el informe se abrirá en esta pestaña. Desde el resultado puedes descargar su versión en PDF.</p></details>
+        <details><summary>¿Para qué necesitan mi correo?</summary><p>Usamos tu correo corporativo para la entrega y recuperación del informe, según el consentimiento que aceptas al enviar la solicitud.</p></details>
+        <details><summary>¿Quién puede acceder al resultado?</summary><p>El informe se abre mediante un enlace de acceso y no se indexa en buscadores. Quien tenga ese enlace puede consultarlo: compártelo sólo con las personas que deban verlo.</p></details>
       </div>
     </section>
 
@@ -432,7 +299,7 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
 
 <script>
   // Conserva el destino en la URL y anuncia el encabezado al navegar con teclado o lector de pantalla.
-  document.querySelectorAll<HTMLAnchorElement>('.hero-cta, .topbar-link').forEach((link) => {
+  document.querySelectorAll<HTMLAnchorElement>('.hero-cta, .topbar-link, [data-start-analysis]').forEach((link) => {
     link.addEventListener('click', (event) => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
       const targetId = link.hash === '#brand-visibility-form' ? 'brand-visibility-form-title' : 'framework-title'
@@ -478,7 +345,7 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
   .hero-orbit-frame {
     position: absolute;
     inset: 0;
-    z-index: -1;
+    z-index: 1;
     overflow: hidden;
     pointer-events: none;
   }
@@ -486,8 +353,8 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
   .hero-orbit-frame :global(.hero-orbit) {
     position: absolute;
     top: clamp(64px, 7.6vw, 110px);
-    left: 59.7%;
-    width: 52.8%;
+    left: 52%;
+    width: 60%;
     max-width: none;
     height: auto;
     pointer-events: none;
@@ -495,7 +362,6 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
   }
 
   .topbar,
-  .preview-flow-grid,
   .framework-band {
     width: var(--brand-shell-width);
     margin-inline: auto;
@@ -672,584 +538,32 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
 
 
 
-  .preview-flow-section {
-    margin-top: clamp(-1.25rem, -1.8vw, -0.55rem);
-    border-top: 1px solid var(--engine-line);
-    border-bottom: 1px solid var(--engine-line);
-    background: var(--engine-paper);
-  }
-
-  .preview-flow-grid {
-    display: block;
-    padding: clamp(1.25rem, 2.8vw, 2.15rem) 0 clamp(2.8rem, 5.2vw, 4.4rem);
-  }
-
-  .report-preview {
-    display: grid;
-    gap: clamp(0.9rem, 1.8vw, 1.25rem);
-    min-width: 0;
-  }
-
-  .section-heading {
-    display: grid;
-    grid-template-columns: minmax(0, 0.58fr) minmax(320px, 0.42fr);
-    gap: clamp(1rem, 3vw, 2rem);
-    align-items: center;
-  }
-
-  .section-kicker {
-    margin: 0 0 0.3rem;
-    color: var(--engine-paper-ink);
-    font-size: 0.72rem;
-    font-weight: 820;
-    letter-spacing: 0;
-    line-height: 1.2;
-    text-transform: uppercase;
-  }
-
-  .framework-kicker {
-    display: inline-flex;
-    width: max-content;
-    align-items: center;
-    gap: 0.26rem;
-    color: var(--engine-paper-ink);
-  }
-
-  .inline-efeonce-logo {
-    display: inline-block;
-    flex: 0 0 auto;
-    width: 4.92rem;
-    height: 1.16rem;
-    background: currentColor;
-    -webkit-mask: url('/branding/efeonce-logo-negative.svg') center / contain no-repeat;
-    mask: url('/branding/efeonce-logo-negative.svg') center / contain no-repeat;
-    transform: translateY(0.02rem);
-  }
-
-  .section-heading h2 {
-    font-family: 'Bricolage Grotesque Variable', sans-serif;
-    margin: 0;
-    color: var(--engine-paper-ink);
-    font-size: clamp(1.45rem, 2.2vw, 2.05rem);
-    font-weight: 760;
-    line-height: 1.14;
-    text-wrap: balance;
-  }
-
-  .section-heading > div > p {
-    max-width: 660px;
-    margin: 0.62rem 0 0;
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.94rem;
-    line-height: 1.56;
-  }
-
-  .report-signal-strip {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.58rem;
-    min-width: 0;
-  }
-
-  .report-signal-strip span {
-    display: grid;
-    gap: 0.22rem;
-    min-width: 0;
-    border: 1px solid color-mix(in srgb, var(--axis-blue) 14%, var(--axis-gray-100));
-    border-radius: 8px;
-    padding: 0.78rem 0.82rem;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.62)),
-      color-mix(in srgb, var(--axis-blue) 3%, transparent);
-    box-shadow: 0 18px 46px -42px rgba(0, 40, 77, 0.36);
-  }
-
-  .report-signal-strip strong {
-    color: var(--engine-paper-ink);
-    font-size: 0.76rem;
-    font-weight: 780;
-    line-height: 1.16;
-  }
-
-  .report-signal-strip small {
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.68rem;
-    font-weight: 620;
-    line-height: 1.28;
-  }
-
-  .preview-module-strip {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    overflow: clip;
-    border: 1px solid var(--axis-gray-100);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow:
-      0 24px 64px -56px rgba(17, 24, 39, 0.38),
-      inset 0 1px 0 rgba(255, 255, 255, 0.86);
-  }
-
-  .preview-module {
-    display: grid;
-    align-content: start;
-    gap: 0.54rem;
-    min-width: 0;
-    border-left: 1px solid var(--axis-gray-100);
-    padding: clamp(1rem, 2vw, 1.3rem);
-  }
-
-  .preview-module:first-child {
-    border-left: 0;
-  }
-
-  .preview-module-top {
-    display: flex;
-    align-items: center;
-    gap: 0.72rem;
-  }
-
-  .preview-module small {
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.72rem;
-    font-weight: 760;
-    line-height: 1.2;
-  }
-
-  .preview-module h3 {
-    margin: 0;
-    color: var(--engine-paper-ink);
-    font-size: 0.92rem;
-    font-weight: 740;
-    line-height: 1.22;
-  }
-
-  .preview-module p {
-    margin: 0;
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.82rem;
-    line-height: 1.48;
-  }
-
-  .report-proof-row {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
-    overflow: clip;
-    border: 1px solid var(--axis-gray-100);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.72);
-  }
-
-  .report-proof-row p {
-    min-width: 0;
-    margin: 0;
-    border-left: 1px solid var(--axis-gray-100);
-    padding: 0.9rem 1rem;
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.8rem;
-    line-height: 1.45;
-  }
-
-  .report-proof-row p:first-child {
-    border-left: 0;
-  }
-
-  .report-proof-row strong {
-    color: var(--engine-paper-ink);
-    font-weight: 760;
-  }
-
-  .framework-band {
-    display: grid;
-    gap: clamp(1.4rem, 2.8vw, 2.2rem);
-    padding: var(--brand-form-dock-clearance, clamp(9rem, 12vw, 14rem)) 0 clamp(2.6rem, 4.8vw, 4.25rem);
-  }
-
-  .framework-heading {
-    display: grid;
-    grid-template-columns: minmax(0, 0.66fr) minmax(280px, 0.34fr);
-    gap: clamp(1rem, 3vw, 2.1rem);
-    align-items: end;
-  }
-
-  .framework-heading .section-kicker {
-    grid-column: 1 / -1;
-    margin-bottom: -0.82rem;
-  }
-
-  .framework-heading h2 {
-    margin: 0;
-    max-width: 640px;
-    text-align: left;
-    color: var(--engine-paper-ink);
-    font-size: clamp(1.34rem, 2.15vw, 2rem);
-    font-weight: 760;
-    line-height: 1.12;
-    text-wrap: balance;
-  }
-
-  .framework-heading > p {
-    margin: 0;
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.94rem;
-    line-height: 1.62;
-  }
-
-  .framework-ladder {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0.72rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .framework-ladder > li {
-    position: relative;
-    display: grid;
-    min-width: 0;
-    border: 1px solid var(--engine-line);
-    border-radius: 8px;
-    padding: 0;
-    background: var(--engine-ink);
-  }
-
-  .framework-ladder > li:last-child::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 0 auto;
-    z-index: 1;
-    width: 2px;
-    border-radius: 0 8px 8px 0;
-    background: linear-gradient(
-      180deg,
-      rgba(46, 38, 61, 0.1),
-      rgba(46, 38, 61, 0.25) 48%,
-      rgba(46, 38, 61, 0.12)
-    );
-    pointer-events: none;
-  }
-
-  .framework-ladder > li::after {
-    content: none;
-  }
-
-  .framework-step {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    min-height: 1.6rem;
-    padding-top: 0.08rem;
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.7rem;
-    font-weight: 840;
-    letter-spacing: 0.09em;
-    line-height: 1;
-  }
-
-  .framework-card-body {
-    display: grid;
-    align-content: start;
-    gap: 0.72rem;
-    padding: 0.95rem 1rem 1.08rem;
-  }
-
-  .framework-card-top {
-    display: grid;
-    grid-template-columns: 2rem minmax(0, 1fr);
-    align-items: start;
-    gap: 0.68rem;
-    min-width: 0;
-    text-align: left;
-  }
-
-  .framework-card-top > div {
-    min-width: 0;
-    text-align: left;
-  }
-
-  .framework-title-row {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.36rem;
-    min-width: 0;
-    color: var(--engine-paper-ink);
-  }
-
-  .framework-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    width: 16px;
-    height: 16px;
-    color: var(--engine-paper-ink-soft);
-    opacity: 0.82;
-  }
-
-  .framework-icon :global(svg) {
-    display: block;
-    width: 15px;
-    height: 15px;
-  }
-
-  .framework-card-top strong {
-    display: block;
-    color: var(--engine-paper-ink);
-    font-size: 0.9rem;
-    font-weight: 780;
-    line-height: 1.18;
-  }
-
-  .framework-card-subtitle {
-    display: block;
-    margin-top: 0.14rem;
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.73rem;
-    line-height: 1.28;
-  }
-
-  .framework-question {
-    margin: 0;
-    color: var(--engine-paper-ink);
-    font-size: 0.82rem;
-    font-weight: 720;
-    line-height: 1.35;
-  }
-
-  .framework-card-body > .framework-question,
-  .framework-card-body > p:not(.framework-question),
-  .framework-card-body > em {
-    margin-left: calc(2rem + 0.68rem);
-  }
-
-  .framework-card-body > p:not(.framework-question) {
-    margin: 0 0 0 calc(2rem + 0.68rem);
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.76rem;
-    line-height: 1.42;
-  }
-
-  .framework-card-body em {
-    display: block;
-    margin: 0 0 0 calc(2rem + 0.68rem);
-    border-top: 1px solid var(--axis-gray-100);
-    padding-top: 0.62rem;
-    color: var(--engine-paper-ink);
-    font-size: 0.74rem;
-    font-style: normal;
-    font-weight: 620;
-    line-height: 1.38;
-  }
-
-  .framework-bridge {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.25rem;
-    border: 1px solid var(--engine-line);
-    border-radius: 8px;
-    padding: clamp(1rem, 2vw, 1.2rem);
-    background: var(--engine-ink);
-  }
-
-  .framework-bridge strong {
-    display: block;
-    color: var(--engine-paper-ink);
-    font-size: 0.94rem;
-    font-weight: 760;
-    line-height: 1.25;
-  }
-
-  .framework-bridge p {
-    max-width: 680px;
-    margin: 0.22rem 0 0;
-    color: var(--engine-paper-ink-soft);
-    font-size: 0.84rem;
-    line-height: 1.48;
-  }
-
-  .framework-bridge > span {
-    flex: 0 0 auto;
-    border: 1px solid rgba(3, 117, 219, 0.14);
-    border-radius: 999px;
-    padding: 0.48rem 0.72rem;
-    background: rgba(255, 255, 255, 0.72);
-    color: var(--engine-paper-ink);
-    font-size: 0.72rem;
-    font-weight: 760;
-    line-height: 1;
-    white-space: nowrap;
-  }
-
-  .preview-report-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 0.92fr) minmax(360px, 0.58fr);
-    gap: clamp(0.9rem, 2vw, 1.15rem);
-    align-items: stretch;
-  }
-
-  .preview-module-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.72rem;
-    overflow: visible;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .preview-module {
-    min-height: 176px;
-    border: 1px solid color-mix(in srgb, var(--axis-gray-100) 78%, var(--axis-gray-600));
-    border-radius: 8px;
-    padding: clamp(1rem, 2vw, 1.24rem);
-    background: var(--engine-ink);
-    box-shadow:
-      0 22px 58px -50px rgba(46, 38, 61, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.86);
-  }
-
-  .preview-module:first-child {
-    border-left: 1px solid var(--axis-gray-100);
-  }
-
-  .report-snapshot {
-    position: relative;
-    display: grid;
-    align-content: start;
-    gap: 1rem;
-    min-width: 0;
-    overflow: hidden;
-    border-radius: 8px;
-    padding: clamp(1rem, 2vw, 1.24rem);
-    background: var(--engine-ground);
-    color: var(--engine-ink);
-  }
-
-
-  .snapshot-header,
-  .snapshot-score,
-  .snapshot-notes {
-    position: relative;
-    z-index: 1;
-  }
-
-  .snapshot-header {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.7rem;
-    color: rgba(255, 255, 255, 0.68);
-    font-size: 0.72rem;
-    font-weight: 720;
-    line-height: 1.2;
-  }
-
-  .snapshot-header img {
-    width: min(100%, 300px);
-    height: auto;
-  }
-
-  .snapshot-badge-row {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.48rem;
-  }
-
-  .snapshot-badge-row span {
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 999px;
-    padding: 0.32rem 0.54rem;
-    background: rgba(255, 255, 255, 0.075);
-    color: rgba(255, 255, 255, 0.72);
-    font-size: 0.66rem;
-    font-weight: 720;
-    line-height: 1;
-  }
-
-  .snapshot-score {
-    display: grid;
-    gap: 0.78rem;
-    align-items: center;
-    border-block: 1px solid color-mix(in srgb, var(--engine-ink) 16%, transparent);
-    padding-block: 0.92rem;
-  }
-
-
-
-
-
-  .snapshot-score small {
-    display: block;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.68rem;
-    font-weight: 760;
-    line-height: 1.2;
-    text-transform: uppercase;
-  }
-
-  .snapshot-score strong {
-    display: block;
-    margin-top: 0.18rem;
-    color: var(--engine-ink);
-    font-size: 1rem;
-    line-height: 1.25;
-  }
-
-
-
-
-  .snapshot-notes {
-    display: grid;
-    gap: 0.52rem;
-    margin-top: auto;
-  }
-
-  .snapshot-notes p {
-    margin: 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 0.62rem 0.68rem;
-    background: rgba(255, 255, 255, 0.07);
-    color: rgba(255, 255, 255, 0.72);
-    font-size: 0.76rem;
-    line-height: 1.42;
-  }
-
-  .snapshot-notes strong {
-    color: var(--engine-ink);
-  }
-
-  .report-proof-row {
-    gap: 0.72rem;
-    overflow: visible;
-    border: 0;
-    background: transparent;
-  }
-
-  .report-proof-row p,
-  .report-proof-row p:first-child {
-    border: 1px solid var(--axis-gray-100);
-    border-radius: 8px;
-    padding: 0.92rem 1rem;
-    background: var(--engine-ink);
-  }
-
-  .capture-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
+  .section-kicker { margin: 0 0 .8rem; color: var(--engine-paper-ink-soft); font-size: .8rem; font-weight: 500; }
+  .framework-band { width: var(--brand-shell-width); margin-inline: auto; padding: var(--brand-form-dock-clearance,clamp(9rem,12vw,14rem)) 0 clamp(3rem,6vw,5rem); display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); gap: clamp(2rem,5vw,5rem); align-items: start; }
+  .framework-kicker { display: flex; align-items: center; gap: .4rem; }
+  .inline-efeonce-logo { display: inline-block; width: 66px; height: 18px; background: var(--engine-paper-ink); mask: url('/branding/efeonce-logo-negative.svg') center / contain no-repeat; }
+  .framework-heading h2,.decision-copy h2 { font-family: 'Bricolage Grotesque Variable',sans-serif; color: var(--engine-paper-ink); font-size: clamp(1.8rem,3vw,2.7rem); font-weight: 600; letter-spacing: -.025em; line-height: 1.12; margin: 0; }
+  .framework-heading > p:last-child,.decision-copy > p:not(.section-kicker) { color: var(--engine-paper-ink-soft); font-size: .95rem; line-height: 1.75; margin: 1.25rem 0 0; }
+  .framework-ladder { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--engine-line); }
+  .framework-ladder > li { border-bottom: 1px solid var(--engine-line); }
+  .method-detail summary { display: grid; grid-template-columns: 1.5rem minmax(0,1fr) 24px 16px; gap: 1rem; align-items: center; padding: 1.3rem 0; cursor: pointer; list-style: none; }
+  .method-detail summary::-webkit-details-marker { display: none; }
+  .method-number { font-size: .75rem; color: var(--engine-paper-ink-soft); }
+  .method-question { display: block; font-size: 1rem; line-height: 1.4; font-weight: 500; color: var(--engine-paper-ink); }
+  .method-subtitle { display: block; font-size: .75rem; line-height: 1.5; margin-top: .35rem; color: var(--engine-paper-ink-soft); }
+  .method-expand { font-size: 1.4rem; font-weight: 300; }
+  .method-detail[open] .method-expand { transform: rotate(45deg); }
+  .method-answer { padding: 0 2rem 1.25rem 2.5rem; font-size: .85rem; color: var(--engine-paper-ink-soft); line-height: 1.7; }
+  .method-answer p { margin: 0 0 .5rem; }
+  .decision-section { width: var(--brand-shell-width); margin-inline: auto; padding-block: clamp(3rem,6vw,6rem); display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); gap: clamp(2rem,5vw,5rem); }
+  .final-cta { margin-top: 1.75rem; background: var(--engine-ground); color: var(--engine-ink); }
+  .final-cta:hover { background: var(--engine-paper-ink); color: var(--engine-ink); }
+  .decision-questions details { border-bottom: 1px solid var(--engine-line); padding-block: 1.15rem; }
+  .decision-questions details:first-child { border-top: 1px solid var(--engine-line); }
+  .decision-questions summary { font-size: .95rem; font-weight: 500; cursor: pointer; color: var(--engine-paper-ink); }
+  .decision-questions p { font-size: .85rem; line-height: 1.75; color: var(--engine-paper-ink-soft); margin: .75rem 0 0; }
+  #framework-title { scroll-margin-top: 24px; }
+  summary:focus-visible { outline: 2px solid var(--engine-accent); outline-offset: 4px; }
 
   .brand-visibility-footer {
     background: var(--engine-ground);
@@ -1306,122 +620,26 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
 
 
   @media (max-width: 980px) {
-    .footer-aeo-logo {
-      margin-inline: auto;
-    }
-
-    .brand-visibility-page {
-      --brand-form-card-radius: 1rem;
-      --brand-hero-bottom-radius: 0;
-    }
-
-    .preview-flow-grid,
-    .framework-band {
-      width: min(100% - 32px, 720px);
-    }
-
-    .framework-band {
-      padding-top: 1.45rem;
-    }
-
-    .preview-flow-section {
-      margin-top: 0;
-    }
-
-    .preview-flow-grid {
-      padding-top: 1.55rem;
-    }
-
-    .preview-module-strip,
-    .framework-band ol,
-    .report-proof-row,
-    .section-heading {
-      grid-template-columns: 1fr;
-    }
-
-    .preview-module,
-    .framework-band li {
-      border-right: 0;
-      border-left: 0;
-      border-bottom: 1px solid var(--axis-gray-100);
-      padding: 0.8rem 0;
-    }
-
-    .framework-band li:last-child,
-    .preview-module:last-child {
-      border-bottom: 0;
-    }
-
-    .preview-module {
-      border-left: 0;
-    }
-
-    .report-proof-row p,
-    .report-proof-row p:first-child {
-      border-left: 0;
-      border-top: 1px solid var(--axis-gray-100);
-    }
-
-    .report-proof-row p:first-child {
-      border-top: 0;
-    }
-
-    .framework-heading,
-    .framework-ladder,
-    .preview-report-layout {
-      grid-template-columns: 1fr;
-    }
-
-    .report-signal-strip {
-      grid-template-columns: 1fr;
-    }
-
-    .framework-heading .section-kicker {
-      margin-bottom: -0.25rem;
-    }
-
-    .framework-ladder > li,
-    .framework-ladder > li:last-child {
-      border: 1px solid var(--axis-gray-100);
-      padding: 0;
-    }
-
-    .framework-bridge {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .framework-bridge > span {
-      white-space: normal;
-      line-height: 1.35;
-    }
-
-    .preview-module,
-    .preview-module:first-child,
-    .preview-module:last-child,
-    .report-proof-row p,
-    .report-proof-row p:first-child {
-      border: 1px solid var(--axis-gray-100);
-      border-radius: 8px;
-      padding: 0.95rem;
-    }
-
-    .report-snapshot {
-      min-height: 280px;
-    }
+    .footer-aeo-logo { margin-inline: auto; }
+    .brand-visibility-page { --brand-form-card-radius: 1rem; --brand-hero-bottom-radius: 0; }
+    .framework-band,.decision-section { width: min(100% - 32px,720px); grid-template-columns: 1fr; gap: 1.75rem; }
+    .framework-band { padding-top: 2.25rem; }
+    .method-detail summary { gap: .65rem; }
+    .method-answer { padding-left: 2.15rem; }
+    .final-cta { justify-content: center; }
   }
 
   /* Teléfono: compuesto mobile-first (norma web §4.1). La órbita arriba a la derecha, la voz debajo de ella. */
   @media (max-width: 980px) {
     /* --orbit-w: ancho del archivo de la órbita (1920 × 1080; anillo r = 0,225 w, centro a 0,281 w). */
     .hero-shell {
-      --orbit-w: min(100vw, 560px);
+      --orbit-w: min(100vw, 440px);
     }
 
     .hero-orbit-frame :global(.hero-orbit) {
       top: 48px;
       left: auto;
-      right: calc(var(--orbit-w) * -0.308);
+      right: calc(var(--orbit-w) * -0.12);
       width: var(--orbit-w);
     }
 
@@ -1430,7 +648,7 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
     }
 
     .hero-grid {
-      padding-top: calc(var(--orbit-w) * 0.506 + 30px); /* la voz empieza bajo el anillo */
+      padding-top: calc(var(--orbit-w) * 0.506 + 56px); /* la voz empieza bajo el anillo */
       /* En este ancho el formulario ya está en el flujo: no necesita la reserva de solape de escritorio. */
       padding-bottom: 48px;
     }

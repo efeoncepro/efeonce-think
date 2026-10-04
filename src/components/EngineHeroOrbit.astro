@@ -1,18 +1,97 @@
 ---
 import orbitSvg from '../../public/branding/products/orbit-engine-dark-screen.svg?raw'
-import { orbitMotionCss } from '@lib/engine-orbit-motion'
+// Local motion proposal, operator feedback 2026-10-04. Not a replacement of AXIS brand-close.
+const scene = { cycleSeconds: 12, engines: ['chatgpt', 'gemini', 'claude'] }
 ---
 
-<!-- The official asset stays byte-identical. Inline markup exposes AXIS animation hooks without client JS. -->
-<div class="hero-orbit axis-orbit-animate" data-capture="brand-visibility-orbit-motion" aria-hidden="true">
-  <Fragment set:html={orbitSvg} />
-</div>
-<Fragment set:html={`<style>${orbitMotionCss}</style>`} />
+<engine-hero-orbit class="hero-orbit" data-capture="brand-visibility-orbit-motion" style={`--scene-cycle:${scene.cycleSeconds}s`}>
+  <div class="orbit-illustration" aria-hidden="true">
+    <Fragment set:html={orbitSvg} />
+    <div class="answer-stack">
+      {scene.engines.map((engine, index) => (
+        <div class="answer-card" style={`--card-delay:${index * scene.cycleSeconds / scene.engines.length}s`}>
+          <div class="answer-card-head">
+            <span class="engine-disc"><img src={`/logos/engines/${engine}.svg`} alt="" width="24" height="24" /></span>
+            <span class="answer-line answer-line-heading"></span>
+          </div>
+          <span class="answer-line"></span>
+          <span class="answer-line answer-line-short"></span>
+          <span class="answer-citation"><span></span><span></span></span>
+        </div>
+      ))}
+    </div>
+  </div>
+  <button class="orbit-toggle" type="button" hidden>Pausar animación</button>
+</engine-hero-orbit>
 
 <style>
-  .hero-orbit :global(svg) {
-    display: block;
-    width: 100%;
-    height: auto;
+  .hero-orbit { display: block; }
+  .orbit-illustration { position: relative; }
+  .hero-orbit :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
+  .hero-orbit :global([data-axis-element="orbit"]) { transform-box: view-box; transform-origin: center; }
+  .answer-stack { position: absolute; width: 28%; height: 30%; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  .answer-stack::before, .answer-stack::after { content: ''; position: absolute; inset: 0; border: 1px solid color-mix(in srgb, var(--engine-ink-soft) 20%, transparent); border-radius: 12px; background: var(--engine-ground); transform: translate(8px, 8px) rotate(5deg); }
+  .answer-stack::after { transform: translate(-6px, -7px) rotate(-5deg); }
+  .answer-card { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; justify-content: center; gap: 10%; padding: 10%; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--engine-ink-soft) 38%, transparent); background: var(--engine-ground); box-shadow: 0 12px 40px color-mix(in srgb, var(--engine-accent) 18%, transparent); opacity: 0; }
+  .answer-card:first-child { opacity: 1; }
+  .answer-card-head { display: flex; align-items: center; gap: 10%; margin-bottom: 2%; }
+  .engine-disc { display: grid; place-items: center; background: var(--engine-ink); border-radius: 50%; width: 24%; aspect-ratio: 1; flex-shrink: 0; }
+  .engine-disc img { width: 68%; height: auto; }
+  .answer-line { display: block; height: 5px; border-radius: 8px; background: color-mix(in srgb, var(--engine-ink-soft) 35%, transparent); }
+  .answer-line-heading { width: 58%; background: var(--engine-ink-soft); }
+  .answer-line-short { width: 68%; }
+  .answer-citation { display: flex; gap: 5%; margin-top: 3%; }
+  .answer-citation span { width: 27%; height: 5px; border-radius: 8px; background: var(--engine-accent); }
+  .answer-citation span:last-child { width: 17%; opacity: .55; }
+  .orbit-toggle { position: absolute; top: 96%; left: 50%; transform: translateX(-50%); pointer-events: auto; white-space: nowrap; color: var(--engine-ink-soft); background: transparent; border: 1px solid color-mix(in srgb, var(--engine-ink-soft) 25%, transparent); border-radius: 999px; padding: 8px 14px; font: 400 12px/1.4 'Poppins', sans-serif; cursor: pointer; }
+  .orbit-toggle[hidden] { display: none; }
+  .orbit-toggle:hover { border-color: var(--engine-ink-soft); }
+  .orbit-toggle:focus-visible { outline: 2px solid var(--engine-ink); outline-offset: 4px; }
+  .hero-orbit[data-motion-ready] :global([data-axis-element="orbit"]) { animation: orbit-journey var(--scene-cycle) linear infinite; }
+  .hero-orbit[data-motion-ready] .answer-card { animation: answer-relay var(--scene-cycle) ease-in-out var(--card-delay) infinite forwards; }
+  .hero-orbit[data-playing="false"] :global([data-axis-element="orbit"]), .hero-orbit[data-playing="false"] .answer-card { animation-play-state: paused; }
+  @keyframes orbit-journey { to { transform: rotate(360deg); } }
+  @keyframes answer-relay { 0%, 29% { opacity: 1; transform: translateY(0) scale(1); } 33.333%, 96% { opacity: 0; transform: translateY(-8px) scale(.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+  @media (max-width: 980px) { .answer-stack { height: 40%; } }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-orbit[data-motion-ready] :global([data-axis-element="orbit"]), .hero-orbit[data-motion-ready] .answer-card { animation: none; }
+    .answer-card { opacity: 0; }
+    .answer-card:first-child { opacity: 1; }
+    .orbit-toggle { display: none; }
   }
 </style>
+
+<script>
+  class EngineHeroOrbit extends HTMLElement {
+    private cleanup?: () => void
+    connectedCallback() {
+      if (this.cleanup) return
+      const button = this.querySelector<HTMLButtonElement>('.orbit-toggle')
+      if (!button) return
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
+      let paused = false
+      let visible = false
+      const update = () => {
+        this.toggleAttribute('data-motion-ready', !reduced.matches)
+        this.dataset.playing = String(!paused && visible && !document.hidden && !reduced.matches)
+        button.hidden = reduced.matches
+        button.textContent = paused ? 'Reanudar animación' : 'Pausar animación'
+      }
+      const toggle = () => { paused = !paused; update() }
+      const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update() })
+      observer.observe(this)
+      button.addEventListener('click', toggle)
+      reduced.addEventListener('change', update)
+      document.addEventListener('visibilitychange', update)
+      update()
+      this.cleanup = () => {
+        observer.disconnect()
+        button.removeEventListener('click', toggle)
+        reduced.removeEventListener('change', update)
+        document.removeEventListener('visibilitychange', update)
+      }
+    }
+    disconnectedCallback() { this.cleanup?.(); this.cleanup = undefined }
+  }
+  if (!customElements.get('engine-hero-orbit')) customElements.define('engine-hero-orbit', EngineHeroOrbit)
+</script>
