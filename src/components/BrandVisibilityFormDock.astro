@@ -832,7 +832,9 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
   greenhouse-form {
     display: block;
     min-width: 0;
-
+    --ghf-accent: var(--engine-ground);
+    --ghf-accent-contrast: var(--engine-ink);
+    --ghf-focus: var(--engine-accent);
   }
 
   /* Supported host tokens: target the renderer's scope, where variant defaults are declared. */
@@ -847,6 +849,30 @@ const rendererSrc = `${greenhouseBase}/growth-forms/renderer-latest.js`
     --ghf-field-shadow-focus: 0 0 0 3px color-mix(in srgb,var(--engine-accent) 18%,transparent);
     --ghf-action-shadow: 0 8px 20px color-mix(in srgb,var(--engine-ground) 12%,transparent);
     --ghf-action-shadow-hover: 0 10px 24px color-mix(in srgb,var(--engine-ground) 18%,transparent);
+  }
+  /* Scoped host treatment: renderer uses !important to isolate itself from host resets.
+     Match that boundary only for this landing, including its load-error button. */
+  .form-card greenhouse-form :global(.ghf-form .ghf-btn) {
+    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    box-shadow: none !important;
+  }
+  .form-card greenhouse-form :global(.ghf-form .ghf-btn:hover:not(:disabled)),
+  .form-card greenhouse-form :global(.ghf-form .ghf-btn:focus-visible) {
+    transform: none;
+    filter: none;
+    border-color: var(--engine-accent) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb,var(--engine-accent) 18%,transparent) !important;
+  }
+  .form-card greenhouse-form :global(.ghf-form .ghf-btn:not(.ghf-btn--ghost):not(.ghf-btn--skip):hover:not(:disabled)) {
+    background: var(--engine-ink-soft) !important;
+    color: var(--engine-ground) !important;
+  }
+  .form-card greenhouse-form :global(.ghf-form .ghf-btn:active:not(:disabled)) {
+    transform: none;
+    box-shadow: inset 0 0 0 2px var(--engine-accent) !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .form-card greenhouse-form :global(.ghf-btn), .form-card greenhouse-form :global(.ghf-btn-arrow) { transition: none; transform: none !important; }
   }
   /* Field layout only; order and membership remain in the governed contract. */
   @media (min-width: 981px) {

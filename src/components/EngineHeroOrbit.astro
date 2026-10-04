@@ -1,64 +1,70 @@
 ---
 import orbitSvg from '../../public/branding/products/orbit-engine-dark-screen.svg?raw'
-// Local motion proposal, operator feedback 2026-10-04. Not a replacement of AXIS brand-close.
-const scene = { cycleSeconds: 12, engines: ['chatgpt', 'gemini', 'claude'] }
+// Surface choreography approved for implementation, 2026-10-04; not AXIS logo motion.
+const cycleSeconds = 12
 ---
 
-<engine-hero-orbit class="hero-orbit" data-capture="brand-visibility-orbit-motion" style={`--scene-cycle:${scene.cycleSeconds}s`}>
-  <div class="orbit-illustration" aria-hidden="true">
-    <Fragment set:html={orbitSvg} />
-    <div class="answer-stack">
-      {scene.engines.map((engine, index) => (
-        <div class="answer-card" style={`--card-delay:${index * scene.cycleSeconds / scene.engines.length}s`}>
-          <div class="answer-card-head">
-            <span class="engine-disc"><img src={`/logos/engines/${engine}.svg`} alt="" width="24" height="24" /></span>
-            <span class="answer-line answer-line-heading"></span>
-          </div>
-          <span class="answer-line"></span>
-          <span class="answer-line answer-line-short"></span>
-          <span class="answer-citation"><span></span><span></span></span>
+<engine-hero-orbit class="hero-orbit" data-capture="brand-visibility-orbit-motion" style={`--scene-cycle:${cycleSeconds}s`}>
+  <figure class="demo" aria-label="Ejemplo ilustrativo: una consulta genera una respuesta que menciona una marca y cita su sitio. No es un resultado real.">
+    <div class="demo-stage" aria-hidden="true">
+      <div class="demo-orbit"><Fragment set:html={orbitSvg} /></div>
+      <div class="demo-conversation">
+        <div class="demo-query"><span class="query-label">LA PREGUNTA</span><p>¿Qué marca me recomiendas?</p><span class="query-arrow">↗</span></div>
+        <div class="demo-answer">
+          <div class="answer-heading"><span class="answer-symbol">✳</span><span>Una respuesta de IA</span></div>
+          <p class="answer-intro">Entre las opciones para lo que buscas…</p>
+          <div class="brand-mention"><span class="mention-index">01</span><strong>Tu marca</strong><span class="mention-check">↗</span></div>
+          <div class="demo-citation"><span>Fuente citada</span><strong>tu-sitio.ejemplo</strong></div>
         </div>
-      ))}
+        <div class="demo-insight">¿Tu marca está en esa respuesta?</div>
+      </div>
     </div>
-  </div>
-  <button class="orbit-toggle" type="button" hidden>Pausar animación</button>
+    <button class="orbit-toggle" type="button" hidden aria-label="Pausar demostración"></button>
+  </figure>
 </engine-hero-orbit>
 
 <style>
-  .hero-orbit { display: block; }
-  .orbit-illustration { position: relative; }
-  .hero-orbit :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
+  .hero-orbit { display: block; min-width: 0; }
+  .demo { position: relative; margin: 0; }
+  .demo-stage { position: relative; isolation: isolate; display: grid; place-items: center; aspect-ratio: 1; }
+  .demo-orbit { position: absolute; inset: 0; z-index: -1; display: grid; place-items: center; pointer-events: none; }
+  .demo-orbit :global(svg) { position: absolute; width: 220%; height: auto; max-width: none; }
   .hero-orbit :global([data-axis-element="orbit"]) { transform-box: view-box; transform-origin: center; }
-  .answer-stack { position: absolute; width: 28%; height: 30%; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-  .answer-stack::before, .answer-stack::after { content: ''; position: absolute; inset: 0; border: 1px solid color-mix(in srgb, var(--engine-ink-soft) 20%, transparent); border-radius: 12px; background: var(--engine-ground); transform: translate(8px, 8px) rotate(5deg); }
-  .answer-stack::after { transform: translate(-6px, -7px) rotate(-5deg); }
-  .answer-card { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; justify-content: center; gap: 10%; padding: 10%; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--engine-ink-soft) 38%, transparent); background: var(--engine-ground); box-shadow: 0 12px 40px color-mix(in srgb, var(--engine-accent) 18%, transparent); opacity: 0; }
-  .answer-card:first-child { opacity: 1; }
-  .answer-card-head { display: flex; align-items: center; gap: 10%; margin-bottom: 2%; }
-  .engine-disc { display: grid; place-items: center; background: var(--engine-ink); border-radius: 50%; width: 24%; aspect-ratio: 1; flex-shrink: 0; }
-  .engine-disc img { width: 68%; height: auto; }
-  .answer-line { display: block; height: 5px; border-radius: 8px; background: color-mix(in srgb, var(--engine-ink-soft) 35%, transparent); }
-  .answer-line-heading { width: 58%; background: var(--engine-ink-soft); }
-  .answer-line-short { width: 68%; }
-  .answer-citation { display: flex; gap: 5%; margin-top: 3%; }
-  .answer-citation span { width: 27%; height: 5px; border-radius: 8px; background: var(--engine-accent); }
-  .answer-citation span:last-child { width: 17%; opacity: .55; }
-  .orbit-toggle { position: absolute; top: 96%; left: 50%; transform: translateX(-50%); pointer-events: auto; white-space: nowrap; color: var(--engine-ink-soft); background: transparent; border: 1px solid color-mix(in srgb, var(--engine-ink-soft) 25%, transparent); border-radius: 999px; padding: 8px 14px; font: 400 12px/1.4 'Poppins', sans-serif; cursor: pointer; }
+  .demo-conversation { width: 72%; display: grid; gap: 12px; font-size: clamp(.8125rem, 1.05vw, 1rem); }
+  .demo-query { position: relative; padding: 16px 34px 16px 18px; border: 1px solid color-mix(in srgb,var(--engine-ink-soft) 35%,transparent); border-radius: 16px 16px 4px 16px; background: var(--engine-ground); }
+  .query-label { color: var(--engine-ink-soft); font-size: .75rem; letter-spacing: .12em; }
+  .demo-query p { margin: 6px 0 0; color: var(--engine-ink); font-weight: 500; line-height: 1.4; }
+  .query-arrow { position: absolute; right: 14px; top: 50%; color: var(--engine-ink-soft); }
+  .demo-answer { padding: 20px; border-radius: 4px 16px 16px 16px; background: var(--engine-paper); color: var(--engine-paper-ink); box-shadow: 0 20px 48px color-mix(in srgb,var(--engine-ground) 35%,transparent); }
+  .answer-heading { display: flex; align-items: center; gap: 8px; font-size: .6875rem; font-weight: 500; }
+  .answer-symbol { font-size: 20px; line-height: 1; color: var(--engine-accent); }
+  .answer-intro { margin: 14px 0; font-size: .8125rem; line-height: 1.5; }
+  .brand-mention { background: color-mix(in srgb,var(--engine-accent) 12%,transparent); display: flex; align-items: center; gap: 12px; border-block: 1px solid var(--engine-line); padding: 12px 0; }
+  .mention-index { font-size: .6875rem; color: var(--engine-paper-ink-soft); }
+  .brand-mention strong { font-family: 'Bricolage Grotesque Variable', sans-serif; font-size: clamp(1.375rem,2.2vw,2rem); font-weight: 650; }
+  .mention-check { margin-left: auto; font-size: 22px; color: var(--engine-accent); }
+  .demo-citation { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 14px; font-size: .75rem; }
+  .demo-citation span { color: var(--engine-paper-ink-soft); }
+  .demo-citation strong { font-weight: 500; }
+  .demo-insight { color: var(--engine-ink-soft); text-align: center; font-size: .75rem; }
+  /* The scene itself is a native button hit area; Enter/Space work without custom key handlers. */
+  .orbit-toggle { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 16px; background: transparent; cursor: pointer; }
   .orbit-toggle[hidden] { display: none; }
-  .orbit-toggle:hover { border-color: var(--engine-ink-soft); }
   .orbit-toggle:focus-visible { outline: 2px solid var(--engine-ink); outline-offset: 4px; }
   .hero-orbit[data-motion-ready] :global([data-axis-element="orbit"]) { animation: orbit-journey var(--scene-cycle) linear infinite; }
-  .hero-orbit[data-motion-ready] .answer-card { animation: answer-relay var(--scene-cycle) ease-in-out var(--card-delay) infinite forwards; }
-  .hero-orbit[data-playing="false"] :global([data-axis-element="orbit"]), .hero-orbit[data-playing="false"] .answer-card { animation-play-state: paused; }
+  .hero-orbit[data-motion-ready] .demo-query { animation: query-arrives var(--scene-cycle) ease-in-out infinite; }
+  .hero-orbit[data-motion-ready] .answer-intro { animation: answer-arrives var(--scene-cycle) ease-in-out infinite; }
+  .hero-orbit[data-motion-ready] .brand-mention { animation: mention-focus var(--scene-cycle) ease-in-out infinite; }
+  .hero-orbit[data-motion-ready] .demo-citation, .hero-orbit[data-motion-ready] .demo-insight { animation: citation-arrives var(--scene-cycle) ease-in-out infinite; }
+  .hero-orbit[data-playing="false"] :global(*) { animation-play-state: paused !important; }
   @keyframes orbit-journey { to { transform: rotate(360deg); } }
-  @keyframes answer-relay { 0%, 29% { opacity: 1; transform: translateY(0) scale(1); } 33.333%, 96% { opacity: 0; transform: translateY(-8px) scale(.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-  @media (max-width: 980px) { .answer-stack { height: 40%; } }
-  @media (prefers-reduced-motion: reduce) {
-    .hero-orbit[data-motion-ready] :global([data-axis-element="orbit"]), .hero-orbit[data-motion-ready] .answer-card { animation: none; }
-    .answer-card { opacity: 0; }
-    .answer-card:first-child { opacity: 1; }
-    .orbit-toggle { display: none; }
-  }
+  @keyframes query-arrives { 0%, 3% { transform: translateY(4px); } 9%, 100% { transform: none; } }
+  @keyframes answer-arrives { 0%, 14% { opacity: 0; transform: translateY(10px); } 23%, 94% { opacity: 1; transform: none; } 100% { opacity: 0; transform: none; } }
+  @keyframes mention-focus { 0%, 30% { background: transparent; } 40%, 85% { background: color-mix(in srgb,var(--engine-accent) 12%,transparent); } 94%, 100% { background: transparent; } }
+  @keyframes citation-arrives { 0%, 36% { opacity: 0; } 44%, 94% { opacity: 1; } 100% { opacity: 0; } }
+  @media (max-width: 980px) { .demo-conversation { width: 70%; gap: 10px; } .demo-answer { padding: 16px; } .demo-query { padding-block: 12px; } }
+  @media (max-width: 420px) { .demo-query { padding-right: 14px; } .query-arrow { display: none; } .demo-query p { font-size: .75rem; } .demo-orbit :global(svg) { width: 270%; } .demo-stage { margin-block: 22px; } .demo-conversation { width: 76%; gap: 8px; } .demo-query { padding-block: 10px; } .demo-answer { padding: 14px; } .answer-intro { margin-block: 10px; } .brand-mention { padding-block: 8px; } .demo-citation { margin-top: 10px; } .demo-insight { font-size: .6875rem; } }
+  @media (prefers-reduced-motion: reduce) { .hero-orbit :global(*) { animation: none !important; } .orbit-toggle { display: none; } }
 </style>
 
 <script>
@@ -75,7 +81,7 @@ const scene = { cycleSeconds: 12, engines: ['chatgpt', 'gemini', 'claude'] }
         this.toggleAttribute('data-motion-ready', !reduced.matches)
         this.dataset.playing = String(!paused && visible && !document.hidden && !reduced.matches)
         button.hidden = reduced.matches
-        button.textContent = paused ? 'Reanudar animación' : 'Pausar animación'
+        button.setAttribute('aria-label', paused ? 'Reanudar demostración' : 'Pausar demostración')
       }
       const toggle = () => { paused = !paused; update() }
       const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update() })

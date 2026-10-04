@@ -177,15 +177,10 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
     style={`${landingCssVars};--axis-blue:${axis.accent[500]};--axis-blue-dark:${axis.accent[700]};--axis-navy:${axis.accent[900]};--axis-navy-soft:${axis.accent[800]};--axis-success:${axis.success[500]};--axis-warning:${axis.warning[500]};--axis-gray-50:${axis.gray[50]};--axis-gray-100:${axis.gray[100]};--axis-gray-200:${axis.gray[200]};--axis-gray-600:${axis.gray[600]};--axis-gray-800:${axis.gray[800]};--axis-gray-900:${axis.gray[900]};`}
   >
     <section class="hero-shell" data-capture="brand-visibility-hero" aria-labelledby="brand-visibility-title">
-      <div class="hero-orbit-frame">
-        <EngineHeroOrbit />
-      </div>
-
       <header class="topbar">
         <a class="brand-link" href="/" aria-label="Efeonce AI Visibility Report, ir a Efeonce Think">
           <img class="product-lockup" src="/branding/products/ai-visibility-report-lockup-negative.svg" alt="Efeonce AI Visibility Report" width="431" height="31" />
         </a>
-        <a class="topbar-link" href="#framework-title">Cómo funciona</a>
       </header>
 
       <div class="hero-grid">
@@ -195,18 +190,19 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
             <span class="hero-answer">Averígualo<span class="hero-sphere" aria-hidden="true"></span></span>
           </h1>
           <p class="hero-lead">
-            Medimos cómo aparece tu marca en las respuestas de ChatGPT, Claude, Gemini, Perplexity y Google,
-            y <strong>quién ocupa el lugar que te toca.</strong>
+            Descubre cómo aparece tu marca, quién aparece en su lugar
+            y <strong>qué mejorar primero.</strong>
           </p>
 
           <div class="engine-chips" data-capture="brand-visibility-signal-preview" aria-label="Motores de respuesta y superficies generativas analizadas">
             <EngineAvatarGroup providers={engines} size="md" max={5} />
           </div>
 
-          <div class="hero-cta-row">
-            <a class="hero-cta" href="#brand-visibility-form">Empezar mi análisis <span aria-hidden="true">→</span></a>
-            <p class="hero-cta-note">Informe en pantalla y descarga en PDF.</p>
-          </div>
+        </div>
+        <EngineHeroOrbit />
+        <div class="hero-cta-row">
+          <a class="hero-cta" href="#brand-visibility-form">Empezar mi análisis <span aria-hidden="true">→</span></a>
+          <p class="hero-cta-note">Informe en pantalla y descarga en PDF.</p>
         </div>
       </div>
 
@@ -299,7 +295,7 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
 
 <script>
   // Conserva el destino en la URL y anuncia el encabezado al navegar con teclado o lector de pantalla.
-  document.querySelectorAll<HTMLAnchorElement>('.hero-cta, .topbar-link, [data-start-analysis]').forEach((link) => {
+  document.querySelectorAll<HTMLAnchorElement>('.hero-cta, [data-start-analysis]').forEach((link) => {
     link.addEventListener('click', (event) => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
       const targetId = link.hash === '#brand-visibility-form' ? 'brand-visibility-form-title' : 'framework-title'
@@ -341,26 +337,6 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
     color: var(--engine-ink);
   }
 
-  /* Recorta la órbita al hero sin recortar la tarjeta del formulario, que cuelga por debajo. */
-  .hero-orbit-frame {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .hero-orbit-frame :global(.hero-orbit) {
-    position: absolute;
-    top: clamp(64px, 7.6vw, 110px);
-    left: 52%;
-    width: 60%;
-    max-width: none;
-    height: auto;
-    pointer-events: none;
-    user-select: none;
-  }
-
   .topbar,
   .framework-band {
     width: var(--brand-shell-width);
@@ -389,29 +365,23 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
     height: 34px;
   }
 
-  .topbar-link {
-    color: var(--engine-ink-soft);
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    text-underline-offset: 4px;
-  }
-
-  .topbar-link:hover {
-    color: var(--engine-ink);
-    text-decoration: underline;
-  }
-
   .brand-link:focus-visible,
-  .topbar-link:focus-visible,
   .hero-cta:focus-visible {
     outline: 2px solid var(--engine-ink);
     outline-offset: 4px;
   }
 
   .hero-grid {
-    padding: clamp(96px, 11vw, 160px) var(--hero-inset) calc(clamp(5.8rem, 9vw, 8rem) + clamp(72px, 7vw, 104px));
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(24px, 4vw, 64px);
+    padding: clamp(48px, 6vw, 88px) var(--hero-inset) calc(clamp(5.8rem, 9vw, 8rem) + 72px);
+    overflow: clip;
   }
+  .hero-grid > :global(.hero-orbit) { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+  .hero-grid > .hero-copy { align-self: end; }
+  .hero-grid > .hero-cta-row { align-self: start; grid-column: 1; }
 
   .hero-copy {
     display: flex;
@@ -451,7 +421,7 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
 
   .hero-answer {
     font-family: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
-    font-size: clamp(4.25rem, 8.9vw, 8rem); /* respuesta ≥ 3× la pregunta en todo ancho */
+    font-size: clamp(3.4rem, 7.8vw, 7.5rem); /* respuesta ≥ 3× la pregunta en todo ancho */
     font-weight: 760;
     letter-spacing: -0.035em;
     line-height: 0.92;
@@ -509,12 +479,18 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
     font-size: 1.0625rem;
     font-weight: 600;
     text-decoration: none;
-    transition: background-color 160ms ease;
+    border: 2px solid transparent;
+    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
   }
 
   .hero-cta:hover {
     background: var(--engine-ink-soft);
+    border-color: var(--engine-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb,var(--engine-accent) 20%,transparent);
   }
+  .hero-cta span { transition: transform 180ms ease; }
+  .hero-cta:hover span, .hero-cta:focus-visible span { transform: translateX(4px); }
+  .hero-cta:active { box-shadow: inset 0 0 0 2px var(--engine-accent); }
 
   .hero-cta-note {
     margin: 0;
@@ -629,42 +605,19 @@ const footerSloganPx = sloganFontPx(footerLogoWidthPx)
     .final-cta { justify-content: center; }
   }
 
-  /* Teléfono: compuesto mobile-first (norma web §4.1). La órbita arriba a la derecha, la voz debajo de ella. */
+  /* Message first; the scene remains in normal flow at tablet/mobile widths. */
   @media (max-width: 980px) {
-    /* --orbit-w: ancho del archivo de la órbita (1920 × 1080; anillo r = 0,225 w, centro a 0,281 w). */
-    .hero-shell {
-      --orbit-w: min(100vw, 440px);
-    }
-
-    .hero-orbit-frame :global(.hero-orbit) {
-      top: 48px;
-      left: auto;
-      right: calc(var(--orbit-w) * -0.12);
-      width: var(--orbit-w);
-    }
-
-    .topbar-link {
-      display: none;
-    }
-
-    .hero-grid {
-      padding-top: calc(var(--orbit-w) * 0.506 + 56px); /* la voz empieza bajo el anillo */
-      /* En este ancho el formulario ya está en el flujo: no necesita la reserva de solape de escritorio. */
-      padding-bottom: 48px;
-    }
-
-    .hero-cta-row {
-      flex-direction: column;
-      align-items: stretch;
-      width: 100%;
-    }
-
-    .hero-cta {
-      justify-content: center;
-    }
+    .hero-grid { grid-template-columns: minmax(0,1fr); grid-template-rows: auto; padding-top: 48px; padding-bottom: 48px; row-gap: 24px; }
+    .hero-copy { width: 100%; }
+    .hero-answer { font-size: clamp(4rem, 10.8vw, 6.5rem); }
+    .hero-grid > :global(.hero-orbit) { grid-column: 1; grid-row: auto; width: min(100%, 430px); justify-self: center; }
+    .hero-cta-row { flex-direction: column; align-items: stretch; width: 100%; margin-top: 0; }
+    .hero-cta { justify-content: center; }
   }
 
   @media (max-width: 640px) {
+    .hero-grid { padding-top: 32px; row-gap: 18px; }
+    .hero-question { font-size: 1.25rem; }
     .brand-link {
       width: min(100%, var(--engine-mobile-lockup-width));
     }
