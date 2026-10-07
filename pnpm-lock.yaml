@@ -21,8 +21,8 @@ importers:
         specifier: ^11.0.2
         version: 11.0.2(astro@7.0.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@24.13.2)(@vercel/functions@3.7.5)(jiti@2.7.0)(yaml@2.9.0))(react@19.2.7)
       '@efeoncepro/axis-ui-primitives':
-        specifier: 0.6.5
-        version: 0.6.5(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: 0.6.6
+        version: 0.6.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@fontsource-variable/bricolage-grotesque':
         specifier: ^5.3.0
         version: 5.3.0
@@ -365,14 +365,17 @@ packages:
   '@efeoncepro/axis-tokens@0.6.0':
     resolution: {integrity: sha512-kohsRJcyDu/NkSp6VlHFYOr5d+0XZ65bLuSscmtR9FxLqe8DVElInuZfVbFCVouYOjJaFEASC5po2MunTWHSZQ==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.6.0/36ff49d776f27fd82cd2cd84a17bbc3ee6b1aa26}
 
+  '@efeoncepro/axis-tokens@0.6.1':
+    resolution: {integrity: sha512-u8ujA1OYvXNU2i0fVs+OD3u4gvLImQuiwRqNqabAcVz8e5UbLuOGrMg0ObcPqByjc6JmxFJy3ReEfvxuS+Qw+w==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.6.1/1c28d0f9632ac762a2209bc623b3002ccda71547}
+
   '@efeoncepro/axis-ui-contracts@0.3.42':
     resolution: {integrity: sha512-aHkmVVqR1veCdPD1qw3d6+cGfRJbMA30u13Nqnu/uXSUHZlVlLD0LJjLNsc0nJUy6AXIcFx4UZfAhjB2jCzUNg==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.3.42/3bb396f6627fc2550d9c8722c0dc85c67b79986a}
 
   '@efeoncepro/axis-ui-contracts@0.7.0':
     resolution: {integrity: sha512-mpEohwxyz0yC5mE7WioO0jwepfIrDhASwP9o7vPqHxSFRo1z6fzYjfbJVpmjTboIdmia03RZtddbIrI/Sv0aig==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.7.0/9793ac097297492c4439b5d3dcb521af1cf5cd63}
 
-  '@efeoncepro/axis-ui-primitives@0.6.5':
-    resolution: {integrity: sha512-NDCRQcqL45XPaQ/2NYrCi+N2hpRG7S80Lqqgw1R4byjw38iVdp8VeJhy7lwoQ7xbLLnlnwSD9mdAldaoC3/P5w==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-primitives/0.6.5/bda5852fec528b3cd96abb80f112911658241232}
+  '@efeoncepro/axis-ui-primitives@0.6.6':
+    resolution: {integrity: sha512-K3UMivY0XXx5CY8pF3Ode0FSYKFnzDXm3PiJlyUKLsk3kNwmigiduIchs+31lDvvUN/OpopediiWqAvK7UFYSw==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-primitives/0.6.6/b03f2a87c13b0b8e78e6073cad457127742155a0}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -2848,6 +2851,8 @@ snapshots:
 
   '@efeoncepro/axis-tokens@0.6.0': {}
 
+  '@efeoncepro/axis-tokens@0.6.1': {}
+
   '@efeoncepro/axis-ui-contracts@0.3.42':
     dependencies:
       '@efeoncepro/axis-tokens': 0.3.42
@@ -2856,10 +2861,10 @@ snapshots:
     dependencies:
       '@efeoncepro/axis-tokens': 0.6.0
 
-  '@efeoncepro/axis-ui-primitives@0.6.5(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@efeoncepro/axis-ui-primitives@0.6.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@efeoncepro/axis-graphic-line': 0.17.0(react@19.2.7)
-      '@efeoncepro/axis-tokens': 0.6.0
+      '@efeoncepro/axis-tokens': 0.6.1
       '@efeoncepro/axis-ui-contracts': 0.7.0
       libphonenumber-js: 1.13.14
       media-chrome: 4.19.3(react@19.2.7)

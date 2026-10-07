@@ -368,12 +368,12 @@ revisión visual. Publish autorizado: commit alcance propio, push main **Think**
 ## AXIS video — published package integration (2026-10-07)
 
 `src/components/AxisVideoPlayer.astro` renders shared AXIS SSR markup and enhances it near the viewport,
-preserving native fallback. Think pins `@efeoncepro/axis-ui-primitives@0.6.5` from GitHub Packages,
-with tokens 0.6.0 and contracts 0.7.0 through the lockfile. No sibling checkout, local `link:` or
+preserving native fallback. Think pins `@efeoncepro/axis-ui-primitives@0.6.6` from GitHub Packages,
+with tokens 0.6.1 and contracts 0.7.0 through the lockfile. No sibling checkout, local `link:` or
 vendored player implementation is required. The adapter connects Astro; visual behavior belongs to AXIS.
 
 The first production readback (0.6.3) was main `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5`, Ready.
-The current 0.6.5 package was published by [release 37669427070](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070), source `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`. Registry installation, DOM/React/integrations exports and SSR passed verification; installed player JS/CSS match the AXIS verified build byte for byte. The package fixes replay-orbit visibility when shared button styles are also loaded. Production delivery follows this consumer repository’s `main` deployment; consult the canonical QA record for its exact consumer SHA and provider readback.
+The approved 0.6.6 replay refinement centers the canonical orbit on the image, adds a translucent halo and end poster, and keeps thin strokes at every size. It is distributed by [release 37696704305](https://github.com/efeoncepro/axis-design-system/actions/runs/37696704305), source `5062ba95201f458e61e0feeab4a1580d97c2a7b6`. Production delivery follows this consumer repository’s `main` deployment; consult the canonical QA record for consumer SHA and provider readback. The adapter remains unchanged.
 [The demonstration route](https://think.efeoncepro.com/preview/video-player) uses the actual BaseLayout,
 remains **noindex with analytics disabled**, and includes sample video plus Spanish VTT. A deployed
 preview route is not adoption in private reports and does not insert or modify client content.
