@@ -368,11 +368,12 @@ revisión visual. Publish autorizado: commit alcance propio, push main **Think**
 ## AXIS video — published package integration (2026-10-07)
 
 `src/components/AxisVideoPlayer.astro` renders shared AXIS SSR markup and enhances it near the viewport,
-preserving native fallback. Think pins `@efeoncepro/axis-ui-primitives@0.6.3` from GitHub Packages,
+preserving native fallback. Think pins `@efeoncepro/axis-ui-primitives@0.6.5` from GitHub Packages,
 with tokens 0.6.0 and contracts 0.7.0 through the lockfile. No sibling checkout, local `link:` or
 vendored player implementation is required. The adapter connects Astro; visual behavior belongs to AXIS.
 
-Main `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5` deployed Ready to Vercel Production.
+The first production readback (0.6.3) was main `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5`, Ready.
+The current 0.6.5 package was published by [release 37669427070](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070), source `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`. Registry installation, DOM/React/integrations exports and SSR passed verification; installed player JS/CSS match the AXIS verified build byte for byte. The package fixes replay-orbit visibility when shared button styles are also loaded. Production delivery follows this consumer repository’s `main` deployment; consult the canonical QA record for its exact consumer SHA and provider readback.
 [The demonstration route](https://think.efeoncepro.com/preview/video-player) uses the actual BaseLayout,
 remains **noindex with analytics disabled**, and includes sample video plus Spanish VTT. A deployed
 preview route is not adoption in private reports and does not insert or modify client content.
@@ -392,7 +393,7 @@ separates successful registry installation, build/typecheck, deployment and runt
 flat-blue painting in long-lived in-app browser tabs remains **open**; fresh playback, captions and
 orbital replay pass, but neither the dependency fix nor reload proves that painting defect is resolved.
 
-### Consumer control hooks (working-tree follow-up, 2026-10-07)
+### Consumer control hooks (2026-10-07)
 
 `AxisVideoPlayer.astro` accepts the complete shared `model` and a serializable `options` prop:
 `resumeTime`, `doubleTapSeek`, `preferences`, `loading` and `enableAnnotations`. Functions, signals

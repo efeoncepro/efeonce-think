@@ -21,8 +21,8 @@ importers:
         specifier: ^11.0.2
         version: 11.0.2(astro@7.0.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@24.13.2)(@vercel/functions@3.7.5)(jiti@2.7.0)(yaml@2.9.0))(react@19.2.7)
       '@efeoncepro/axis-ui-primitives':
-        specifier: 0.6.3
-        version: 0.6.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: 0.6.5
+        version: 0.6.5(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@fontsource-variable/bricolage-grotesque':
         specifier: ^5.3.0
         version: 5.3.0
@@ -371,8 +371,8 @@ packages:
   '@efeoncepro/axis-ui-contracts@0.7.0':
     resolution: {integrity: sha512-mpEohwxyz0yC5mE7WioO0jwepfIrDhASwP9o7vPqHxSFRo1z6fzYjfbJVpmjTboIdmia03RZtddbIrI/Sv0aig==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.7.0/9793ac097297492c4439b5d3dcb521af1cf5cd63}
 
-  '@efeoncepro/axis-ui-primitives@0.6.3':
-    resolution: {integrity: sha512-gr+FmUZ67TlkYJObi16k4IthZQtR8Gg+AqJBStW1KuMS3K6e3zpy70qWe5VYrlPP5glhlrYcLSvFI2TW2oPgUw==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-primitives/0.6.3/a82f09757cc2fc20e51d89997359bf1cfa617c34}
+  '@efeoncepro/axis-ui-primitives@0.6.5':
+    resolution: {integrity: sha512-NDCRQcqL45XPaQ/2NYrCi+N2hpRG7S80Lqqgw1R4byjw38iVdp8VeJhy7lwoQ7xbLLnlnwSD9mdAldaoC3/P5w==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-primitives/0.6.5/bda5852fec528b3cd96abb80f112911658241232}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -2856,7 +2856,7 @@ snapshots:
     dependencies:
       '@efeoncepro/axis-tokens': 0.6.0
 
-  '@efeoncepro/axis-ui-primitives@0.6.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@efeoncepro/axis-ui-primitives@0.6.5(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@efeoncepro/axis-graphic-line': 0.17.0(react@19.2.7)
       '@efeoncepro/axis-tokens': 0.6.0
