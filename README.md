@@ -364,3 +364,11 @@ Comprobar 1440/390/320, deep links, teclado, noJS, reduced-motion, overflow y vi
 No provocar HMR mientras un test registra transición. Gate verde no sustituye lectura editorial ni
 revisión visual. Publish autorizado: commit alcance propio, push main **Think**, READY + SHA exacto
 +alias y lectura pública de documento/medios, conservando rollback del deployment anterior.
+
+## AXIS video candidate — local preview 2026-10-07
+
+`src/components/AxisVideoPlayer.astro` renders the shared AXIS SSR markup and enhances it near the viewport, preserving native fallback. `/preview/video-player` uses the actual BaseLayout, noindex and analytics disabled; no private report is changed. Its sample media is local preview content, not publication approval.
+
+The package dependency currently uses `link:../axis-design-system/packages/primitives` to verify the unpublished candidate. **Before CI/deploy, publish/verify the AXIS packages and replace this link with an exact private release pin.** It is intentionally not evidence of productive adoption. Full API/QA: AXIS `docs/agent-composition/video-player.md`, `docs/quality/video-player-0.5.0.md`.
+
+2026-10-07 review snapshot: operator authorized commit/push, not deployment. Orbital replay replaces the text-only action while retaining its accessible name. Think preview now connects the existing Spanish VTT. Intermittent flat-blue video painting in the in-app browser remains an open incident; fresh full playback and replay work, but the trigger has not been isolated. Release evidence and blockers: AXIS `docs/quality/video-player-0.5.0.md`.

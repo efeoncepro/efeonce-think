@@ -1,0 +1,20 @@
+---
+import {videoPlayerHtml,type VideoPlayerModel} from '@efeoncepro/axis-ui-primitives/video-player'
+import '@efeoncepro/axis-ui-primitives/video-player.css'
+interface Props {model:VideoPlayerModel}
+const {model}=Astro.props
+---
+<div data-axis-player>
+  <Fragment set:html={videoPlayerHtml(model)} />
+  <script type="application/json" data-axis-model set:html={JSON.stringify(model).replace(/</g,'\\u003c')} />
+</div>
+<script>
+import {enhanceVideoPlayer,registerVideoPlayer,type VideoPlayerModel} from '@efeoncepro/axis-ui-primitives/video-player'
+const observer=new IntersectionObserver(async entries=>{
+ for(const entry of entries){if(!entry.isIntersecting)continue;observer.unobserve(entry.target)
+  const root=entry.target.querySelector<HTMLElement>('.axis-video')!
+  try{await registerVideoPlayer();if(root.isConnected&&!root.dataset.enhanced)enhanceVideoPlayer(root,JSON.parse(entry.target.querySelector('[data-axis-model]')!.textContent!) as VideoPlayerModel)}catch{/* Native video remains available when enhancement cannot load. */}
+ }
+},{rootMargin:'200px'})
+document.querySelectorAll('[data-axis-player]').forEach(host=>observer.observe(host))
+</script>

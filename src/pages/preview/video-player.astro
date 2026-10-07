@@ -1,0 +1,19 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import AxisVideoPlayer from '@/components/AxisVideoPlayer.astro'
+import {axis} from '@lib/report-tokens'
+const model={id:'think-video-preview',title:'De la pregunta a la respuesta',src:'/preview-media/sparks-review.mp4',poster:'/preview-media/sparks-poster.png',skin:'cinema' as const,presentation:'embedded' as const,preload:'metadata' as const,tracks:[{src:'/preview-media/sparks-es.vtt',language:'es',label:'Español',kind:'subtitles' as const}]}
+---
+<BaseLayout title="Video player | Efeonce Think" description="Vista previa local del reproductor compartido AXIS dentro de Think." noindex analytics={false}>
+<main class="video-preview" style={`--ink:${axis.accent[900]};--paper:${axis.gray[50]};--line:${axis.gray[200]}`}>
+<header><a href="/" aria-label="Efeonce Think"><img src="/branding/efeonce-logo.svg" alt="Efeonce" width="140" /></a><span>Think · Vista previa</span></header>
+<article><p>De una idea a una decisión.</p><h1>El contenido también se puede ver.</h1><p>Una explicación en el mismo lugar donde exploras la evidencia. Sin salir del informe ni perder el contexto.</p>
+<AxisVideoPlayer model={model}/>
+<p class="caption">Muestra local de integración · Los Sparks. Este clip prueba la interfaz; no añade contenido a informes de clientes.</p>
+<h2>Continúa con el contexto.</h2><p>El reproductor ocupa únicamente el espacio del video. El título, los capítulos y la transcripción se incorporan cuando el producto los necesita.</p>
+</article>
+</main>
+</BaseLayout>
+<style>
+.video-preview{color:var(--ink);background:var(--paper);min-height:100vh;padding:clamp(1rem,4vw,3rem);font-family:Poppins,system-ui,sans-serif}.video-preview header{display:flex;align-items:center;justify-content:space-between;gap:1rem;max-width:70rem;margin:0 auto 4rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line)}.video-preview article{max-width:52rem;margin:auto}.video-preview h1{font-size:clamp(2rem,5vw,3.6rem);line-height:1.08;letter-spacing:-.04em;margin:1rem 0 1.5rem}.video-preview h2{font-size:1.8rem;line-height:1.2;margin:2rem 0 1rem}.video-preview p{line-height:1.7;margin:1rem 0 2rem}.video-preview .caption{font-size:.8rem;margin-top:.8rem}.video-preview :global(.axis-video){margin-top:2rem}
+</style>

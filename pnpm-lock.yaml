@@ -20,6 +20,9 @@ importers:
       '@astrojs/vercel':
         specifier: ^11.0.2
         version: 11.0.2(astro@7.0.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@24.13.2)(@vercel/functions@3.7.5)(jiti@2.7.0)(yaml@2.9.0))(react@19.2.7)
+      '@efeoncepro/axis-ui-primitives':
+        specifier: link:../axis-design-system/packages/primitives
+        version: link:../axis-design-system/packages/primitives
       '@fontsource-variable/bricolage-grotesque':
         specifier: ^5.3.0
         version: 5.3.0
