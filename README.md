@@ -365,12 +365,29 @@ No provocar HMR mientras un test registra transición. Gate verde no sustituye l
 revisión visual. Publish autorizado: commit alcance propio, push main **Think**, READY + SHA exacto
 +alias y lectura pública de documento/medios, conservando rollback del deployment anterior.
 
-## AXIS video candidate — local preview 2026-10-07
+## AXIS video — published package integration (2026-10-07)
 
-`src/components/AxisVideoPlayer.astro` renders the shared AXIS SSR markup and enhances it near the viewport, preserving native fallback. `/preview/video-player` uses the actual BaseLayout, noindex and analytics disabled; no private report is changed. Its sample media is local preview content, not publication approval.
+`src/components/AxisVideoPlayer.astro` renders shared AXIS SSR markup and enhances it near the viewport,
+preserving native fallback. Think pins `@efeoncepro/axis-ui-primitives@0.6.3` from GitHub Packages,
+with tokens 0.6.0 and contracts 0.7.0 through the lockfile. No sibling checkout, local `link:` or
+vendored player implementation is required. The adapter connects Astro; visual behavior belongs to AXIS.
 
-The package dependency is pinned to `@efeoncepro/axis-ui-primitives@0.6.3`, with published transitive `axis-tokens@0.6.0` and `axis-ui-contracts@0.7.0`. The repository needs no sibling checkout. `.npmrc` declares only the private scope; authentication belongs to the build system. Vercel `NPM_RC` is configured for Production and Preview branch `codex/video-player-20261007`; it contains the existing organization read credential and must never be committed. Publication/install/deployment readbacks are recorded in AXIS `docs/quality/video-player-0.5.0.md`.
+Main `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5` deployed Ready to Vercel Production.
+[The demonstration route](https://think.efeoncepro.com/preview/video-player) uses the actual BaseLayout,
+remains **noindex with analytics disabled**, and includes sample video plus Spanish VTT. A deployed
+preview route is not adoption in private reports and does not insert or modify client content.
 
-2026-10-07 review snapshot: operator authorized commit/push, not deployment. Orbital replay replaces the text-only action while retaining its accessible name. Think preview now connects the existing Spanish VTT. Intermittent flat-blue video painting in the in-app browser remains an open incident; fresh full playback and replay work, but the trigger has not been isolated. Release evidence and blockers: AXIS `docs/quality/video-player-0.5.0.md`.
+`.npmrc` declares only the private scope; authentication belongs to the build system. Sensitive Vercel
+`NPM_RC` is configured for Production and Preview branch `codex/video-player-20261007`; never commit
+its resolved contents. The earlier `8a1c206` Preview failed because a sibling `link:` target did not
+exist in Vercel; the published pin and lockfile resolve that packaging issue.
 
-The earlier `8a1c206` Preview failed because the local `link:` target was absent in Vercel. The exact registry dependency replaces that link; no vendored player implementation or generated fallback was added. The operator subsequently authorized pushing AXIS and Think to `main`; production delivery uses the published dependency and preserves the noindex preview route.
+Use the [canonical AXIS integration manual](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/video-player.md)
+for skins, presentation, sizes, SSR/React, caption preferences and lifecycle. Product code remains
+responsible for sources, access, persistence, review authorization and analytics consent. Do not fork
+those controls into Think-specific CSS or copy the API catalog here.
+
+[Release and verification evidence](https://github.com/efeoncepro/axis-design-system/blob/main/docs/quality/video-player-0.5.0.md)
+separates successful registry installation, build/typecheck, deployment and runtime readback. Intermittent
+flat-blue painting in long-lived in-app browser tabs remains **open**; fresh playback, captions and
+orbital replay pass, but neither the dependency fix nor reload proves that painting defect is resolved.
