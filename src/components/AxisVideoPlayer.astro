@@ -1,20 +1,17 @@
 ---
 import {videoPlayerHtml,type VideoPlayerModel} from '@efeoncepro/axis-ui-primitives/video-player'
 import '@efeoncepro/axis-ui-primitives/video-player.css'
-interface Props {model:VideoPlayerModel}
-const {model}=Astro.props
+import {serializeAxisVideoOptions,type AxisVideoSerializableOptions} from '@/lib/axis-video-client'
+interface Props {model:VideoPlayerModel; options?:AxisVideoSerializableOptions}
+const {model,options={}}=Astro.props
+const safeOptions=serializeAxisVideoOptions(options)
+const config=JSON.stringify({model,options:safeOptions}).replace(/</g,'\\u003c')
 ---
-<div data-axis-player>
+<div data-axis-player data-axis-loading={safeOptions.loading ?? 'visible'}>
   <Fragment set:html={videoPlayerHtml(model)} />
-  <script type="application/json" data-axis-model set:html={JSON.stringify(model).replace(/</g,'\\u003c')} />
+  <script is:inline type="application/json" data-axis-config set:html={config} />
 </div>
 <script>
-import {enhanceVideoPlayer,registerVideoPlayer,type VideoPlayerModel} from '@efeoncepro/axis-ui-primitives/video-player'
-const observer=new IntersectionObserver(async entries=>{
- for(const entry of entries){if(!entry.isIntersecting)continue;observer.unobserve(entry.target)
-  const root=entry.target.querySelector<HTMLElement>('.axis-video')!
-  try{await registerVideoPlayer();if(root.isConnected&&!root.dataset.enhanced)enhanceVideoPlayer(root,JSON.parse(entry.target.querySelector('[data-axis-model]')!.textContent!) as VideoPlayerModel)}catch{/* Native video remains available when enhancement cannot load. */}
- }
-},{rootMargin:'200px'})
-document.querySelectorAll('[data-axis-player]').forEach(host=>observer.observe(host))
+import {installAxisVideoPlayers} from '@/lib/axis-video-client'
+installAxisVideoPlayers()
 </script>

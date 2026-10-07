@@ -391,3 +391,58 @@ those controls into Think-specific CSS or copy the API catalog here.
 separates successful registry installation, build/typecheck, deployment and runtime readback. Intermittent
 flat-blue painting in long-lived in-app browser tabs remains **open**; fresh playback, captions and
 orbital replay pass, but neither the dependency fix nor reload proves that painting defect is resolved.
+
+### Consumer control hooks (working-tree follow-up, 2026-10-07)
+
+`AxisVideoPlayer.astro` accepts the complete shared `model` and a serializable `options` prop:
+`resumeTime`, `doubleTapSeek`, `preferences`, `loading` and `enableAnnotations`. Functions, signals
+and streaming engines never pass through SSR JSON. The preview supplies real chapters, transcript,
+Spanish captions and ten existing thumbnail images from the same AXIS Sparks cut; its default
+remains Cinema embedded. This adds capability data, not a review backend or private-report adoption.
+
+Client integrations register a synchronous listener **before mounting**:
+
+```ts
+import {
+  getAxisVideoPlayer, mountAxisVideoPlayers,
+  type AxisVideoConfigureDetail, type AxisVideoReadyDetail,
+} from './axis-video-client'
+
+// Use an application-owned listener lifetime when installing product hooks.
+document.addEventListener('axis-video:configure', event => {
+  const { model, options } = (event as CustomEvent<AxisVideoConfigureDetail>).detail
+  if (model.id !== 'my-authorized-video') return
+  options.onSubmitComment = saveAuthorizedComment
+  options.onResolveMarker = resolveAuthorizedMarker
+  options.onPreferencesChange = persistPreferences
+  options.onNext = openNextAuthorizedVideo
+  // onEvent can use AXIS videoAnalytics with the product's consent and transport.
+})
+document.addEventListener('axis-video:ready', event => {
+  const { player, signal } = (event as CustomEvent<AxisVideoReadyDetail>).detail
+  // attachVideoStream(player, authorizedAdapter, signal) belongs here when required.
+})
+mountAxisVideoPlayers()
+```
+
+The bubbling host events are `axis-video:configure` (`{model,options,signal}`),
+`axis-video:ready` (`{player,signal}`), `axis-video:destroy` (`{player}`), and
+`axis-video:error` (`{code:'enhancement-failed'}`). Configure allows synchronous edits before
+registration; a changed model regenerates matching SSR. Ready exposes the central AXIS handle. A client hook may
+set `options.signal` to its own AbortSignal: an already-aborted signal cancels mounting, and later
+abort disposes the instance. It is linked to the adapter's lifetime rather than replacing it;
+`detail.signal` and the signal in ready always identify that combined lifetime. Teardown removes
+the external listener, and a late abort cannot dispose a newer instance of the same host.
+For an already-mounted host, `getAxisVideoPlayer(host)` avoids depending on a missed ready event;
+use its `updateOptions`, `update`, `hasDraft` and other shared methods. These hooks grant no authority:
+products still validate access and asset/version binding on the server.
+
+`src/lib/axis-video-client.ts` owns idempotent discovery, lazy intersection, pending-mount abort,
+DOM removal and Astro navigation teardown. Its lifetime signal disposes consumer listeners/streaming;
+`disposeAxisVideoPlayer(s)` provides explicit teardown. Removing or moving a node is distinguished
+at mutation-batch time. Native SSR remains available if enhancement fails, with no raw error or URL
+in diagnostic events. No dependency changes or new AXIS release are required for this adapter work.
+
+Focused checks: `node --test tests/axis-video-client.test.ts`, `pnpm build`, `pnpm type-check`.
+The lifecycle tests cover pending duplicate mounts/abort, disconnection, client-only option rejection
+and native error fallback; they do not replace real-browser playback or close the blue-paint incident.
