@@ -2,10 +2,12 @@ import {test} from 'node:test'
 import assert from 'node:assert/strict'
 import {readFileSync} from 'node:fs'
 import {createHash} from 'node:crypto'
-import sample from '../src/lib/aeo-xray/published/pichincha.json' with {type:'json'}
+import pichincha from '../src/lib/aeo-xray/published/pichincha.json' with {type:'json'}
+import pibank from '../src/lib/aeo-xray/published/pibank.json' with {type:'json'}
 import {readPublishedSample,publishedSampleAsset} from '../src/lib/aeo-xray/published.ts'
 
-test('published package accepts the complete composition and exact approved media',()=>{
+for(const sample of [pichincha,pibank]){
+test(`${sample.editionId}: published package accepts the complete composition and exact approved media`,()=>{
  const result=readPublishedSample(sample.key)
  assert.equal(result.status,'ok')
  assert.equal(sample.model.artifacts.length,2)
@@ -16,13 +18,13 @@ test('published package accepts the complete composition and exact approved medi
   assert.equal(createHash('sha256').update(bytes).digest('hex'),asset.ref.sha256)
  }
 })
-test('unknown publication and undeclared assets fail closed',()=>{
+test(`${sample.editionId}: unknown publication and undeclared assets fail closed`,()=>{
  assert.deepEqual(readPublishedSample('sample_unknown'),{status:'not_found'})
  for(const id of ['../pichincha.json','constructor','__proto__','unknown'])assert.equal(publishedSampleAsset(sample.key,id),null)
  assert.equal(publishedSampleAsset('sample_unknown','bank-logo'),null)
 })
 
-test('published question decisions agree with their instrument nodes',()=>{
+test(`${sample.editionId}: published question decisions agree with their instrument nodes`,()=>{
  for(const artifact of sample.model.artifacts){
   for(const question of artifact.experience.evidence.fanOut.items){
    assert.ok(artifact.blocks.some(block=>block.id===question.coveredBy))
@@ -34,4 +36,10 @@ test('published question decisions agree with their instrument nodes',()=>{
    }
   }
  }
+})
+}
+test('published sample keys and media folders are unique',()=>{
+ assert.notEqual(pichincha.key,pibank.key)
+ assert.notEqual(pichincha.editionId,pibank.editionId)
+ for(const url of Object.values(pibank.assets))assert.ok(url.startsWith(`/aeo-xray-media/${pibank.key}/`))
 })

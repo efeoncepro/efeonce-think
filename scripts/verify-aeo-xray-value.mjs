@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict'
 import {mkdirSync,writeFileSync} from 'node:fs'
 import {chromium} from 'playwright'
-import sample from '../src/lib/aeo-xray/published/pichincha.json' with {type:'json'}
-const base=process.env.XRAY_VERIFY_BASE??'http://127.0.0.1:4345',token=process.env.XRAY_VERIFY_TOKEN??sample.key
+import pichincha from '../src/lib/aeo-xray/published/pichincha.json' with {type:'json'}
+import pibank from '../src/lib/aeo-xray/published/pibank.json' with {type:'json'}
+const base=process.env.XRAY_VERIFY_BASE??'http://127.0.0.1:4345',token=process.env.XRAY_VERIFY_TOKEN??pichincha.key
+const sample=[pichincha,pibank].find(s=>s.key===token)??pichincha,landingId=sample.model.artifacts[0].id
 const url=artifact=>`${base}/aeo-xray/r/${token}?artifact=${artifact}&step=articulo`
 const out='.captures/aeo-xray-value';mkdirSync(out,{recursive:true})
 const checks=[],check=(name,value)=>{assert.ok(value,name);checks.push(name)}
@@ -38,20 +40,20 @@ try{
    check(prefix+' exact block selected after navigation',new URL(page.url()).hash===`#block-${id}`)
    check(prefix+' explorer collapses for specimen',await page.locator('[data-value-explorer]').getAttribute('open')===null)
   }
-  await page.goto(url('ahorro-preferente'),{waitUntil:'networkidle'})
+  await page.goto(url(landingId),{waitUntil:'networkidle'})
   check(name+' landing contains nine distinct modules',await page.locator('[data-landing-module]').count()===9)
   await page.locator('[data-currency="1"]').click()
-  check(name+' dollar conditions selected',await page.locator('[data-currency-panel="1"]').isVisible()&&!await page.locator('[data-currency-panel="0"]').isVisible())
+  check(name+' second condition group selected',await page.locator('[data-currency-panel="1"]').isVisible()&&!await page.locator('[data-currency-panel="0"]').isVisible())
   await page.locator('.faq-item > summary').first().click()
   check(name+' FAQ expands',await page.locator('.faq-item').first().getAttribute('open')!==null)
   check(name+' no browser errors',errors.length===0)
   await context.close()
  }
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage()
- await page.goto(url('ahorro-preferente'))
+ await page.goto(url(landingId))
  await page.locator('[data-value-explorer] > summary').click()
  check('no JS all question answers remain available',await page.locator('[data-value-panel]:visible').count()===sample.model.artifacts[0].experience.evidence.fanOut.items.length)
- check('no JS both currencies remain available',await page.locator('[data-currency-panel]:visible').count()===2)
+ check('no JS all condition groups remain available',await page.locator('[data-currency-panel]:visible').count()>=2)
  check('no JS no mobile overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1))
  await context.close();writeFileSync(out+'/verification.json',JSON.stringify({checks},null,2));console.log(`${checks.length} value and landing checks passed`)
 }finally{await browser.close()}

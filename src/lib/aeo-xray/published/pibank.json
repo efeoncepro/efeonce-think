@@ -1,0 +1,3432 @@
+{
+ "key": "sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV",
+ "editionId": "pibank-2026-10-08",
+ "model": {
+  "contract": "efeonce.aeo-xray",
+  "version": "0.1.0",
+  "locale": "es-PE",
+  "title": "Pibank Perú · Ahorro que se entiende",
+  "preparedFor": "Pibank Perú",
+  "preparedAt": "2026-10-08",
+  "sources": [
+   {
+    "id": "product",
+    "label": "Cuenta Soles Pibank · pibank.pe",
+    "url": "https://pibank.pe/cuenta-soles-pibank/",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "tariff",
+    "label": "Tarifario Cuenta Soles Pibank · actualizado 28/09/2026",
+    "url": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/Web/Tarifario_CuentaSolesPibank.pdf",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "terms",
+    "label": "Cartilla de información Cuenta Soles Pibank · actualizada 28/09/2026",
+    "url": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/ONBOARDING/CartillaInformacion_CuentaSolesPibank.pdf",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "faq-open",
+    "label": "Pibank · ¿Qué necesito y cómo abro una cuenta?",
+    "url": "https://pibank.pe/faq/que-necesito-y-como-puedo-abrir-una-cuenta-en-pibank/",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "about",
+    "label": "Pibank · Quiénes somos",
+    "url": "https://pibank.pe/quienes-somos/",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "sbs",
+    "label": "SBS · Compara y elige",
+    "url": "https://www.sbs.gob.pe/usuarios/aprende-con-la-sbs/compara-y-elige",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "fsd",
+    "label": "Fondo de Seguro de Depósitos · cobertura",
+    "url": "https://fsd.org.pe/cobertura/",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "dataforseo-method",
+    "label": "DataForSEO · metodología del proveedor, no snapshot de resultados",
+    "url": "https://docs.dataforseo.com/v3/dataforseo_labs-google-keyword_overview-live/",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "dataforseo-serp",
+    "label": "DataForSEO · Google orgánico y AI Overview (metodología)",
+    "url": "https://docs.dataforseo.com/v3/serp/google/organic/live/advanced/",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "dataforseo-ai-mode",
+    "label": "DataForSEO · Google AI Mode (metodología)",
+    "url": "https://docs.dataforseo.com/v3/serp/google/ai_mode/live/advanced/",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "bank-visual-reference",
+    "label": "Pibank · sitio oficial (referencia visual y marca)",
+    "url": "https://pibank.pe/",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "google-lcp",
+    "label": "web.dev · optimizar LCP",
+    "url": "https://web.dev/articles/optimize-lcp",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "google-noindex",
+    "label": "Google Search Central · controlar indexación",
+    "url": "https://developers.google.com/search/docs/crawling-indexing/block-indexing",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "google-canonical",
+    "label": "Google Search Central · consolidar URL duplicadas",
+    "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "google-search-updates",
+    "label": "Google Search Central · registro de cambios",
+    "url": "https://developers.google.com/search/updates",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "creative-demo",
+    "label": "Efeonce · propuesta editorial",
+    "url": "https://efeoncepro.com/",
+    "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "image-production",
+    "label": "Producción de imagen ilustrativa · GPT Image",
+    "url": "https://platform.openai.com/docs/guides/image-generation",
+    "accessedAt": "2026-10-08"
+   }
+  ],
+  "assets": [
+   {
+    "id": "landing-banner",
+    "ref": {
+     "kind": "protected",
+     "assetId": "landing-banner",
+     "sha256": "33f20e8cb51deb3bb89383fc1e90d611489ac8bcd9779899c0c4c935a2845c16"
+    },
+    "alt": "Una mujer sonríe mientras revisa su teléfono, sentada en un sofá de un departamento luminoso.",
+    "width": 1280,
+    "height": 536,
+    "credit": "Fotografía: Efeonce · imagen ilustrativa generada; no es clienta ni testimonio",
+    "sourceId": "image-production",
+    "approval": "approved"
+   },
+   {
+    "id": "article-banner",
+    "ref": {
+     "kind": "protected",
+     "assetId": "article-banner",
+     "sha256": "4b869e299e8773ef385947aada96ad62f41d401e776950e5c24293861aae8c35"
+    },
+    "alt": "Un hombre revisa su teléfono junto a un computador portátil y una libreta, en la mesa de su casa.",
+    "width": 1536,
+    "height": 1024,
+    "credit": "Fotografía: Efeonce · imagen ilustrativa generada; no es cliente ni testimonio",
+    "sourceId": "image-production",
+    "approval": "approved"
+   },
+   {
+    "id": "bank-logo",
+    "ref": {
+     "kind": "protected",
+     "assetId": "bank-logo",
+     "sha256": "132d1ee3861844e744ac1f2f103bafcd63db319db4f6eb990ac40cfdda362e6d"
+    },
+    "alt": "Pibank",
+    "width": 516,
+    "height": 132,
+    "credit": "Marca oficial Pibank · rasterizada del SVG original del sitio de Pibank",
+    "sourceId": "bank-visual-reference",
+    "approval": "approved"
+   },
+   {
+    "id": "banner-compare",
+    "ref": {
+     "kind": "protected",
+     "assetId": "banner-compare",
+     "sha256": "e512efa2e61bc4a30a37aa47cac7b482656f44cb764f0ccb3e3a6699bdfab324"
+    },
+    "alt": "Compara con las condiciones a la vista. Rendimiento, costos y liquidez.",
+    "width": 1440,
+    "height": 640,
+    "credit": "Composición: Efeonce · propuesta editorial",
+    "sourceId": "creative-demo",
+    "approval": "approved"
+   },
+   {
+    "id": "banner-prepare",
+    "ref": {
+     "kind": "protected",
+     "assetId": "banner-prepare",
+     "sha256": "37c8260971e33f0b203e84d862fe51a6127f56ab92fcc6ae55bd733bf1a66103"
+    },
+    "alt": "Antes de abrirla, ten todo listo. DNI, celular, correo y canal oficial.",
+    "width": 1440,
+    "height": 640,
+    "credit": "Composición: Efeonce · fotografía ilustrativa generada",
+    "sourceId": "creative-demo",
+    "approval": "approved"
+   },
+   {
+    "id": "social-compare",
+    "ref": {
+     "kind": "protected",
+     "assetId": "social-compare",
+     "sha256": "052bd8b649dc39c8125841b93c85d7b4e0964a7ae5bdf177f41a72217800a351"
+    },
+    "alt": "Pibank. Tu ahorro merece más que una tasa. Rendimiento, costos y liquidez. Tres cosas que también importan. Fotografía de un hombre que revisa su teléfono junto a un portátil.",
+    "width": 1080,
+    "height": 1350,
+    "credit": "Composición: Efeonce · propuesta editorial; marca Pibank",
+    "sourceId": "creative-demo",
+    "approval": "approved"
+   },
+   {
+    "id": "social-average",
+    "ref": {
+     "kind": "protected",
+     "assetId": "social-average",
+     "sha256": "cf6d05adcd0f013ca4a7abf3776f7fd269e0409affaa7be55185b9208626888a"
+    },
+    "alt": "Pibank. Disponible no siempre significa con tarjeta. Ingresas y retiras tu dinero por transferencia, desde la app. Sin tarjeta ni efectivo.",
+    "width": 1080,
+    "height": 1350,
+    "credit": "Composición: Efeonce · propuesta editorial; marca Pibank",
+    "sourceId": "creative-demo",
+    "approval": "approved"
+   },
+   {
+    "id": "social-costs",
+    "ref": {
+     "kind": "protected",
+     "assetId": "social-costs",
+     "sha256": "ec014815e95e5373db022f04686ffeb6b4b92609e9ec1cf17f664f498ecf6e2f"
+    },
+    "alt": "Pibank. Sin mantenimiento no significa sin costos. Mantenimiento: S/ 0. Esto es distinto del ITF y de los servicios adicionales que pidas. Mira cómo usas tu cuenta.",
+    "width": 1080,
+    "height": 1350,
+    "credit": "Composición: Efeonce · propuesta editorial; marca Pibank",
+    "sourceId": "creative-demo",
+    "approval": "approved"
+   },
+   {
+    "id": "social-story",
+    "ref": {
+     "kind": "protected",
+     "assetId": "social-story",
+     "sha256": "91229766bad7e69876c98d74cfddbc1eb53c1a78cb2b12eec0254b54198b55d2"
+    },
+    "alt": "Pibank. Antes de elegir: una cuenta, tres cosas por revisar. Rendimiento, costos y liquidez. Fotografía de un hombre que revisa su teléfono. Lee la guía antes de abrir tu cuenta.",
+    "width": 1080,
+    "height": 1920,
+    "credit": "Composición: Efeonce · propuesta editorial; marca Pibank",
+    "sourceId": "creative-demo",
+    "approval": "approved"
+   }
+  ],
+  "brand": {
+   "name": "Pibank",
+   "accent": "#0F265C",
+   "ink": "#0F265C",
+   "action": "#FFDC00",
+   "actionText": "#0F265C",
+   "fontFamily": "system-sans",
+   "displayFontFamily": "Poppins",
+   "logoAssetId": "bank-logo"
+  },
+  "artifacts": [
+   {
+    "id": "cuenta-soles",
+    "kind": "landing",
+    "title": "Cuenta Soles Pibank",
+    "summary": "Conoce la Cuenta Soles Pibank: 5% TREA desde el primer sol, sin mantenimiento ni saldo mínimo, cómo funciona y cómo abrirla online.",
+    "blocks": [
+     {
+      "id": "lp-hero",
+      "eyebrow": "Cuenta Soles Pibank",
+      "title": "Cuenta Soles Pibank",
+      "text": "Ahorra en soles con 5% TREA desde el primer sol, sin comisiones de mantenimiento y con tu dinero disponible por transferencia.",
+      "cta": {
+       "label": "Conocer las condiciones",
+       "artifactId": "cuenta-soles",
+       "blockId": "lp-condiciones"
+      },
+      "kind": "hero"
+     },
+     {
+      "id": "landing-banner-block",
+      "kind": "image",
+      "assetId": "landing-banner",
+      "role": "hero"
+     },
+     {
+      "id": "landing-answer",
+      "kind": "answer-capsule",
+      "text": "La Cuenta Soles Pibank es una cuenta de ahorros 100% digital en soles: paga 5% TREA desde el primer sol, no cobra mantenimiento ni exige saldo mínimo y se opera por transferencias, sin tarjeta. Antes de abrirla, confirma la tasa y las condiciones vigentes en la cartilla y el tarifario de Pibank."
+     },
+     {
+      "id": "lp-beneficios-title",
+      "level": 2,
+      "text": "Tu ahorro rinde desde el primer sol.",
+      "kind": "heading",
+      "short": "Beneficios"
+     },
+     {
+      "id": "lp-beneficios",
+      "items": [
+       "5% TREA desde el primer sol depositado.",
+       "Sin comisiones de mantenimiento ni saldo mínimo.",
+       "Tu dinero disponible: lo ingresas y lo retiras por transferencia."
+      ],
+      "kind": "list",
+      "sourceIds": [
+       "product",
+       "terms"
+      ]
+     },
+     {
+      "id": "lp-condiciones",
+      "level": 2,
+      "text": "Las condiciones, en una sola tabla.",
+      "kind": "heading",
+      "short": "Condiciones"
+     },
+     {
+      "id": "lp-tabla",
+      "rows": [
+       [
+        "Tasa",
+        "TEA igual a la TREA desde S/ 1, base de 360 días",
+        "5.00%"
+       ],
+       [
+        "Costos",
+        "ITF en las operaciones afectas",
+        "0.005%"
+       ],
+       [
+        "Costos",
+        "Saldo mínimo de equilibrio",
+        "S/ 0.00"
+       ],
+       [
+        "Costos",
+        "Comisión de mantenimiento",
+        "S/ 0"
+       ],
+       [
+        "Uso",
+        "100% digital: ingresos y retiros por transferencia, sin tarjeta ni efectivo",
+        "Digital"
+       ]
+      ],
+      "sourceIds": [
+       "product",
+       "tariff",
+       "terms"
+      ],
+      "caption": "Condiciones publicadas por Pibank, consultadas el 08/10/2026 (cartilla y tarifario actualizados al 28/09/2026). La tasa está en la cartilla y las comisiones e ITF en el tarifario; verifica la versión vigente antes de abrir tu cuenta.",
+      "kind": "table",
+      "columns": [
+       "Tema",
+       "Condición publicada",
+       "Valor"
+      ]
+     },
+     {
+      "id": "lp-condiciones-copy",
+      "text": "La TREA es igual a la TEA cuando no hay movimientos adicionales a la apertura, sobre una base anual de 360 días. Los intereses se aplican desde el primer sol y se liquidan cada mes.",
+      "sourceIds": [
+       "terms",
+       "product"
+      ],
+      "kind": "paragraph"
+     },
+     {
+      "id": "lp-soles-note",
+      "text": "La cuenta es solo en soles y no tiene tarjeta de débito ni operaciones en efectivo por agencias, cajeros o agentes. Si necesitas pagar con tarjeta o retirar efectivo, contempla otro medio.",
+      "sourceIds": [
+       "tariff"
+      ],
+      "kind": "paragraph"
+     },
+     {
+      "id": "lp-requisitos",
+      "level": 2,
+      "text": "Ábrela desde tu celular.",
+      "kind": "heading",
+      "short": "Cómo abrirla"
+     },
+     {
+      "id": "lp-requisitos-copy",
+      "text": "Ten a mano tu DNI, tu celular y tu correo electrónico. La cuenta es para mayores de edad y se abre en el sitio oficial de Pibank, desde «Hazte cliente».",
+      "sourceIds": [
+       "faq-open"
+      ],
+      "kind": "paragraph"
+     },
+     {
+      "id": "lp-pasos",
+      "ordered": true,
+      "items": [
+       "Completa tus datos y valida tu celular y tu correo.",
+       "Verifica tu identidad y acepta el contrato y la cartilla.",
+       "Crea tu usuario en la app y transfiere desde tu banco para empezar a ahorrar."
+      ],
+      "kind": "list",
+      "sourceIds": [
+       "faq-open"
+      ]
+     },
+     {
+      "id": "lp-confianza",
+      "level": 2,
+      "text": "Decide con toda la información.",
+      "kind": "heading"
+     },
+     {
+      "id": "lp-confianza-copy",
+      "text": "Pibank es la banca digital de Banco Pichincha Perú. Tu depósito está cubierto por el Fondo de Seguro de Depósitos hasta el monto máximo vigente; consulta sus condiciones antes de decidir.",
+      "sourceIds": [
+       "about",
+       "fsd"
+      ],
+      "kind": "paragraph"
+     },
+     {
+      "id": "landing-sources",
+      "kind": "sources",
+      "title": "Fuentes y condiciones consultadas",
+      "items": [
+       {
+        "text": "Cuenta Soles Pibank · pibank.pe",
+        "href": "https://pibank.pe/cuenta-soles-pibank/"
+       },
+       {
+        "text": "Tarifario Cuenta Soles · actualizado 28/09/2026",
+        "href": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/Web/Tarifario_CuentaSolesPibank.pdf"
+       },
+       {
+        "text": "Cartilla de información · actualizada 28/09/2026",
+        "href": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/ONBOARDING/CartillaInformacion_CuentaSolesPibank.pdf"
+       },
+       {
+        "text": "Requisitos y apertura · FAQ oficial de Pibank",
+        "href": "https://pibank.pe/faq/que-necesito-y-como-puedo-abrir-una-cuenta-en-pibank/"
+       },
+       {
+        "text": "SBS · Compara y elige",
+        "href": "https://www.sbs.gob.pe/usuarios/aprende-con-la-sbs/compara-y-elige"
+       },
+       {
+        "text": "Fondo de Seguro de Depósitos · cobertura",
+        "href": "https://fsd.org.pe/cobertura/"
+       }
+      ]
+     },
+     {
+      "id": "lp-faq",
+      "items": [
+       {
+        "question": "¿Sin mantenimiento significa que todo es gratis?",
+        "answer": "No hay comisión de mantenimiento y las transferencias digitales del tarifario no cobran comisión, pero puede aplicar el ITF y algunos servicios adicionales tienen costo, como el estado de cuenta en papel."
+       },
+       {
+        "question": "¿Desde cuánto empiezo a ganar intereses?",
+        "answer": "Desde el primer sol depositado, sin monto mínimo. Los intereses se liquidan cada mes según la cartilla vigente."
+       },
+       {
+        "question": "¿Puedo retirar mi dinero cuando quiera?",
+        "answer": "Sí, por transferencia a otra cuenta. La Cuenta Soles no tiene tarjeta ni permite retiros en efectivo; revisa límites y horarios en los canales oficiales."
+       }
+      ],
+      "sourceIds": [
+       "tariff",
+       "terms",
+       "product"
+      ],
+      "kind": "faq",
+      "title": "Resuelve tus dudas antes de continuar",
+      "anchor": "lp-faq",
+      "short": "Preguntas"
+     },
+     {
+      "id": "lp-related",
+      "title": "Antes de abrirla, compara con criterio.",
+      "text": "Una guía para comparar rendimiento, costos y liquidez entre cuentas de ahorros.",
+      "kind": "cta",
+      "action": {
+       "label": "Leer la guía",
+       "artifactId": "comparar-cuentas"
+      }
+     },
+     {
+      "id": "lp-final",
+      "title": "Empieza por conocer tu cuenta.",
+      "text": "Consulta la información oficial de Pibank y decide con las condiciones completas.",
+      "kind": "cta",
+      "action": {
+       "label": "Ver Cuenta Soles Pibank",
+       "href": "https://pibank.pe/cuenta-soles-pibank/"
+      }
+     }
+    ],
+    "annotations": [
+     {
+      "id": "cuenta-soles-keyword-observation",
+      "scope": "site",
+      "category": "on-page",
+      "title": "La búsqueda que informa esta propuesta",
+      "explanation": "La observación distingue una consulta amplia de búsquedas de apertura y comparación. Sirve para decidir el papel de cada contenido; no mide resultados de esta muestra.",
+      "status": "measured",
+      "sourceIds": [
+       "dataforseo-method"
+      ],
+      "evidence": {
+       "description": "Observación de Efeonce con DataForSEO el 06/10/2026, mercado Perú (2604), idioma español. Volumen mensual estimado, sin segmentación por dispositivo: «cuenta de ahorros», 2,900; «que banco paga mas intereses», 480; «en que banco puedo ahorrar mi dinero y ganar intereses», 390; «abrir cuenta de ahorros», 210; «cuenta de ahorros sin mantenimiento», 50. Los volúmenes no se suman ni equivalen a tráfico potencial. El enlace documenta la metodología del proveedor; los resultados consultados se conservan en el expediente de esta edición.",
+       "asOf": "2026-10-06",
+       "sourceIds": [
+        "dataforseo-method"
+       ]
+      }
+     },
+     {
+      "id": "cuenta-soles-ai-answers",
+      "scope": "site",
+      "category": "aeo",
+      "title": "Qué responde hoy la IA",
+      "explanation": "Una muestra del panel AEO de la propuesta: en cada pregunta se registra si Pibank aparece, si sus datos son correctos, qué fuentes cita la respuesta y a qué bancos nombra. Hoy, cuando la IA menciona a Pibank, cita a terceros y hasta condiciones de otro país; esta pieza propone que pibank.pe sea la fuente verificable.",
+      "status": "measured",
+      "sourceIds": [
+       "dataforseo-ai-mode",
+       "dataforseo-serp"
+      ],
+      "evidence": {
+       "description": "Observación de Efeonce con DataForSEO, Google AI Mode, Perú (2604), español, escritorio, 08/10/2026. Pibank apareció en 1 de 4 preguntas genéricas de ahorro («cuenta de ahorros que paga más intereses peru»), con 5% TREA, citando a Afluenta, Comparabanca e Infobae; no apareció en «cuenta de ahorros sin mantenimiento», «mejor cuenta de ahorros peru» ni «cuenta de ahorros online peru». En la captura de Google del 06/10/2026 para «cuenta de ahorros sin mantenimiento», el resumen de IA atribuyó a Pibank una tasa de 11.00% E.A., condición de Pibank Colombia, citando a Rankia Colombia; el 08/10/2026 ese resumen ya no mencionaba a Pibank. Snapshots en el expediente de la edición.",
+       "asOf": "2026-10-08",
+       "sourceIds": [
+        "dataforseo-ai-mode",
+        "dataforseo-serp"
+       ]
+      }
+     },
+     {
+      "id": "cuenta-soles-search-role",
+      "scope": "page",
+      "category": "on-page",
+      "title": "Una intención por pieza",
+      "explanation": "La landing resuelve condiciones y siguiente paso de la Cuenta Soles; el artículo responde cómo comparar cuentas por rendimiento, costos y liquidez. Se conectan con enlaces descriptivos para no duplicar contenido. En la propuesta, el pilar se mejora en M1–M2 y las comparativas empiezan en M3; la priorización se contrasta con Search Console y datos del banco.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-lp-beneficios-title",
+      "scope": "block",
+      "blockId": "lp-beneficios-title",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-lp-condiciones",
+      "scope": "block",
+      "blockId": "lp-condiciones",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-lp-tabla",
+      "scope": "block",
+      "blockId": "lp-tabla",
+      "category": "on-page",
+      "title": "Comparación con condiciones",
+      "explanation": "La tasa permanece junto a su base y su fecha, y la nota indica en qué documento se confirma cada condición. La tabla está en HTML con encabezados; es lo que una IA puede citar con contexto, en vez de una cifra suelta en un reel.",
+      "status": "implemented",
+      "sourceIds": [
+       "product",
+       "tariff"
+      ],
+      "evidence": {
+       "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "ann-lp-condiciones-copy",
+      "scope": "block",
+      "blockId": "lp-condiciones-copy",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "La afirmación puede contrastarse contra una fuente oficial fechada. Se debe reverificar antes de enviar y al cambiar las condiciones.",
+      "status": "proposed",
+      "sourceIds": [
+       "tariff"
+      ]
+     },
+     {
+      "id": "ann-lp-soles-note",
+      "scope": "block",
+      "blockId": "lp-soles-note",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "La afirmación puede contrastarse contra una fuente oficial fechada. Se debe reverificar antes de enviar y al cambiar las condiciones.",
+      "status": "proposed",
+      "sourceIds": [
+       "product"
+      ]
+     },
+     {
+      "id": "ann-lp-requisitos",
+      "scope": "block",
+      "blockId": "lp-requisitos",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-lp-requisitos-copy",
+      "scope": "block",
+      "blockId": "lp-requisitos-copy",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "El pasaje responde qué preparar antes de iniciar la apertura y remite al canal oficial. Tiene contexto suficiente para entenderse solo y una fuente oficial; su presencia no demuestra que un motor ya lo haya citado.",
+      "status": "implemented",
+      "sourceIds": [
+       "product"
+      ],
+      "evidence": {
+       "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "ann-lp-confianza",
+      "scope": "block",
+      "blockId": "lp-confianza",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-lp-confianza-copy",
+      "scope": "block",
+      "blockId": "lp-confianza-copy",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "La afirmación puede contrastarse contra una fuente oficial fechada. Se debe reverificar antes de enviar y al cambiar las condiciones.",
+      "status": "proposed",
+      "sourceIds": [
+       "fsd",
+       "sbs"
+      ]
+     },
+     {
+      "id": "ann-lp-faq-title",
+      "scope": "block",
+      "blockId": "lp-faq",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "implemented",
+      "sourceIds": [],
+      "evidence": {
+       "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "ann-lp-faq",
+      "scope": "block",
+      "blockId": "lp-faq",
+      "category": "aeo",
+      "title": "Preguntas que resuelven dudas",
+      "explanation": "La respuesta distingue mantenimiento de ITF y servicios adicionales. Ese matiz evita que una respuesta breve se vuelva una afirmación financiera incorrecta. Las respuestas están en el HTML y se pueden contrastar con el tarifario.",
+      "status": "implemented",
+      "sourceIds": [
+       "tariff",
+       "product"
+      ],
+      "evidence": {
+       "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "ann-lp-final",
+      "scope": "block",
+      "blockId": "lp-final",
+      "category": "conversion",
+      "title": "Siguiente paso claro",
+      "explanation": "La acción tiene destino y contexto. En esta muestra no existe apertura bancaria ni medición de cuentas fondeadas.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-lp-related",
+      "scope": "block",
+      "blockId": "lp-related",
+      "category": "conversion",
+      "title": "Siguiente paso claro",
+      "explanation": "La acción tiene destino y contexto. En esta muestra no existe apertura bancaria ni medición de cuentas fondeadas.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "cuenta-soles-technical",
+      "scope": "page",
+      "category": "technical",
+      "title": "Indexación separada",
+      "explanation": "La muestra Think lleva noindex y queda fuera del sitemap. Canonical e indexación en pibank.pe son una propuesta de implementación, no un estado comprobado.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "cuenta-soles-structured-data",
+      "scope": "page",
+      "category": "aeo",
+      "title": "Contenido y representación",
+      "explanation": "Exhibir JSON-LD propuesto derivado del contenido; no emitir datos estructurados que atribuyan esta publicación a Pibank. La propuesta corrige además el identificador del sitio, hoy distinto entre páginas.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "cuenta-soles-measurement",
+      "scope": "site",
+      "category": "conversion",
+      "title": "Medición por etapas",
+      "explanation": "Proponer lectura, interacción CTA y llegada al canal de apertura, y medir visibilidad y citas en IA con el panel AEO. Apertura y fondeo requieren integración autorizada y datos del banco; no se infieren del clic.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "cuenta-soles-hero-structure",
+      "scope": "block",
+      "blockId": "lp-hero",
+      "category": "on-page",
+      "title": "Titular, contexto y fotografía original",
+      "explanation": "La pieza abre con un H1 único y un contexto que explica qué encontrará la persona. La imagen declara dimensiones y texto alternativo; su crédito la identifica como ilustrativa, no como clienta ni testimonio.",
+      "status": "implemented",
+      "sourceIds": [],
+      "evidence": {
+       "description": "Implementado en el renderer de esta muestra y comprobado en HTML y navegador local a 1440 y 390 píxeles. No representa una implementación en pibank.pe.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "lp-tech-image-delivery",
+      "scope": "page",
+      "category": "technical",
+      "title": "Hero visible pronto, sin descargar una imagen excesiva",
+      "explanation": "Mantener la imagen principal en el HTML inicial, con dimensiones intrínsecas y prioridad alta. Preparar tamaños según el ancho real del hero y comprobar qué archivo descarga cada viewport. La muestra conserva el WebP protegido, con loading=eager y fetchpriority=high; no genera srcset ni AVIF para ese recurso. Antes de publicar, verificar bytes transferidos y elemento LCP en móvil: la fotografía podría no ser el elemento LCP.",
+      "status": "proposed",
+      "sourceIds": [
+       "google-lcp"
+      ]
+     },
+     {
+      "id": "lp-tech-font-layout",
+      "scope": "page",
+      "category": "technical",
+      "title": "Tipografía estable desde el primer render",
+      "explanation": "Definir las familias y pesos usados por titular, cuerpo y botones; servir sólo los necesarios y probar el salto entre fallback y fuente final. Pibank usa Gilroy e IBM Plex Sans; la muestra usa Poppins y la fuente del sistema como sustitutas. Revisar el waterfall y comprobar que el CTA no cambia de posición al cargar la fuente; cualquier mejora de CLS exige medición antes/después.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "lp-tech-canonical-release",
+      "scope": "page",
+      "category": "technical",
+      "title": "Una URL pública de producto y una muestra no listada",
+      "explanation": "Conservar la URL oficial de la Cuenta Soles como destino y alinear canonical, sitemap y enlaces internos. El diagnóstico público del 07/10/2026 encontró dos etiquetas canonical iguales en páginas clave: dejar una por plantilla y comprobarla en el código. La muestra compartida tiene noindex,nofollow y canonical propio de Efeonce; esos valores no son la configuración propuesta para el producto.",
+      "status": "proposed",
+      "sourceIds": [
+       "google-canonical",
+       "google-noindex",
+       "product"
+      ]
+     },
+     {
+      "id": "lp-tech-pdf-history",
+      "scope": "site",
+      "category": "technical",
+      "title": "Cartilla y tarifario vigentes, enlazados desde el producto",
+      "explanation": "La cartilla y el tarifario de la Cuenta Soles están en un almacenamiento externo (blob) y se actualizaron el 28/09/2026. Enlazarlos con texto descriptivo desde la página del producto, con su fecha visible, para que personas y motores encuentren la versión vigente. Si se publican versiones nuevas, revisar que la anterior no quede como única fuente citada.",
+      "status": "proposed",
+      "sourceIds": [
+       "google-noindex",
+       "terms"
+      ]
+     },
+     {
+      "id": "lp-tech-semantic-links",
+      "scope": "page",
+      "category": "on-page",
+      "title": "Condiciones comparables y siguiente paso explícito",
+      "explanation": "En la implementación final, usar un H1 de producto, H2 para condiciones, apertura y preguntas, encabezados de columna en la tabla y enlaces descriptivos a la cartilla, al tarifario y a la guía. Comprobar HTML renderizado, lectura con teclado y relación de cada condición con su fuente. La jerarquía final se valida en la plantilla de pibank.pe.",
+      "status": "proposed",
+      "sourceIds": [
+       "product",
+       "tariff"
+      ]
+     },
+     {
+      "id": "faq-schema",
+      "blockId": "lp-faq",
+      "scope": "block",
+      "category": "technical",
+      "title": "FAQ: contenido útil, marcado opcional",
+      "explanation": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
+      "status": "proposed",
+      "sourceIds": [
+       "google-search-updates"
+      ],
+      "evidence": {
+       "description": "Google Search Central registra el retiro de los resultados enriquecidos FAQ desde el 07/05/2026 y la retirada de su documentación el 15/06/2026. El ejemplo de código se conserva sólo como representación semántica opcional de preguntas visibles.",
+       "asOf": "2026-10-08",
+       "sourceIds": [
+        "google-search-updates"
+       ]
+      }
+     }
+    ],
+    "seo": {
+     "title": "Cuenta Soles Pibank: 5% TREA y sin mantenimiento",
+     "description": "Conoce la Cuenta Soles Pibank: 5% TREA desde el primer sol, sin mantenimiento ni saldo mínimo, condiciones y cómo abrirla online.",
+     "canonical": "https://pibank.pe/cuenta-soles-pibank/",
+     "robots": "index,follow",
+     "lang": "es-PE",
+     "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "headline": "Cuenta Soles Pibank",
+      "description": "Conoce la Cuenta Soles Pibank: 5% TREA desde el primer sol, sin mantenimiento ni saldo mínimo, condiciones y cómo abrirla online.",
+      "inLanguage": "es-PE",
+      "url": "https://pibank.pe/cuenta-soles-pibank/"
+     }
+    },
+    "experience": {
+     "thesis": "Condiciones claras y fuentes propias conectan la búsqueda, la respuesta de la IA y un siguiente paso verificable.",
+     "meta": {
+      "instrument": "AEO X-Ray",
+      "sampleFor": "Pibank Perú",
+      "sampleTitle": "Cuenta Soles Pibank",
+      "kicker": "Muestra de trabajo Efeonce",
+      "preparedAt": "2026-10-08",
+      "preparedBy": "Efeonce"
+     },
+     "gap": {
+      "kicker": "Una observación de búsqueda y de IA, dos respuestas complementarias",
+      "headline": "La IA ya habla de Pibank, pero no con su propia voz.",
+      "lead": "Quien busca una cuenta no siempre busca a Pibank por su nombre. Esta propuesta pone las condiciones a la vista y responde las dudas antes del canal de apertura.",
+      "serpTitle": "Primeros cinco resultados orgánicos de la consulta",
+      "serpBadge": "Perú · español · escritorio",
+      "serpSummary": "Pibank no apareció entre los 19 resultados orgánicos retornados para «cuenta de ahorros sin mantenimiento».",
+      "serpNote": "Snapshot DataForSEO del 08/10/2026 para «cuenta de ahorros sin mantenimiento». Profundidad solicitada 20; retornados 19 orgánicos. No es una medición de toda la categoría.",
+      "serp": [
+       {
+        "pos": 1,
+        "domain": "interbank.pe",
+        "kind": "Banco"
+       },
+       {
+        "pos": 2,
+        "domain": "www.abretucuenta.viabcp.com",
+        "kind": "Banco"
+       },
+       {
+        "pos": 3,
+        "domain": "www.bbva.pe",
+        "kind": "Banco"
+       },
+       {
+        "pos": 4,
+        "domain": "www.scotiabank.com.pe",
+        "kind": "Banco"
+       },
+       {
+        "pos": 5,
+        "domain": "www.bancofalabella.pe",
+        "kind": "Banco"
+       }
+      ],
+      "diagnosisLabel": "La oportunidad de esta muestra",
+      "punch": "Que pibank.pe sea la fuente que se cita.",
+      "punchNote": "En AI Mode (08/10/2026), Pibank apareció en 1 de 4 preguntas genéricas de ahorro y la respuesta citó a Afluenta, Comparabanca e Infobae, no a pibank.pe. El 06/10/2026, el resumen de IA de Google para «cuenta de ahorros sin mantenimiento» le atribuyó la tasa de Pibank Colombia; el 08/10 ya no lo mencionaba.",
+      "punchWhy": "Las condiciones de la Cuenta Soles ya compiten; lo que falta es que el sitio propio las explique de forma que buscadores e IA puedan citarlas con fecha y fuente.",
+      "punchOpportunity": "La landing propone tasa, costos, liquidez y siguiente paso legibles y verificables.",
+      "asideLabel": "Qué está medido y qué está propuesto",
+      "aside": "La SERP y las respuestas de IA son observadas; la mejora editorial está propuesta. No medimos resultados de estas piezas ni conversiones del banco."
+     },
+     "machine": {
+      "seo": [
+       {
+        "id": "meta-title",
+        "label": "Title propuesto",
+        "value": "Cuenta Soles Pibank: 5% TREA y sin mantenimiento",
+        "why": "Resume el propósito de la pieza en el resultado de búsqueda.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "lp-hero",
+        "detail": "48 caracteres; longitud descriptiva, no garantía de visualización."
+       },
+       {
+        "id": "meta-description",
+        "label": "Descripción propuesta",
+        "value": "Conoce la Cuenta Soles Pibank: 5% TREA desde el primer sol, sin mantenimiento ni saldo mínimo, condiciones y cómo abrirla online.",
+        "why": "Anticipa lo que la persona encontrará y mantiene la misma promesa que el contenido.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "landing-answer"
+       },
+       {
+        "id": "canonical",
+        "label": "Canonical propuesto",
+        "value": "https://pibank.pe/cuenta-soles-pibank/",
+        "why": "Destino previsto para una eventual implementación bancaria; no es el canonical operativo de la muestra.",
+        "tier": 2,
+        "sourceScope": "page",
+        "sourceStatus": "proposed"
+       },
+       {
+        "id": "robots",
+        "label": "Indexación de la muestra",
+        "value": "noindex, nofollow",
+        "why": "Mantiene esta demostración separada del sitio del banco. Noindex no sustituye el control de acceso.",
+        "tier": 2,
+        "sourceScope": "site",
+        "sourceStatus": "proposed"
+       },
+       {
+        "id": "language",
+        "label": "Idioma del contenido",
+        "value": "es-PE",
+        "why": "Declara el idioma y la variante del contenido para navegación y tecnología de asistencia.",
+        "tier": 2,
+        "sourceScope": "page",
+        "sourceStatus": "proposed"
+       },
+       {
+        "id": "cta-destination",
+        "label": "Siguiente paso",
+        "value": "Canal oficial para condiciones; navegación demostrativa entre piezas",
+        "why": "Un clic en la muestra no equivale a apertura o fondeo.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "lp-final"
+       }
+      ],
+      "og": [
+       {
+        "id": "og-title",
+        "label": "og:title propuesto",
+        "value": "Cuenta Soles Pibank: 5% TREA y sin mantenimiento",
+        "why": "Coherencia entre página y vista previa.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "lp-hero"
+       },
+       {
+        "id": "og-description",
+        "label": "og:description propuesta",
+        "value": "Conoce la Cuenta Soles Pibank: 5% TREA desde el primer sol, sin mantenimiento ni saldo mínimo, condiciones y cómo abrirla online.",
+        "why": "Vista previa fiel a la pieza.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "landing-answer"
+       },
+       {
+        "id": "og-image",
+        "label": "Imagen de vista previa",
+        "value": "Asset landing-banner; URL final se define al publicar con autorización",
+        "why": "Definir imagen y texto alternativo sin atribuir respaldo de la persona retratada.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "landing-banner-block"
+       }
+      ],
+      "headings": {
+       "sourceScope": "page",
+       "sourceStatus": "proposed",
+       "why": "La jerarquía representa el orden real del contenido; no se añaden headings sólo para estilo.",
+       "tree": [
+        {
+         "level": 1,
+         "text": "Cuenta Soles Pibank",
+         "coupleId": "lp-hero"
+        },
+        {
+         "level": 2,
+         "text": "Tu ahorro rinde desde el primer sol.",
+         "coupleId": "lp-beneficios-title"
+        },
+        {
+         "level": 2,
+         "text": "Las condiciones, en una sola tabla.",
+         "coupleId": "lp-condiciones"
+        },
+        {
+         "level": 2,
+         "text": "Ábrela desde tu celular.",
+         "coupleId": "lp-requisitos"
+        },
+        {
+         "level": 2,
+         "text": "Decide con toda la información.",
+         "coupleId": "lp-confianza"
+        },
+        {
+         "level": 2,
+         "text": "Resuelve tus dudas antes de continuar",
+         "coupleId": "lp-faq"
+        }
+       ]
+      },
+      "alts": [
+       {
+        "coupleId": "landing-banner-block",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "alt": "Una mujer sonríe mientras revisa su teléfono, sentada en un sofá de un departamento luminoso.",
+        "why": "Descripción observable de una fotografía ilustrativa generada; no inventa relación comercial ni testimonio."
+       }
+      ],
+      "jsonld": [
+       {
+        "id": "page-schema",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "type": "WebPage",
+        "metric": "Derivado de título, descripción e idioma visibles",
+        "why": "Representación propuesta para el sitio de destino; aquí se muestra inerte, sin atribuir publicación al banco.",
+        "tier": 2,
+        "code": {
+         "@context": "https://schema.org",
+         "@type": "WebPage",
+         "headline": "Cuenta Soles Pibank",
+         "description": "Conoce la Cuenta Soles Pibank: 5% TREA desde el primer sol, sin mantenimiento ni saldo mínimo, condiciones y cómo abrirla online.",
+         "inLanguage": "es-PE",
+         "url": "https://pibank.pe/cuenta-soles-pibank/"
+        }
+       },
+       {
+        "id": "faq-schema",
+        "coupleId": "lp-faq",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "type": "FAQPage",
+        "metric": "3 preguntas visibles",
+        "why": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
+        "tier": 2,
+        "code": {
+         "@context": "https://schema.org",
+         "@type": "FAQPage",
+         "mainEntity": [
+          {
+           "@type": "Question",
+           "name": "¿Sin mantenimiento significa que todo es gratis?",
+           "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No hay comisión de mantenimiento y las transferencias digitales del tarifario no cobran comisión, pero puede aplicar el ITF y algunos servicios adicionales tienen costo, como el estado de cuenta en papel."
+           }
+          },
+          {
+           "@type": "Question",
+           "name": "¿Desde cuánto empiezo a ganar intereses?",
+           "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Desde el primer sol depositado, sin monto mínimo. Los intereses se liquidan cada mes según la cartilla vigente."
+           }
+          },
+          {
+           "@type": "Question",
+           "name": "¿Puedo retirar mi dinero cuando quiera?",
+           "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí, por transferencia a otra cuenta. La Cuenta Soles no tiene tarjeta ni permite retiros en efectivo; revisa límites y horarios en los canales oficiales."
+           }
+          }
+         ]
+        }
+       }
+      ],
+      "craft": [
+       {
+        "label": "Respuesta compacta",
+        "detail": "Una respuesta directa con alcance y condiciones.",
+        "why": "Permite entender la decisión antes del detalle, sin prometer recuperación por un motor.",
+        "tier": 3,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "landing-answer"
+       },
+       {
+        "label": "Condiciones junto al dato",
+        "detail": "Tasa, base, fecha y fuente viajan juntas.",
+        "why": "Reduce una comparación engañosa basada sólo en una cifra.",
+        "tier": 3,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "lp-tabla"
+       },
+       {
+        "label": "Imagen con autoría",
+        "detail": "Fotografía ilustrativa generada, procedencia y ALT factual.",
+        "why": "La persona no se presenta como cliente ni testimonio de Pibank.",
+        "tier": 3,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "landing-banner-block"
+       },
+       {
+        "label": "Fuente primaria",
+        "detail": "Tarifario/cartilla o autoridad pública identificados.",
+        "why": "Permite revisar una condición sin confiar sólo en la propuesta.",
+        "tier": 3,
+        "sourceScope": "page",
+        "sourceStatus": "proposed"
+       },
+       {
+        "label": "Accesibilidad y lectura",
+        "detail": "Tabla con encabezados, jerarquía coherente y controles con nombre.",
+        "why": "La implementación debe verificarse en teclado y móvil; este nodo no certifica conformidad.",
+        "tier": 3,
+        "sourceScope": "page",
+        "sourceStatus": "proposed"
+       },
+       {
+        "label": "Medición por etapas",
+        "detail": "Separar lectura, CTA, llegada al canal, apertura y fondeo.",
+        "why": "Las dos últimas etapas requieren integración y datos autorizados del banco.",
+        "tier": 3,
+        "sourceScope": "site",
+        "sourceStatus": "proposed"
+       },
+       {
+        "id": "cuenta-soles-keyword-observation",
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "La búsqueda que informa esta propuesta",
+        "detail": "SEO on-page",
+        "why": "La observación distingue una consulta amplia de búsquedas de apertura y comparación. Sirve para decidir el papel de cada contenido; no mide resultados de esta muestra.",
+        "tier": 2,
+        "source": "DataForSEO · metodología del proveedor, no snapshot de resultados",
+        "asOf": "2026-10-06"
+       },
+       {
+        "id": "cuenta-soles-ai-answers",
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "Qué responde hoy la IA",
+        "detail": "AEO",
+        "why": "Una muestra del panel AEO de la propuesta: en cada pregunta se registra si Pibank aparece, si sus datos son correctos, qué fuentes cita la respuesta y a qué bancos nombra. Hoy, cuando la IA menciona a Pibank, cita a terceros y hasta condiciones de otro país; esta pieza propone que pibank.pe sea la fuente verificable.",
+        "tier": 2,
+        "source": "DataForSEO · Google AI Mode (metodología) · DataForSEO · Google orgánico y AI Overview (metodología)",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "cuenta-soles-search-role",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Una intención por pieza",
+        "detail": "SEO on-page",
+        "why": "La landing resuelve condiciones y siguiente paso de la Cuenta Soles; el artículo responde cómo comparar cuentas por rendimiento, costos y liquidez. Se conectan con enlaces descriptivos para no duplicar contenido. En la propuesta, el pilar se mejora en M1–M2 y las comparativas empiezan en M3; la priorización se contrasta con Search Console y datos del banco.",
+        "tier": 2
+       },
+       {
+        "id": "ann-lp-beneficios-title",
+        "coupleId": "lp-beneficios-title",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-lp-condiciones",
+        "coupleId": "lp-condiciones",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-lp-tabla",
+        "coupleId": "lp-tabla",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Comparación con condiciones",
+        "detail": "SEO on-page",
+        "why": "La tasa permanece junto a su base y su fecha, y la nota indica en qué documento se confirma cada condición. La tabla está en HTML con encabezados; es lo que una IA puede citar con contexto, en vez de una cifra suelta en un reel.",
+        "tier": 2,
+        "source": "Cuenta Soles Pibank · pibank.pe · Tarifario Cuenta Soles Pibank · actualizado 28/09/2026",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-lp-condiciones-copy",
+        "coupleId": "lp-condiciones-copy",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "La afirmación puede contrastarse contra una fuente oficial fechada. Se debe reverificar antes de enviar y al cambiar las condiciones.",
+        "tier": 2,
+        "source": "Tarifario Cuenta Soles Pibank · actualizado 28/09/2026",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-lp-soles-note",
+        "coupleId": "lp-soles-note",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "La afirmación puede contrastarse contra una fuente oficial fechada. Se debe reverificar antes de enviar y al cambiar las condiciones.",
+        "tier": 2,
+        "source": "Cuenta Soles Pibank · pibank.pe",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-lp-requisitos",
+        "coupleId": "lp-requisitos",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-lp-requisitos-copy",
+        "coupleId": "lp-requisitos-copy",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "El pasaje responde qué preparar antes de iniciar la apertura y remite al canal oficial. Tiene contexto suficiente para entenderse solo y una fuente oficial; su presencia no demuestra que un motor ya lo haya citado.",
+        "tier": 2,
+        "source": "Cuenta Soles Pibank · pibank.pe",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-lp-confianza",
+        "coupleId": "lp-confianza",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-lp-confianza-copy",
+        "coupleId": "lp-confianza-copy",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "La afirmación puede contrastarse contra una fuente oficial fechada. Se debe reverificar antes de enviar y al cambiar las condiciones.",
+        "tier": 2,
+        "source": "Fondo de Seguro de Depósitos · cobertura · SBS · Compara y elige",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-lp-faq-title",
+        "coupleId": "lp-faq",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-lp-faq",
+        "coupleId": "lp-faq",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Preguntas que resuelven dudas",
+        "detail": "AEO",
+        "why": "La respuesta distingue mantenimiento de ITF y servicios adicionales. Ese matiz evita que una respuesta breve se vuelva una afirmación financiera incorrecta. Las respuestas están en el HTML y se pueden contrastar con el tarifario.",
+        "tier": 2,
+        "source": "Tarifario Cuenta Soles Pibank · actualizado 28/09/2026 · Cuenta Soles Pibank · pibank.pe",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-lp-final",
+        "coupleId": "lp-final",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Siguiente paso claro",
+        "detail": "Conversión",
+        "why": "La acción tiene destino y contexto. En esta muestra no existe apertura bancaria ni medición de cuentas fondeadas.",
+        "tier": 2
+       },
+       {
+        "id": "ann-lp-related",
+        "coupleId": "lp-related",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Siguiente paso claro",
+        "detail": "Conversión",
+        "why": "La acción tiene destino y contexto. En esta muestra no existe apertura bancaria ni medición de cuentas fondeadas.",
+        "tier": 2
+       },
+       {
+        "id": "cuenta-soles-technical",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Indexación separada",
+        "detail": "SEO técnico",
+        "why": "La muestra Think lleva noindex y queda fuera del sitemap. Canonical e indexación en pibank.pe son una propuesta de implementación, no un estado comprobado.",
+        "tier": 2
+       },
+       {
+        "id": "cuenta-soles-structured-data",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Contenido y representación",
+        "detail": "AEO",
+        "why": "Exhibir JSON-LD propuesto derivado del contenido; no emitir datos estructurados que atribuyan esta publicación a Pibank. La propuesta corrige además el identificador del sitio, hoy distinto entre páginas.",
+        "tier": 2
+       },
+       {
+        "id": "cuenta-soles-measurement",
+        "sourceScope": "site",
+        "sourceStatus": "proposed",
+        "label": "Medición por etapas",
+        "detail": "Conversión",
+        "why": "Proponer lectura, interacción CTA y llegada al canal de apertura, y medir visibilidad y citas en IA con el panel AEO. Apertura y fondeo requieren integración autorizada y datos del banco; no se infieren del clic.",
+        "tier": 2
+       },
+       {
+        "id": "cuenta-soles-hero-structure",
+        "coupleId": "lp-hero",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Titular, contexto y fotografía original",
+        "detail": "SEO on-page",
+        "why": "La pieza abre con un H1 único y un contexto que explica qué encontrará la persona. La imagen declara dimensiones y texto alternativo; su crédito la identifica como ilustrativa, no como clienta ni testimonio.",
+        "tier": 2
+       },
+       {
+        "id": "lp-tech-image-delivery",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Hero visible pronto, sin descargar una imagen excesiva",
+        "detail": "SEO técnico",
+        "why": "Mantener la imagen principal en el HTML inicial, con dimensiones intrínsecas y prioridad alta. Preparar tamaños según el ancho real del hero y comprobar qué archivo descarga cada viewport. La muestra conserva el WebP protegido, con loading=eager y fetchpriority=high; no genera srcset ni AVIF para ese recurso. Antes de publicar, verificar bytes transferidos y elemento LCP en móvil: la fotografía podría no ser el elemento LCP.",
+        "tier": 2,
+        "source": "web.dev · optimizar LCP",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "lp-tech-font-layout",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Tipografía estable desde el primer render",
+        "detail": "SEO técnico",
+        "why": "Definir las familias y pesos usados por titular, cuerpo y botones; servir sólo los necesarios y probar el salto entre fallback y fuente final. Pibank usa Gilroy e IBM Plex Sans; la muestra usa Poppins y la fuente del sistema como sustitutas. Revisar el waterfall y comprobar que el CTA no cambia de posición al cargar la fuente; cualquier mejora de CLS exige medición antes/después.",
+        "tier": 2
+       },
+       {
+        "id": "lp-tech-canonical-release",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Una URL pública de producto y una muestra no listada",
+        "detail": "SEO técnico",
+        "why": "Conservar la URL oficial de la Cuenta Soles como destino y alinear canonical, sitemap y enlaces internos. El diagnóstico público del 07/10/2026 encontró dos etiquetas canonical iguales en páginas clave: dejar una por plantilla y comprobarla en el código. La muestra compartida tiene noindex,nofollow y canonical propio de Efeonce; esos valores no son la configuración propuesta para el producto.",
+        "tier": 2,
+        "source": "Google Search Central · consolidar URL duplicadas · Google Search Central · controlar indexación · Cuenta Soles Pibank · pibank.pe",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "lp-tech-pdf-history",
+        "sourceScope": "site",
+        "sourceStatus": "proposed",
+        "label": "Cartilla y tarifario vigentes, enlazados desde el producto",
+        "detail": "SEO técnico",
+        "why": "La cartilla y el tarifario de la Cuenta Soles están en un almacenamiento externo (blob) y se actualizaron el 28/09/2026. Enlazarlos con texto descriptivo desde la página del producto, con su fecha visible, para que personas y motores encuentren la versión vigente. Si se publican versiones nuevas, revisar que la anterior no quede como única fuente citada.",
+        "tier": 2,
+        "source": "Google Search Central · controlar indexación · Cartilla de información Cuenta Soles Pibank · actualizada 28/09/2026",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "lp-tech-semantic-links",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Condiciones comparables y siguiente paso explícito",
+        "detail": "SEO on-page",
+        "why": "En la implementación final, usar un H1 de producto, H2 para condiciones, apertura y preguntas, encabezados de columna en la tabla y enlaces descriptivos a la cartilla, al tarifario y a la guía. Comprobar HTML renderizado, lectura con teclado y relación de cada condición con su fuente. La jerarquía final se valida en la plantilla de pibank.pe.",
+        "tier": 2,
+        "source": "Cuenta Soles Pibank · pibank.pe · Tarifario Cuenta Soles Pibank · actualizado 28/09/2026",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "faq-schema",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "FAQ: contenido útil, marcado opcional",
+        "detail": "SEO técnico",
+        "why": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
+        "tier": 2,
+        "source": "Google Search Central · registro de cambios",
+        "asOf": "2026-10-08",
+        "coupleId": "lp-faq"
+       }
+      ]
+     },
+     "flow": [
+      {
+       "step": "",
+       "label": "La oportunidad",
+       "next": "Veamos la pieza que responde a esta oportunidad."
+      },
+      {
+       "step": "articulo",
+       "label": "La pieza",
+       "next": "Ahora mira cómo se conecta el contenido con su capa técnica."
+      },
+      {
+       "step": "radiografia",
+       "label": "La radiografía",
+       "next": "La misma idea puede vivir en otros formatos."
+      },
+      {
+       "step": "atomizacion",
+       "label": "Dónde más vive",
+       "next": ""
+      }
+     ],
+     "atomsIntro": "De una guía a piezas listas para revisar: tres láminas de feed y una Story. Explora cada formato y vuelve al bloque que le dio origen.",
+     "atoms": [
+      {
+       "sourceScope": "block",
+       "sourceStatus": "implemented",
+       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "id": "social",
+       "kind": "Feed · Comparación",
+       "coupleId": "lp-tabla",
+       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "why": "Una respuesta extensa se convierte en una entrada visual a la guía, conservando el mensaje y su vínculo con el contenido completo.",
+       "post": {
+        "hook": "Tu ahorro merece más que una tasa.",
+        "body": "Rendimiento, costos y liquidez. Tres cosas que conviene mirar juntas antes de elegir una cuenta.",
+        "cta": "Lee la guía completa antes de elegir tu cuenta.",
+        "imageAssetId": "social-compare",
+        "alt": "Pibank. Tu ahorro merece más que una tasa. Rendimiento, costos y liquidez. Tres cosas que también importan. Fotografía de un hombre que revisa su teléfono junto a un portátil."
+       },
+       "deliverable": [
+        {
+         "k": "Formato producido",
+         "v": "1080×1350 px · WebP"
+        },
+        {
+         "k": "Composición",
+         "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Pibank Perú."
+        },
+        {
+         "k": "Publicación",
+         "v": "Muestra para revisión; no publicada en Instagram."
+        }
+       ]
+      },
+      {
+       "sourceScope": "block",
+       "sourceStatus": "implemented",
+       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "id": "video",
+       "kind": "Story",
+       "coupleId": "lp-pasos",
+       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "why": "La misma idea se adapta al consumo vertical y devuelve a la sección que explica cómo abrir la cuenta.",
+       "post": {
+        "hook": "Antes de elegir tu cuenta.",
+        "body": "Mira el rendimiento, los costos y la liquidez. Confirma todo en la cartilla y el tarifario oficiales.",
+        "cta": "Lee la guía completa antes de elegir tu cuenta.",
+        "imageAssetId": "social-story",
+        "alt": "Pibank. Antes de elegir: una cuenta, tres cosas por revisar. Rendimiento, costos y liquidez. Fotografía de un hombre que revisa su teléfono. Lee la guía antes de abrir tu cuenta."
+       },
+       "deliverable": [
+        {
+         "k": "Formato producido",
+         "v": "1080×1920 px · WebP"
+        },
+        {
+         "k": "Composición",
+         "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Pibank Perú."
+        },
+        {
+         "k": "Publicación",
+         "v": "Muestra para revisión; no publicada en Instagram."
+        }
+       ]
+      },
+      {
+       "sourceScope": "block",
+       "sourceStatus": "implemented",
+       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "id": "imagenes",
+       "kind": "Feed · Liquidez",
+       "coupleId": "lp-condiciones-copy",
+       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "why": "La pieza explica una condición de la cuenta —cómo entra y sale el dinero— sin convertirla en una promesa.",
+       "post": {
+        "hook": "Disponible no siempre significa con tarjeta.",
+        "body": "Una cuenta 100% digital puede darte tu dinero por transferencia. Revisa cómo ingresas y retiras antes de elegir.",
+        "cta": "Lee la guía completa antes de elegir tu cuenta.",
+        "imageAssetId": "social-average",
+        "alt": "Pibank. Disponible no siempre significa con tarjeta. Ingresas y retiras tu dinero por transferencia, desde la app. Sin tarjeta ni efectivo."
+       },
+       "deliverable": [
+        {
+         "k": "Formato producido",
+         "v": "1080×1350 px · WebP"
+        },
+        {
+         "k": "Composición",
+         "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Pibank Perú."
+        },
+        {
+         "k": "Publicación",
+         "v": "Muestra para revisión; no publicada en Instagram."
+        }
+       ]
+      },
+      {
+       "sourceScope": "block",
+       "sourceStatus": "implemented",
+       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "id": "social-costos",
+       "kind": "Feed · Costos",
+       "coupleId": "lp-faq",
+       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "why": "La pieza corrige una interpretación frecuente y conduce al bloque que explica el alcance de la condición comercial.",
+       "post": {
+        "hook": "Sin mantenimiento no significa sin costos.",
+        "body": "Mantenimiento: S/ 0. Revisa también el ITF y los servicios que pedirás según cómo uses tu cuenta.",
+        "cta": "Lee la guía completa antes de elegir tu cuenta.",
+        "imageAssetId": "social-costs",
+        "alt": "Pibank. Sin mantenimiento no significa sin costos. Mantenimiento: S/ 0. Esto es distinto del ITF y de los servicios adicionales que pidas. Mira cómo usas tu cuenta."
+       },
+       "deliverable": [
+        {
+         "k": "Formato producido",
+         "v": "1080×1350 px · WebP"
+        },
+        {
+         "k": "Composición",
+         "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Pibank Perú."
+        },
+        {
+         "k": "Publicación",
+         "v": "Muestra para revisión; no publicada en Instagram."
+        }
+       ]
+      }
+     ],
+     "evidence": {
+      "intro": "Separar observación, propuesta y resultado evita atribuir a la muestra efectos que todavía no medimos.",
+      "facts": [
+       {
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "SERP observada",
+        "value": "Pibank no apareció en los 19 orgánicos retornados",
+        "note": "Consulta exacta: «cuenta de ahorros sin mantenimiento». Perú 2604, español, escritorio, 08/10/2026; no generalizar a otras consultas.",
+        "source": "DataForSEO · Google organic live/advanced · task 10082356-1987-0139-0000-e695fd18ffeb · snapshot conservado en expediente de la edición",
+        "asOf": "2026-10-08",
+        "headline": false
+       },
+       {
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "Respuestas de IA observadas",
+        "value": "Pibank apareció en 1 de 4 preguntas genéricas, citado por terceros",
+        "note": "Google AI Mode, Perú 2604, español, escritorio, 08/10/2026. La respuesta que lo menciona cita a Afluenta, Comparabanca e Infobae. El 06/10/2026, el resumen de IA de «cuenta de ahorros sin mantenimiento» le atribuyó la tasa de Pibank Colombia; el 08/10/2026 ya no lo mencionaba.",
+        "source": "DataForSEO · Google AI Mode live/advanced · snapshots en expediente de la edición",
+        "asOf": "2026-10-08",
+        "headline": false
+       },
+       {
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "Demanda estimada por término",
+        "value": "2,900 búsquedas/mes: cuenta de ahorros",
+        "note": "DataForSEO Labs, Perú/español, sin dispositivo segmentado. Consulta del 06/10/2026.",
+        "source": "DataForSEO keyword_overview/live · snapshot en expediente de la edición.",
+        "asOf": "2026-10-06",
+        "headline": false
+       },
+       {
+        "coupleId": "lp-tabla",
+        "sourceScope": "block",
+        "sourceStatus": "verified",
+        "label": "Fuente de condiciones",
+        "value": "Cartilla y tarifario Cuenta Soles 28/09/2026",
+        "note": "Consulta documental de fuente oficial; no verifica aprobación o implementación de esta muestra.",
+        "source": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/ONBOARDING/CartillaInformacion_CuentaSolesPibank.pdf",
+        "asOf": "2026-10-08",
+        "headline": false
+       }
+      ],
+      "fanOut": {
+       "title": "Preguntas cubiertas por esta pieza",
+       "note": "Cobertura editorial visible, no evidencia de que una IA ya haya recuperado o citado estas respuestas.",
+       "items": [
+        {
+         "q": "¿Desde cuánto gano intereses?",
+         "coveredBy": "lp-tabla",
+         "covered": true
+        },
+        {
+         "q": "¿Sin mantenimiento significa sin otros costos?",
+         "coveredBy": "lp-faq",
+         "covered": true
+        },
+        {
+         "q": "¿Qué necesito para abrirla?",
+         "coveredBy": "lp-requisitos-copy",
+         "covered": true
+        }
+       ]
+      },
+      "honesty": "No se consultó Search Console/GA4 del banco ni se midieron aperturas o fondeo. Las cifras de búsqueda son estimaciones del proveedor y las respuestas de IA son snapshots fechados, no pronósticos."
+     },
+     "ui": {
+      "disclaimerLabel": "Demostración de Efeonce",
+      "disclaimerBody": "Muestra editorial preparada para Pibank Perú. Adelanta el trabajo de la propuesta técnica 2027.",
+      "paneArticleTitle": "La pieza",
+      "paneArticleSubtitle": "Lo que ve la persona",
+      "paneMachineTab": "Lo que lee una máquina",
+      "paneEvidenceTab": "La evidencia",
+      "hintDesktop": "Pasa el cursor o enfoca un bloque para ver sus datos. Haz clic para fijarlo.",
+      "hintMobile": "Toca un bloque para ver qué información produce.",
+      "whyLabel": "Para qué sirve",
+      "schemaNote": "JSON-LD propuesto, mostrado como texto. No se emite en esta muestra ni acredita una publicación del banco.",
+      "sourceLabel": "Fuente",
+      "thesisLabel": "Por qué existe esta pieza",
+      "licenseTitle": "Imágenes, diseño y procedencia",
+      "licenseNote": "Fotografías ilustrativas generadas por Efeonce para esta muestra y recursos oficiales de Pibank, con fuentes verificadas. Banners y derivados compuestos por Efeonce; sujetos a revisión del banco.",
+      "backToArticle": "Volver a la pieza",
+      "bylineBy": "Por",
+      "readTime": "min de lectura",
+      "instrumentTitle": "La radiografía",
+      "specimenChip": "Propuesta para pibank.pe",
+      "producesLabel": "datos",
+      "producesLabelOne": "dato",
+      "flowNext": "Siguiente",
+      "flowOf": "de",
+      "srProduces": "Este bloque produce {n} datos en la capa de máquina.",
+      "closing": "Una pieza puede explicar las condiciones, responder una duda, ser la fuente que cita la IA y dar origen a otros formatos. Es una muestra de la propuesta técnica: pilar Cuenta Soles en M1–M2, comparativas desde M3, panel AEO mensual y comunidad desde M3. Su publicación y resultados requieren aprobación y datos del banco.",
+      "verifyTitle": "Comprueba la propuesta",
+      "verifyNote": "Las consultas y las respuestas de IA cambian con el tiempo. El snapshot preserva fecha, país, idioma y dispositivo; la muestra no acredita ranking futuro, citas de IA ni aperturas.",
+      "verifySteps": [
+       {
+        "what": "Condiciones",
+        "how": "Abre la página de la Cuenta Soles, su cartilla y su tarifario. Compara tasa, base y fecha con la tabla."
+       },
+       {
+        "what": "Búsqueda",
+        "how": "Repite las consultas indicadas en Google Perú y en AI Mode. Compara con los snapshots del 08/10/2026, sin esperar resultados idénticos."
+       },
+       {
+        "what": "Representación técnica",
+        "how": "Comprueba que titulares, FAQ y datos mostrados en la máquina coincidan con la pieza visible. El marcado es una propuesta, no una garantía de visibilidad."
+       }
+      ]
+     }
+    }
+   },
+   {
+    "id": "comparar-cuentas",
+    "kind": "article",
+    "title": "¿Qué cuenta de ahorros te conviene? Compara rendimiento, costos y liquidez",
+    "summary": "Una guía para comparar cuentas de ahorros por rendimiento (TREA), costos, liquidez, documentos y respaldo antes de abrir una online.",
+    "blocks": [
+     {
+      "id": "art-hero",
+      "eyebrow": "Ahorro en simple",
+      "title": "¿Qué cuenta de ahorros te conviene? Compara rendimiento, costos y liquidez",
+      "text": "La tasa llama la atención, pero la cuenta tiene que servir para tu dinero. Compara con un orden simple: cuánto rinde, cuánto cuesta y qué tan disponible está.",
+      "kind": "hero"
+     },
+     {
+      "id": "article-banner-block",
+      "kind": "image",
+      "assetId": "article-banner",
+      "role": "hero"
+     },
+     {
+      "id": "article-answer",
+      "kind": "answer-capsule",
+      "text": "Para comparar cuentas de ahorros, mira tres cosas juntas: el rendimiento (TREA, moneda y saldo al que aplica), los costos (mantenimiento, operaciones e ITF) y la liquidez (cómo ingresas y retiras tu dinero). Después confirma todo en la cartilla y el tarifario vigentes. Una tasa aislada no basta para decidir."
+     },
+     {
+      "id": "article-toc",
+      "kind": "toc",
+      "title": "En esta guía"
+     },
+     {
+      "id": "art-intro",
+      "text": "Tienes un ahorro separado —un fondo para imprevistos, la gratificación o una meta— y quieres que rinda sin perder acceso a él. Abres un comparador, aparecen varias tasas y todas parecen buenas. Antes de elegir, conviene ordenar la comparación: qué rinde tu dinero en la práctica, qué te cobrarán por usarlo y con qué rapidez lo tendrás cuando lo necesites. Esta guía propone ese orden. Puedes seguirla con la cartilla de cada cuenta a un lado.",
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-objetivo",
+      "level": 2,
+      "text": "¿Para qué es este ahorro?",
+      "kind": "heading",
+      "short": "Tu objetivo"
+     },
+     {
+      "id": "art-objetivo-answer",
+      "text": "Define primero el propósito: un fondo para imprevistos, una reserva disponible o una meta con fecha. Anota cuánto mantendrás y cada cuánto moverás dinero; esa descripción decide qué condición pesa más.",
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-objetivo-body",
+      "text": "Un fondo de emergencia tiene que estar disponible el día que lo uses; una meta a varios meses tolera menos movimientos. Ponle nombre y monto a cada uno. Si moverás dinero seguido, los canales y sus costos importan tanto como la tasa. Si será una reserva, revisa cómo y en cuánto tiempo accederías a ella. Lleva esas preguntas a cada cuenta, en lugar de adaptar tu presupuesto a un anuncio.",
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-trea",
+      "level": 2,
+      "text": "¿Cuánto rinde de verdad tu dinero?",
+      "kind": "heading",
+      "short": "Rendimiento"
+     },
+     {
+      "id": "art-trea-answer",
+      "text": "Compara la TREA, no solo la tasa de interés: la TREA expresa el rendimiento anual considerando los costos de la cuenta. Mírala junto con la moneda y el saldo al que aplica. La SBS recomienda revisar la cartilla y el contrato antes de depositar.",
+      "sourceIds": [
+       "sbs"
+      ],
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-trea-body",
+      "text": "Haz la comparación en la misma moneda y para un saldo parecido. Algunas cuentas pagan su mejor tasa solo desde cierto saldo promedio; otras, desde el primer sol. En la Cuenta Soles Pibank, por ejemplo, la cartilla del 28/09/2026 indica 5% TEA, igual a la TREA, desde S/ 1. Anota cada tasa con su condición y su fecha.",
+      "kind": "paragraph",
+      "sourceIds": [
+       "terms"
+      ]
+     },
+     {
+      "id": "art-banner-compare",
+      "kind": "image",
+      "role": "body",
+      "assetId": "banner-compare",
+      "caption": "Rendimiento, costos y liquidez: compara las condiciones juntas.",
+      "sourceIds": [
+       "creative-demo"
+      ]
+     },
+     {
+      "id": "art-saldo",
+      "level": 2,
+      "text": "¿Qué tan disponible está tu dinero?",
+      "kind": "heading",
+      "short": "Liquidez"
+     },
+     {
+      "id": "art-saldo-answer",
+      "text": "La liquidez es la facilidad para usar tu dinero cuando lo necesitas. Revisa cómo ingresas y retiras fondos —tarjeta, efectivo o solo transferencias— y qué límites u horarios aplican.",
+      "sourceIds": [
+       "tariff"
+      ],
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-saldo-body",
+      "text": "Una cuenta 100% digital puede darte tu dinero por transferencia en lugar de un cajero. La Cuenta Soles Pibank funciona así: sin tarjeta ni efectivo, con ingresos y retiros por transferencia desde la app. Puede encajar con un ahorro que mueves pocas veces y combinarse con otra cuenta para tus gastos diarios. Decide según tu uso, no según el formato.",
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-tabla",
+      "caption": "Checklist personal de comparación",
+      "rows": [
+       [
+        "Rendimiento",
+        "¿Qué TREA corresponde a mi saldo y en qué moneda?"
+       ],
+       [
+        "Costos",
+        "¿Cobra mantenimiento? ¿Qué operaciones o impuestos aplican?"
+       ],
+       [
+        "Liquidez",
+        "¿Cómo ingreso y retiro mi dinero, y en cuánto tiempo?"
+       ],
+       [
+        "Documentos",
+        "¿Tengo la cartilla y el tarifario vigentes, con su fecha?"
+       ],
+       [
+        "Respaldo",
+        "¿El depósito está cubierto por el FSD y hasta qué monto?"
+       ]
+      ],
+      "kind": "table",
+      "columns": [
+       "Qué revisar",
+       "Pregunta para resolver"
+      ]
+     },
+     {
+      "id": "art-costos",
+      "level": 2,
+      "text": "¿Sin mantenimiento significa sin costos?",
+      "kind": "heading",
+      "short": "Costos"
+     },
+     {
+      "id": "art-costos-answer",
+      "text": "No siempre. Una comisión de mantenimiento en cero no describe todas las operaciones. Revisa en el tarifario los servicios que usarás y el ITF, el impuesto que se aplica por ley a ciertas operaciones.",
+      "sourceIds": [
+       "tariff"
+      ],
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-costos-body",
+      "text": "Haz una lista de tus hábitos: transferir, consultar, pedir un estado de cuenta. Búscalos en el tarifario y anota su condición. En la Cuenta Soles Pibank, por ejemplo, no hay mantenimiento ni comisión por las transferencias digitales previstas, pero pueden aplicar el ITF y el costo de servicios adicionales que pidas. Compara cada cuenta con esa misma lista.",
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-apertura",
+      "level": 2,
+      "text": "¿Qué necesitas para abrirla online?",
+      "kind": "heading",
+      "short": "Apertura"
+     },
+     {
+      "id": "art-apertura-answer",
+      "text": "Ten listo tu DNI, tu celular y tu correo, y reserva unos minutos para leer el contrato y la cartilla. En Pibank la apertura es en línea y para mayores de edad. Verifica los requisitos vigentes en el canal oficial antes de iniciar.",
+      "sourceIds": [
+       "faq-open"
+      ],
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-apertura-body",
+      "text": "Abre el sitio oficial desde una dirección que hayas comprobado y evita enlaces que no puedas identificar. Durante la lectura, detente donde aparezca algo que no entiendas y usa los canales de ayuda del banco. Al terminar, guarda la confirmación, el contrato y la cartilla en un lugar al que puedas volver. Completar un formulario no reemplaza esa revisión.",
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-banner-prepare",
+      "kind": "image",
+      "role": "body",
+      "assetId": "banner-prepare",
+      "caption": "Confirma requisitos y condiciones en el canal oficial antes de iniciar.",
+      "sourceIds": [
+       "creative-demo"
+      ]
+     },
+     {
+      "id": "art-respaldo",
+      "level": 2,
+      "text": "¿Cómo revisar el respaldo de tus depósitos?",
+      "kind": "heading",
+      "short": "Respaldo"
+     },
+     {
+      "id": "art-respaldo-answer",
+      "text": "Consulta si la entidad y el depósito están cubiertos por el FSD, así como el límite y las exclusiones aplicables. La cobertura publicada para setiembre–noviembre de 2026 es S/ 123,000; comprueba el periodo vigente cuando tomes tu decisión.",
+      "sourceIds": [
+       "fsd"
+      ],
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-respaldo-body",
+      "text": "Guarda el enlace de consulta junto al tarifario. Una cifra sin fecha pierde contexto y una mención al seguro no reemplaza sus condiciones. Si vas a mantener distintos depósitos, pregunta cómo se aplica la cobertura a tu situación. El objetivo es saber qué estás contratando y dónde puedes comprobarlo, sin depender de una frase destacada.",
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-faq",
+      "items": [
+       {
+        "question": "¿Debo elegir la tasa más alta?",
+        "answer": "Usa la tasa como parte de la comparación. Revisa también moneda, saldo al que aplica, costos y la forma en que usarás tu dinero."
+       },
+       {
+        "question": "¿Puedo tener una cuenta para ahorrar y otra para gastar?",
+        "answer": "Sí. Muchas personas separan el ahorro de la cuenta que usan a diario. Revisa los costos y las transferencias entre ambas para que la combinación te convenga."
+       },
+       {
+        "question": "¿Dónde confirmo las condiciones de la Cuenta Soles?",
+        "answer": "En la página oficial de Pibank y en la cartilla y el tarifario enlazados desde ella."
+       }
+      ],
+      "kind": "faq",
+      "title": "Preguntas frecuentes",
+      "anchor": "art-faq",
+      "short": "Preguntas frecuentes"
+     },
+     {
+      "id": "art-close",
+      "text": "Cierra la comparación con una hoja sencilla: tu objetivo, el saldo que mantendrás, cómo moverás el dinero y las condiciones que ya entendiste. Si queda una pregunta abierta, resuélvela antes de contratar. La mejor decisión empieza cuando sabes por qué una cuenta encaja contigo.",
+      "kind": "paragraph"
+     },
+     {
+      "id": "art-cta",
+      "title": "Revisa una cuenta con las condiciones a la vista.",
+      "text": "Conoce la tasa, los costos y la forma de uso de la Cuenta Soles Pibank.",
+      "kind": "cta",
+      "action": {
+       "label": "Conocer Cuenta Soles",
+       "artifactId": "cuenta-soles"
+      }
+     },
+     {
+      "id": "article-sources",
+      "kind": "sources",
+      "title": "Fuentes y condiciones consultadas",
+      "items": [
+       {
+        "text": "Cuenta Soles Pibank · pibank.pe",
+        "href": "https://pibank.pe/cuenta-soles-pibank/"
+       },
+       {
+        "text": "Tarifario Cuenta Soles · actualizado 28/09/2026",
+        "href": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/Web/Tarifario_CuentaSolesPibank.pdf"
+       },
+       {
+        "text": "Cartilla de información · actualizada 28/09/2026",
+        "href": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/ONBOARDING/CartillaInformacion_CuentaSolesPibank.pdf"
+       },
+       {
+        "text": "Requisitos y apertura · FAQ oficial de Pibank",
+        "href": "https://pibank.pe/faq/que-necesito-y-como-puedo-abrir-una-cuenta-en-pibank/"
+       },
+       {
+        "text": "SBS · Compara y elige",
+        "href": "https://www.sbs.gob.pe/usuarios/aprende-con-la-sbs/compara-y-elige"
+       },
+       {
+        "text": "Fondo de Seguro de Depósitos · cobertura",
+        "href": "https://fsd.org.pe/cobertura/"
+       }
+      ]
+     }
+    ],
+    "annotations": [
+     {
+      "id": "comparar-cuentas-keyword-observation",
+      "scope": "site",
+      "category": "on-page",
+      "title": "La búsqueda que informa esta propuesta",
+      "explanation": "La observación distingue una consulta amplia de búsquedas de apertura y comparación. Sirve para decidir el papel de cada contenido; no mide resultados de esta muestra.",
+      "status": "measured",
+      "sourceIds": [
+       "dataforseo-method"
+      ],
+      "evidence": {
+       "description": "Observación de Efeonce con DataForSEO el 06/10/2026, mercado Perú (2604), idioma español. Volumen mensual estimado, sin segmentación por dispositivo: «cuenta de ahorros», 2,900; «que banco paga mas intereses», 480; «en que banco puedo ahorrar mi dinero y ganar intereses», 390; «abrir cuenta de ahorros», 210; «cuenta de ahorros sin mantenimiento», 50. Los volúmenes no se suman ni equivalen a tráfico potencial. El enlace documenta la metodología del proveedor; los resultados consultados se conservan en el expediente de esta edición.",
+       "asOf": "2026-10-06",
+       "sourceIds": [
+        "dataforseo-method"
+       ]
+      }
+     },
+     {
+      "id": "comparar-cuentas-ai-answers",
+      "scope": "site",
+      "category": "aeo",
+      "title": "Qué responde hoy la IA",
+      "explanation": "Una muestra del panel AEO de la propuesta: en cada pregunta se registra si Pibank aparece, si sus datos son correctos, qué fuentes cita la respuesta y a qué bancos nombra. Hoy, cuando la IA menciona a Pibank, cita a terceros y hasta condiciones de otro país; esta pieza propone que pibank.pe sea la fuente verificable.",
+      "status": "measured",
+      "sourceIds": [
+       "dataforseo-ai-mode",
+       "dataforseo-serp"
+      ],
+      "evidence": {
+       "description": "Observación de Efeonce con DataForSEO, Google AI Mode, Perú (2604), español, escritorio, 08/10/2026. Pibank apareció en 1 de 4 preguntas genéricas de ahorro («cuenta de ahorros que paga más intereses peru»), con 5% TREA, citando a Afluenta, Comparabanca e Infobae; no apareció en «cuenta de ahorros sin mantenimiento», «mejor cuenta de ahorros peru» ni «cuenta de ahorros online peru». En la captura de Google del 06/10/2026 para «cuenta de ahorros sin mantenimiento», el resumen de IA atribuyó a Pibank una tasa de 11.00% E.A., condición de Pibank Colombia, citando a Rankia Colombia; el 08/10/2026 ese resumen ya no mencionaba a Pibank. Snapshots en el expediente de la edición.",
+       "asOf": "2026-10-08",
+       "sourceIds": [
+        "dataforseo-ai-mode",
+        "dataforseo-serp"
+       ]
+      }
+     },
+     {
+      "id": "comparar-cuentas-search-role",
+      "scope": "page",
+      "category": "on-page",
+      "title": "Una intención por pieza",
+      "explanation": "La landing resuelve condiciones y siguiente paso de la Cuenta Soles; el artículo responde cómo comparar cuentas por rendimiento, costos y liquidez. Se conectan con enlaces descriptivos para no duplicar contenido. En la propuesta, el pilar se mejora en M1–M2 y las comparativas empiezan en M3; la priorización se contrasta con Search Console y datos del banco.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-objetivo",
+      "scope": "block",
+      "blockId": "art-objetivo",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-objetivo-answer",
+      "scope": "block",
+      "blockId": "art-objetivo-answer",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-trea",
+      "scope": "block",
+      "blockId": "art-trea",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-trea-answer",
+      "scope": "block",
+      "blockId": "art-trea-answer",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "Resuelve qué comparar además de la tasa: moneda, saldo requerido y costos. La respuesta conserva esas condiciones junto al dato financiero y enlaza al criterio de la SBS; así permite comparar productos sin reducir la decisión a un porcentaje.",
+      "status": "implemented",
+      "sourceIds": [
+       "sbs"
+      ],
+      "evidence": {
+       "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "ann-art-saldo",
+      "scope": "block",
+      "blockId": "art-saldo",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-saldo-answer",
+      "scope": "block",
+      "blockId": "art-saldo-answer",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "Explica el saldo promedio con una operación comprensible y lo conecta con el tarifario. Atiende la duda que puede impedir cumplir el tramo de una tasa; una respuesta extraída debe conservar el período y la regla de cálculo, no sólo el porcentaje.",
+      "status": "implemented",
+      "sourceIds": [
+       "tariff"
+      ],
+      "evidence": {
+       "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "ann-art-tabla",
+      "scope": "block",
+      "blockId": "art-tabla",
+      "category": "on-page",
+      "title": "Comparación con condiciones",
+      "explanation": "La comparación conserva las condiciones junto al dato; los encabezados deben ser semánticos y legibles en móvil.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-costos",
+      "scope": "block",
+      "blockId": "art-costos",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-costos-answer",
+      "scope": "block",
+      "blockId": "art-costos-answer",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+      "status": "proposed",
+      "sourceIds": [
+       "tariff"
+      ]
+     },
+     {
+      "id": "ann-art-apertura",
+      "scope": "block",
+      "blockId": "art-apertura",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-apertura-answer",
+      "scope": "block",
+      "blockId": "art-apertura-answer",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "Separa la preparación para abrir la cuenta de la contratación. Responde la intención de apertura con requisitos y canal oficial, y obliga a comprobar su vigencia; reduce incertidumbre sin prometer aprobación ni inventar pasos del banco.",
+      "status": "implemented",
+      "sourceIds": [
+       "product"
+      ],
+      "evidence": {
+       "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "ann-art-respaldo",
+      "scope": "block",
+      "blockId": "art-respaldo",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-respaldo-answer",
+      "scope": "block",
+      "blockId": "art-respaldo-answer",
+      "category": "aeo",
+      "title": "Respuesta y contexto",
+      "explanation": "Mantiene juntos entidad, depósito cubierto, límite y período de cobertura. La fuente es el Fondo de Seguro de Depósitos: conservar estas condiciones evita que una respuesta aislada transforme una protección acotada en una garantía universal.",
+      "status": "implemented",
+      "sourceIds": [
+       "fsd"
+      ],
+      "evidence": {
+       "description": "Contenido implementado en el HTML de esta muestra y revisado en escritorio y móvil. No acredita publicación en el dominio del banco ni resultados de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "ann-art-faq-title",
+      "scope": "block",
+      "blockId": "art-faq",
+      "category": "on-page",
+      "title": "Jerarquía y navegación",
+      "explanation": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-faq",
+      "scope": "block",
+      "blockId": "art-faq",
+      "category": "aeo",
+      "title": "Preguntas que resuelven dudas",
+      "explanation": "Preguntas y respuestas visibles; su representación técnica debe derivarse de este mismo contenido, sin prometer un resultado enriquecido.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "ann-art-cta",
+      "scope": "block",
+      "blockId": "art-cta",
+      "category": "conversion",
+      "title": "Siguiente paso claro",
+      "explanation": "La acción tiene destino y contexto. En esta muestra no existe apertura bancaria ni medición de cuentas fondeadas.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "comparar-cuentas-technical",
+      "scope": "page",
+      "category": "technical",
+      "title": "Indexación separada",
+      "explanation": "La muestra Think lleva noindex y queda fuera del sitemap. Canonical e indexación en pibank.pe son una propuesta de implementación, no un estado comprobado.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "comparar-cuentas-structured-data",
+      "scope": "page",
+      "category": "aeo",
+      "title": "Contenido y representación",
+      "explanation": "Exhibir JSON-LD propuesto derivado del contenido; no emitir datos estructurados que atribuyan esta publicación a Pibank. La propuesta corrige además el identificador del sitio, hoy distinto entre páginas.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "comparar-cuentas-measurement",
+      "scope": "site",
+      "category": "conversion",
+      "title": "Medición por etapas",
+      "explanation": "Proponer lectura, interacción CTA y llegada al canal de apertura, y medir visibilidad y citas en IA con el panel AEO. Apertura y fondeo requieren integración autorizada y datos del banco; no se infieren del clic.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "comparar-cuentas-hero-structure",
+      "scope": "block",
+      "blockId": "art-hero",
+      "category": "on-page",
+      "title": "Titular, contexto y fotografía original",
+      "explanation": "La pieza abre con un H1 único y un contexto que explica qué encontrará la persona. La imagen declara dimensiones y texto alternativo; su crédito la identifica como ilustrativa, no como clienta ni testimonio.",
+      "status": "implemented",
+      "sourceIds": [],
+      "evidence": {
+       "description": "Implementado en el renderer de esta muestra y comprobado en HTML y navegador local a 1440 y 390 píxeles. No representa una implementación en pibank.pe.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "article-tech-image-delivery",
+      "scope": "page",
+      "category": "technical",
+      "title": "Banner proporcionado a la columna de lectura",
+      "explanation": "Preparar variantes del banner para los anchos de lectura móvil y escritorio, conservar dimensiones y reservar lazy-loading para imágenes posteriores. La muestra entrega el WebP protegido con tamaño intrínseco y prioridad alta para el hero; los tamaños declarados en el componente no se convierten en srcset en este carril. Confirmar solicitud efectiva, bytes, decodificación y elemento LCP con caché fría antes de decidir preload o más prioridad.",
+      "status": "proposed",
+      "sourceIds": [
+       "google-lcp"
+      ]
+     },
+     {
+      "id": "article-tech-font-reading",
+      "scope": "page",
+      "category": "technical",
+      "title": "Lectura estable mientras cargan las fuentes",
+      "explanation": "Probar el artículo con fuentes bloqueadas y después disponibles: titular, cápsula y tabla deben seguir legibles, y el cambio tipográfico no debe desplazar los enlaces del índice. Revisar pesos y familias descargados por la plantilla editorial, conservar fallback compatible y evitar precargar fuentes que no se usan al inicio. Registrar desplazamientos de layout en una prueba reproducible; aún no hay una medición de CLS de esta pieza.",
+      "status": "proposed",
+      "sourceIds": []
+     },
+     {
+      "id": "article-tech-canonical-target",
+      "scope": "page",
+      "category": "technical",
+      "title": "Canonical editorial distinto del producto",
+      "explanation": "La ruta editorial propuesta es /blog/como-comparar-cuentas-de-ahorro/ dentro del hub de ahorro; debe tener canonical propio cuando exista como página pública. No canonicalizar la guía hacia la landing: resuelven intenciones distintas. Confirmar HTTP 200, canonical absoluto, sitemap y enlaces internos al publicar. La URL propuesta no demuestra que la página exista.",
+      "status": "proposed",
+      "sourceIds": [
+       "google-canonical"
+      ]
+     },
+     {
+      "id": "article-tech-source-version",
+      "scope": "page",
+      "category": "on-page",
+      "title": "Fuentes vigentes con fecha visible",
+      "explanation": "Enlazar la cartilla y el tarifario que respaldan cada condición y conservar la fecha de revisión editorial. Cuando cambie una fuente, revisar tabla, FAQ y piezas sociales en la misma actualización. Verificar que los enlaces resuelvan y que tasa, base y fecha coincidan con el documento.",
+      "status": "proposed",
+      "sourceIds": [
+       "tariff",
+       "terms"
+      ]
+     },
+     {
+      "id": "article-tech-semantic-navigation",
+      "scope": "page",
+      "category": "on-page",
+      "title": "Índice y respuestas que funcionan sin JavaScript",
+      "explanation": "Mantener titular, respuestas, tabla y fuentes en HTML renderizado; usar enlaces de índice a IDs únicos y subtítulos con niveles coherentes. Comprobar que el índice llegue a cada sección con teclado y JavaScript desactivado, y que el enlace «Conocer Cuenta Soles» conecte con la landing. En pibank.pe deberá apuntar a la URL oficial.",
+      "status": "proposed",
+      "sourceIds": [
+       "product"
+      ]
+     },
+     {
+      "id": "ann-art-banner-compare",
+      "scope": "block",
+      "blockId": "art-banner-compare",
+      "category": "on-page",
+      "title": "Un apoyo visual en el momento de decisión",
+      "explanation": "El banner refuerza la idea del pasaje sin sustituir el texto. La imagen conserva dimensiones explícitas, texto alternativo y carga diferida; la explicación y las condiciones siguen disponibles en HTML.",
+      "status": "implemented",
+      "sourceIds": [],
+      "evidence": {
+       "description": "Banner editorial renderizado en la muestra, con dimensiones y ALT. No acredita publicación en el sitio del banco ni impacto de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "ann-art-banner-prepare",
+      "scope": "block",
+      "blockId": "art-banner-prepare",
+      "category": "on-page",
+      "title": "Un apoyo visual en el momento de decisión",
+      "explanation": "El banner refuerza la idea del pasaje sin sustituir el texto. La imagen conserva dimensiones explícitas, texto alternativo y carga diferida; la explicación y las condiciones siguen disponibles en HTML.",
+      "status": "implemented",
+      "sourceIds": [],
+      "evidence": {
+       "description": "Banner editorial renderizado en la muestra, con dimensiones y ALT. No acredita publicación en el sitio del banco ni impacto de búsqueda.",
+       "asOf": "2026-10-08",
+       "sourceIds": []
+      }
+     },
+     {
+      "id": "faq-schema",
+      "blockId": "art-faq",
+      "scope": "block",
+      "category": "technical",
+      "title": "FAQ: contenido útil, marcado opcional",
+      "explanation": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
+      "status": "proposed",
+      "sourceIds": [
+       "google-search-updates"
+      ],
+      "evidence": {
+       "description": "Google Search Central registra el retiro de los resultados enriquecidos FAQ desde el 07/05/2026 y la retirada de su documentación el 15/06/2026. El ejemplo de código se conserva sólo como representación semántica opcional de preguntas visibles.",
+       "asOf": "2026-10-08",
+       "sourceIds": [
+        "google-search-updates"
+       ]
+      }
+     }
+    ],
+    "seo": {
+     "title": "Cuenta de ahorros: cómo comparar rendimiento, costos y liquidez",
+     "description": "Una guía para comparar cuentas de ahorros por rendimiento (TREA), costos, liquidez, documentos y respaldo antes de abrir una online.",
+     "canonical": "https://pibank.pe/blog/como-comparar-cuentas-de-ahorro/",
+     "robots": "index,follow",
+     "lang": "es-PE",
+     "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "¿Qué cuenta de ahorros te conviene? Compara rendimiento, costos y liquidez",
+      "description": "Una guía para comparar cuentas de ahorros por rendimiento (TREA), costos, liquidez, documentos y respaldo antes de abrir una online.",
+      "inLanguage": "es-PE",
+      "url": "https://pibank.pe/blog/como-comparar-cuentas-de-ahorro/"
+     }
+    },
+    "byline": {
+     "author": "Efeonce · muestra editorial",
+     "publishedAt": "2026-10-08"
+    },
+    "experience": {
+     "thesis": "Condiciones claras y fuentes propias conectan la búsqueda, la respuesta de la IA y un siguiente paso verificable.",
+     "meta": {
+      "instrument": "AEO X-Ray",
+      "sampleFor": "Pibank Perú",
+      "sampleTitle": "Cómo comparar cuentas de ahorros",
+      "kicker": "Muestra de trabajo Efeonce",
+      "preparedAt": "2026-10-08",
+      "preparedBy": "Efeonce"
+     },
+     "gap": {
+      "kicker": "Una observación de búsqueda y de IA, dos respuestas complementarias",
+      "headline": "Elegir empieza por comparar bien.",
+      "lead": "Quien compara cuentas busca criterios antes que marcas. Esta guía ordena la decisión y lleva a las condiciones verificables de la Cuenta Soles.",
+      "serpTitle": "Primeros cinco resultados orgánicos de la consulta",
+      "serpBadge": "Perú · español · escritorio",
+      "serpSummary": "Pibank no apareció entre los 18 resultados orgánicos retornados para «mejor cuenta de ahorros peru».",
+      "serpNote": "Snapshot DataForSEO del 08/10/2026 para «mejor cuenta de ahorros peru». Profundidad solicitada 20; retornados 18 orgánicos. No es una medición de toda la categoría.",
+      "serp": [
+       {
+        "pos": 1,
+        "domain": "www.youtube.com",
+        "kind": "Video"
+       },
+       {
+        "pos": 2,
+        "domain": "comparabancaperu.com",
+        "kind": "Comparador"
+       },
+       {
+        "pos": 3,
+        "domain": "www.scotiabank.com.pe",
+        "kind": "Banco"
+       },
+       {
+        "pos": 4,
+        "domain": "www.mibanco.com.pe",
+        "kind": "Banco"
+       },
+       {
+        "pos": 5,
+        "domain": "www.viabcp.com",
+        "kind": "Banco"
+       }
+      ],
+      "diagnosisLabel": "La oportunidad de esta muestra",
+      "punch": "Responder la comparación que hoy resuelven otros.",
+      "punchNote": "Para «mejor cuenta de ahorros peru», la respuesta de AI Mode del 08/10/2026 recomendó cuentas de otras entidades y citó comparadores; Pibank no apareció. Entre los primeros resultados orgánicos hay un video, un comparador y otras entidades.",
+      "punchWhy": "La mayor demanda está en quienes comparan cuentas antes de mover su dinero. Una guía de comparación honesta, con la Cuenta Soles como ejemplo verificable, es donde Pibank puede entrar.",
+      "punchOpportunity": "El artículo propone ordenar rendimiento, costos, liquidez, documentos y respaldo.",
+      "asideLabel": "Qué está medido y qué está propuesto",
+      "aside": "La SERP y las respuestas de IA son observadas; la mejora editorial está propuesta. No medimos resultados de estas piezas ni conversiones del banco."
+     },
+     "machine": {
+      "seo": [
+       {
+        "id": "meta-title",
+        "label": "Title propuesto",
+        "value": "Cuenta de ahorros: cómo comparar rendimiento, costos y liquidez",
+        "why": "Resume el propósito de la pieza en el resultado de búsqueda.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "art-hero",
+        "detail": "63 caracteres; longitud descriptiva, no garantía de visualización."
+       },
+       {
+        "id": "meta-description",
+        "label": "Descripción propuesta",
+        "value": "Una guía para comparar cuentas de ahorros por rendimiento (TREA), costos, liquidez, documentos y respaldo antes de abrir una online.",
+        "why": "Anticipa lo que la persona encontrará y mantiene la misma promesa que el contenido.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "article-answer"
+       },
+       {
+        "id": "canonical",
+        "label": "Canonical propuesto",
+        "value": "https://pibank.pe/blog/como-comparar-cuentas-de-ahorro/",
+        "why": "Destino previsto para una eventual implementación bancaria; no es el canonical operativo de la muestra.",
+        "tier": 2,
+        "sourceScope": "page",
+        "sourceStatus": "proposed"
+       },
+       {
+        "id": "robots",
+        "label": "Indexación de la muestra",
+        "value": "noindex, nofollow",
+        "why": "Mantiene esta demostración separada del sitio del banco. Noindex no sustituye el control de acceso.",
+        "tier": 2,
+        "sourceScope": "site",
+        "sourceStatus": "proposed"
+       },
+       {
+        "id": "language",
+        "label": "Idioma del contenido",
+        "value": "es-PE",
+        "why": "Declara el idioma y la variante del contenido para navegación y tecnología de asistencia.",
+        "tier": 2,
+        "sourceScope": "page",
+        "sourceStatus": "proposed"
+       },
+       {
+        "id": "cta-destination",
+        "label": "Siguiente paso",
+        "value": "Canal oficial para condiciones; navegación demostrativa entre piezas",
+        "why": "Un clic en la muestra no equivale a apertura o fondeo.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "art-cta"
+       }
+      ],
+      "og": [
+       {
+        "id": "og-title",
+        "label": "og:title propuesto",
+        "value": "Cuenta de ahorros: cómo comparar rendimiento, costos y liquidez",
+        "why": "Coherencia entre página y vista previa.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "art-hero"
+       },
+       {
+        "id": "og-description",
+        "label": "og:description propuesta",
+        "value": "Una guía para comparar cuentas de ahorros por rendimiento (TREA), costos, liquidez, documentos y respaldo antes de abrir una online.",
+        "why": "Vista previa fiel a la pieza.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "article-answer"
+       },
+       {
+        "id": "og-image",
+        "label": "Imagen de vista previa",
+        "value": "Asset article-banner; URL final se define al publicar con autorización",
+        "why": "Definir imagen y texto alternativo sin atribuir respaldo de la persona retratada.",
+        "tier": 2,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "article-banner-block"
+       }
+      ],
+      "headings": {
+       "sourceScope": "page",
+       "sourceStatus": "proposed",
+       "why": "La jerarquía representa el orden real del contenido; no se añaden headings sólo para estilo.",
+       "tree": [
+        {
+         "level": 1,
+         "text": "¿Qué cuenta de ahorros te conviene? Compara rendimiento, costos y liquidez",
+         "coupleId": "art-hero"
+        },
+        {
+         "level": 2,
+         "text": "¿Para qué es este ahorro?",
+         "coupleId": "art-objetivo"
+        },
+        {
+         "level": 2,
+         "text": "¿Cuánto rinde de verdad tu dinero?",
+         "coupleId": "art-trea"
+        },
+        {
+         "level": 2,
+         "text": "¿Qué tan disponible está tu dinero?",
+         "coupleId": "art-saldo"
+        },
+        {
+         "level": 2,
+         "text": "¿Sin mantenimiento significa sin costos?",
+         "coupleId": "art-costos"
+        },
+        {
+         "level": 2,
+         "text": "¿Qué necesitas para abrirla online?",
+         "coupleId": "art-apertura"
+        },
+        {
+         "level": 2,
+         "text": "¿Cómo revisar el respaldo de tus depósitos?",
+         "coupleId": "art-respaldo"
+        },
+        {
+         "level": 2,
+         "text": "Preguntas frecuentes",
+         "coupleId": "art-faq"
+        }
+       ]
+      },
+      "alts": [
+       {
+        "coupleId": "article-banner-block",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "alt": "Un hombre revisa su teléfono junto a un computador portátil y una libreta, en la mesa de su casa.",
+        "why": "Descripción observable de una fotografía ilustrativa generada; no inventa relación comercial ni testimonio."
+       },
+       {
+        "coupleId": "art-banner-compare",
+        "alt": "Compara con las condiciones a la vista. Rendimiento, costos y liquidez.",
+        "why": "El ALT comunica el mensaje esencial del banner; la explicación permanece en texto visible.",
+        "sourceScope": "block",
+        "sourceStatus": "implemented"
+       },
+       {
+        "coupleId": "art-banner-prepare",
+        "alt": "Antes de abrirla, ten todo listo. DNI, celular, correo y canal oficial.",
+        "why": "El ALT comunica el mensaje esencial del banner; la explicación permanece en texto visible.",
+        "sourceScope": "block",
+        "sourceStatus": "implemented"
+       }
+      ],
+      "jsonld": [
+       {
+        "id": "page-schema",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "type": "BlogPosting",
+        "metric": "Derivado de título, descripción e idioma visibles",
+        "why": "Representación propuesta para el sitio de destino; aquí se muestra inerte, sin atribuir publicación al banco.",
+        "tier": 2,
+        "code": {
+         "@context": "https://schema.org",
+         "@type": "BlogPosting",
+         "headline": "¿Qué cuenta de ahorros te conviene? Compara rendimiento, costos y liquidez",
+         "description": "Una guía para comparar cuentas de ahorros por rendimiento (TREA), costos, liquidez, documentos y respaldo antes de abrir una online.",
+         "inLanguage": "es-PE",
+         "url": "https://pibank.pe/blog/como-comparar-cuentas-de-ahorro/"
+        }
+       },
+       {
+        "id": "faq-schema",
+        "coupleId": "art-faq",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "type": "FAQPage",
+        "metric": "3 preguntas visibles",
+        "why": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
+        "tier": 2,
+        "code": {
+         "@context": "https://schema.org",
+         "@type": "FAQPage",
+         "mainEntity": [
+          {
+           "@type": "Question",
+           "name": "¿Debo elegir la tasa más alta?",
+           "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Usa la tasa como parte de la comparación. Revisa también moneda, saldo al que aplica, costos y la forma en que usarás tu dinero."
+           }
+          },
+          {
+           "@type": "Question",
+           "name": "¿Puedo tener una cuenta para ahorrar y otra para gastar?",
+           "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. Muchas personas separan el ahorro de la cuenta que usan a diario. Revisa los costos y las transferencias entre ambas para que la combinación te convenga."
+           }
+          },
+          {
+           "@type": "Question",
+           "name": "¿Dónde confirmo las condiciones de la Cuenta Soles?",
+           "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "En la página oficial de Pibank y en la cartilla y el tarifario enlazados desde ella."
+           }
+          }
+         ]
+        }
+       }
+      ],
+      "craft": [
+       {
+        "label": "Respuesta compacta",
+        "detail": "Una respuesta directa con alcance y condiciones.",
+        "why": "Permite entender la decisión antes del detalle, sin prometer recuperación por un motor.",
+        "tier": 3,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "article-answer"
+       },
+       {
+        "label": "Condiciones junto al dato",
+        "detail": "Tasa, base, fecha y fuente viajan juntas.",
+        "why": "Reduce una comparación engañosa basada sólo en una cifra.",
+        "tier": 3,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "art-saldo-answer"
+       },
+       {
+        "label": "Imagen con autoría",
+        "detail": "Fotografía ilustrativa generada, procedencia y ALT factual.",
+        "why": "La persona no se presenta como cliente ni testimonio de Pibank.",
+        "tier": 3,
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "coupleId": "article-banner-block"
+       },
+       {
+        "label": "Fuente primaria",
+        "detail": "Tarifario/cartilla o autoridad pública identificados.",
+        "why": "Permite revisar una condición sin confiar sólo en la propuesta.",
+        "tier": 3,
+        "sourceScope": "page",
+        "sourceStatus": "proposed"
+       },
+       {
+        "label": "Accesibilidad y lectura",
+        "detail": "Tabla con encabezados, jerarquía coherente y controles con nombre.",
+        "why": "La implementación debe verificarse en teclado y móvil; este nodo no certifica conformidad.",
+        "tier": 3,
+        "sourceScope": "page",
+        "sourceStatus": "proposed"
+       },
+       {
+        "label": "Medición por etapas",
+        "detail": "Separar lectura, CTA, llegada al canal, apertura y fondeo.",
+        "why": "Las dos últimas etapas requieren integración y datos autorizados del banco.",
+        "tier": 3,
+        "sourceScope": "site",
+        "sourceStatus": "proposed"
+       },
+       {
+        "id": "comparar-cuentas-keyword-observation",
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "La búsqueda que informa esta propuesta",
+        "detail": "SEO on-page",
+        "why": "La observación distingue una consulta amplia de búsquedas de apertura y comparación. Sirve para decidir el papel de cada contenido; no mide resultados de esta muestra.",
+        "tier": 2,
+        "source": "DataForSEO · metodología del proveedor, no snapshot de resultados",
+        "asOf": "2026-10-06"
+       },
+       {
+        "id": "comparar-cuentas-ai-answers",
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "Qué responde hoy la IA",
+        "detail": "AEO",
+        "why": "Una muestra del panel AEO de la propuesta: en cada pregunta se registra si Pibank aparece, si sus datos son correctos, qué fuentes cita la respuesta y a qué bancos nombra. Hoy, cuando la IA menciona a Pibank, cita a terceros y hasta condiciones de otro país; esta pieza propone que pibank.pe sea la fuente verificable.",
+        "tier": 2,
+        "source": "DataForSEO · Google AI Mode (metodología) · DataForSEO · Google orgánico y AI Overview (metodología)",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "comparar-cuentas-search-role",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Una intención por pieza",
+        "detail": "SEO on-page",
+        "why": "La landing resuelve condiciones y siguiente paso de la Cuenta Soles; el artículo responde cómo comparar cuentas por rendimiento, costos y liquidez. Se conectan con enlaces descriptivos para no duplicar contenido. En la propuesta, el pilar se mejora en M1–M2 y las comparativas empiezan en M3; la priorización se contrasta con Search Console y datos del banco.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-objetivo",
+        "coupleId": "art-objetivo",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-objetivo-answer",
+        "coupleId": "art-objetivo-answer",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-trea",
+        "coupleId": "art-trea",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-trea-answer",
+        "coupleId": "art-trea-answer",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "Resuelve qué comparar además de la tasa: moneda, saldo requerido y costos. La respuesta conserva esas condiciones junto al dato financiero y enlaza al criterio de la SBS; así permite comparar productos sin reducir la decisión a un porcentaje.",
+        "tier": 2,
+        "source": "SBS · Compara y elige",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-art-saldo",
+        "coupleId": "art-saldo",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-saldo-answer",
+        "coupleId": "art-saldo-answer",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "Explica el saldo promedio con una operación comprensible y lo conecta con el tarifario. Atiende la duda que puede impedir cumplir el tramo de una tasa; una respuesta extraída debe conservar el período y la regla de cálculo, no sólo el porcentaje.",
+        "tier": 2,
+        "source": "Tarifario Cuenta Soles Pibank · actualizado 28/09/2026",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-art-tabla",
+        "coupleId": "art-tabla",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Comparación con condiciones",
+        "detail": "SEO on-page",
+        "why": "La comparación conserva las condiciones junto al dato; los encabezados deben ser semánticos y legibles en móvil.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-costos",
+        "coupleId": "art-costos",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-costos-answer",
+        "coupleId": "art-costos-answer",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "Respuesta autosuficiente, con alcance y fuente cuando corresponde. Facilita comprensión; no garantiza recuperación ni cita.",
+        "tier": 2,
+        "source": "Tarifario Cuenta Soles Pibank · actualizado 28/09/2026",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-art-apertura",
+        "coupleId": "art-apertura",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-apertura-answer",
+        "coupleId": "art-apertura-answer",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "Separa la preparación para abrir la cuenta de la contratación. Responde la intención de apertura con requisitos y canal oficial, y obliga a comprobar su vigencia; reduce incertidumbre sin prometer aprobación ni inventar pasos del banco.",
+        "tier": 2,
+        "source": "Cuenta Soles Pibank · pibank.pe",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-art-respaldo",
+        "coupleId": "art-respaldo",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-respaldo-answer",
+        "coupleId": "art-respaldo-answer",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Respuesta y contexto",
+        "detail": "AEO",
+        "why": "Mantiene juntos entidad, depósito cubierto, límite y período de cobertura. La fuente es el Fondo de Seguro de Depósitos: conservar estas condiciones evita que una respuesta aislada transforme una protección acotada en una garantía universal.",
+        "tier": 2,
+        "source": "Fondo de Seguro de Depósitos · cobertura",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-art-faq-title",
+        "coupleId": "art-faq",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Jerarquía y navegación",
+        "detail": "SEO on-page",
+        "why": "Un encabezado descriptivo organiza esta sección y permite localizar la respuesta sin leer toda la pieza.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-faq",
+        "coupleId": "art-faq",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Preguntas que resuelven dudas",
+        "detail": "AEO",
+        "why": "Preguntas y respuestas visibles; su representación técnica debe derivarse de este mismo contenido, sin prometer un resultado enriquecido.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-cta",
+        "coupleId": "art-cta",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "Siguiente paso claro",
+        "detail": "Conversión",
+        "why": "La acción tiene destino y contexto. En esta muestra no existe apertura bancaria ni medición de cuentas fondeadas.",
+        "tier": 2
+       },
+       {
+        "id": "comparar-cuentas-technical",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Indexación separada",
+        "detail": "SEO técnico",
+        "why": "La muestra Think lleva noindex y queda fuera del sitemap. Canonical e indexación en pibank.pe son una propuesta de implementación, no un estado comprobado.",
+        "tier": 2
+       },
+       {
+        "id": "comparar-cuentas-structured-data",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Contenido y representación",
+        "detail": "AEO",
+        "why": "Exhibir JSON-LD propuesto derivado del contenido; no emitir datos estructurados que atribuyan esta publicación a Pibank. La propuesta corrige además el identificador del sitio, hoy distinto entre páginas.",
+        "tier": 2
+       },
+       {
+        "id": "comparar-cuentas-measurement",
+        "sourceScope": "site",
+        "sourceStatus": "proposed",
+        "label": "Medición por etapas",
+        "detail": "Conversión",
+        "why": "Proponer lectura, interacción CTA y llegada al canal de apertura, y medir visibilidad y citas en IA con el panel AEO. Apertura y fondeo requieren integración autorizada y datos del banco; no se infieren del clic.",
+        "tier": 2
+       },
+       {
+        "id": "comparar-cuentas-hero-structure",
+        "coupleId": "art-hero",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Titular, contexto y fotografía original",
+        "detail": "SEO on-page",
+        "why": "La pieza abre con un H1 único y un contexto que explica qué encontrará la persona. La imagen declara dimensiones y texto alternativo; su crédito la identifica como ilustrativa, no como clienta ni testimonio.",
+        "tier": 2
+       },
+       {
+        "id": "article-tech-image-delivery",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Banner proporcionado a la columna de lectura",
+        "detail": "SEO técnico",
+        "why": "Preparar variantes del banner para los anchos de lectura móvil y escritorio, conservar dimensiones y reservar lazy-loading para imágenes posteriores. La muestra entrega el WebP protegido con tamaño intrínseco y prioridad alta para el hero; los tamaños declarados en el componente no se convierten en srcset en este carril. Confirmar solicitud efectiva, bytes, decodificación y elemento LCP con caché fría antes de decidir preload o más prioridad.",
+        "tier": 2,
+        "source": "web.dev · optimizar LCP",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "article-tech-font-reading",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Lectura estable mientras cargan las fuentes",
+        "detail": "SEO técnico",
+        "why": "Probar el artículo con fuentes bloqueadas y después disponibles: titular, cápsula y tabla deben seguir legibles, y el cambio tipográfico no debe desplazar los enlaces del índice. Revisar pesos y familias descargados por la plantilla editorial, conservar fallback compatible y evitar precargar fuentes que no se usan al inicio. Registrar desplazamientos de layout en una prueba reproducible; aún no hay una medición de CLS de esta pieza.",
+        "tier": 2
+       },
+       {
+        "id": "article-tech-canonical-target",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Canonical editorial distinto del producto",
+        "detail": "SEO técnico",
+        "why": "La ruta editorial propuesta es /blog/como-comparar-cuentas-de-ahorro/ dentro del hub de ahorro; debe tener canonical propio cuando exista como página pública. No canonicalizar la guía hacia la landing: resuelven intenciones distintas. Confirmar HTTP 200, canonical absoluto, sitemap y enlaces internos al publicar. La URL propuesta no demuestra que la página exista.",
+        "tier": 2,
+        "source": "Google Search Central · consolidar URL duplicadas",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "article-tech-source-version",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Fuentes vigentes con fecha visible",
+        "detail": "SEO on-page",
+        "why": "Enlazar la cartilla y el tarifario que respaldan cada condición y conservar la fecha de revisión editorial. Cuando cambie una fuente, revisar tabla, FAQ y piezas sociales en la misma actualización. Verificar que los enlaces resuelvan y que tasa, base y fecha coincidan con el documento.",
+        "tier": 2,
+        "source": "Tarifario Cuenta Soles Pibank · actualizado 28/09/2026 · Cartilla de información Cuenta Soles Pibank · actualizada 28/09/2026",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "article-tech-semantic-navigation",
+        "sourceScope": "page",
+        "sourceStatus": "proposed",
+        "label": "Índice y respuestas que funcionan sin JavaScript",
+        "detail": "SEO on-page",
+        "why": "Mantener titular, respuestas, tabla y fuentes en HTML renderizado; usar enlaces de índice a IDs únicos y subtítulos con niveles coherentes. Comprobar que el índice llegue a cada sección con teclado y JavaScript desactivado, y que el enlace «Conocer Cuenta Soles» conecte con la landing. En pibank.pe deberá apuntar a la URL oficial.",
+        "tier": 2,
+        "source": "Cuenta Soles Pibank · pibank.pe",
+        "asOf": "2026-10-08"
+       },
+       {
+        "id": "ann-art-banner-compare",
+        "coupleId": "art-banner-compare",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Un apoyo visual en el momento de decisión",
+        "detail": "SEO on-page",
+        "why": "El banner refuerza la idea del pasaje sin sustituir el texto. La imagen conserva dimensiones explícitas, texto alternativo y carga diferida; la explicación y las condiciones siguen disponibles en HTML.",
+        "tier": 2
+       },
+       {
+        "id": "ann-art-banner-prepare",
+        "coupleId": "art-banner-prepare",
+        "sourceScope": "block",
+        "sourceStatus": "implemented",
+        "label": "Un apoyo visual en el momento de decisión",
+        "detail": "SEO on-page",
+        "why": "El banner refuerza la idea del pasaje sin sustituir el texto. La imagen conserva dimensiones explícitas, texto alternativo y carga diferida; la explicación y las condiciones siguen disponibles en HTML.",
+        "tier": 2
+       },
+       {
+        "id": "faq-schema",
+        "sourceScope": "block",
+        "sourceStatus": "proposed",
+        "label": "FAQ: contenido útil, marcado opcional",
+        "detail": "SEO técnico",
+        "why": "Representación opcional de preguntas visibles. Google retiró los resultados enriquecidos FAQ en mayo de 2026; este marcado no se propone como palanca de visibilidad ni garantiza citas de IA.",
+        "tier": 2,
+        "source": "Google Search Central · registro de cambios",
+        "asOf": "2026-10-08",
+        "coupleId": "art-faq"
+       }
+      ]
+     },
+     "flow": [
+      {
+       "step": "",
+       "label": "La oportunidad",
+       "next": "Veamos la pieza que responde a esta oportunidad."
+      },
+      {
+       "step": "articulo",
+       "label": "La pieza",
+       "next": "Ahora mira cómo se conecta el contenido con su capa técnica."
+      },
+      {
+       "step": "radiografia",
+       "label": "La radiografía",
+       "next": "La misma idea puede vivir en otros formatos."
+      },
+      {
+       "step": "atomizacion",
+       "label": "Dónde más vive",
+       "next": ""
+      }
+     ],
+     "atomsIntro": "De una guía a piezas listas para revisar: tres láminas de feed y una Story. Explora cada formato y vuelve al bloque que le dio origen.",
+     "atoms": [
+      {
+       "sourceScope": "block",
+       "sourceStatus": "implemented",
+       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "id": "social",
+       "kind": "Feed · Comparación",
+       "coupleId": "article-answer",
+       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "why": "Una respuesta extensa se convierte en una entrada visual a la guía, conservando el mensaje y su vínculo con el contenido completo.",
+       "post": {
+        "hook": "Tu ahorro merece más que una tasa.",
+        "body": "Rendimiento, costos y liquidez. Tres cosas que conviene mirar juntas antes de elegir una cuenta.",
+        "cta": "Lee la guía completa antes de elegir tu cuenta.",
+        "imageAssetId": "social-compare",
+        "alt": "Pibank. Tu ahorro merece más que una tasa. Rendimiento, costos y liquidez. Tres cosas que también importan. Fotografía de un hombre que revisa su teléfono junto a un portátil."
+       },
+       "deliverable": [
+        {
+         "k": "Formato producido",
+         "v": "1080×1350 px · WebP"
+        },
+        {
+         "k": "Composición",
+         "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Pibank Perú."
+        },
+        {
+         "k": "Publicación",
+         "v": "Muestra para revisión; no publicada en Instagram."
+        }
+       ]
+      },
+      {
+       "sourceScope": "block",
+       "sourceStatus": "implemented",
+       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "id": "video",
+       "kind": "Story",
+       "coupleId": "art-apertura-answer",
+       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "why": "La misma idea se adapta al consumo vertical y devuelve a la sección que explica cómo abrir la cuenta.",
+       "post": {
+        "hook": "Antes de elegir tu cuenta.",
+        "body": "Mira el rendimiento, los costos y la liquidez. Confirma todo en la cartilla y el tarifario oficiales.",
+        "cta": "Lee la guía completa antes de elegir tu cuenta.",
+        "imageAssetId": "social-story",
+        "alt": "Pibank. Antes de elegir: una cuenta, tres cosas por revisar. Rendimiento, costos y liquidez. Fotografía de un hombre que revisa su teléfono. Lee la guía antes de abrir tu cuenta."
+       },
+       "deliverable": [
+        {
+         "k": "Formato producido",
+         "v": "1080×1920 px · WebP"
+        },
+        {
+         "k": "Composición",
+         "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Pibank Perú."
+        },
+        {
+         "k": "Publicación",
+         "v": "Muestra para revisión; no publicada en Instagram."
+        }
+       ]
+      },
+      {
+       "sourceScope": "block",
+       "sourceStatus": "implemented",
+       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "id": "imagenes",
+       "kind": "Feed · Liquidez",
+       "coupleId": "art-saldo-answer",
+       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "why": "La pieza explica una condición de la cuenta —cómo entra y sale el dinero— sin convertirla en una promesa.",
+       "post": {
+        "hook": "Disponible no siempre significa con tarjeta.",
+        "body": "Una cuenta 100% digital puede darte tu dinero por transferencia. Revisa cómo ingresas y retiras antes de elegir.",
+        "cta": "Lee la guía completa antes de elegir tu cuenta.",
+        "imageAssetId": "social-average",
+        "alt": "Pibank. Disponible no siempre significa con tarjeta. Ingresas y retiras tu dinero por transferencia, desde la app. Sin tarjeta ni efectivo."
+       },
+       "deliverable": [
+        {
+         "k": "Formato producido",
+         "v": "1080×1350 px · WebP"
+        },
+        {
+         "k": "Composición",
+         "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Pibank Perú."
+        },
+        {
+         "k": "Publicación",
+         "v": "Muestra para revisión; no publicada en Instagram."
+        }
+       ]
+      },
+      {
+       "sourceScope": "block",
+       "sourceStatus": "implemented",
+       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "id": "social-costos",
+       "kind": "Feed · Costos",
+       "coupleId": "art-costos-answer",
+       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "why": "La pieza corrige una interpretación frecuente y conduce al bloque que explica el alcance de la condición comercial.",
+       "post": {
+        "hook": "Sin mantenimiento no significa sin costos.",
+        "body": "Mantenimiento: S/ 0. Revisa también el ITF y los servicios que pedirás según cómo uses tu cuenta.",
+        "cta": "Lee la guía completa antes de elegir tu cuenta.",
+        "imageAssetId": "social-costs",
+        "alt": "Pibank. Sin mantenimiento no significa sin costos. Mantenimiento: S/ 0. Esto es distinto del ITF y de los servicios adicionales que pidas. Mira cómo usas tu cuenta."
+       },
+       "deliverable": [
+        {
+         "k": "Formato producido",
+         "v": "1080×1350 px · WebP"
+        },
+        {
+         "k": "Composición",
+         "v": "Marca oficial en SVG, tipografía real y copy editable. Propuesta inspirada en el lenguaje visual de Pibank Perú."
+        },
+        {
+         "k": "Publicación",
+         "v": "Muestra para revisión; no publicada en Instagram."
+        }
+       ]
+      }
+     ],
+     "evidence": {
+      "intro": "Separar observación, propuesta y resultado evita atribuir a la muestra efectos que todavía no medimos.",
+      "facts": [
+       {
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "SERP observada",
+        "value": "Pibank no apareció en los 18 orgánicos retornados",
+        "note": "Consulta exacta: «mejor cuenta de ahorros peru». Perú 2604, español, escritorio, 08/10/2026; no generalizar a otras consultas.",
+        "source": "DataForSEO · Google organic live/advanced · task 10082356-1987-0139-0000-28d08e40ecbc · snapshot conservado en expediente de la edición",
+        "asOf": "2026-10-08",
+        "headline": false
+       },
+       {
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "Respuestas de IA observadas",
+        "value": "Pibank apareció en 1 de 4 preguntas genéricas, citado por terceros",
+        "note": "Google AI Mode, Perú 2604, español, escritorio, 08/10/2026. La respuesta que lo menciona cita a Afluenta, Comparabanca e Infobae. El 06/10/2026, el resumen de IA de «cuenta de ahorros sin mantenimiento» le atribuyó la tasa de Pibank Colombia; el 08/10/2026 ya no lo mencionaba.",
+        "source": "DataForSEO · Google AI Mode live/advanced · snapshots en expediente de la edición",
+        "asOf": "2026-10-08",
+        "headline": false
+       },
+       {
+        "sourceScope": "site",
+        "sourceStatus": "measured",
+        "label": "Demanda estimada por término",
+        "value": "480 búsquedas/mes: que banco paga mas intereses",
+        "note": "DataForSEO Labs, Perú/español, sin dispositivo segmentado. Consulta del 06/10/2026.",
+        "source": "DataForSEO keyword_overview/live · snapshot en expediente de la edición.",
+        "asOf": "2026-10-06",
+        "headline": false
+       },
+       {
+        "coupleId": "art-trea-answer",
+        "sourceScope": "block",
+        "sourceStatus": "verified",
+        "label": "Fuente de condiciones",
+        "value": "Cartilla y tarifario Cuenta Soles 28/09/2026",
+        "note": "Consulta documental de fuente oficial; no verifica aprobación o implementación de esta muestra.",
+        "source": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/ONBOARDING/CartillaInformacion_CuentaSolesPibank.pdf",
+        "asOf": "2026-10-08",
+        "headline": false
+       }
+      ],
+      "fanOut": {
+       "title": "Preguntas cubiertas por esta pieza",
+       "note": "Cobertura editorial visible, no evidencia de que una IA ya haya recuperado o citado estas respuestas.",
+       "items": [
+        {
+         "q": "¿Cuánto rinde de verdad mi dinero?",
+         "coveredBy": "art-trea-answer",
+         "covered": true
+        },
+        {
+         "q": "¿Qué tan disponible estará mi dinero?",
+         "coveredBy": "art-saldo-answer",
+         "covered": true
+        },
+        {
+         "q": "¿Qué necesito para abrirla online?",
+         "coveredBy": "art-apertura-answer",
+         "covered": true
+        },
+        {
+         "q": "¿Cómo reviso la cobertura de mis depósitos?",
+         "coveredBy": "art-respaldo-answer",
+         "covered": true
+        }
+       ]
+      },
+      "honesty": "No se consultó Search Console/GA4 del banco ni se midieron aperturas o fondeo. Las cifras de búsqueda son estimaciones del proveedor y las respuestas de IA son snapshots fechados, no pronósticos."
+     },
+     "ui": {
+      "disclaimerLabel": "Demostración de Efeonce",
+      "disclaimerBody": "Muestra editorial preparada para Pibank Perú. Adelanta el trabajo de la propuesta técnica 2027.",
+      "paneArticleTitle": "La pieza",
+      "paneArticleSubtitle": "Lo que ve la persona",
+      "paneMachineTab": "Lo que lee una máquina",
+      "paneEvidenceTab": "La evidencia",
+      "hintDesktop": "Pasa el cursor o enfoca un bloque para ver sus datos. Haz clic para fijarlo.",
+      "hintMobile": "Toca un bloque para ver qué información produce.",
+      "whyLabel": "Para qué sirve",
+      "schemaNote": "JSON-LD propuesto, mostrado como texto. No se emite en esta muestra ni acredita una publicación del banco.",
+      "sourceLabel": "Fuente",
+      "thesisLabel": "Por qué existe esta pieza",
+      "licenseTitle": "Imágenes, diseño y procedencia",
+      "licenseNote": "Fotografías ilustrativas generadas por Efeonce para esta muestra y recursos oficiales de Pibank, con fuentes verificadas. Banners y derivados compuestos por Efeonce; sujetos a revisión del banco.",
+      "backToArticle": "Volver a la pieza",
+      "bylineBy": "Por",
+      "readTime": "min de lectura",
+      "instrumentTitle": "La radiografía",
+      "specimenChip": "Propuesta para pibank.pe",
+      "producesLabel": "datos",
+      "producesLabelOne": "dato",
+      "flowNext": "Siguiente",
+      "flowOf": "de",
+      "srProduces": "Este bloque produce {n} datos en la capa de máquina.",
+      "closing": "Una pieza puede explicar las condiciones, responder una duda, ser la fuente que cita la IA y dar origen a otros formatos. Es una muestra de la propuesta técnica: pilar Cuenta Soles en M1–M2, comparativas desde M3, panel AEO mensual y comunidad desde M3. Su publicación y resultados requieren aprobación y datos del banco.",
+      "verifyTitle": "Comprueba la propuesta",
+      "verifyNote": "Las consultas y las respuestas de IA cambian con el tiempo. El snapshot preserva fecha, país, idioma y dispositivo; la muestra no acredita ranking futuro, citas de IA ni aperturas.",
+      "verifySteps": [
+       {
+        "what": "Condiciones",
+        "how": "Abre la página de la Cuenta Soles, su cartilla y su tarifario. Compara tasa, base y fecha con la tabla."
+       },
+       {
+        "what": "Búsqueda",
+        "how": "Repite las consultas indicadas en Google Perú y en AI Mode. Compara con los snapshots del 08/10/2026, sin esperar resultados idénticos."
+       },
+       {
+        "what": "Representación técnica",
+        "how": "Comprueba que titulares, FAQ y datos mostrados en la máquina coincidan con la pieza visible. El marcado es una propuesta, no una garantía de visibilidad."
+       }
+      ]
+     }
+    }
+   }
+  ],
+  "flow": {
+   "entryArtifactId": "cuenta-soles",
+   "links": [
+    {
+     "fromArtifactId": "cuenta-soles",
+     "toArtifactId": "comparar-cuentas",
+     "label": "Antes de abrir una cuenta: cómo comparar"
+    },
+    {
+     "fromArtifactId": "comparar-cuentas",
+     "toArtifactId": "cuenta-soles",
+     "label": "Conocer la Cuenta Soles"
+    }
+   ]
+  },
+  "status": "resolved",
+  "schema": "axis.aeo-xray-composition.v1",
+  "tokens": {
+   "version": "0.1.0",
+   "lifecycle": "candidate",
+   "shell": {
+    "ground": "#091951",
+    "ink": "#ffffff",
+    "accent": "#0375db",
+    "muted": "#cfe4fa"
+   },
+   "canvas": {
+    "background": "#ffffff",
+    "ink": "#001a33",
+    "muted": "#5b6b7c",
+    "rule": "#e3e7ec"
+   },
+   "layout": {
+    "maxWidth": "76rem",
+    "readingWidth": "46rem",
+    "inspectorWidth": "24rem",
+    "mobileBreakpoint": "48rem",
+    "gap": "1.5rem",
+    "padding": "1.5rem"
+   },
+   "typography": {
+    "hero": "clamp(2.5rem, 5vw, 4.5rem)",
+    "h2": "clamp(1.75rem, 3vw, 2.75rem)",
+    "h3": "1.5rem",
+    "body": "1.0625rem",
+    "small": "0.8125rem",
+    "readingLineHeight": 1.75,
+    "headingLineHeight": 1.15
+   },
+   "spacing": {
+    "xs": "0.5rem",
+    "sm": "1rem",
+    "md": "1.5rem",
+    "lg": "2.5rem",
+    "xl": "4rem",
+    "section": "6rem"
+   },
+   "hero": {
+    "minHeight": "32rem",
+    "mobileMinHeight": "24rem"
+   },
+   "radius": {
+    "xs": "2px",
+    "sm": "4px",
+    "md": "6px",
+    "lg": "8px",
+    "xl": "10px",
+    "xxl": "12px",
+    "display": "16px",
+    "round": "9999px"
+   },
+   "motion": {
+    "duration": {
+     "instant": "75ms",
+     "short": "150ms",
+     "standard": "200ms",
+     "medium": "300ms",
+     "long": "400ms",
+     "extended": "600ms"
+    },
+    "ease": {
+     "emphasized": "cubic-bezier(0.2, 0, 0, 1)",
+     "standard": "cubic-bezier(0.4, 0, 0.2, 1)",
+     "emphasizedAccelerate": "cubic-bezier(0.3, 0, 0.8, 0.15)",
+     "linear": "linear"
+    },
+    "reducedMotion": "prefers-reduced-motion: reduce"
+   },
+   "fonts": {
+    "Roboto Slab": "Roboto Slab Variable, Georgia, serif",
+    "system-sans": "system-ui, sans-serif",
+    "system-serif": "Georgia, serif",
+    "Poppins": "Poppins, system-ui, sans-serif",
+    "Geist": "Geist, system-ui, sans-serif",
+    "Bricolage Grotesque": "Bricolage Grotesque, system-ui, sans-serif"
+   },
+   "accessibility": {
+    "normalTextContrast": 4.5,
+    "largeTextContrast": 3,
+    "targetSizePx": 44,
+    "reducedMotion": true
+   },
+   "categories": [
+    "technical",
+    "on-page",
+    "aeo",
+    "conversion"
+   ],
+   "evidenceStates": [
+    "proposed",
+    "implemented",
+    "verified",
+    "measured"
+   ],
+   "choreography": {
+    "preset": "original-xray",
+    "source": "efeonce-think/src/styles/aeo-xray.css",
+    "sharedHeroMs": 420,
+    "instrumentEnterMs": 420,
+    "instrumentExitMs": 260,
+    "instrumentTravel": "14%",
+    "pageFadeOutMs": 180,
+    "pageRiseMs": 320,
+    "pageRiseDistance": "10px",
+    "couplingMs": 140,
+    "pulseMs": 320,
+    "mobileSheetMs": 220,
+    "enterEase": "cubic-bezier(0.2, 0, 0, 1)",
+    "exitEase": "cubic-bezier(0.4, 0, 1, 1)",
+    "reducedMotion": "none"
+   },
+   "defaultMode": "read",
+   "demoRobots": "noindex,nofollow"
+  },
+  "adapterChecks": [
+   "demo-noindex",
+   "content-escaped",
+   "no-active-bank-form",
+   "scoped-annotations",
+   "keyboard-and-mobile",
+   "contrast",
+   "asset-authorization",
+   "source-dates-visible",
+   "evidence-status-visible"
+  ]
+ },
+ "assets": {
+  "landing-banner": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/landing-cuenta-soles.webp",
+  "article-banner": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/blog-comparar-cuentas.webp",
+  "bank-logo": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-logo.webp",
+  "banner-compare": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/banner-comparar.webp",
+  "banner-prepare": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/banner-apertura.webp",
+  "social-compare": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-social-01-compara.webp",
+  "social-average": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-social-02-liquidez.webp",
+  "social-costs": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-social-03-costos.webp",
+  "social-story": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-story-01-guia.webp"
+ }
+}

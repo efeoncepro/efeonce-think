@@ -3,7 +3,8 @@ import {mkdirSync,writeFileSync} from 'node:fs'
 import {chromium} from 'playwright'
 const base=process.env.XRAY_VERIFY_BASE??'http://127.0.0.1:4345'
 const token=process.env.XRAY_VERIFY_TOKEN??'fixture-pichincha'
-const entry=`${base}/aeo-xray/r/${token}?artifact=guia-cuenta-online`
+const articleId=(process.env.XRAY_VERIFY_ARTIFACTS??'ahorro-preferente,guia-cuenta-online').split(',')[1]
+const entry=`${base}/aeo-xray/r/${token}?artifact=${articleId}`
 const out='.captures/aeo-xray-curtain';mkdirSync(out,{recursive:true})
 const checks=[],check=(name,ok)=>{assert.ok(ok,name);checks.push(name);console.log(name)}
 const browser=await chromium.launch()

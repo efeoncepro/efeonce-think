@@ -3,13 +3,14 @@ import assert from 'node:assert/strict'
 import {mkdirSync,writeFileSync} from 'node:fs'
 const base=process.env.XRAY_VERIFY_BASE??'http://127.0.0.1:4345'
 const token=process.env.XRAY_VERIFY_TOKEN??'fixture-pichincha'
+const [landingId,articleId]=(process.env.XRAY_VERIFY_ARTIFACTS??'ahorro-preferente,guia-cuenta-online').split(',')
 const out='.captures/aeo-xray-extension';mkdirSync(out,{recursive:true})
 const browser=await chromium.launch();const checks=[]
 const check=(name,value)=>{assert.ok(value,name);checks.push(name)}
 try{
  for(const [name,width,height]of[['desktop',1440,1000],['mobile',390,844],['compact',320,780]]){
   const context=await browser.newContext({viewport:{width,height},reducedMotion:'reduce'});const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.name))
-  for(const artifact of ['ahorro-preferente','guia-cuenta-online'])for(const step of['','articulo','radiografia','atomizacion']){
+  for(const artifact of [landingId,articleId])for(const step of['','articulo','radiografia','atomizacion']){
    const prefix=`${name}/${artifact}/${step||'gap'}`;console.log(prefix)
    const response=await page.goto(`${base}/aeo-xray/r/${token}?artifact=${artifact}&step=${step}`,{waitUntil:'networkidle'})
    check(prefix+' status',response.status()===200)
@@ -29,7 +30,7 @@ try{
    await page.evaluate(()=>scrollTo(0,0))
    check(prefix+' images loaded',await page.locator('.xr img:visible').evaluateAll(els=>els.every(i=>i.complete&&i.naturalWidth>0)))
    if(step==='articulo'){
-    if(artifact==='ahorro-preferente'){
+    if(artifact===landingId){
      const layout=await page.locator('.landing-hero').evaluate(el=>{
       const figure=el.querySelector('.landing-photo'),copy=el.querySelector('.landing-copy');
       const f=figure.getBoundingClientRect(),c=copy.getBoundingClientRect();
@@ -38,8 +39,8 @@ try{
      check(prefix+' hero composition',name==='desktop'?layout.position==='absolute'&&layout.imageTop<=layout.copyTop+1:layout.position==='relative'&&layout.imageTop>=layout.copyBottom-1)
     }
 
-    check(prefix+' full piece',await page.locator('.post').innerText().then(t=>t.split(/\s+/).length>(artifact==='guia-cuenta-online'?800:250)))
-    if(artifact==='guia-cuenta-online')check(prefix+' toc',await page.locator('.toc a,.editorial-aside nav a').count()>=5)
+    check(prefix+' full piece',await page.locator('.post').innerText().then(t=>t.split(/\s+/).length>(artifact===articleId?800:250)))
+    if(artifact===articleId)check(prefix+' toc',await page.locator('.toc a,.editorial-aside nav a').count()>=5)
    }
    if(step==='radiografia'){
     await page.mouse.move(1,1);await page.keyboard.press('Escape')
@@ -55,6 +56,6 @@ try{
   }
   check(name+' no JS errors',errors.length===0);await context.close()
  }
- const nojs=await browser.newContext({javaScriptEnabled:false});const p=await nojs.newPage();await p.goto(`${base}/aeo-xray/r/${token}?artifact=guia-cuenta-online&step=radiografia`);check('noJS instrument and selected source',await p.locator('.inst').count()===1&&await p.locator('[data-couple][data-on]').count()>0);await nojs.close()
+ const nojs=await browser.newContext({javaScriptEnabled:false});const p=await nojs.newPage();await p.goto(`${base}/aeo-xray/r/${token}?artifact=${articleId}&step=radiografia`);check('noJS instrument and selected source',await p.locator('.inst').count()===1&&await p.locator('[data-couple][data-on]').count()>0);await nojs.close()
  writeFileSync(out+'/verification.json',JSON.stringify({checks},null,2));console.log(`${checks.length} checks passed`)
 }finally{await browser.close()}

@@ -3,9 +3,10 @@
  * These links are distribution links, not authenticated access grants.
  */
 import pichincha from './published/pichincha.json' with { type: 'json' }
+import pibank from './published/pibank.json' with { type: 'json' }
 import { acceptSharedXray, type SharedXrayResult } from './accept.ts'
 
-const samples = [pichincha]
+const samples = [pichincha, pibank]
 export const isPublishedSampleKey = (key: string) => key.startsWith('sample_')
 export function readPublishedSample(key: string): SharedXrayResult {
   const sample = samples.find(sample => sample.key === key)

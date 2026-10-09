@@ -4,7 +4,8 @@ import {chromium} from 'playwright'
 
 const base = process.env.XRAY_VERIFY_BASE ?? 'http://127.0.0.1:4345'
 const token = process.env.XRAY_VERIFY_TOKEN ?? 'fixture-pichincha'
-const url = (step='articulo', artifact='ahorro-preferente') => `${base}/aeo-xray/r/${token}?artifact=${artifact}&step=${step}`
+const landingId = (process.env.XRAY_VERIFY_ARTIFACTS ?? 'ahorro-preferente,guia-cuenta-online').split(',')[0]
+const url = (step='articulo', artifact=landingId) => `${base}/aeo-xray/r/${token}?artifact=${artifact}&step=${step}`
 const out = '.captures/aeo-xray-motion'
 mkdirSync(out, {recursive:true})
 const browser = await chromium.launch()
