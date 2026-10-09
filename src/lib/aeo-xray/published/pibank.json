@@ -116,6 +116,12 @@
     "label": "Google Cloud · Gemini Omni 1.1 Flash, modelo utilizado",
     "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-1-flash",
     "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "music-production",
+    "label": "ElevenLabs · Eleven Music, modelo utilizado para la música",
+    "url": "https://elevenlabs.io/docs/capabilities/music",
+    "accessedAt": "2026-10-08"
    }
   ],
   "assets": [
@@ -166,12 +172,12 @@
     "ref": {
      "kind": "protected",
      "assetId": "social-video",
-     "sha256": "89341950b792083307fb060452c5e4bd7fdd39246fafa39a685a34695066312c"
+     "sha256": "ea38c2ec159fa91d314d30ea7ba6a62789d8574e2714701738dff06a05f1d785"
     },
     "alt": "Video vertical: ¿qué cuenta de ahorros te conviene? Rendimiento, costos y liquidez, y elige tu cuenta con todo a la vista.",
     "width": 1080,
     "height": 1920,
-    "credit": "Video: Efeonce · tomas ilustrativas animadas con Gemini Omni 1.1; textos, gráfica y marca compuestos",
+    "credit": "Video: Efeonce · tomas ilustrativas animadas con Gemini Omni 1.1; música generada con Eleven Music; textos, gráfica y marca compuestos",
     "sourceId": "omni-production",
     "approval": "approved"
    },
@@ -1526,7 +1532,7 @@
        "kind": "Story + video",
        "coupleId": "lp-pasos",
        "bornFrom": "De la sección «Ábrela desde tu celular»",
-       "why": "La misma idea se adapta al consumo vertical. El video se entiende sin audio y devuelve a la guía para comparar con todo a la vista.",
+       "why": "La misma idea se adapta al consumo vertical. El video se entiende con o sin sonido y devuelve a la guía para comparar con todo a la vista.",
        "post": {
         "hook": "Antes de elegir tu cuenta.",
         "body": "Mira el rendimiento, los costos y la liquidez. Confirma todo en la cartilla y el tarifario oficiales.",
@@ -1549,7 +1555,7 @@
         },
         {
          "k": "Video producido",
-         "v": "MP4 H.264 · 1080×1920 · 30 fps · 12 segundos · sin audio; controles y descarga disponibles."
+         "v": "MP4 H.264 · 1080×1920 · 30 fps · 12 segundos · música instrumental (AAC, −16 LUFS); se entiende también sin sonido. Controles y descarga disponibles."
         },
         {
          "k": "Transcripción visual",
@@ -1563,7 +1569,7 @@
         "label": "Video vertical · 12 segundos",
         "title": "¿Qué cuenta de ahorros te conviene?",
         "description": "Dos tomas ilustrativas animadas desde las fotos de la muestra, con tipografía cinética y gráfica de Efeonce en la paleta de Pibank.",
-        "disclosure": "Ejemplo editorial de Efeonce. Tomas animadas con Gemini Omni 1.1 a partir de fotografías generadas; marca, textos y gráfica compuestos por separado. No representa a personas reales ni testimonios del banco."
+        "disclosure": "Ejemplo editorial de Efeonce. Tomas animadas con Gemini Omni 1.1 a partir de fotografías generadas y música instrumental generada con Eleven Music; marca, textos y gráfica compuestos por separado. No representa a personas reales ni testimonios del banco."
        }
       },
       {
@@ -3381,7 +3387,7 @@
        "kind": "Story + video",
        "coupleId": "art-apertura-answer",
        "bornFrom": "De la sección «¿Qué necesitas para abrirla online?»",
-       "why": "La misma idea se adapta al consumo vertical. El video se entiende sin audio y devuelve a la guía para comparar con todo a la vista.",
+       "why": "La misma idea se adapta al consumo vertical. El video se entiende con o sin sonido y devuelve a la guía para comparar con todo a la vista.",
        "post": {
         "hook": "Antes de elegir tu cuenta.",
         "body": "Mira el rendimiento, los costos y la liquidez. Confirma todo en la cartilla y el tarifario oficiales.",
@@ -3404,7 +3410,7 @@
         },
         {
          "k": "Video producido",
-         "v": "MP4 H.264 · 1080×1920 · 30 fps · 12 segundos · sin audio; controles y descarga disponibles."
+         "v": "MP4 H.264 · 1080×1920 · 30 fps · 12 segundos · música instrumental (AAC, −16 LUFS); se entiende también sin sonido. Controles y descarga disponibles."
         },
         {
          "k": "Transcripción visual",
@@ -3418,7 +3424,7 @@
         "label": "Video vertical · 12 segundos",
         "title": "¿Qué cuenta de ahorros te conviene?",
         "description": "Dos tomas ilustrativas animadas desde las fotos de la muestra, con tipografía cinética y gráfica de Efeonce en la paleta de Pibank.",
-        "disclosure": "Ejemplo editorial de Efeonce. Tomas animadas con Gemini Omni 1.1 a partir de fotografías generadas; marca, textos y gráfica compuestos por separado. No representa a personas reales ni testimonios del banco."
+        "disclosure": "Ejemplo editorial de Efeonce. Tomas animadas con Gemini Omni 1.1 a partir de fotografías generadas y música instrumental generada con Eleven Music; marca, textos y gráfica compuestos por separado. No representa a personas reales ni testimonios del banco."
        }
       },
       {
