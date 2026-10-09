@@ -14,6 +14,8 @@ const cases=questions.map(q=>{
  return {q,block,decisions,sources:model.sources.filter(s=>ids.has(s.id))}
 }).filter(c=>c.block)
 const V=C.value
+const M=artifact.experience?.measure
+const measure={title:M?.title??V.measureTitle,intro:M?.intro??V.measureIntro,items:M?.items??V.measure}
 ---
 {cases.length>0&&<details class="value-explorer" data-value-explorer>
  <summary><span class="value-label"><ScanLine size={19}/><strong>{V.summary}</strong><span class="value-count">{cases.length} {V.questions}</span></span><span class="value-open">{V.open}<ChevronDown size={17}/></span></summary>
@@ -32,7 +34,7 @@ const V=C.value
     <div class="value-actions"><a data-astro-prefetch="false" class="value-primary" href={experienceHref(artifact.id,'radiografia',`block-${c.q.coveredBy}`)}>{V.inspect}<ArrowRight size={18}/></a><a data-astro-prefetch="false" href={experienceHref(artifact.id,'articulo',`block-${c.q.coveredBy}`)}>{V.read}</a></div>
    </section>)}</div>
   </div>
-  <details class="value-measure"><summary>{V.measureTitle}<ChevronDown size={19}/></summary><p>{V.measureIntro}</p><dl>{V.measure.map(m=><div><dt>{m.label}</dt><dd><strong>{m.question}</strong><p>{m.method}</p></dd></div>)}</dl><div class="value-platform"><h3>{V.platformTitle}</h3><p>{V.platformGoogle} <a href="https://developers.google.com/search/docs/fundamentals/ai-optimization-guide" target="_blank" rel="noopener noreferrer" data-astro-prefetch="false">Google Search Central <ArrowUpRight size={13}/></a></p><p>{V.platformOpenAI} <a href="https://developers.openai.com/api/docs/bots" target="_blank" rel="noopener noreferrer" data-astro-prefetch="false">OpenAI <ArrowUpRight size={13}/></a></p></div></details>
+  <details class="value-measure"><summary>{measure.title}<ChevronDown size={19}/></summary><p>{measure.intro}</p><dl>{measure.items.map(m=><div><dt>{m.label}</dt><dd><strong>{m.question}</strong><p>{m.method}</p></dd></div>)}</dl><div class="value-platform"><h3>{V.platformTitle}</h3><p>{V.platformGoogle} <a href="https://developers.google.com/search/docs/fundamentals/ai-optimization-guide" target="_blank" rel="noopener noreferrer" data-astro-prefetch="false">Google Search Central <ArrowUpRight size={13}/></a></p><p>{V.platformOpenAI} <a href="https://developers.openai.com/api/docs/bots" target="_blank" rel="noopener noreferrer" data-astro-prefetch="false">OpenAI <ArrowUpRight size={13}/></a></p></div></details>
  </div>
 </details>}
 <script>

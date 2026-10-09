@@ -1,0 +1,33 @@
+---
+/** 0.2.0 · Siguiente paso concreto al terminar el recorrido (`experience.nextStep`). */
+import {ArrowUpRight} from '@lucide/astro'
+import type {AxisAeoXrayArtifact} from '@/lib/axis/aeo-xray/aeo-xray.js'
+import {xrayCopy as C} from '@/lib/aeo-xray/copy'
+interface Props{artifact:AxisAeoXrayArtifact}
+const next=Astro.props.artifact.experience?.nextStep
+const external=next?.ctaHref.startsWith('https://')
+---
+{next&&<section class="next-step" aria-labelledby="next-step-title" data-next-step>
+  <div>
+    <p class="early-eyebrow">{C.early.nextEyebrow}</p>
+    <h2 id="next-step-title">{next.title}</h2>
+    <p>{next.body}</p>
+  </div>
+  <div class="next-step-action">
+    <a href={next.ctaHref} data-astro-prefetch="false" {...(external?{target:'_blank',rel:'noopener noreferrer'}:{})}>{next.ctaLabel}<ArrowUpRight size={19} aria-hidden="true"/></a>
+    {next.note&&<p>{next.note}</p>}
+  </div>
+</section>}
+<style>
+.next-step{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:2rem;align-items:center;margin-top:2.5rem;padding:clamp(1.5rem,3vw,2.5rem);border-radius:12px;background:var(--navy);color:var(--ink-d);font-family:'Geist Variable',system-ui,sans-serif}
+.next-step .early-eyebrow{color:var(--blue-up)}
+.next-step h2{font:500 clamp(1.5rem,2.4vw,2.1rem)/1.25 Poppins,system-ui,sans-serif;margin:0 0 .6rem;text-wrap:balance}
+.next-step p{font-size:.95rem;line-height:1.7;color:var(--dim-d);margin:0;max-width:60ch}
+.next-step-action{display:flex;flex-direction:column;align-items:flex-start;gap:.75rem}
+.next-step-action a{display:inline-flex;align-items:center;gap:.75rem;min-height:48px;padding:.85rem 1.25rem;border-radius:8px;background:var(--landing-action,var(--blue));color:var(--landing-action-ink,white);font-weight:600;font-size:1rem;text-decoration:none;transition:transform var(--xr-motion-control) var(--xr-motion-ease)}
+.next-step-action a:hover{transform:translateY(-2px)}
+.next-step-action a:focus-visible{outline:3px solid var(--blue-up);outline-offset:3px}
+.next-step-action p{font-size:.8rem}
+@media(max-width:800px){.next-step{grid-template-columns:1fr}.next-step-action a{width:100%;justify-content:space-between}}
+@media(prefers-reduced-motion:reduce){.next-step-action a{transition:none}.next-step-action a:hover{transform:none}}
+</style>

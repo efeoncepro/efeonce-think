@@ -29,6 +29,23 @@ export const xrayCopy = {
     method: 'Metodología y alcance', reading: 'Nuestra lectura',
   },
   welcome: {title:'Esto preparamos para ti:',enter:'Haz click aquí'},
+  // 0.2.0 · bloques opcionales de experiencia temprana. {brand} y {site} se reemplazan al renderizar.
+  early: {
+    aiEyebrow: 'Panel de respuestas de IA · datos reales',
+    aiQuestion: 'Pregunta', aiKind: {generic: 'Genérica', brand: 'Con la marca'},
+    aiAppears: '¿Aparece {brand}?', aiAccuracy: '¿Dato correcto?', aiOwnSite: '¿Cita {site}?', aiCited: 'Fuentes que cita',
+    yes: 'Sí', no: 'No', accuracy: {correct: 'Correcto', incorrect: 'Incorrecto', 'not-mentioned': 'Sin mención'},
+    aiSummaryGeneric: 'En {surface}, con preguntas genéricas, {brand} aparece en {appears} de {total}',
+    aiSummaryOwnSite: 'y la IA cita {site} en {own} de {total}.',
+    aiMethod: 'Cómo se obtuvo', aiSurfaceDate: 'Superficie y fecha',
+    todayEyebrow: 'Hoy y con la pieza', todayRead: 'Qué lee la máquina', todayNow: 'Hoy', todayProposed: 'Con la pieza',
+    verdict: {keep: 'Se conserva', improve: 'Se mejora', add: 'Se suma'},
+    todayMethod: 'Cómo se leyó', todayRead_at: 'Leído el',
+    reviewEyebrow: 'Así trabajaríamos juntos', reviewClaims: 'Cada dato con su documento', reviewComments: 'Comentarios de la revisión',
+    reviewOwner: 'Revisa', reviewDocument: 'Se confirma en', reviewSee: 'Ver el bloque',
+    status: {pending: 'Por aprobar', approved: 'Aprobado', changes: 'Con cambios'},
+    reviewOn: 'Sobre', nextEyebrow: 'El siguiente paso',
+  },
   value: {
     summary: 'El valor detrás de la pieza', questions: 'preguntas', open: 'Explorar decisiones',
     eyebrow: 'De la intención a la decisión', title: 'Una pregunta. Una respuesta que se puede comprobar.',

@@ -1,9 +1,9 @@
 {
  "key": "sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV",
- "editionId": "pibank-2026-10-08",
+ "editionId": "pibank-2026-10-09",
  "model": {
   "contract": "efeonce.aeo-xray",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "locale": "es-PE",
   "title": "Pibank Perú · Ahorro que se entiende",
   "preparedFor": "Pibank Perú",
@@ -110,6 +110,12 @@
     "label": "Producción de imagen ilustrativa · GPT Image",
     "url": "https://platform.openai.com/docs/guides/image-generation",
     "accessedAt": "2026-10-08"
+   },
+   {
+    "id": "omni-production",
+    "label": "Google Cloud · Gemini Omni 1.1 Flash, modelo utilizado",
+    "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-1-flash",
+    "accessedAt": "2026-10-08"
    }
   ],
   "assets": [
@@ -152,6 +158,48 @@
     "width": 516,
     "height": 132,
     "credit": "Marca oficial Pibank · rasterizada del SVG original del sitio de Pibank",
+    "sourceId": "bank-visual-reference",
+    "approval": "approved"
+   },
+   {
+    "id": "social-video",
+    "ref": {
+     "kind": "protected",
+     "assetId": "social-video",
+     "sha256": "89341950b792083307fb060452c5e4bd7fdd39246fafa39a685a34695066312c"
+    },
+    "alt": "Video vertical: ¿qué cuenta de ahorros te conviene? Rendimiento, costos y liquidez, y elige tu cuenta con todo a la vista.",
+    "width": 1080,
+    "height": 1920,
+    "credit": "Video: Efeonce · tomas ilustrativas animadas con Gemini Omni 1.1; textos, gráfica y marca compuestos",
+    "sourceId": "omni-production",
+    "approval": "approved"
+   },
+   {
+    "id": "social-video-poster",
+    "ref": {
+     "kind": "protected",
+     "assetId": "social-video-poster",
+     "sha256": "e12b95a29076e9563be8f1e3eba53daaed8a594d159f08c4e755014483fd91d9"
+    },
+    "alt": "¿Qué cuenta de ahorros te conviene? Fotograma del video de muestra.",
+    "width": 1080,
+    "height": 1920,
+    "credit": "Composición: Efeonce · fotograma del video de muestra",
+    "sourceId": "omni-production",
+    "approval": "approved"
+   },
+   {
+    "id": "bank-logo-dark",
+    "ref": {
+     "kind": "protected",
+     "assetId": "bank-logo-dark",
+     "sha256": "fb8774f9e8fbfb7c1d72289008a13e58b538212eded75ffa15754eb4b1dddd57"
+    },
+    "alt": "Pibank",
+    "width": 516,
+    "height": 132,
+    "credit": "Marca oficial Pibank para fondos oscuros · rasterizada del SVG original del sitio de Pibank",
     "sourceId": "bank-visual-reference",
     "approval": "approved"
    },
@@ -248,7 +296,8 @@
    "actionText": "#0F265C",
    "fontFamily": "system-sans",
    "displayFontFamily": "Poppins",
-   "logoAssetId": "bank-logo"
+   "logoAssetId": "bank-logo",
+   "logoOnDarkAssetId": "bank-logo-dark"
   },
   "artifacts": [
    {
@@ -885,7 +934,7 @@
       "punchWhy": "Las condiciones de la Cuenta Soles ya compiten; lo que falta es que el sitio propio las explique de forma que buscadores e IA puedan citarlas con fecha y fuente.",
       "punchOpportunity": "La landing propone tasa, costos, liquidez y siguiente paso legibles y verificables.",
       "asideLabel": "Qué está medido y qué está propuesto",
-      "aside": "La SERP y las respuestas de IA son observadas; la mejora editorial está propuesta. No medimos resultados de estas piezas ni conversiones del banco."
+      "aside": "La SERP y las respuestas de IA son observadas; la pieza es la propuesta. Los resultados se miden desde el mes 1, con los datos del banco."
      },
      "machine": {
       "seo": [
@@ -1441,11 +1490,11 @@
       {
        "sourceScope": "block",
        "sourceStatus": "implemented",
-       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "honesty": "Ejemplo editorial de Efeonce para esta muestra; se publica sólo con la aprobación del banco.",
        "id": "social",
        "kind": "Feed · Comparación",
        "coupleId": "lp-tabla",
-       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "bornFrom": "De la sección «Las condiciones, en una sola tabla»",
        "why": "Una respuesta extensa se convierte en una entrada visual a la guía, conservando el mensaje y su vínculo con el contenido completo.",
        "post": {
         "hook": "Tu ahorro merece más que una tasa.",
@@ -1472,12 +1521,12 @@
       {
        "sourceScope": "block",
        "sourceStatus": "implemented",
-       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "honesty": "Ejemplo editorial de Efeonce para esta muestra; se publica sólo con la aprobación del banco.",
        "id": "video",
-       "kind": "Story",
+       "kind": "Story + video",
        "coupleId": "lp-pasos",
-       "bornFrom": "Del bloque de la pieza que explica esta decisión",
-       "why": "La misma idea se adapta al consumo vertical y devuelve a la sección que explica cómo abrir la cuenta.",
+       "bornFrom": "De la sección «Ábrela desde tu celular»",
+       "why": "La misma idea se adapta al consumo vertical. El video se entiende sin audio y devuelve a la guía para comparar con todo a la vista.",
        "post": {
         "hook": "Antes de elegir tu cuenta.",
         "body": "Mira el rendimiento, los costos y la liquidez. Confirma todo en la cartilla y el tarifario oficiales.",
@@ -1497,17 +1546,34 @@
         {
          "k": "Publicación",
          "v": "Muestra para revisión; no publicada en Instagram."
+        },
+        {
+         "k": "Video producido",
+         "v": "MP4 H.264 · 1080×1920 · 30 fps · 12 segundos · sin audio; controles y descarga disponibles."
+        },
+        {
+         "k": "Transcripción visual",
+         "v": "Antes de elegir. ¿Qué cuenta de ahorros te conviene? Revisa tres cosas: rendimiento, la TREA con su base y su fecha; costos, mantenimiento, operaciones e ITF; liquidez, cómo ingresas y retiras tu dinero. Confírmalo en la cartilla y el tarifario oficiales. Compara con la información completa. Elige tu cuenta con todo a la vista. Lee la guía."
         }
-       ]
+       ],
+       "reel": {
+        "assetId": "social-video",
+        "posterAssetId": "social-video-poster",
+        "alt": "Video vertical: ¿qué cuenta de ahorros te conviene? Rendimiento, costos y liquidez, y elige tu cuenta con todo a la vista.",
+        "label": "Video vertical · 12 segundos",
+        "title": "¿Qué cuenta de ahorros te conviene?",
+        "description": "Dos tomas ilustrativas animadas desde las fotos de la muestra, con tipografía cinética y gráfica de Efeonce en la paleta de Pibank.",
+        "disclosure": "Ejemplo editorial de Efeonce. Tomas animadas con Gemini Omni 1.1 a partir de fotografías generadas; marca, textos y gráfica compuestos por separado. No representa a personas reales ni testimonios del banco."
+       }
       },
       {
        "sourceScope": "block",
        "sourceStatus": "implemented",
-       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "honesty": "Ejemplo editorial de Efeonce para esta muestra; se publica sólo con la aprobación del banco.",
        "id": "imagenes",
        "kind": "Feed · Liquidez",
        "coupleId": "lp-condiciones-copy",
-       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "bornFrom": "De la sección «Las condiciones, en una sola tabla»",
        "why": "La pieza explica una condición de la cuenta —cómo entra y sale el dinero— sin convertirla en una promesa.",
        "post": {
         "hook": "Disponible no siempre significa con tarjeta.",
@@ -1534,11 +1600,11 @@
       {
        "sourceScope": "block",
        "sourceStatus": "implemented",
-       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "honesty": "Ejemplo editorial de Efeonce para esta muestra; se publica sólo con la aprobación del banco.",
        "id": "social-costos",
        "kind": "Feed · Costos",
        "coupleId": "lp-faq",
-       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "bornFrom": "De las preguntas frecuentes",
        "why": "La pieza corrige una interpretación frecuente y conduce al bloque que explica el alcance de la condición comercial.",
        "post": {
         "hook": "Sin mantenimiento no significa sin costos.",
@@ -1629,7 +1695,7 @@
         }
        ]
       },
-      "honesty": "No se consultó Search Console/GA4 del banco ni se midieron aperturas o fondeo. Las cifras de búsqueda son estimaciones del proveedor y las respuestas de IA son snapshots fechados, no pronósticos."
+      "honesty": "Las cifras de búsqueda son estimaciones del proveedor y las respuestas de IA, capturas fechadas. El mes 1 suma Search Console y los datos del banco."
      },
      "ui": {
       "disclaimerLabel": "Demostración de Efeonce",
@@ -1656,9 +1722,9 @@
       "flowNext": "Siguiente",
       "flowOf": "de",
       "srProduces": "Este bloque produce {n} datos en la capa de máquina.",
-      "closing": "Una pieza puede explicar las condiciones, responder una duda, ser la fuente que cita la IA y dar origen a otros formatos. Es una muestra de la propuesta técnica: pilar Cuenta Soles en M1–M2, comparativas desde M3, panel AEO mensual y comunidad desde M3. Su publicación y resultados requieren aprobación y datos del banco.",
+      "closing": "Una pieza puede explicar las condiciones, responder una duda, ser la fuente que cita la IA y dar origen a otros formatos. Es lo que el programa produce: el pilar de Cuenta Soles (M1–M2), las comparativas (desde M3), el panel AEO cada mes y la comunidad (desde M3).",
       "verifyTitle": "Comprueba la propuesta",
-      "verifyNote": "Las consultas y las respuestas de IA cambian con el tiempo. El snapshot preserva fecha, país, idioma y dispositivo; la muestra no acredita ranking futuro, citas de IA ni aperturas.",
+      "verifyNote": "Las respuestas de IA cambian con el tiempo: cada captura conserva fecha, país, idioma y dispositivo para comparar con el mismo protocolo.",
       "verifySteps": [
        {
         "what": "Condiciones",
@@ -1670,9 +1736,257 @@
        },
        {
         "what": "Representación técnica",
-        "how": "Comprueba que titulares, FAQ y datos mostrados en la máquina coincidan con la pieza visible. El marcado es una propuesta, no una garantía de visibilidad."
+        "how": "Comprueba que títulos, preguntas frecuentes y datos de la capa técnica coincidan con lo que se ve en la pieza."
+       }
+      ],
+      "welcomeTitle": "Preparado para el equipo de Pibank",
+      "welcomeEnter": "Ver la muestra"
+     },
+     "aiPanel": {
+      "title": "Qué responde hoy la IA cuando alguien busca dónde ahorrar",
+      "intro": "Una muestra real del panel que propone el programa: las mismas preguntas, la misma superficie y un registro de qué dice la IA de Pibank y a quién cita.",
+      "surface": "Google AI Mode",
+      "market": "Perú · español · escritorio",
+      "asOf": "2026-10-08",
+      "method": "Consultas a Google AI Mode y al resumen de IA de Google con DataForSEO, mercado Perú (2604), idioma español, escritorio. Por cada respuesta se registró si nombra a Pibank, si el dato coincide con la cartilla y el tarifario vigentes y qué dominios cita. Capturas conservadas en el expediente de la edición.",
+      "note": "En el programa, el panel repite 24 preguntas en tres superficies, dos veces al mes. Una mención en una respuesta de IA no es una visita ni una cuenta.",
+      "rows": [
+       {
+        "question": "cuenta de ahorros sin mantenimiento",
+        "kind": "generic",
+        "appears": false,
+        "accuracy": "not-mentioned",
+        "citesOwnSite": false,
+        "cited": [
+         "viabcp.com",
+         "interbank.pe",
+         "scotiabank.com.pe",
+         "bbva.pe"
+        ],
+        "detail": "La respuesta recomienda cuentas de otros bancos."
+       },
+       {
+        "question": "mejor cuenta de ahorros peru",
+        "kind": "generic",
+        "appears": false,
+        "accuracy": "not-mentioned",
+        "citesOwnSite": false,
+        "cited": [
+         "bancofalabella.pe",
+         "sbs.gob.pe",
+         "comparabancaperu.com",
+         "instagram.com"
+        ],
+        "detail": "Responde con comparadores, el regulador y otras entidades."
+       },
+       {
+        "question": "cuenta de ahorros online peru",
+        "kind": "generic",
+        "appears": false,
+        "accuracy": "not-mentioned",
+        "citesOwnSite": false,
+        "cited": [
+         "interbank.pe",
+         "santanderconsumer.com.pe",
+         "comparabancaperu.com",
+         "bbva.pe"
+        ],
+        "detail": "Recomienda cuentas digitales de otras entidades."
+       },
+       {
+        "question": "cuenta de ahorros que paga más intereses peru",
+        "kind": "generic",
+        "appears": true,
+        "accuracy": "correct",
+        "citesOwnSite": false,
+        "cited": [
+         "afluenta.pe",
+         "comparabancaperu.com",
+         "infobae.com",
+         "andina.pe",
+         "efectibank.pe"
+        ],
+        "detail": "Pone primera a la Cuenta Soles con 5.00% TREA, pero la respaldan terceros: no cita pibank.pe."
+       },
+       {
+        "question": "cuenta de ahorros sin mantenimiento",
+        "kind": "generic",
+        "appears": true,
+        "accuracy": "incorrect",
+        "citesOwnSite": false,
+        "cited": [
+         "rankia.co"
+        ],
+        "surface": "Resumen de IA de Google",
+        "asOf": "2026-10-06",
+        "detail": "Le atribuyó a Pibank una tasa de 11.00% E.A., que corresponde a Pibank Colombia. El 08/10 ese resumen ya no lo mencionaba."
+       },
+       {
+        "question": "pibank",
+        "kind": "brand",
+        "appears": true,
+        "accuracy": "correct",
+        "citesOwnSite": true,
+        "cited": [
+         "pibank.pe",
+         "infobae.com"
+        ],
+        "detail": "Cuando buscan la marca, la IA describe bien la Cuenta Soles y cita pibank.pe."
+       },
+       {
+        "question": "pibank es seguro",
+        "kind": "brand",
+        "appears": true,
+        "accuracy": "correct",
+        "citesOwnSite": true,
+        "cited": [
+         "pibank.pe",
+         "facebook.com",
+         "infobae.com"
+        ],
+        "detail": "Explica el respaldo de Banco Pichincha y la cobertura del Fondo de Seguro de Depósitos, y cita pibank.pe."
        }
       ]
+     },
+     "today": {
+      "title": "Lo que la máquina lee hoy de tu página de Cuenta Soles",
+      "intro": "Leímos la página pública de la Cuenta Soles y la pusimos al lado de lo que leería con esta pieza.",
+      "url": "https://pibank.pe/cuenta-soles-pibank/",
+      "asOf": "2026-10-09",
+      "method": "Lectura del HTML público de la página el 09/10/2026: título, descripción, encabezados, datos estructurados y textos alternativos. No incluye datos de Search Console ni de rendimiento.",
+      "note": "Algunas imágenes sin texto alternativo pueden ser decorativas; se revisan una por una en el diagnóstico del mes 1.",
+      "rows": [
+       {
+        "label": "Título del resultado",
+        "today": "«Cuenta Soles Pibank - Pibank Perú»",
+        "proposed": "«Cuenta Soles Pibank: 5% TREA y sin mantenimiento»: la condición se ve en el resultado.",
+        "verdict": "improve"
+       },
+       {
+        "label": "Descripción",
+        "today": "«Abre una Cuenta Soles Pibank con intereses desde el primer sol, sin comisiones y tu dinero siempre disponible.»",
+        "proposed": "Suma la tasa, el saldo mínimo y cómo abrirla, en menos de 160 caracteres.",
+        "verdict": "improve"
+       },
+       {
+        "label": "Encabezados",
+        "today": "Tres encabezados de sección; uno junta «Beneficios» y «Abrir cuenta».",
+        "proposed": "Un encabezado por decisión: beneficios, condiciones, cómo abrirla y respaldo.",
+        "verdict": "improve"
+       },
+       {
+        "label": "Condiciones con su fuente",
+        "today": "5% TREA en la portada; la equivalencia TEA = TREA va en una nota y la base de 360 días no aparece.",
+        "proposed": "Una tabla con tasa, base, costos y uso, y el documento donde se confirma cada uno.",
+        "verdict": "improve"
+       },
+       {
+        "label": "Datos del producto",
+        "today": "Ya marca la página como producto financiero (FinancialProduct), con la organización y la ruta de navegación.",
+        "proposed": "Se conserva tal como está.",
+        "verdict": "keep"
+       },
+       {
+        "label": "Preguntas frecuentes",
+        "today": "Visibles en la página, sin marcado de preguntas frecuentes.",
+        "proposed": "Marcado FAQPage que coincide palabra por palabra con lo visible.",
+        "verdict": "add"
+       },
+       {
+        "label": "Textos alternativos",
+        "today": "15 de 17 imágenes sin texto alternativo o con texto vacío.",
+        "proposed": "Texto alternativo descriptivo en las imágenes que informan.",
+        "verdict": "improve"
+       }
+      ]
+     },
+     "review": {
+      "title": "Así te llegaría para revisar",
+      "intro": "Antes de publicar, cada dato llega con el documento donde se confirma y quién lo aprueba. El plan vive en Notion y cada pieza se aprueba en Frame.io, como en la propuesta.",
+      "version": "Versión 2 · 08/10/2026",
+      "note": "Ejemplo de cómo se ve una revisión. Los estados y comentarios muestran el flujo; no son de personas de Pibank.",
+      "items": [
+       {
+        "claim": "5% TEA igual a la TREA desde S/ 1, base de 360 días",
+        "coupleId": "lp-tabla",
+        "document": "Cartilla Cuenta Soles · 28/09/2026",
+        "owner": "Producto",
+        "status": "approved"
+       },
+       {
+        "claim": "Sin comisión de mantenimiento ni saldo mínimo",
+        "coupleId": "lp-tabla",
+        "document": "Tarifario Cuenta Soles · 28/09/2026",
+        "owner": "Producto",
+        "status": "approved"
+       },
+       {
+        "claim": "ITF de 0.005% en las operaciones afectas",
+        "coupleId": "lp-tabla",
+        "document": "Tarifario Cuenta Soles · 28/09/2026",
+        "owner": "Cumplimiento",
+        "status": "pending"
+       },
+       {
+        "claim": "Requisitos y pasos para abrirla",
+        "coupleId": "lp-requisitos-copy",
+        "document": "Preguntas frecuentes de apertura · pibank.pe",
+        "owner": "Producto",
+        "status": "approved"
+       },
+       {
+        "claim": "Cobertura del Fondo de Seguro de Depósitos",
+        "coupleId": "lp-confianza-copy",
+        "document": "FSD · monto vigente para setiembre–noviembre de 2026",
+        "owner": "Cumplimiento",
+        "status": "changes"
+       }
+      ],
+      "comments": [
+       {
+        "role": "Cumplimiento",
+        "coupleId": "lp-tabla",
+        "text": "Aclarar que el ITF lo fija la ley, para que no se lea como un costo de Pibank."
+       },
+       {
+        "role": "Efeonce Editorial",
+        "coupleId": "lp-tabla",
+        "text": "Ajustado en la versión 2: la nota de la tabla dice que el ITF es un impuesto y remite al tarifario."
+       },
+       {
+        "role": "Producto",
+        "coupleId": "lp-confianza-copy",
+        "text": "Antes de publicar, confirmar el monto del FSD para el trimestre siguiente."
+       }
+      ]
+     },
+     "measure": {
+      "title": "Cómo mediríamos esta pieza",
+      "intro": "Las mismas señales que propone el programa. La línea base se fija en el mes 1 con los datos del banco.",
+      "items": [
+       {
+        "label": "SEO · visibilidad",
+        "question": "¿Aparece pibank.pe cuando alguien busca dónde ahorrar?",
+        "method": "Posiciones frente a otros bancos y visitas orgánicas sin marca a las páginas de ahorro, por consulta y dispositivo, en Search Console."
+       },
+       {
+        "label": "AEO · respuestas de IA",
+        "question": "¿La IA nombra a Pibank con datos correctos y cita pibank.pe?",
+        "method": "Panel fijo de preguntas en tres superficies, dos veces al mes: mención, exactitud del dato y fuentes citadas."
+       },
+       {
+        "label": "Negocio · solicitudes y cuentas",
+        "question": "¿La pieza acerca a alguien a abrir su cuenta?",
+        "method": "Solicitudes iniciadas, aperturas y cuentas con fondos atribuidas, con los datos que habilite el banco. Una visita o una mención no es una cuenta."
+       }
+      ]
+     },
+     "nextStep": {
+      "title": "Revisemos la muestra con tu equipo",
+      "body": "En 30 minutos recorremos el X-Ray con Marketing, Producto y Cumplimiento, ajustamos lo que haga falta y dejamos definido qué entra en el mes 1.",
+      "ctaLabel": "Coordinar la revisión",
+      "ctaHref": "mailto:sales@efeoncepro.com?subject=Revisi%C3%B3n%20de%20la%20muestra%20X-Ray%20%C2%B7%20Pibank",
+      "note": "Propuesta: la semana del 12 de octubre, como indica la propuesta técnica."
      }
     }
    },
@@ -2403,7 +2717,7 @@
       "punchWhy": "La mayor demanda está en quienes comparan cuentas antes de mover su dinero. Una guía de comparación honesta, con la Cuenta Soles como ejemplo verificable, es donde Pibank puede entrar.",
       "punchOpportunity": "El artículo propone ordenar rendimiento, costos, liquidez, documentos y respaldo.",
       "asideLabel": "Qué está medido y qué está propuesto",
-      "aside": "La SERP y las respuestas de IA son observadas; la mejora editorial está propuesta. No medimos resultados de estas piezas ni conversiones del banco."
+      "aside": "La SERP y las respuestas de IA son observadas; la pieza es la propuesta. Los resultados se miden desde el mes 1, con los datos del banco."
      },
      "machine": {
       "seo": [
@@ -3031,11 +3345,11 @@
       {
        "sourceScope": "block",
        "sourceStatus": "implemented",
-       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "honesty": "Ejemplo editorial de Efeonce para esta muestra; se publica sólo con la aprobación del banco.",
        "id": "social",
        "kind": "Feed · Comparación",
        "coupleId": "article-answer",
-       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "bornFrom": "De la respuesta directa de la pieza",
        "why": "Una respuesta extensa se convierte en una entrada visual a la guía, conservando el mensaje y su vínculo con el contenido completo.",
        "post": {
         "hook": "Tu ahorro merece más que una tasa.",
@@ -3062,12 +3376,12 @@
       {
        "sourceScope": "block",
        "sourceStatus": "implemented",
-       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "honesty": "Ejemplo editorial de Efeonce para esta muestra; se publica sólo con la aprobación del banco.",
        "id": "video",
-       "kind": "Story",
+       "kind": "Story + video",
        "coupleId": "art-apertura-answer",
-       "bornFrom": "Del bloque de la pieza que explica esta decisión",
-       "why": "La misma idea se adapta al consumo vertical y devuelve a la sección que explica cómo abrir la cuenta.",
+       "bornFrom": "De la sección «¿Qué necesitas para abrirla online?»",
+       "why": "La misma idea se adapta al consumo vertical. El video se entiende sin audio y devuelve a la guía para comparar con todo a la vista.",
        "post": {
         "hook": "Antes de elegir tu cuenta.",
         "body": "Mira el rendimiento, los costos y la liquidez. Confirma todo en la cartilla y el tarifario oficiales.",
@@ -3087,17 +3401,34 @@
         {
          "k": "Publicación",
          "v": "Muestra para revisión; no publicada en Instagram."
+        },
+        {
+         "k": "Video producido",
+         "v": "MP4 H.264 · 1080×1920 · 30 fps · 12 segundos · sin audio; controles y descarga disponibles."
+        },
+        {
+         "k": "Transcripción visual",
+         "v": "Antes de elegir. ¿Qué cuenta de ahorros te conviene? Revisa tres cosas: rendimiento, la TREA con su base y su fecha; costos, mantenimiento, operaciones e ITF; liquidez, cómo ingresas y retiras tu dinero. Confírmalo en la cartilla y el tarifario oficiales. Compara con la información completa. Elige tu cuenta con todo a la vista. Lee la guía."
         }
-       ]
+       ],
+       "reel": {
+        "assetId": "social-video",
+        "posterAssetId": "social-video-poster",
+        "alt": "Video vertical: ¿qué cuenta de ahorros te conviene? Rendimiento, costos y liquidez, y elige tu cuenta con todo a la vista.",
+        "label": "Video vertical · 12 segundos",
+        "title": "¿Qué cuenta de ahorros te conviene?",
+        "description": "Dos tomas ilustrativas animadas desde las fotos de la muestra, con tipografía cinética y gráfica de Efeonce en la paleta de Pibank.",
+        "disclosure": "Ejemplo editorial de Efeonce. Tomas animadas con Gemini Omni 1.1 a partir de fotografías generadas; marca, textos y gráfica compuestos por separado. No representa a personas reales ni testimonios del banco."
+       }
       },
       {
        "sourceScope": "block",
        "sourceStatus": "implemented",
-       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "honesty": "Ejemplo editorial de Efeonce para esta muestra; se publica sólo con la aprobación del banco.",
        "id": "imagenes",
        "kind": "Feed · Liquidez",
        "coupleId": "art-saldo-answer",
-       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "bornFrom": "De la sección «¿Qué tan disponible está tu dinero?»",
        "why": "La pieza explica una condición de la cuenta —cómo entra y sale el dinero— sin convertirla en una promesa.",
        "post": {
         "hook": "Disponible no siempre significa con tarjeta.",
@@ -3124,11 +3455,11 @@
       {
        "sourceScope": "block",
        "sourceStatus": "implemented",
-       "honesty": "Ejemplo editorial producido por Efeonce para esta muestra. Sujeto a revisión y aprobación del banco; no publicado en redes ni asociado a resultados de campaña.",
+       "honesty": "Ejemplo editorial de Efeonce para esta muestra; se publica sólo con la aprobación del banco.",
        "id": "social-costos",
        "kind": "Feed · Costos",
        "coupleId": "art-costos-answer",
-       "bornFrom": "Del bloque de la pieza que explica esta decisión",
+       "bornFrom": "De la sección «¿Sin mantenimiento significa sin costos?»",
        "why": "La pieza corrige una interpretación frecuente y conduce al bloque que explica el alcance de la condición comercial.",
        "post": {
         "hook": "Sin mantenimiento no significa sin costos.",
@@ -3224,7 +3555,7 @@
         }
        ]
       },
-      "honesty": "No se consultó Search Console/GA4 del banco ni se midieron aperturas o fondeo. Las cifras de búsqueda son estimaciones del proveedor y las respuestas de IA son snapshots fechados, no pronósticos."
+      "honesty": "Las cifras de búsqueda son estimaciones del proveedor y las respuestas de IA, capturas fechadas. El mes 1 suma Search Console y los datos del banco."
      },
      "ui": {
       "disclaimerLabel": "Demostración de Efeonce",
@@ -3251,9 +3582,9 @@
       "flowNext": "Siguiente",
       "flowOf": "de",
       "srProduces": "Este bloque produce {n} datos en la capa de máquina.",
-      "closing": "Una pieza puede explicar las condiciones, responder una duda, ser la fuente que cita la IA y dar origen a otros formatos. Es una muestra de la propuesta técnica: pilar Cuenta Soles en M1–M2, comparativas desde M3, panel AEO mensual y comunidad desde M3. Su publicación y resultados requieren aprobación y datos del banco.",
+      "closing": "Una pieza puede explicar las condiciones, responder una duda, ser la fuente que cita la IA y dar origen a otros formatos. Es lo que el programa produce: el pilar de Cuenta Soles (M1–M2), las comparativas (desde M3), el panel AEO cada mes y la comunidad (desde M3).",
       "verifyTitle": "Comprueba la propuesta",
-      "verifyNote": "Las consultas y las respuestas de IA cambian con el tiempo. El snapshot preserva fecha, país, idioma y dispositivo; la muestra no acredita ranking futuro, citas de IA ni aperturas.",
+      "verifyNote": "Las respuestas de IA cambian con el tiempo: cada captura conserva fecha, país, idioma y dispositivo para comparar con el mismo protocolo.",
       "verifySteps": [
        {
         "what": "Condiciones",
@@ -3265,9 +3596,239 @@
        },
        {
         "what": "Representación técnica",
-        "how": "Comprueba que titulares, FAQ y datos mostrados en la máquina coincidan con la pieza visible. El marcado es una propuesta, no una garantía de visibilidad."
+        "how": "Comprueba que títulos, preguntas frecuentes y datos de la capa técnica coincidan con lo que se ve en la pieza."
+       }
+      ],
+      "welcomeTitle": "Preparado para el equipo de Pibank",
+      "welcomeEnter": "Ver la muestra"
+     },
+     "aiPanel": {
+      "title": "Qué responde hoy la IA cuando alguien busca dónde ahorrar",
+      "intro": "Una muestra real del panel que propone el programa: las mismas preguntas, la misma superficie y un registro de qué dice la IA de Pibank y a quién cita.",
+      "surface": "Google AI Mode",
+      "market": "Perú · español · escritorio",
+      "asOf": "2026-10-08",
+      "method": "Consultas a Google AI Mode y al resumen de IA de Google con DataForSEO, mercado Perú (2604), idioma español, escritorio. Por cada respuesta se registró si nombra a Pibank, si el dato coincide con la cartilla y el tarifario vigentes y qué dominios cita. Capturas conservadas en el expediente de la edición.",
+      "note": "En el programa, el panel repite 24 preguntas en tres superficies, dos veces al mes. Una mención en una respuesta de IA no es una visita ni una cuenta.",
+      "rows": [
+       {
+        "question": "cuenta de ahorros sin mantenimiento",
+        "kind": "generic",
+        "appears": false,
+        "accuracy": "not-mentioned",
+        "citesOwnSite": false,
+        "cited": [
+         "viabcp.com",
+         "interbank.pe",
+         "scotiabank.com.pe",
+         "bbva.pe"
+        ],
+        "detail": "La respuesta recomienda cuentas de otros bancos."
+       },
+       {
+        "question": "mejor cuenta de ahorros peru",
+        "kind": "generic",
+        "appears": false,
+        "accuracy": "not-mentioned",
+        "citesOwnSite": false,
+        "cited": [
+         "bancofalabella.pe",
+         "sbs.gob.pe",
+         "comparabancaperu.com",
+         "instagram.com"
+        ],
+        "detail": "Responde con comparadores, el regulador y otras entidades."
+       },
+       {
+        "question": "cuenta de ahorros online peru",
+        "kind": "generic",
+        "appears": false,
+        "accuracy": "not-mentioned",
+        "citesOwnSite": false,
+        "cited": [
+         "interbank.pe",
+         "santanderconsumer.com.pe",
+         "comparabancaperu.com",
+         "bbva.pe"
+        ],
+        "detail": "Recomienda cuentas digitales de otras entidades."
+       },
+       {
+        "question": "cuenta de ahorros que paga más intereses peru",
+        "kind": "generic",
+        "appears": true,
+        "accuracy": "correct",
+        "citesOwnSite": false,
+        "cited": [
+         "afluenta.pe",
+         "comparabancaperu.com",
+         "infobae.com",
+         "andina.pe",
+         "efectibank.pe"
+        ],
+        "detail": "Pone primera a la Cuenta Soles con 5.00% TREA, pero la respaldan terceros: no cita pibank.pe."
+       },
+       {
+        "question": "cuenta de ahorros sin mantenimiento",
+        "kind": "generic",
+        "appears": true,
+        "accuracy": "incorrect",
+        "citesOwnSite": false,
+        "cited": [
+         "rankia.co"
+        ],
+        "surface": "Resumen de IA de Google",
+        "asOf": "2026-10-06",
+        "detail": "Le atribuyó a Pibank una tasa de 11.00% E.A., que corresponde a Pibank Colombia. El 08/10 ese resumen ya no lo mencionaba."
+       },
+       {
+        "question": "pibank",
+        "kind": "brand",
+        "appears": true,
+        "accuracy": "correct",
+        "citesOwnSite": true,
+        "cited": [
+         "pibank.pe",
+         "infobae.com"
+        ],
+        "detail": "Cuando buscan la marca, la IA describe bien la Cuenta Soles y cita pibank.pe."
+       },
+       {
+        "question": "pibank es seguro",
+        "kind": "brand",
+        "appears": true,
+        "accuracy": "correct",
+        "citesOwnSite": true,
+        "cited": [
+         "pibank.pe",
+         "facebook.com",
+         "infobae.com"
+        ],
+        "detail": "Explica el respaldo de Banco Pichincha y la cobertura del Fondo de Seguro de Depósitos, y cita pibank.pe."
        }
       ]
+     },
+     "today": {
+      "title": "Lo que encuentra hoy la máquina cuando alguien compara cuentas",
+      "intro": "Revisamos el mapa del sitio de pibank.pe para ver qué página podría responder la comparación.",
+      "url": "https://pibank.pe/",
+      "asOf": "2026-10-09",
+      "method": "Lectura del mapa del sitio público (sitemap.xml) de pibank.pe el 09/10/2026: 8 páginas y 51 preguntas frecuentes.",
+      "note": "La guía se publica sólo con el visto bueno de Producto y Cumplimiento.",
+      "rows": [
+       {
+        "label": "Página que responde «¿qué cuenta me conviene?»",
+        "today": "No existe: ninguna de las 8 páginas ni de las 51 preguntas frecuentes compara cuentas.",
+        "proposed": "Una guía para comparar por rendimiento, costos y liquidez.",
+        "verdict": "add"
+       },
+       {
+        "label": "Preguntas frecuentes",
+        "today": "51 respuestas sobre la cuenta, la app y la seguridad.",
+        "proposed": "Se conservan; la guía enlaza a las que responden cada criterio.",
+        "verdict": "keep"
+       },
+       {
+        "label": "Ejemplo verificable",
+        "today": "La Cuenta Soles se explica sólo en su página de producto.",
+        "proposed": "La guía usa la Cuenta Soles como ejemplo, con su cartilla y su tarifario, y enlaza a su página.",
+        "verdict": "add"
+       },
+       {
+        "label": "Datos estructurados",
+        "today": "No hay una página que marcar.",
+        "proposed": "Article y FAQPage coherentes con lo que se ve en la guía.",
+        "verdict": "add"
+       }
+      ]
+     },
+     "review": {
+      "title": "Así te llegaría para revisar",
+      "intro": "Antes de publicar, cada dato llega con el documento donde se confirma y quién lo aprueba. El plan vive en Notion y cada pieza se aprueba en Frame.io, como en la propuesta.",
+      "version": "Versión 2 · 08/10/2026",
+      "note": "Ejemplo de cómo se ve una revisión. Los estados y comentarios muestran el flujo; no son de personas de Pibank.",
+      "items": [
+       {
+        "claim": "Qué es la TREA y cómo se compara",
+        "coupleId": "art-trea-answer",
+        "document": "Cartilla Cuenta Soles · 28/09/2026",
+        "owner": "Cumplimiento",
+        "status": "approved"
+       },
+       {
+        "claim": "Costos: mantenimiento, operaciones e ITF",
+        "coupleId": "art-costos-answer",
+        "document": "Tarifario Cuenta Soles · 28/09/2026",
+        "owner": "Producto",
+        "status": "approved"
+       },
+       {
+        "claim": "Liquidez: ingresos y retiros por transferencia",
+        "coupleId": "art-saldo-answer",
+        "document": "Tarifario y preguntas frecuentes de la app",
+        "owner": "Producto",
+        "status": "pending"
+       },
+       {
+        "claim": "Cobertura del Fondo de Seguro de Depósitos",
+        "coupleId": "art-respaldo-answer",
+        "document": "FSD · monto vigente para setiembre–noviembre de 2026",
+        "owner": "Cumplimiento",
+        "status": "changes"
+       },
+       {
+        "claim": "La tabla compara criterios, no entidades",
+        "coupleId": "art-tabla",
+        "document": "Criterio de comparaciones del banco",
+        "owner": "Cumplimiento",
+        "status": "pending"
+       }
+      ],
+      "comments": [
+       {
+        "role": "Producto",
+        "coupleId": "art-saldo-answer",
+        "text": "Aclarar en cuánto tiempo llega una transferencia desde otro banco, o enlazar la pregunta frecuente que lo explica."
+       },
+       {
+        "role": "Efeonce Editorial",
+        "coupleId": "art-saldo-answer",
+        "text": "De acuerdo: enlazamos la pregunta frecuente de transferencias en la versión 2."
+       },
+       {
+        "role": "Cumplimiento",
+        "coupleId": "art-tabla",
+        "text": "Comparar criterios y no bancos está bien. Si se suman nombres de otras entidades, vuelve a revisión."
+       }
+      ]
+     },
+     "measure": {
+      "title": "Cómo mediríamos esta pieza",
+      "intro": "Las mismas señales que propone el programa. La línea base se fija en el mes 1 con los datos del banco.",
+      "items": [
+       {
+        "label": "SEO · visibilidad",
+        "question": "¿Aparece pibank.pe cuando alguien busca dónde ahorrar?",
+        "method": "Posiciones frente a otros bancos y visitas orgánicas sin marca a las páginas de ahorro, por consulta y dispositivo, en Search Console."
+       },
+       {
+        "label": "AEO · respuestas de IA",
+        "question": "¿La IA nombra a Pibank con datos correctos y cita pibank.pe?",
+        "method": "Panel fijo de preguntas en tres superficies, dos veces al mes: mención, exactitud del dato y fuentes citadas."
+       },
+       {
+        "label": "Negocio · solicitudes y cuentas",
+        "question": "¿La pieza acerca a alguien a abrir su cuenta?",
+        "method": "Solicitudes iniciadas, aperturas y cuentas con fondos atribuidas, con los datos que habilite el banco. Una visita o una mención no es una cuenta."
+       }
+      ]
+     },
+     "nextStep": {
+      "title": "Revisemos la muestra con tu equipo",
+      "body": "En 30 minutos recorremos el X-Ray con Marketing, Producto y Cumplimiento, ajustamos lo que haga falta y dejamos definido qué entra en el mes 1.",
+      "ctaLabel": "Coordinar la revisión",
+      "ctaHref": "mailto:sales@efeoncepro.com?subject=Revisi%C3%B3n%20de%20la%20muestra%20X-Ray%20%C2%B7%20Pibank",
+      "note": "Propuesta: la semana del 12 de octubre, como indica la propuesta técnica."
      }
     }
    }
@@ -3427,6 +3988,9 @@
   "social-compare": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-social-01-compara.webp",
   "social-average": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-social-02-liquidez.webp",
   "social-costs": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-social-03-costos.webp",
-  "social-story": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-story-01-guia.webp"
+  "social-story": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-story-01-guia.webp",
+  "bank-logo-dark": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-logo-dark.webp",
+  "social-video": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-guia.mp4",
+  "social-video-poster": "/aeo-xray-media/sample_OHsE6ODH3DZU2rRsLwjGUS8CeR10qvUV/pibank-video-poster.webp"
  }
 }

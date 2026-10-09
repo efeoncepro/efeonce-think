@@ -1,0 +1,54 @@
+---
+/** 0.2.0 · Lo que la máquina lee hoy de la página real frente a lo que leería con la pieza (`experience.today`). */
+import {ArrowUpRight, ChevronDown} from '@lucide/astro'
+import type {AxisAeoXrayArtifact} from '@/lib/axis/aeo-xray/aeo-xray.js'
+import {xrayCopy as C} from '@/lib/aeo-xray/copy'
+interface Props{artifact:AxisAeoXrayArtifact}
+const {artifact}=Astro.props
+const today=artifact.experience?.today
+const E=C.early
+const date=(d:string)=>d.split('-').reverse().join('/')
+---
+{today&&<section class="today" aria-labelledby={`today-${artifact.id}`} data-today>
+  <header>
+    <p class="early-eyebrow">{E.todayEyebrow}</p>
+    <h2 id={`today-${artifact.id}`}>{today.title}</h2>
+    <p>{today.intro} <a href={today.url} target="_blank" rel="noopener noreferrer" data-astro-prefetch="false">{new URL(today.url).hostname + new URL(today.url).pathname}<ArrowUpRight size={14} aria-hidden="true"/></a> · {E.todayRead_at} {date(today.asOf)}</p>
+  </header>
+  <div class="today-grid" role="table" aria-labelledby={`today-${artifact.id}`}>
+    <div class="today-row today-head" role="row"><span role="columnheader">{E.todayRead}</span><span role="columnheader">{E.todayNow}</span><span role="columnheader">{E.todayProposed}</span></div>
+    {today.rows.map(r=><div class="today-row" role="row" data-verdict={r.verdict}>
+      <span role="rowheader" class="today-label">{r.label}<span class:list={['chip',`verdict-${r.verdict}`]}>{E.verdict[r.verdict]}</span></span>
+      <span role="cell" class="today-now"><span class="m-label">{E.todayNow}</span>{r.today}</span>
+      <span role="cell" class="today-prop"><span class="m-label">{E.todayProposed}</span>{r.proposed}</span>
+    </div>)}
+  </div>
+  <details class="early-method"><summary>{E.todayMethod}<ChevronDown size={16} aria-hidden="true"/></summary><p>{today.method}</p></details>
+  <p class="early-note">{today.note}</p>
+</section>}
+<style>
+.today{padding:3rem 1rem 0;color:var(--ink);font-family:'Geist Variable',system-ui,sans-serif}
+.today>header{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);column-gap:3rem;align-items:start;margin-bottom:1.25rem}
+.today>header .early-eyebrow{grid-column:1/-1}
+.today h2{font:500 clamp(1.4rem,2vw,1.85rem)/1.4 Poppins,system-ui,sans-serif;margin:0;max-width:24ch;text-wrap:balance}
+.today>header>p:last-child{font-size:.9rem;line-height:1.8;color:var(--ink-3);margin:0}
+.today>header a{color:var(--ink-2);display:inline-flex;align-items:center;gap:.2rem}
+.today-grid{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.today-row{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr) minmax(0,1fr);gap:1.5rem;padding:1rem 1.25rem;border-top:1px solid var(--line);font-size:.85rem;line-height:1.6}
+.today-head{border-top:0;background:var(--surf);font-size:var(--t-over);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:600;padding-block:.75rem}
+.today-label{display:flex;flex-direction:column;align-items:flex-start;gap:.4rem;font-weight:600}
+.today-now{color:var(--ink-3)}
+.today-prop{color:var(--ink)}
+.m-label{display:none}
+:global(.verdict-keep){background:var(--surf-2);color:var(--ink-2);border-color:var(--line-2)}
+:global(.verdict-improve){background:color-mix(in srgb,var(--blue) 10%,white);color:var(--ax-primary-800);border-color:color-mix(in srgb,var(--blue) 30%,white)}
+:global(.verdict-add){background:color-mix(in srgb,#1f8a4c 12%,white);color:#14612f;border-color:color-mix(in srgb,#1f8a4c 30%,white)}
+@media(max-width:800px){
+ .today{padding:2rem 0 0}
+ .today>header{grid-template-columns:1fr;row-gap:.5rem}
+ .today h2{max-width:none}
+ .today-head{display:none}
+ .today-row{grid-template-columns:1fr;gap:.6rem}
+ .m-label{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:.15rem}
+}
+</style>

@@ -4,6 +4,8 @@ import type {RenderSample} from '@/lib/aeo-xray/render-model'
 import type {AxisAeoXrayArtifact,AxisAeoXrayManifest} from '@/lib/axis/aeo-xray/aeo-xray.js'
 import {assetHref} from '@/lib/aeo-xray/view'
 import {xrayCopy as C} from '@/lib/aeo-xray/copy'
+import AiPanel from './AiPanel.astro'
+import TodayCompare from './TodayCompare.astro'
 interface Props {d:RenderSample;artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest;href:string}
 const {d,artifact,model,href}=Astro.props
 const {gap}=d
@@ -60,6 +62,8 @@ const answerSources=model.sources.filter(s=>sourceIds.includes(s.id))
       <div class="op-reading"><p class="op-label">{O.reading}</p><h3>{gap.punch}</h3><p>{gap.punchNote}</p><p>{gap.punchWhy}</p><div><ArrowRight size={20} aria-hidden="true"/><p>{gap.punchOpportunity}</p></div></div>
     </div>
   </section>
+  <AiPanel artifact={artifact} model={model}/>
+  <TodayCompare artifact={artifact}/>
 </section>
 <script>
   function initOpportunity(){

@@ -16,6 +16,8 @@ import {assetHref} from '@/lib/aeo-xray/view'
 import ValueExplorer from './ValueExplorer.astro'
 import Opportunity from './Opportunity.astro'
 import WelcomeCurtain from './WelcomeCurtain.astro'
+import ReviewPanel from './ReviewPanel.astro'
+import NextStep from './NextStep.astro'
 import {xrayCopy as C} from '@/lib/aeo-xray/copy'
 
 /**
@@ -49,7 +51,9 @@ const { ui, machine, evidence, meta, client, gap, atoms, thesis } = d
 const composition=landing as {artifact:AxisAeoXrayArtifact;model:AxisAeoXrayManifest}|undefined
 const flow=d.flow.map(s=>({...s,label:s.step===''?C.opportunity.nav:s.label}))
 const headlineFacts = evidence.facts.filter(f => f.headline)
-const clientLogo = composition?.model.assets.find(asset=>asset.id===composition.model.brand?.logoAssetId)
+// 0.2.0: el logo para fondos oscuros va directo sobre el navy; sin él, la versión clara necesita su recuadro.
+const darkLogo = composition?.model.assets.find(asset=>asset.id===composition.model.brand?.logoOnDarkAssetId)
+const clientLogo = darkLogo ?? composition?.model.assets.find(asset=>asset.id===composition.model.brand?.logoAssetId)
 
 const i = flow.findIndex(s => s.step === step)
 const cur = flow[i]
@@ -136,7 +140,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
             height="30"
           />
         </a>
-        {clientLogo && <div class="xr-client-brand"><img src={assetHref(clientLogo)} alt={client.name} width={clientLogo.width} height={clientLogo.height}/></div>}
+        {clientLogo && <div class:list={['xr-client-brand',{'is-on-dark':!!darkLogo}]}><img src={assetHref(clientLogo)} alt={client.name} width={clientLogo.width} height={clientLogo.height}/></div>}
       </div>
     </header>
 
@@ -268,6 +272,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 
         </div>
       )}
+      {step === 'articulo' && composition && <ReviewPanel artifact={composition.artifact} hrefBlock={(id:string)=>`${href('radiografia')}#block-${encodeURIComponent(id)}`} />}
 
       {/* ══════════ ③ LA RADIOGRAFÍA — el split con el acoplamiento ══════════ */}
       {step === 'radiografia' && (
@@ -365,6 +370,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
                   promete la cajita. */}
               <p class="verify-n">{ui.verifyNote}</p>
             </div>
+            {composition && <NextStep artifact={composition.artifact} />}
           </footer>
         </section>
       )}
@@ -830,7 +836,7 @@ const COPYRIGHT_YEAR = new Date().getFullYear()
 )}
 
 <style>
-.xr-client-brand{margin-left:auto;padding:.5rem .9rem;background:white;border-radius:.35rem;flex:0 0 auto}.xr-client-brand img{display:block;width:auto;height:30px;max-width:190px;object-fit:contain}
+.xr-client-brand{margin-left:auto;padding:.5rem .9rem;background:white;border-radius:.35rem;flex:0 0 auto}.xr-client-brand.is-on-dark{background:transparent;padding-inline:0}.xr-client-brand img{display:block;width:auto;height:30px;max-width:190px;object-fit:contain}
 @media(max-width:680px){.xr-client-brand{padding:.4rem}.xr-client-brand img{width:clamp(100px,calc(100vw - 250px),130px);height:24px}.xr-brand.xr-product-brand .xr-logo{width:clamp(138px,calc(100vw - 205px),228px);height:auto}.xr-brand{gap:.5rem}}
 @media(max-width:680px){.xr[data-composed] .xr-rail::after{content:"›";position:absolute;right:0;top:.4rem;padding:.15rem .4rem;background:var(--navy-2);color:var(--blue-up);font-size:1.3rem;line-height:1;pointer-events:none}}
 .xr[data-composed][data-step="articulo"] .read-stage{width:100%;padding-top:0}.xr[data-composed][data-step="articulo"] main.xr-wrap{padding-inline:0;max-width:none}

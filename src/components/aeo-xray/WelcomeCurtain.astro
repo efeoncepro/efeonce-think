@@ -5,14 +5,17 @@ import {assetHref} from '@/lib/aeo-xray/view'
 import {xrayCopy as C} from '@/lib/aeo-xray/copy'
 interface Props {model:AxisAeoXrayManifest;enabled:boolean}
 const {model,enabled}=Astro.props
-const logo=model.assets.find(asset=>asset.id===model.brand?.logoAssetId)
+const darkLogo=model.assets.find(asset=>asset.id===model.brand?.logoOnDarkAssetId)
+const logo=darkLogo??model.assets.find(asset=>asset.id===model.brand?.logoAssetId)
+const ui=model.artifacts[0]?.experience?.ui as Record<string,unknown>|undefined
+const welcome={title:typeof ui?.welcomeTitle==='string'?ui.welcomeTitle:C.welcome.title,enter:typeof ui?.welcomeEnter==='string'?ui.welcomeEnter:C.welcome.enter}
 ---
 {enabled&&<dialog open class="xr-curtain" data-xray-curtain aria-labelledby="xr-welcome-title">
   <div class="curtain-layout">
     <div class="curtain-invitation">
-      <div class="curtain-client">{logo?<img src={assetHref(logo)} alt={model.preparedFor} width={logo.width} height={logo.height} loading="eager" decoding="sync"/>:<p>{model.preparedFor}</p>}</div>
-      <h2 id="xr-welcome-title">{C.welcome.title}</h2>
-      <form method="dialog"><button type="submit" class="curtain-enter" autofocus><span>{C.welcome.enter}</span><ArrowUp size={21} stroke-width={1.6} aria-hidden="true" focusable="false"/></button></form>
+      <div class:list={['curtain-client',{'is-on-dark':!!darkLogo}]}>{logo?<img src={assetHref(logo)} alt={model.preparedFor} width={logo.width} height={logo.height} loading="eager" decoding="sync"/>:<p>{model.preparedFor}</p>}</div>
+      <h2 id="xr-welcome-title">{welcome.title}</h2>
+      <form method="dialog"><button type="submit" class="curtain-enter" autofocus><span>{welcome.enter}</span><ArrowUp size={21} stroke-width={1.6} aria-hidden="true" focusable="false"/></button></form>
     </div>
     <footer class="curtain-signature">
       <img class="curtain-logo" src="/branding/aeo-lockup-negative.svg" alt="Efeonce AEO" width="228" height="30"/>
@@ -102,7 +105,7 @@ const logo=model.assets.find(asset=>asset.id===model.brand?.logoAssetId)
   .xr-curtain:not([open]){display:none}.xr-curtain::backdrop{background:transparent}
   .curtain-layout{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:clamp(2rem,6vh,5rem) 1.5rem max(2rem,env(safe-area-inset-bottom));box-sizing:border-box;text-align:center}
   .curtain-invitation{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 0 5rem;min-height:360px}
-  .curtain-client{display:grid;place-items:center;background:var(--surf);padding:1.1rem 1.5rem;border-radius:6px;max-width:100%;color:var(--ink);margin-bottom:clamp(2.5rem,6vh,4.5rem)}
+  .curtain-client.is-on-dark{background:transparent;padding:0}.curtain-client{display:grid;place-items:center;background:var(--surf);padding:1.1rem 1.5rem;border-radius:6px;max-width:100%;color:var(--ink);margin-bottom:clamp(2.5rem,6vh,4.5rem)}
   .curtain-client img{width:clamp(190px,22vw,270px);height:auto;max-height:85px;object-fit:contain;display:block}.curtain-client p{margin:0;font:500 1.5rem/1.4 var(--curtain-display)}
   .curtain-invitation h2{font:500 clamp(1.9rem,4vw,3.2rem)/1.23 var(--curtain-display);letter-spacing:-.025em;text-wrap:balance;max-width:16ch;margin:0 0 2rem;color:var(--ink-d)}
   .curtain-enter{display:inline-flex;align-items:center;justify-content:center;gap:1.6rem;min-height:56px;padding:1rem 1.5rem;border-radius:999px;border:1px solid var(--line-d);background:var(--ink-d);color:var(--navy);font:600 .95rem/1 var(--curtain-body);cursor:pointer;transition:background-color var(--xr-motion-morph) var(--xr-motion-ease)}
