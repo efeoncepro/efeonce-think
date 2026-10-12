@@ -1,6 +1,7 @@
 /**
- * Isotipos de plataforma de Insights (TASK-1996): copias de AXIS_PLATFORM_ASSETS (@efeoncepro/axis-brand-assets 0.4.15) en
- * `public/logos/platforms/`, uno por canal del vocabulario de Greenhouse (`INSIGHT_CHANNEL_IDS`, 19 plataformas).
+ * Isotipos de plataforma de Insights (TASK-1996): copias de AXIS_PLATFORM_ASSETS (@efeoncepro/axis-brand-assets 0.4.25) en
+ * `public/logos/platforms/`, uno por canal del vocabulario de Greenhouse (`INSIGHT_CHANNEL_IDS`, 22 plataformas desde que
+ * AXIS sumó Facebook, Threads y X).
  * Greenhouse decide dónde va cada isotipo; Think sólo lo dibuja. Una plataforma sin archivo queda con su nombre.
  */
 export const PLATFORM_LOGO: Record<string, string> = {
@@ -22,6 +23,9 @@ export const PLATFORM_LOGO: Record<string, string> = {
   instagram: '/logos/platforms/instagram.svg',
   tiktok: '/logos/platforms/tiktok.svg',
   meta: '/logos/platforms/meta.svg',
+  facebook: '/logos/platforms/facebook.svg',
+  threads: '/logos/platforms/threads.svg',
+  x: '/logos/platforms/x.svg',
   frameio: '/logos/platforms/frameio.svg'
 }
 
