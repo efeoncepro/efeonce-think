@@ -6,8 +6,9 @@
  * AXIS: los valores se copian 1:1 acá y en ningún otro lado. Ningún estilo de la landing escribe un HEX: todo sale de
  * este archivo como variable CSS (`landingCssVars`).
  *
- * Archivos de marca (copiados sin modificar de `@efeoncepro/axis-brand-assets` 0.4.10, `public/branding/`):
- * - `products/ai-visibility-report-lockup-negative.svg` — sha256 cb497e63…dce
+ * Archivos de marca (copiados sin modificar de `@efeoncepro/axis-brand-assets`, `public/branding/`; el lockup es el de
+ * la terminación concéntrica del anillo, idéntico al del paquete 0.4.25):
+ * - `products/ai-visibility-report-lockup-negative.svg` — sha256 b1d84efd…60b
  * - `products/orbit-engine-dark-screen.svg` (`assets/orbit/`) — sha256 aa65567c…606
  * - `efeonce-logo-negative.svg` — sha256 f221fc92…b3f
  */

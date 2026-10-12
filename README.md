@@ -125,8 +125,14 @@ revocar en Greenhouse revoca en la lectura siguiente. Estados `404`/`410`/`429`/
 - El token nunca aparece en el HTML: descargas por `?descargar=report_pdf|deck_pdf` y logo del cliente por `?logo=1`
   sobre la misma URL (Greenhouse revalida el grant). Sin GTM; `Cache-Control: private, no-store`,
   `X-Robots-Tag: noindex, nofollow`, `Referrer-Policy: no-referrer`.
-- Assets: `public/branding/insights/*` (de `@efeoncepro/axis-brand-assets` 0.4.0); OG genérica sin datos del informe,
-  generada con `node scripts/build-insights-og.mjs`.
+- Assets: `public/branding/insights/*` (copias idénticas a `@efeoncepro/axis-brand-assets` 0.4.25: la marca nació en
+  0.4.0 y lleva la terminación concéntrica del anillo desde `6c4fefd`); OG genérica sin datos del informe, generada
+  con `node scripts/build-insights-og.mjs`.
+- Isotipos de plataforma: `public/logos/platforms/*.svg`, 22 archivos, copia byte a byte de
+  `assets/platforms/<id>-isotype.svg` de `@efeoncepro/axis-brand-assets` 0.4.25 (Think no instala el paquete). El mapa
+  canal → archivo vive en `src/lib/insights-platforms.ts` y sigue a `INSIGHT_CHANNEL_IDS` de Greenhouse; un canal sin
+  archivo queda con su nombre. Greenhouse sólo envía el `channelId` que el hecho trae sellado: una fuente citada
+  (facebook.com, x.com) no llega con canal.
 - Fixtures sólo en `astro dev` con tokens `fixture-*` (`src/lib/insights-fixtures.ts`); `fixture-cifras` es el modelo 1.4.
 - Modelo 1.4 (TASK-1975): la tarjeta de cifra (`StatCard.astro`) abre el capítulo antes de los gráficos, que Think
   dibuja en el orden en que llegan. Retícula 1 / 2 / 3 columnas según la cantidad (una a 390 px), variación con
@@ -232,8 +238,9 @@ Las capturas y trazas quedan en `.captures/aeo-xray-motion` y `.captures/aeo-xra
 ### Marca y producción de derivados
 
 La cabecera usa el lockup oficial `aeo-lockup-negative.svg` de
-`@efeoncepro/axis-brand-assets` 0.4.8, idéntico al archivo de Greenhouse y al sello AXIS
-`5e51544c05601735213789b0d9fc8e3be12eee950251bb3a2abf78f49403fecb`.
+`@efeoncepro/axis-brand-assets` (versión con la terminación concéntrica del anillo, AXIS `2651192`; idéntico al del
+paquete 0.4.25), igual al archivo de Greenhouse y al sello AXIS
+`5519687b56eeee198216931ad2a2bdaf6d281ecab75f8d696c429446dbbc5311`.
 Se distribuye como copia estática sin editar en `public/branding/`; X-Ray identifica
 la experiencia en la barra de piezas, separado del lockup de marca.
 

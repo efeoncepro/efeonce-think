@@ -117,6 +117,7 @@ partir de ellos. Mismas reglas que arriba: presentación pura, tokens (desde `@l
 | **`ChartFigure`** | Un `ChartSpecV1` explorable, dibujado en el servidor sin librería de gráficos. |
 | **`ModuleScene`** | La escena de un capítulo (módulo) del informe: gráfico principal narrado + resto compacto. |
 | **`FactMark`** | Marca de procedencia de una cifra: «Medido» o «Estimado». |
+| **`StatCard`** | La tarjeta de cifra (modelo 1.4): cifra, variación y, si la cifra es de una plataforma, su isotipo (`@lib/insights-platforms`). |
 
 Nota sobre nombres: el plan original hablaba de `EditionMasthead` y `FactCallout`. No existen como componentes. La
 portada (masthead) es markup propio de la página (`<header class="ins-hero">` en `[token].astro`), y el callout de
