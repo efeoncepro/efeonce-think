@@ -49,6 +49,19 @@ const safeJsonLd = (value: Record<string, unknown>) => JSON.stringify(value).rep
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    {/* Default first: cookie choices cannot arrive before an explicit denied state.
+        analytics=false keeps credential-bearing reports free of all tracking/banner code. */}
+    {analytics && <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
+      gtag('consent', 'default', { ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', analytics_storage:'denied', functionality_storage:'denied', personalization_storage:'denied', security_storage:'granted' });
+      window.efeonceConsentDefaultSet = true;
+      window.efeonceConsentMeasurementEnabled = true;
+      window.dataLayer.push({ meta_ads_consent:'denied', analytics_consent:'denied' });
+    </script>}
+    {analytics && <script is:inline src="/measurement/consent-bridge.v1.js?v=15026e5d27ed" />}
+    {analytics && <script is:inline id="hs-script-loader" async defer src="https://js.hs-scripts.com/48713323.js" />}
+
     {/* Google Tag Manager — medición unificada con efeoncepro.com (misma propiedad GA4, container GTM-NGHPGRLZ).
         El page_view lo dispara un GA4 Config gateado por hostname dentro del container; los forms `<greenhouse-form>`
         emiten `gh_form_submission_accepted` → el tag genérico `generate_lead`. Doc: greenhouse-eo docs/reference/measurement-gtm-ga4. */}
@@ -88,5 +101,38 @@ const safeJsonLd = (value: Record<string, unknown>) => JSON.stringify(value).rep
     {/* Google Tag Manager (noscript) */}
     {analytics && <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NGHPGRLZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>}
     <slot />
+    {analytics && <script is:inline>
+      (function () {
+        var privacy = Array.from(document.querySelectorAll('footer a[href*="/politica-de-privacidad"]')).pop();
+        var host = document.querySelector('[data-efeonce-legal-links]') || (privacy && privacy.parentElement) || Array.from(document.querySelectorAll('footer')).pop();
+        if (!host || document.querySelector('[data-efeonce-cookie-settings]')) return;
+        var separator = document.createElement('span');
+        separator.textContent = ' · ';
+        separator.setAttribute('aria-hidden', 'true');
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'efeonce-cookie-preferences';
+        button.setAttribute('data-efeonce-cookie-settings', '');
+        button.textContent = 'Preferencias de cookies';
+        host.append(separator, button);
+      })();
+    </script>}
   </body>
 </html>
+
+<style is:global>
+  .efeonce-cookie-preferences {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    padding: 0;
+    min-height: 1.5em;
+    cursor: pointer;
+    text-align: inherit;
+  }
+  .efeonce-cookie-preferences:hover { text-decoration: underline; }
+  .efeonce-cookie-preferences:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+</style>

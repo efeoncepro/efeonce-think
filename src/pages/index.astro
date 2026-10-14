@@ -10,14 +10,18 @@ import { axis } from '@lib/report-tokens'
   <main
     class="home-hero"
     data-capture="home-hero"
-    style={`--axis-navy-soft:${axis.accent[800]};--axis-navy:${axis.accent[900]};`}
+    style={`--axis-navy-soft:${axis.accent[800]};--axis-navy:${axis.accent[900]};--axis-legal-ink:${axis.gray[200]};`}
   >
     <img class="think-mark" src="/branding/eo-think-2.svg" alt="Efeonce Think" />
+    <footer class="home-legal" data-efeonce-legal-links aria-label="Enlaces legales">
+      <a href="https://efeoncepro.com/politica-de-privacidad/">Privacidad</a>
+    </footer>
   </main>
 </BaseLayout>
 
 <style>
   .home-hero {
+    position: relative;
     display: grid;
     place-items: center;
     min-height: 100dvh;
@@ -30,6 +34,21 @@ import { axis } from '@lib/report-tokens'
     width: min(520px, 68vw);
     height: auto;
   }
+
+  .home-legal {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    color: var(--axis-legal-ink);
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+  .home-legal a { color: inherit; }
+  .home-legal a:hover { text-decoration: underline; }
 
   @media (max-width: 640px) {
     .think-mark {
