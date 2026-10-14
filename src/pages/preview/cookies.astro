@@ -1,0 +1,232 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import '@fontsource-variable/bricolage-grotesque'
+import '@fontsource/poppins/400.css'
+import '@fontsource/poppins/500.css'
+import '@efeoncepro/axis-ui-primitives/button.css'
+import '@efeoncepro/axis-ui-primitives/forms.css'
+import { buttonHtml, switchHtml } from '@efeoncepro/axis-ui-primitives'
+import tokens from '@lib/cookie-preview-tokens.json'
+
+const variables = Object.entries({
+  '--cp-paper': tokens.color.paper, '--cp-ink': tokens.color.navy, '--cp-night': tokens.color.dark,
+  '--cp-accent': tokens.color.tealDark, '--cp-white': tokens.neutral.onFill,
+  '--cp-line': tokens.neutral.disabledBorder, '--cp-wash': tokens.neutral.softFill,
+  '--cp-display': `'${tokens.type.answer.family}', sans-serif`,
+  '--cp-text': `'${tokens.type.text.family}', sans-serif`,
+  '--cp-weight': tokens.type.answer.weight, '--cp-tracking': tokens.type.answer.tracking,
+  '--cp-unit': tokens.geometry.spacing.base, '--cp-radius': tokens.geometry.radius.display,
+  '--cp-round': tokens.geometry.radius.round, '--cp-body': tokens.typography.bodyMd.size,
+  '--cp-small': tokens.typography.bodySm.size, '--cp-line-height': tokens.typography.bodyMd.lineHeight,
+  '--cp-title': tokens.typography.surfaceHeroTitle.size,
+  '--cp-title-mobile': tokens.typography.surfaceHeroTitle.mobileSize,
+  '--cp-duration': tokens.motion.duration.standard, '--cp-ease': tokens.motion.ease.emphasized,
+  '--cp-shadow': tokens.elevation.modal.boxShadow,
+  '--cp-focus': tokens.focusWidth, '--cp-focus-offset': tokens.focusOffset,
+  '--cp-border': tokens.borderWidth,
+}).map(([key, value]) => `${key}:${value}`).join(';')
+const button = (label: string, variant: 'solid'|'outline'|'ghost' = 'solid') => buttonHtml({ label, variant, tone: 'neutral', surface: 'light', size: 'md' })
+const categories = [
+  { id: 'necessary', title: 'Esenciales', detail: 'Seguridad y funciones básicas del sitio. Siempre activas.', fixed: true },
+  { id: 'analytics', title: 'Analítica', detail: 'Nos ayudan a entender qué contenido funciona y cómo mejorar tu experiencia.', fixed: false },
+  { id: 'advertising', title: 'Publicidad', detail: 'Permiten medir campañas y mostrarte anuncios relevantes en Meta y Google.', fixed: false },
+  { id: 'functionality', title: 'Funcionalidad', detail: 'Recuerdan tus preferencias para que no tengas que elegirlas de nuevo.', fixed: false },
+]
+---
+<BaseLayout title="Efeonce · Propuesta de privacidad" noindex analytics={false}>
+  <div class="cookie-preview" style={variables} data-capture="cookie-preview" data-surface-recipe="candidate.public-consent-editorial">
+    <aside class="preview-note" aria-label="Estado de la propuesta">
+      <span>Propuesta visual · La órbita</span><button id="restart-demo">Volver a ver el aviso</button>
+    </aside>
+    <header class="site-header">
+      <img src="/branding/efeonce-logo.svg" alt="Efeonce" />
+      <span class="site-label">Think<span aria-hidden="true"> / </span>Ideas que mueven.</span>
+    </header>
+    <main id="preview-main">
+      <div class="hero-caption">PENSAMIENTO QUE SE CONVIERTE EN ACCIÓN</div>
+      <h1>La claridad<br />cambia todo<span class="brand-point">.</span></h1>
+      <p class="hero-description">Ideas, criterio y herramientas para tomar<br class="desktop-break" /> mejores decisiones sobre tu crecimiento.</p>
+      <p class="demo-disclosure">Esta vista permite probar el diseño.<br />Tus cookies y preferencias reales no cambian.</p>
+    </main>
+    <footer class="site-footer">
+      <span>Efeonce Group</span>
+      <div><a href="https://efeoncepro.com/politica-de-privacidad/">Privacidad</a><button id="footer-preferences">Preferencias de cookies</button></div>
+    </footer>
+
+    <section class="consent-card" aria-labelledby="banner-title" aria-describedby="banner-description" data-capture="cookie-banner">
+      <div class="card-eyebrow"><span class="tiny-point" aria-hidden="true"></span> PRIVACIDAD, A TU MEDIDA</div>
+      <h2 id="banner-title">Tu visita.<br />Tus reglas.</h2>
+      <p id="banner-description">Usamos cookies para que el sitio funcione. Con tu permiso, también para mejorarlo y mostrarte publicidad relevante. Tú eliges.</p>
+      <div class="banner-actions">
+        <span data-action="accept"><Fragment set:html={button('Aceptar todas')} /></span>
+        <span data-action="reject"><Fragment set:html={button('Solo esenciales', 'outline')} /></span>
+      </div>
+      <div class="card-bottom"><span id="customize"><Fragment set:html={buttonHtml({label:'Personalizar preferencias',variant:'link',tone:'neutral',surface:'light',size:'sm',trailingIcon:'arrow-up-right'})} /></span><span>Puedes cambiarlo después.</span></div>
+    </section>
+
+    <dialog class="preferences" aria-labelledby="preferences-title" aria-describedby="preferences-intro" data-capture="cookie-preferences">
+      <div class="panel-heading">
+        <span class="card-eyebrow">TU PRIVACIDAD</span>
+        <span id="close-panel"><Fragment set:html={buttonHtml({label:'Cerrar preferencias', iconOnly:true, leadingIcon:'x', variant:'ghost', tone:'neutral', surface:'light', size:'sm'})} /></span>
+      </div>
+      <div class="panel-intro"><h2 id="preferences-title" tabindex="-1">Elige qué<br />compartes<span class="brand-point">.</span></h2><p id="preferences-intro">Lo esencial funciona siempre.<br />Todo lo demás lo decides tú.</p></div>
+      <div class="category-list">
+        {categories.map(category => <div class="category-row">
+          <div><h3 id={`${category.id}-title`}>{category.title}</h3><p id={`${category.id}-detail`}>{category.detail}</p></div>
+          {category.fixed ? <span class="always-active">Siempre activas</span> : <div class="category-control"><Fragment set:html={switchHtml({id:`choice-${category.id}`, label:category.title, surface:'light'})} /></div>}
+        </div>)}
+      </div>
+      <div class="panel-footer"><p>Revisa o cambia tu elección en<br /><strong>Preferencias de cookies</strong>, al pie del sitio.</p><div class="panel-actions"><span data-action="reject"><Fragment set:html={button('Solo esenciales','outline')} /></span><span data-action="save"><Fragment set:html={button('Guardar mi elección')} /></span></div></div>
+    </dialog>
+    <div class="save-note" role="status" aria-live="polite" hidden><strong>Tu elección está lista.</strong><span>En esta propuesta se guarda solo mientras la página esté abierta.</span></div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Candidate visual adapter. Never call HubSpot, gtag, CAPI or browser storage here.
+  const root = document.querySelector<HTMLElement>('.cookie-preview')!
+  const card = root.querySelector<HTMLElement>('.consent-card')!
+  const dialog = root.querySelector<HTMLDialogElement>('dialog')!
+  const note = root.querySelector<HTMLElement>('.save-note')!
+  const categories = ['analytics', 'advertising', 'functionality'] as const
+  let saved = { analytics:false, advertising:false, functionality:false }
+  let lastFocus: HTMLElement | null = null
+  let noteTimeout: ReturnType<typeof setTimeout>
+  const input = (id: string) => root.querySelector<HTMLInputElement>(`#choice-${id}`)!
+  categories.forEach(id => {
+    input(id).setAttribute('aria-describedby', `${id}-detail`)
+    input(id).setAttribute('aria-labelledby', `${id}-title`)
+  })
+  function openPreferences() {
+    lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    categories.forEach(id => { input(id).checked = saved[id] })
+    dialog.showModal()
+    document.documentElement.style.overflow = 'hidden'
+    root.querySelector<HTMLElement>('#preferences-title')!.focus()
+  }
+  function closePreferences() {
+    dialog.close()
+  }
+  dialog.addEventListener('keydown', event => {
+    if (event.key !== 'Tab') return
+    const controls = Array.from(dialog.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),a[href]')).filter(control => control.getClientRects().length)
+    const first = controls[0], last = controls.at(-1)
+    if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
+    else if (event.shiftKey && (document.activeElement === first || document.activeElement?.id === 'preferences-title')) { event.preventDefault(); last?.focus() }
+  })
+  dialog.addEventListener('close', () => {
+    document.documentElement.style.overflow = ''
+    if (lastFocus && !lastFocus.closest('[hidden]')) lastFocus.focus()
+  })
+  root.querySelector('#customize')!.addEventListener('click', openPreferences)
+  root.querySelector('#footer-preferences')!.addEventListener('click', openPreferences)
+  root.querySelector('#close-panel button')!.addEventListener('click', closePreferences)
+  root.querySelectorAll<HTMLElement>('[data-action]').forEach(action => action.addEventListener('click', () => {
+    const kind = action.dataset.action
+    categories.forEach(id => { saved[id] = kind === 'save' ? input(id).checked : kind === 'accept' })
+    card.hidden = true
+    if (dialog.open) closePreferences()
+    // The triggering button has disappeared: return to the persistent footer control.
+    root.querySelector<HTMLButtonElement>('#footer-preferences')!.focus()
+    clearTimeout(noteTimeout)
+    note.hidden = false
+    noteTimeout = setTimeout(() => { note.hidden = true }, 6000)
+  }))
+  root.querySelector('#restart-demo')!.addEventListener('click', () => {
+    saved = { analytics:false, advertising:false, functionality:false }
+    note.hidden = true
+    card.hidden = false
+    if (dialog.open) closePreferences()
+  })
+  // Exposed only for local visual QA; no persisted consent and no runtime integration.
+  root.dataset.demoOnly = 'true'
+</script>
+
+<style is:global>
+  .cookie-preview { --s:var(--cp-unit); min-height:100svh; background:var(--cp-paper); color:var(--cp-ink); font:400 var(--cp-body)/var(--cp-line-height) var(--cp-text); }
+  .cookie-preview * { box-sizing:border-box; }
+  .cookie-preview [hidden] { display:none !important; }
+  .cookie-preview button,.cookie-preview a { -webkit-tap-highlight-color:transparent; }
+  .cookie-preview button:not(.axis-button), .cookie-preview a { font:inherit; color:inherit; }
+  .cookie-preview button:not(.axis-button) { cursor:pointer; background:none; border:0; padding:0; }
+  .cookie-preview :focus-visible { outline:var(--cp-focus) solid var(--cp-ink); outline-offset:var(--cp-focus-offset); }
+  .preview-note { padding:calc(var(--s)*3) calc(var(--s)*12); display:flex; align-items:center; justify-content:space-between; gap:calc(var(--s)*4); background:var(--cp-night); color:var(--cp-paper); font-size:var(--cp-small); }
+  .preview-note button { text-decoration:underline; text-underline-offset:var(--s); min-height:calc(var(--s)*7); }
+  .site-header { display:flex; align-items:center; justify-content:space-between; padding:calc(var(--s)*10) calc(var(--s)*16); border-bottom:var(--cp-border) solid var(--cp-line); }
+  .site-header img { width:calc(var(--s)*40); height:auto; }
+  .site-label { display:flex; gap:calc(var(--s)*3); align-items:center; }
+  .site-label > span { color:var(--cp-accent); }
+  #preview-main { padding:calc(var(--s)*22) calc(var(--s)*16) calc(var(--s)*32); min-height:calc(100svh - var(--s)*64); }
+  .hero-caption,.card-eyebrow { font-size:var(--cp-small); letter-spacing:.08em; font-weight:500; }
+  .hero-caption { margin-bottom:calc(var(--s)*8); }
+  #preview-main h1 { font:var(--cp-weight) calc(var(--cp-title)*2.8)/.98 var(--cp-display); letter-spacing:var(--cp-tracking); margin:0; max-width:calc(var(--s)*220); }
+  .brand-point { color:var(--cp-accent); }
+  .hero-description { font-size:calc(var(--cp-body)*1.15); line-height:1.7; margin-top:calc(var(--s)*8); }
+  .demo-disclosure { font-size:var(--cp-small); margin-top:calc(var(--s)*14); }
+  .site-footer { display:flex; justify-content:space-between; align-items:center; gap:calc(var(--s)*6); margin:0 calc(var(--s)*16); padding:calc(var(--s)*6) 0; border-top:var(--cp-border) solid var(--cp-line); font-size:var(--cp-small); }
+  .site-footer > div { display:flex; flex-wrap:wrap; gap:calc(var(--s)*8); }
+  .site-footer a,.site-footer button { text-decoration:underline; text-underline-offset:var(--s); min-height:calc(var(--s)*6); }
+  .consent-card { position:fixed; bottom:calc(var(--s)*8); right:calc(var(--s)*8); z-index:20; width:calc(var(--s)*142); max-width:calc(100vw - var(--s)*16); padding:calc(var(--s)*9); border-radius:var(--cp-radius); border:var(--cp-border) solid var(--cp-line); background:var(--cp-paper); box-shadow:var(--cp-shadow); animation:consent-arrive var(--cp-duration) var(--cp-ease); }
+  .card-eyebrow { display:flex; align-items:center; gap:calc(var(--s)*2); }
+  .tiny-point { display:inline-block; width:calc(var(--s)*2); height:calc(var(--s)*2); border-radius:var(--cp-round); background:var(--cp-accent); }
+  .consent-card h2 { font:var(--cp-weight) calc(var(--cp-title)*1.24)/1.04 var(--cp-display); letter-spacing:var(--cp-tracking); margin:calc(var(--s)*6) 0 calc(var(--s)*4); }
+  .consent-card p { line-height:1.75; margin:0; max-width:48ch; }
+  .banner-actions { display:grid; grid-template-columns:1fr 1fr; gap:calc(var(--s)*3); margin-top:calc(var(--s)*7); }
+  .banner-actions .axis-button { width:100%; }
+  .card-bottom { display:flex; justify-content:space-between; align-items:center; gap:calc(var(--s)*4); margin-top:calc(var(--s)*5); font-size:var(--cp-small); }
+  #customize .axis-button { padding-inline:0; }
+  .card-bottom > span:last-child { max-width:16ch; text-align:right; }
+  .preferences { width:calc(var(--s)*184); max-width:calc(100vw - var(--s)*12); max-height:calc(100svh - var(--s)*12); padding:0; margin:auto; border:var(--cp-border) solid var(--cp-line); border-radius:var(--cp-radius); color:var(--cp-ink); background:var(--cp-paper); box-shadow:var(--cp-shadow); overflow:auto; }
+  .preferences[open] { animation:consent-arrive var(--cp-duration) var(--cp-ease); }
+  .preferences::backdrop { background:color-mix(in srgb,var(--cp-night) 48%, transparent); backdrop-filter:blur(var(--s)); }
+  .panel-heading { display:flex; justify-content:space-between; align-items:center; padding:calc(var(--s)*6) calc(var(--s)*9) 0; }
+  .panel-intro { display:flex; align-items:end; justify-content:space-between; gap:calc(var(--s)*8); padding:calc(var(--s)*4) calc(var(--s)*9) calc(var(--s)*7); }
+  .panel-intro h2 { font:var(--cp-weight) calc(var(--cp-title)*1.45)/1.02 var(--cp-display); letter-spacing:var(--cp-tracking); margin:0; outline:none; }
+  .panel-intro p { line-height:1.65; margin:0 0 var(--s); }
+  .category-list { padding:0 calc(var(--s)*9); }
+  .category-row { display:grid; grid-template-columns:1fr auto; align-items:center; column-gap:calc(var(--s)*8); padding:calc(var(--s)*5) 0; border-top:var(--cp-border) solid var(--cp-line); }
+  .category-row h3 { font-weight:500; font-size:var(--cp-body); margin:0 0 calc(var(--s)*1); }
+  .category-row p { font-size:var(--cp-small); line-height:1.65; margin:0; max-width:49ch; }
+  .always-active { font-size:var(--cp-small); white-space:nowrap; background:var(--cp-wash); padding:calc(var(--s)*2) calc(var(--s)*3); border-radius:var(--cp-round); }
+  .category-control .axis-choice__label { display:none; }
+  .category-control .axis-choice__target { gap:0; }
+  .panel-footer { margin-top:calc(var(--s)*2); padding:calc(var(--s)*6) calc(var(--s)*9) calc(var(--s)*8); background:var(--cp-wash); }
+  .panel-footer p { margin:0 0 calc(var(--s)*5); font-size:var(--cp-small); line-height:1.65; }
+  .panel-footer strong { font-weight:500; }
+  .panel-actions { display:grid; grid-template-columns:1fr 1fr; gap:calc(var(--s)*3); }
+  .panel-actions .axis-button { width:100%; }
+  .save-note { position:fixed; bottom:calc(var(--s)*8); left:50%; transform:translateX(-50%); width:max-content; max-width:calc(100vw - var(--s)*10); z-index:25; padding:calc(var(--s)*4) calc(var(--s)*6); background:var(--cp-night); color:var(--cp-paper); border-radius:var(--cp-radius); box-shadow:var(--cp-shadow); pointer-events:none; }
+  .save-note strong,.save-note span { display:block; }
+  .save-note span { font-size:var(--cp-small); margin-top:var(--s); }
+  @keyframes consent-arrive { from { translate:0 calc(var(--s)*3); } to { translate:0 0; } }
+  @media(max-width:700px) {
+    .preview-note { padding:calc(var(--s)*3) calc(var(--s)*5); font-size:var(--cp-small); flex-wrap:wrap; gap:var(--s); }
+    .site-header { padding:calc(var(--s)*6) calc(var(--s)*5); }
+    .site-header img { width:calc(var(--s)*30); }
+    .site-label { font-size:var(--cp-small); } .site-label > span { display:none; } .site-label { font-size:0; } .site-label::before { content:'Think'; font-size:var(--cp-body); }
+    #preview-main { padding:calc(var(--s)*14) calc(var(--s)*5) calc(var(--s)*20); }
+    #preview-main h1 { font-size:calc(var(--cp-title)*1.6); }
+    .hero-caption { max-width:28ch; }
+    .hero-description { font-size:var(--cp-body); }
+    .desktop-break { display:none; }
+    .site-footer { margin:0 calc(var(--s)*5); align-items:start; } .site-footer > div { flex-direction:column; gap:calc(var(--s)*3); }
+    .consent-card { right:calc(var(--s)*3); bottom:calc(var(--s)*3); width:calc(100vw - var(--s)*6); max-width:none; padding:calc(var(--s)*6); }
+    .consent-card h2 { font-size:calc(var(--cp-title-mobile)*1.3); margin-top:calc(var(--s)*5); }
+    .consent-card p { font-size:var(--cp-small); }
+    .banner-actions { gap:calc(var(--s)*2); margin-top:calc(var(--s)*5); }
+    .banner-actions .axis-button { padding-inline:calc(var(--s)*2); font-size:var(--cp-small); }
+    .card-bottom { align-items:start; gap:calc(var(--s)*2); margin-top:calc(var(--s)*4); } .card-bottom > span:last-child { display:none; }
+    .preferences { max-width:100vw; width:100vw; max-height:calc(100svh - var(--s)*3); margin:auto 0 0; border-radius:var(--cp-radius) var(--cp-radius) 0 0; }
+    .panel-heading { padding:calc(var(--s)*4) calc(var(--s)*6) 0; }
+    .panel-intro { display:block; padding:calc(var(--s)*3) calc(var(--s)*6) calc(var(--s)*5); }
+    .panel-intro h2 { font-size:calc(var(--cp-title-mobile)*1.3); }
+    .panel-intro p { font-size:var(--cp-small); margin-top:calc(var(--s)*4); }
+    .panel-intro p br { display:none; }
+    .category-list { padding:0 calc(var(--s)*6); }
+    .category-row { column-gap:calc(var(--s)*3); padding:calc(var(--s)*4) 0; }
+    .always-active { font-size:var(--cp-small); padding:var(--s) calc(var(--s)*2); }
+    .panel-footer { padding:calc(var(--s)*5) calc(var(--s)*6) calc(var(--s)*6); }
+    .panel-actions { grid-template-columns:1fr; gap:calc(var(--s)*2); }
+  }
+  @media(prefers-reduced-motion:reduce) { .cookie-preview *, .cookie-preview *::before, .cookie-preview *::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
+</style>

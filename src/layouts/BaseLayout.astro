@@ -1,6 +1,7 @@
 ---
 import '@fontsource-variable/geist'
 import '@styles/global.css'
+import consentUiManifest from '../../public/measurement/consent-ui/manifest.json'
 
 interface Props {
   title: string
@@ -60,6 +61,8 @@ const safeJsonLd = (value: Record<string, unknown>) => JSON.stringify(value).rep
       window.dataLayer.push({ meta_ads_consent:'denied', analytics_consent:'denied' });
     </script>}
     {analytics && <script is:inline src="/measurement/consent-bridge.v1.js?v=15026e5d27ed" />}
+    {analytics && <link rel="stylesheet" href={`/measurement/consent-ui/consent-ui.v1.css?v=${consentUiManifest.files['consent-ui.v1.css'].slice(0,12)}`} />}
+    {analytics && <script is:inline defer src={`/measurement/consent-ui/consent-ui.v1.js?v=${consentUiManifest.files['consent-ui.v1.js'].slice(0,12)}`} />}
     {analytics && <script is:inline id="hs-script-loader" async defer src="https://js.hs-scripts.com/48713323.js" />}
 
     {/* Google Tag Manager — medición unificada con efeoncepro.com (misma propiedad GA4, container GTM-NGHPGRLZ).

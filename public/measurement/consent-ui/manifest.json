@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "authority": "HubSpot category consent; presentation only",
+  "tokens": "@efeoncepro/axis-tokens@0.6.1",
+  "primitives": "@efeoncepro/axis-ui-primitives@0.6.6",
+  "files": {
+    "consent-ui.v1.css": "6f39d85ac719fc2bdbc1becdbc06aa792af219c1195211e7511f222dfa5cbec8",
+    "consent-ui.v1.js": "63b246da2480f07249c40c920f4c6c842cbefb81cfcd14243cebd793af8ff2f9",
+    "bricolage-latin.woff2": "a97804dc9fbe5fc972a08018c5eda4dab7ef2346f64c57e61419d05e6de4ea1c",
+    "poppins-400-latin.woff2": "7d93459d86585bfcdbb7e0376056226adb25821ee54b96236fe2123e9560929f",
+    "poppins-500-latin.woff2": "cd36de204aca2d5fa263a731f7c20009b5e3d754ba1f1e03c33e93a48f3e7446",
+    "LICENSE-bricolage": "923f4ddf0fd39f9b7794ab0df7332f3d95dc43e8ad7ec2289d6d9e8491177f51",
+    "LICENSE-poppins": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b"
+  }
+}
