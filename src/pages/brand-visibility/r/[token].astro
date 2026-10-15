@@ -1569,9 +1569,14 @@ const sectionNumbers = Object.fromEntries(
               </p>
               <a href="https://efeoncepro.com" target="_blank" rel="noopener noreferrer" class="report-footer-link">Conoce más en efeoncepro.com</a>
             </div>
-            <p class="report-footer-disclaimer">
-              {disclaimer || 'Lectura agregada y asistida por IA. Orienta decisiones; no garantiza posiciones, menciones ni resultados comerciales.'}
-            </p>
+            <div class="report-footer-base">
+              <p class="report-footer-disclaimer">
+                {disclaimer || 'Lectura agregada y asistida por IA. Orienta decisiones; no garantiza posiciones, menciones ni resultados comerciales.'}
+              </p>
+              <nav class="report-footer-legal" data-efeonce-legal-links aria-label="Enlaces legales">
+                <a href="https://efeoncepro.com/politica-de-privacidad/" target="_blank" rel="noopener noreferrer">Privacidad</a>
+              </nav>
+            </div>
           </div>
         </footer>
       </article>

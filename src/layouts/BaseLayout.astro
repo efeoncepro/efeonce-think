@@ -106,9 +106,14 @@ const safeJsonLd = (value: Record<string, unknown>) => JSON.stringify(value).rep
     <slot />
     {analytics && <script is:inline>
       (function () {
+        // Solo se monta en un lugar declarado por el footer (o junto a su enlace de privacidad).
+        // Nunca como hijo suelto del <footer>: queda fuera de la grilla y se ve huérfano.
         var privacy = Array.from(document.querySelectorAll('footer a[href*="/politica-de-privacidad"]')).pop();
-        var host = document.querySelector('[data-efeonce-legal-links]') || (privacy && privacy.parentElement) || Array.from(document.querySelectorAll('footer')).pop();
+        var host = document.querySelector('[data-efeonce-legal-links]') || (privacy && privacy.parentElement);
         if (!host || document.querySelector('[data-efeonce-cookie-settings]')) return;
+        // Si el contenedor ya separa sus enlaces con aire (gap >= 16px), el «·» sobra.
+        var hostStyle = getComputedStyle(host);
+        var spaced = /flex|grid/.test(hostStyle.display) && parseFloat(hostStyle.columnGap) >= 16;
         var separator = document.createElement('span');
         separator.textContent = ' · ';
         separator.setAttribute('aria-hidden', 'true');
@@ -117,7 +122,7 @@ const safeJsonLd = (value: Record<string, unknown>) => JSON.stringify(value).rep
         button.className = 'efeonce-cookie-preferences';
         button.setAttribute('data-efeonce-cookie-settings', '');
         button.textContent = 'Preferencias de cookies';
-        host.append(separator, button);
+        if (spaced) host.append(button); else host.append(separator, button);
       })();
     </script>}
   </body>
