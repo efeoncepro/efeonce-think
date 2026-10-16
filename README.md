@@ -76,6 +76,20 @@ Los tokens AXIS se **copian** al hub en `src/lib/report-tokens.ts` (`axis` + `se
 duplicación temporal documentada (decisión práctica del ADR). Al converger en `efeonce-web` se
 formaliza un paquete compartido. **No** hardcodear HEX en componentes: siempre desde `axis.*`.
 
+### Footers: fila legal y «Preferencias de cookies»
+
+`BaseLayout.astro` inyecta el botón «Preferencias de cookies» (`[data-efeonce-cookie-settings]`) sólo con
+`analytics=true`, y lo monta **únicamente** en un host declarado con `data-efeonce-legal-links` o junto al
+enlace de privacidad del footer. No se pega al último `<footer>`. El separador «·» se omite si el host es
+flex/grid con gap ≥ 16px. El clic llama `_hsp.push(['showBanner'])` (consent-bridge).
+
+- Toda página nueva con footer declara su fila legal con `data-efeonce-legal-links`. Sin host declarado no
+  hay botón (el banner inicial sí aparece) y el visitante no puede reabrir sus preferencias.
+- Fila reutilizable: `.report-footer-base` (aviso a la izquierda; `nav.report-footer-legal` con Privacidad +
+  Preferencias de cookies a la derecha; estilos en `src/styles/global.css`). La usan los informes AEO
+  `/brand-visibility` y `/brand-visibility/r/[token]`.
+- Verificar en el frame real (escritorio y móvil) que el botón queda dentro de la grilla del footer.
+
 ## Verificación visual (GVC)
 
 `scripts/capture.mjs <url> <label> [selector]` — Playwright captura desktop + mobile a
