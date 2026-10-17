@@ -1,0 +1,134 @@
+/* ===========================================================================
+   Efeonce — Color tokens
+   Brand palette sampled from "Paleta de color.jpg" (8 master swatches):
+   navy ramp (4 blues) + purple / green / magenta / orange accents.
+   Base values first, then semantic aliases. Dark theme overrides at the end.
+   =========================================================================== */
+
+:root {
+  /* --- Brand blues (the 4-step ramp, dark → bright) ---------------------- */
+  --blue-ink:    #022a4e; /* darkest navy — page ink on light, deep bg */
+  --blue-navy:   #033c71; /* logo wordmark navy */
+  --blue-deep:   #034c8f; /* mid blue */
+  --blue:        #0475db; /* PRIMARY action blue (bright, energetic) */
+
+  /* Blue tints/shades for states & surfaces */
+  --blue-600:    #0362b8; /* primary hover (darker) */
+  --blue-700:    #034c8f; /* primary active */
+  --blue-300:    #6daeec; /* light accent */
+  --blue-100:    #d6e8fa; /* tinted surface */
+  --blue-50:     #eef5fd; /* faint tinted surface */
+
+  /* --- Accent hues ------------------------------------------------------- */
+  --purple:      #623f93;
+  --purple-100:  #e8e1f1;
+  --green:       #6ec208;
+  --green-700:   #569709;
+  --green-100:   #e7f4ce;
+  --magenta:     #bb1953;
+  --magenta-100: #f6d6e0;
+  --orange:      #ff6501;
+  --orange-100:  #ffe2cc;
+
+  /* --- Neutrals (cool slate, tuned to the navy) -------------------------- */
+  --neutral-0:   #ffffff;
+  --neutral-50:  #f5f7fa;
+  --neutral-100: #eaeef3;
+  --neutral-200: #d9e0e8;
+  --neutral-300: #bcc7d3;
+  --neutral-400: #93a1b1;
+  --neutral-500: #6b7888;
+  --neutral-600: #4c5868;
+  --neutral-700: #34404e;
+  --neutral-800: #1f2a37;
+  --neutral-900: #0f1822;
+
+  /* --- Semantic status --------------------------------------------------- */
+  --color-success:    #569709; /* brand green, deepened for contrast */
+  --color-success-bg: var(--green-100);
+  --color-warning:    #d95400; /* brand orange, deepened */
+  --color-warning-bg: var(--orange-100);
+  --color-danger:     var(--magenta);
+  --color-danger-bg:  var(--magenta-100);
+  --color-info:       var(--blue);
+  --color-info-bg:    var(--blue-100);
+
+  /* =====================================================================
+     Semantic aliases — reference these in components, not the raw scale.
+     ===================================================================== */
+  --color-primary:        var(--blue);
+  --color-primary-hover:  var(--blue-600);
+  --color-primary-active: var(--blue-700);
+  --color-primary-soft:   var(--blue-50);
+  --color-on-primary:     #ffffff;
+
+  --color-brand:          var(--blue-navy);  /* logo navy — headers, marks */
+  --color-accent:         var(--orange);     /* energetic highlight */
+
+  /* Text */
+  --text-strong:   var(--blue-ink);   /* headings / display */
+  --text-body:     var(--neutral-700);
+  --text-muted:    var(--neutral-500);
+  --text-subtle:   var(--neutral-400);
+  --text-inverse:  #ffffff;
+  --text-link:     var(--color-primary);
+
+  /* Surfaces */
+  --surface-page:    var(--neutral-0);
+  --surface-subtle:  var(--neutral-50);
+  --surface-card:    var(--neutral-0);
+  --surface-sunken:  var(--neutral-100);
+  --surface-inverse: var(--blue-ink);
+  --surface-brand:   var(--blue-navy);
+
+  /* Borders / lines */
+  --border-subtle:  var(--neutral-200);
+  --border-default: var(--neutral-300);
+  --border-strong:  var(--neutral-400);
+  --border-focus:   var(--color-primary);
+
+  /* Field */
+  --field-bg:      var(--neutral-0);
+  --field-border:  var(--neutral-300);
+  --field-text:    var(--blue-ink);
+  --field-placeholder: var(--neutral-400);
+}
+
+/* ===========================================================================
+   Dark theme — opt in with [data-theme="dark"] or .dark on any ancestor.
+   =========================================================================== */
+:root[data-theme="dark"], .dark {
+  --color-primary:        var(--blue);
+  --color-primary-hover:  var(--blue-300);
+  --color-primary-active: var(--blue-300);
+  --color-primary-soft:   rgba(4,117,219,0.16);
+  --color-brand:          #ffffff;
+
+  --text-strong:   #ffffff;
+  --text-body:     rgba(255,255,255,0.82);
+  --text-muted:    rgba(255,255,255,0.60);
+  --text-subtle:   rgba(255,255,255,0.42);
+  --text-inverse:  var(--blue-ink);
+  --text-link:     var(--blue-300);
+
+  --surface-page:    #07172b;  /* near blue-ink */
+  --surface-subtle:  #0c2138;
+  --surface-card:    #0e2840;
+  --surface-sunken:  #061322;
+  --surface-inverse: #ffffff;
+  --surface-brand:   #07172b;
+
+  --border-subtle:  rgba(255,255,255,0.10);
+  --border-default: rgba(255,255,255,0.16);
+  --border-strong:  rgba(255,255,255,0.28);
+
+  --field-bg:      #0c2138;
+  --field-border:  rgba(255,255,255,0.18);
+  --field-text:    #ffffff;
+  --field-placeholder: rgba(255,255,255,0.38);
+
+  --color-success-bg: rgba(110,194,8,0.16);
+  --color-warning-bg: rgba(255,101,1,0.16);
+  --color-danger-bg:  rgba(187,25,83,0.18);
+  --color-info-bg:    rgba(4,117,219,0.16);
+}

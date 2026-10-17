@@ -1,0 +1,56 @@
+/* ===========================================================================
+   Efeonce — Spacing, radius & sizing tokens
+   8-pt based spacing scale + radius/sizing scales carried over from the
+   Figma token system (radius 6/8/12/16/20/24…, button heights 36/44/52,
+   2px border width).
+   =========================================================================== */
+
+:root {
+  /* Spacing scale (8-pt grid, with 4px half-steps) */
+  --space-0:   0;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-7:   32px;
+  --space-8:   40px;
+  --space-9:   48px;
+  --space-10:  56px;
+  --space-11:  64px;
+  --space-12:  80px;
+  --space-13:  96px;
+  --space-14:  128px;
+
+  /* Radius scale */
+  --radius-xs:   6px;
+  --radius-sm:   8px;
+  --radius-md:   12px;  /* default control radius (buttons, inputs) */
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  24px;
+  --radius-3xl:  32px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+
+  /* Control heights */
+  --control-sm: 36px;
+  --control-md: 44px;
+  --control-lg: 52px;
+
+  /* Circle / avatar sizes */
+  --size-circle-sm: 40px;
+  --size-circle-md: 56px;
+  --size-circle-lg: 72px;
+
+  /* Border width — Efeonce uses a confident 2px line on controls */
+  --border-width:      2px;
+  --border-width-hair: 1px;
+
+  /* Layout */
+  --container-max:    1280px;
+  --container-narrow: 768px;
+  --container-wide:   1440px;
+  --page-gutter:      24px;
+}
