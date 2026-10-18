@@ -1,0 +1,19 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import EfeonceMention from '@/components/EfeonceMention.astro'
+import { axis } from '@lib/report-tokens'
+---
+<BaseLayout title="Mención Efeonce | Efeonce Think" description="Demostración de la mención compartida AXIS dentro de Think." noindex analytics={false}>
+<main class="mention-preview" style={`--ink:${axis.accent[900]};--paper:${axis.gray[50]};--line:${axis.gray[200]}`}>
+<header><a href="/" aria-label="Efeonce Think"><img src="/branding/efeonce-logo.svg" alt="Efeonce" width="140" /></a><span>Think · Vista previa</span></header>
+<article>
+<h1>Lo que sigue, en el mismo texto.</h1>
+<p>Cuando una lectura lleva a un servicio, el enlace lo dice sin cortar la frase: si quieres medir cómo te nombran las IA, empieza por el <EfeonceMention label="AI Visibility Report" href="https://efeoncepro.com/aeo-2/" line="engine" surface="light" />, y si lo que falta es contenido, conversa con nuestro equipo de <EfeonceMention label="marketing de contenidos" href="https://efeoncepro.com/servicio-marketing-de-contenidos/" line="growth" surface="light" />.</p>
+<section class="dark"><p>Sobre fondo oscuro, la misma marca: cada edición trae su lectura en el <EfeonceMention label="informe de Insights" href="/insights/muestra" line="growth" surface="dark" />.</p></section>
+<p class="caption">Demostración de integración. La mención viene de AXIS; Think no tiene CSS propio para ella.</p>
+</article>
+</main>
+</BaseLayout>
+<style>
+.mention-preview{color:var(--ink);background:var(--paper);min-height:100vh;padding:clamp(1rem,4vw,3rem);font-family:Poppins,system-ui,sans-serif}.mention-preview header{display:flex;align-items:center;justify-content:space-between;gap:1rem;max-width:70rem;margin:0 auto 4rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line)}.mention-preview article{max-width:46rem;margin:auto}.mention-preview h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.08;letter-spacing:-.04em;margin:1rem 0 1.5rem}.mention-preview p{font-size:1.125rem;line-height:1.75;margin:1rem 0 2rem}.mention-preview .dark{background:var(--ink);color:var(--paper);border-radius:1rem;padding:1.5rem 1.75rem;margin:2rem 0}.mention-preview .dark p{margin:0}.mention-preview .caption{font-size:.8rem}
+</style>

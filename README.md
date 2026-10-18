@@ -386,6 +386,17 @@ No provocar HMR mientras un test registra transición. Gate verde no sustituye l
 revisión visual. Publish autorizado: commit alcance propio, push main **Think**, READY + SHA exacto
 +alias y lectura pública de documento/medios, conservando rollback del deployment anterior.
 
+## AXIS mention — Mención Efeonce (2026-10-18)
+
+`src/components/EfeonceMention.astro` is a thin wrapper over AXIS: `mentionHtml` + `mention.css` from
+`@efeoncepro/axis-ui-primitives` (contract `efeonce.mention`). Use it for an inline link to an Efeonce service or
+product inside running text: `<EfeonceMention label="AI Visibility Report" href="https://efeoncepro.com/aeo-2/" line="engine" surface="light" />`.
+Only Efeonce destinations build (a site path, or https on `efeoncepro.com` / `efeonce.org` and subdomains); anything
+else fails the build. Color follows the line the page speaks for. Never copy its CSS into Think.
+Requires primitives **0.6.9+**: 0.6.8 shipped a quoted data-URI mask that Astro 7's tsconfig-alias CSS pass tries to
+resolve as a file (`ENAMETOOLONG`). Noindex demo: `/preview/mention/` (analytics off). Manual:
+greenhouse-eo `docs/manual-de-uso/plataforma/usar-mencion-efeonce.md`.
+
 ## AXIS video — published package integration (2026-10-07)
 
 `src/components/AxisVideoPlayer.astro` renders shared AXIS SSR markup and enhances it near the viewport,

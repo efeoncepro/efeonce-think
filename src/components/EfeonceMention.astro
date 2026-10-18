@@ -1,0 +1,15 @@
+---
+/**
+ * Mención Efeonce: enlace a un servicio o producto de Efeonce dentro del texto, con el isotipo delante.
+ * Componente fino sobre AXIS (`@efeoncepro/axis-ui-primitives`, contrato `efeonce.mention`): el marcado y el CSS
+ * salen del paquete. Solo acepta destinos de Efeonce (efeoncepro.com, efeonce.org y subdominios, o una ruta del sitio);
+ * cualquier otro enlace falla en el build.
+ *
+ * <EfeonceMention label="informe de visibilidad" href="https://think.efeoncepro.com/insights/muestra" line="growth" surface="light" />
+ */
+import { mentionHtml, type MentionOptions } from '@efeoncepro/axis-ui-primitives'
+import '@efeoncepro/axis-ui-primitives/mention.css'
+type Props = MentionOptions
+const html = mentionHtml(Astro.props)
+---
+<Fragment set:html={html} />
