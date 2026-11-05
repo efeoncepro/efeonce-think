@@ -1,0 +1,198 @@
+---
+// Muestra de trabajo: reel «Del fuego a tu mesa» para la propuesta de social media de Trattoria Mambrino Chile (noviembre 2026).
+// Página suelta, sin índice ni analítica; se llega por el enlace o el QR de la propuesta. Retiro: borrar esta página y
+// public/muestras/mambrino-del-fuego-e72157376d90/, redeploy y readback.
+import '@fontsource/poppins/400.css'
+import '@fontsource/poppins/600.css'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import AxisVideoPlayer from '@/components/AxisVideoPlayer.astro'
+import type { VideoPlayerModel } from '@efeoncepro/axis-ui-primitives/video-player'
+
+export const prerender = true
+
+const media = '/muestras/mambrino-del-fuego-e72157376d90'
+// Colores tomados de la fotografía de la marca del cliente (terciopelo y fondo); no son tokens de Efeonce.
+const campaign = { velvet: '#6D020B', ink: '#0b0202' }
+
+const model: VideoPlayerModel = {
+  id: 'mambrino-del-fuego-reel',
+  title: 'Trattoria Mambrino Chile · Del fuego a tu mesa',
+  src: `${media}/reel.mp4`,
+  poster: `${media}/poster.webp`,
+  skin: 'cinema' as const,
+  presentation: 'embedded' as const,
+  surface: 'dark' as const,
+  line: 'brand' as const,
+  locale: 'es',
+  aspectRatio: '9:16' as const,
+  preload: 'metadata' as const,
+  duration: 15,
+  tracks: [],
+}
+---
+
+<BaseLayout
+  title="Trattoria Mambrino Chile · Del fuego a tu mesa · Reel | Efeonce Creative Studio"
+  description="Reel de muestra preparado por Efeonce Creative Studio para la propuesta de social media de Trattoria Mambrino Chile."
+  noindex
+  analytics={false}
+>
+  <main class="stage" style={`--v:${campaign.velvet};--ink:${campaign.ink}`}>
+    <header class="top">
+      <img src={`${media}/efeonce-creative-studio.svg`} alt="Efeonce Creative Studio" width="260" height="20" />
+      <span>Propuesta de social media para Trattoria Mambrino Chile</span>
+    </header>
+
+    <section class="hero">
+      <img class="firma" src={`${media}/trattoria-mambrino.png`} alt="Trattoria Mambrino" width="900" height="324" />
+      <div class="frame">
+        <AxisVideoPlayer model={model} options={{ loading: 'eager', doubleTapSeek: true }} />
+      </div>
+      <div class="copy">
+        <p class="kicker">Reel de muestra · Apertura en Santiago</p>
+        <h1>Del fuego a tu mesa.</h1>
+        <p>
+          Así se vería un reel del primer mes: gancho en el primer segundo, un corte cada dos y la fecha de apertura al
+          cierre. Las imágenes son muestras generadas con IA; el reel real se graba en la sesión del mes, en tu tienda.
+        </p>
+        <ul>
+          <li>15 segundos</li>
+          <li>Formato vertical 9:16</li>
+          <li>Música instrumental</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Material preparado por Efeonce Creative Studio para Trattoria Mambrino Chile. Confidencial.</span>
+      <a href="https://efeoncepro.com" rel="noopener">efeoncepro.com</a>
+    </footer>
+  </main>
+</BaseLayout>
+
+<style>
+  .stage {
+    min-height: 100dvh;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: clamp(1.25rem, 3vh, 2.5rem);
+    padding: clamp(1rem, 3vw, 2.25rem) clamp(1rem, 4vw, 3rem);
+    color: #fff;
+    font-family: Poppins, system-ui, sans-serif;
+    background:
+      radial-gradient(60rem 40rem at 50% 42%, color-mix(in srgb, var(--v) 45%, transparent), transparent 70%),
+      radial-gradient(90rem 60rem at 50% 120%, #1c0d0d, transparent 60%),
+      var(--ink);
+  }
+  .top,
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    color: #d8cccc;
+  }
+  .top img {
+    display: block;
+    height: 1.25rem;
+    width: auto;
+  }
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(1.5rem, 4vw, 4rem);
+  }
+  .firma {
+    justify-self: end;
+    width: min(100%, 20rem);
+    height: auto;
+  }
+  .frame {
+    width: min(78dvh * 9 / 16, 26rem);
+    border-radius: 1.25rem;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.12),
+      0 2.5rem 6rem rgb(0 0 0 / 0.7),
+      0 0 7rem color-mix(in srgb, var(--v) 60%, transparent);
+  }
+  .frame :global(.axis-video) {
+    border-radius: 1.25rem;
+    overflow: hidden;
+  }
+  .copy {
+    max-width: 24rem;
+  }
+  .kicker {
+    margin: 0 0 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #ff9a6a;
+  }
+  h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .copy p:not(.kicker) {
+    margin: 0 0 1.25rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #e2d8d8;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  li {
+    padding: 0.375rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    background: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  }
+  .foot a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .foot a:hover,
+  .foot a:focus-visible {
+    text-decoration: underline;
+  }
+  @media (max-width: 60rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
+      text-align: center;
+      gap: 1.5rem;
+    }
+    .firma {
+      justify-self: center;
+      width: min(70%, 14rem);
+    }
+    .frame {
+      width: min(100%, 24rem);
+    }
+    ul {
+      justify-content: center;
+    }
+    .top,
+    .foot {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.5rem;
+    }
+  }
+</style>
